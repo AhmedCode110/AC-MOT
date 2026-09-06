@@ -1,0 +1,80 @@
+{
+  "mode": "paper_eval",
+  "version": "v17",
+  "portable": true,
+  "dataset": "AUTO",
+  "dataset_name": "VisDrone2019-MOT-test-dev",
+  "output_root": "AUTO",
+  "portable_output_subdir": "AC-MOT-results/v17/paper_eval",
+  "weights": "/content/weights/yolov8n.pt",
+  "device": "0",
+  "require_cuda": true,
+  "require_t4": true,
+  "seed": null,
+  "expected_sequences": 17,
+  "expected_frames": 6635,
+  "target_fps": 25.0,
+  "progress_every": 50,
+  "trackeval": "/content/TrackEval",
+  "backend": "pytorch",
+  "decode_chunk_size": 16,
+  "paper_eval_script": "scripts/paper_eval_v17.py",
+  "systems": [
+    {
+      "name": "A0_DEFAULT_FIXED640",
+      "tracker_profile": "default",
+      "adaptive_threshold": false,
+      "adaptive_resolution": false,
+      "smoothing_window": 7,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A1_TUNED_FIXED640",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": false,
+      "adaptive_resolution": false,
+      "smoothing_window": 7,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A2_THRESHOLD_ONLY",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": true,
+      "adaptive_resolution": false,
+      "smoothing_window": 7,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A2R_RESOLUTION_ONLY",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": false,
+      "adaptive_resolution": true,
+      "smoothing_window": 7,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A3_FULL_ACMOT_PRESENTATION",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": true,
+      "adaptive_resolution": true,
+      "smoothing_window": 7,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A3_NO_SMOOTHING",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": true,
+      "adaptive_resolution": true,
+      "smoothing_window": 1,
+      "analysis_stride": 10
+    },
+    {
+      "name": "A3_EVERY_FRAME_SCI",
+      "tracker_profile": "tuned",
+      "adaptive_threshold": true,
+      "adaptive_resolution": true,
+      "smoothing_window": 7,
+      "analysis_stride": 1
+    }
+  ]
+}
