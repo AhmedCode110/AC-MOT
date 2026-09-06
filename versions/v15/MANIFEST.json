@@ -1,0 +1,19 @@
+{
+  "version": "v15",
+  "implementation_commit": "4fa1af6eca033fe72e820cb8ff36fde677b8d426",
+  "files": {
+    "portable_v15.py": "3d7c748ccc5b3c547717f6e773b4ba2d3cf6dbf3",
+    "scripts/speedtest_top3_v15.py": "6c0c9d3991a68c6e74110c5eb8d3d2b87eba8061",
+    "configs/speedtest_top3_v15.json": "b7dac649ac5911d4a69463268aaa6808b821c6a2",
+    "scripts/run.py": "3c813647ef3123b670ae7521c03ec2542e82aa06",
+    "notebooks/AC_MOT_Colab.ipynb": "22da7fb8080d079a50d82f6435b25d78e4fd1029",
+    "configs/active_config.txt": "c47bc075dbb47a8b07093df888fa4e4439fdc55e",
+    "versions/v15/README.md": "7a94f43a8daa4e757a9725c5877be2557d04923d"
+  },
+  "status": "UNVERIFIED_CANDIDATE",
+  "realtime_target_fps": 25.0,
+  "realtime_gate_frames": 300,
+  "realtime_gate_definition": "decoded/live-frame processing only",
+  "dataset_playback_metric": "reported separately and includes local JPEG read/decode",
+  "portable": true
+}
