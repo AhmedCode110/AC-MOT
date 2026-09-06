@@ -11,123 +11,261 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 
+
 def environment(device='cpu', require_cuda=False, require_t4=False):
     import torch
-    info = {'python':sys.version, 'packages':{}, 'cuda_available':torch.cuda.is_available(),
-            'torch_cuda':torch.version.cuda, 'gpu':None}
-    for name in ['torch','torchvision','ultralytics','numpy','scipy','lap','opencv-python']:
+    info = {
+        'python': sys.version,
+        'packages': {},
+        'cuda_available': torch.cuda.is_available(),
+        'torch_cuda': torch.version.cuda,
+        'gpu': None,
+    }
+    for name in ['torch', 'torchvision', 'ultralytics', 'numpy', 'scipy', 'lap', 'opencv-python']:
         info['packages'][name] = md.version(name)
     if info['packages']['ultralytics'] != '8.3.200':
         raise RuntimeError('Requires ultralytics==8.3.200')
     if require_cuda or require_t4:
-        if device != '0': raise ValueError('AC-MOT GPU pipeline requires device 0')
-        if not info['cuda_available']: raise RuntimeError('CUDA required; CPU fallback is prohibited')
-    if info['cuda_available']: info['gpu'] = torch.cuda.get_device_name(0)
-    if require_t4 and 'T4' not in (info['gpu'] or ''): raise RuntimeError('Tesla T4 required')
+        if device != '0':
+            raise ValueError('AC-MOT GPU pipeline requires device 0')
+        if not info['cuda_available']:
+            raise RuntimeError('CUDA required; CPU fallback is prohibited')
+    if info['cuda_available']:
+        info['gpu'] = torch.cuda.get_device_name(0)
+    if require_t4 and 'T4' not in (info['gpu'] or ''):
+        raise RuntimeError('Tesla T4 required')
     return info
 
+
+def resolve_cfg(cfg, verbose=True):
+    cfg = dict(cfg)
+    if cfg.get('portable') and not cfg.get('portable_resolved'):
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from portable_v15 import resolve_portable_config, portable_requirements_text
+        if verbose:
+            print('[PORTABLE] v15 account-specific path resolution enabled.', flush=True)
+            print('[PORTABLE] ' + portable_requirements_text(), flush=True)
+        cfg = resolve_portable_config(cfg, verbose=verbose)
+    return cfg
+
+
 def execute(cfg):
-    mode=cfg['mode']
-    if mode not in ['evaluate_saved','replay','live','cache','speedtest']:raise ValueError('Unknown mode')
-    gpu=mode in ['live','cache','speedtest']
-    info=environment(str(cfg.get('device','0' if gpu else 'cpu')),gpu or cfg.get('require_cuda',False),gpu or cfg.get('require_t4',False))
-    dataset=Path(cfg['dataset']).expanduser().resolve()
-    if not (dataset/'annotations').is_dir():raise ValueError(f'Missing dataset annotations: {dataset}')
-    if gpu and not (dataset/'sequences').is_dir():raise ValueError('Missing sequences directory')
-    output_root=Path(cfg['output_root']).expanduser().resolve()
-    output_root.mkdir(parents=True,exist_ok=True)
-    version=str(cfg.get('version','')).strip()
-    tag=mode+(f'_{version}' if version else '')
-    envelope=output_root/(tag+'_'+dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S')+'_'+uuid.uuid4().hex[:8])
+    cfg = resolve_cfg(cfg, verbose=True)
+    mode = cfg['mode']
+    if mode not in ['evaluate_saved', 'replay', 'live', 'cache', 'speedtest']:
+        raise ValueError('Unknown mode')
+    gpu = mode in ['live', 'cache', 'speedtest']
+    info = environment(
+        str(cfg.get('device', '0' if gpu else 'cpu')),
+        gpu or cfg.get('require_cuda', False),
+        gpu or cfg.get('require_t4', False),
+    )
+
+    dataset = Path(cfg['dataset']).expanduser().resolve()
+    if not (dataset / 'annotations').is_dir():
+        raise ValueError(f'Missing dataset annotations: {dataset}')
+    if gpu and not (dataset / 'sequences').is_dir():
+        raise ValueError('Missing sequences directory')
+
+    output_root = Path(cfg['output_root']).expanduser().resolve()
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    version = str(cfg.get('version', '')).strip()
+    tag = mode + (f'_{version}' if version else '')
+    envelope = output_root / (
+        tag + '_' + dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S') + '_' + uuid.uuid4().hex[:8]
+    )
     envelope.mkdir(exist_ok=False)
-    output=envelope/'result'
-    commit=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
-    dirty=bool(subprocess.check_output(['git','-C',str(ROOT),'status','--porcelain'],text=True).strip())
-    receipt={'git_commit':commit,'git_dirty':dirty,'timestamp_utc':dt.datetime.now(dt.timezone.utc).isoformat(),
-             'environment':info,'configuration':cfg,'dataset_path':str(dataset),'seed':cfg.get('seed'),
-             'seed_note':'Unspecified preserves original behavior; exact bitwise determinism is not guaranteed',
-             'output':str(output),'status':'started'}
-    def save(): (envelope/'run_metadata.json').write_text(json.dumps(receipt,indent=2)+'\n')
+    output = envelope / 'result'
+
+    commit = subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip()
+    dirty = bool(
+        subprocess.check_output(['git', '-C', str(ROOT), 'status', '--porcelain'], text=True).strip()
+    )
+    receipt = {
+        'git_commit': commit,
+        'git_dirty': dirty,
+        'timestamp_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
+        'environment': info,
+        'configuration': cfg,
+        'dataset_path': str(dataset),
+        'seed': cfg.get('seed'),
+        'seed_note': 'Unspecified preserves original behavior; exact bitwise determinism is not guaranteed',
+        'output': str(output),
+        'status': 'started',
+    }
+
+    def save():
+        (envelope / 'run_metadata.json').write_text(json.dumps(receipt, indent=2) + '\n')
+
     save()
-    with (envelope/'environment.txt').open('w') as f:subprocess.run([sys.executable,'-m','pip','freeze'],stdout=f,check=True)
-    def run(script,*args):
-        script_path=Path(script)
+    with (envelope / 'environment.txt').open('w') as f:
+        subprocess.run([sys.executable, '-m', 'pip', 'freeze'], stdout=f, check=True)
+
+    def run(script, *args):
+        script_path = Path(script)
         if script_path.is_absolute() or '..' in script_path.parts:
             raise ValueError(f'Unsafe script path: {script}')
-        target=(ROOT/script_path).resolve()
+        target = (ROOT / script_path).resolve()
         if ROOT not in target.parents or not target.is_file():
             raise ValueError(f'Runner script not found inside repository: {script}')
-        command=[sys.executable,str(target),*map(str,args)]
-        receipt.setdefault('commands',[]).append(command);save()
+
+        command = [sys.executable, str(target), *map(str, args)]
+        receipt.setdefault('commands', []).append(command)
+        save()
+
         if cfg.get('seed') is not None:
-            seed=int(cfg['seed']);code="import random, numpy as np, torch, runpy, sys; s=int(sys.argv.pop(1)); random.seed(s); np.random.seed(s); torch.manual_seed(s); p=sys.argv.pop(1); sys.argv[0]=p; runpy.run_path(p,run_name='__main__')"
-            command=[sys.executable,'-c',code,str(seed),*command[1:]]
-        subprocess.run(command,cwd=ROOT,check=True)
+            seed = int(cfg['seed'])
+            code = (
+                "import random, numpy as np, torch, runpy, sys; "
+                "s=int(sys.argv.pop(1)); random.seed(s); np.random.seed(s); torch.manual_seed(s); "
+                "p=sys.argv.pop(1); sys.argv[0]=p; runpy.run_path(p,run_name='__main__')"
+            )
+            command = [sys.executable, '-c', code, str(seed), *command[1:]]
+        subprocess.run(command, cwd=ROOT, check=True)
+
     try:
-        if mode=='evaluate_saved':
-            run('evaluate.py',cfg['saved_run'],'--dataset',dataset,'--trackeval',cfg['trackeval'],'--output',output)
-        elif mode=='replay':
-            args=['replay','--cache',cfg['cache'],'--output',output]
-            if cfg.get('systems'):args+=['--config',cfg['systems']]
-            if cfg.get('frozen'):args+=['--frozen',cfg['frozen']]
-            run('experiment.py',*args)
+        if mode == 'evaluate_saved':
+            run(
+                'evaluate.py',
+                cfg['saved_run'],
+                '--dataset', dataset,
+                '--trackeval', cfg['trackeval'],
+                '--output', output,
+            )
+
+        elif mode == 'replay':
+            args = ['replay', '--cache', cfg['cache'], '--output', output]
+            if cfg.get('systems'):
+                args += ['--config', cfg['systems']]
+            if cfg.get('frozen'):
+                args += ['--frozen', cfg['frozen']]
+            run('experiment.py', *args)
+
         else:
-            weights=Path(cfg['weights']).expanduser().resolve()
-            if weights.name!='yolov8n.pt':raise ValueError('Preserved detector requires yolov8n.pt')
+            weights = Path(cfg['weights']).expanduser().resolve()
+            if weights.name != 'yolov8n.pt':
+                raise ValueError('Preserved detector requires yolov8n.pt')
             if not weights.exists():
-                weights.parent.mkdir(parents=True,exist_ok=True)
-                subprocess.run([sys.executable,'-c',"from ultralytics import YOLO; YOLO('yolov8n.pt')"],cwd=weights.parent,check=True)
-            names=cfg.get('sequences') or sorted(p.name for p in (dataset/'sequences').iterdir() if p.is_dir())
-            if not names or any(Path(n).name!=n for n in names):raise ValueError('Invalid sequence list')
-            if cfg.get('expected_sequences') is not None and len(names)!=cfg['expected_sequences']:raise ValueError('Unexpected sequence count')
-            count=sum(len(list((dataset/'sequences'/n).glob('*.jpg'))) for n in names)
-            if cfg.get('expected_frames') is not None and count!=cfg['expected_frames']:raise ValueError('Unexpected frame count')
-            if mode=='cache' and (cfg['split']!='development' or 'test' in dataset.name.lower()):raise ValueError('Use a separate development dataset for cache search')
-            seq=envelope/'sequences.json';seq.write_text(json.dumps(names))
-            if mode=='speedtest':
-                systems=envelope/'systems.json';systems.write_text(json.dumps(cfg['systems'],indent=2))
-                script=cfg.get('speedtest_script','scripts/speedtest_top3.py')
-                args=[
-                    '--dataset',dataset,
-                    '--sequences',seq,
-                    '--weights',weights,
-                    '--systems',systems,
-                    '--output',output,
-                    '--target-fps',str(cfg.get('target_fps',25.0)),
-                    '--gate-frames',str(cfg.get('gate_frames',300)),
-                    '--progress-every',str(cfg.get('progress_every',25)),
+                weights.parent.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    [sys.executable, '-c', "from ultralytics import YOLO; YOLO('yolov8n.pt')"],
+                    cwd=weights.parent,
+                    check=True,
+                )
+
+            names = cfg.get('sequences') or sorted(
+                p.name for p in (dataset / 'sequences').iterdir() if p.is_dir()
+            )
+            if not names or any(Path(n).name != n for n in names):
+                raise ValueError('Invalid sequence list')
+            if cfg.get('expected_sequences') is not None and len(names) != cfg['expected_sequences']:
+                raise ValueError('Unexpected sequence count')
+
+            count = sum(len(list((dataset / 'sequences' / n).glob('*.jpg'))) for n in names)
+            if cfg.get('expected_frames') is not None and count != cfg['expected_frames']:
+                raise ValueError('Unexpected frame count')
+
+            if mode == 'cache' and (cfg['split'] != 'development' or 'test' in dataset.name.lower()):
+                raise ValueError('Use a separate development dataset for cache search')
+
+            seq = envelope / 'sequences.json'
+            seq.write_text(json.dumps(names))
+
+            if mode == 'speedtest':
+                systems = envelope / 'systems.json'
+                systems.write_text(json.dumps(cfg['systems'], indent=2))
+                script = cfg.get('speedtest_script', 'scripts/speedtest_top3.py')
+                args = [
+                    '--dataset', dataset,
+                    '--sequences', seq,
+                    '--weights', weights,
+                    '--systems', systems,
+                    '--output', output,
+                    '--target-fps', str(cfg.get('target_fps', 25.0)),
+                    '--gate-frames', str(cfg.get('gate_frames', 300)),
+                    '--progress-every', str(cfg.get('progress_every', 25)),
                 ]
                 if cfg.get('backend') is not None:
-                    args+=['--backend',str(cfg['backend'])]
+                    args += ['--backend', str(cfg['backend'])]
                 if cfg.get('engine') is not None:
-                    args+=['--engine',str(cfg['engine'])]
-                run(script,*args)
+                    args += ['--engine', str(cfg['engine'])]
+                if cfg.get('decode_chunk_size') is not None:
+                    args += ['--decode-chunk-size', str(cfg['decode_chunk_size'])]
+                run(script, *args)
+
             else:
-                args=[mode,'--dataset',dataset,'--sequences',seq,'--weights',weights,'--output',output,'--split',cfg['split']]
-                if mode=='live':args+=['--frozen',cfg['frozen'],'--repeats',str(cfg.get('repeats',3))]
-                run('experiment.py',*args)
-                if mode=='live' and cfg.get('evaluate_repeats',True):
+                args = [
+                    mode,
+                    '--dataset', dataset,
+                    '--sequences', seq,
+                    '--weights', weights,
+                    '--output', output,
+                    '--split', cfg['split'],
+                ]
+                if mode == 'live':
+                    args += ['--frozen', cfg['frozen'], '--repeats', str(cfg.get('repeats', 3))]
+                run('experiment.py', *args)
+
+                if mode == 'live' and cfg.get('evaluate_repeats', True):
                     import shutil
-                    for repeat in range(cfg.get('repeats',3)):
-                        folder=output/f'repeat_{repeat}'
-                        for name in ['configuration.json','dataset_manifest.json']:shutil.copy2(output/name,folder/name)
-                        run('evaluate.py',folder,'--dataset',dataset,'--trackeval',cfg['trackeval'],'--output',output/f'trackeval_repeat_{repeat}')
-        receipt['status']='completed'
+                    for repeat in range(cfg.get('repeats', 3)):
+                        folder = output / f'repeat_{repeat}'
+                        for name in ['configuration.json', 'dataset_manifest.json']:
+                            shutil.copy2(output / name, folder / name)
+                        run(
+                            'evaluate.py',
+                            folder,
+                            '--dataset', dataset,
+                            '--trackeval', cfg['trackeval'],
+                            '--output', output / f'trackeval_repeat_{repeat}',
+                        )
+
+        receipt['status'] = 'completed'
+
     except BaseException as exc:
-        receipt['status']='failed';receipt['error_type']=type(exc).__name__;receipt['error_message']=str(exc);raise
+        receipt['status'] = 'failed'
+        receipt['error_type'] = type(exc).__name__
+        receipt['error_message'] = str(exc)
+        raise
     finally:
-        save();print(f'OUTPUT FOLDER: {envelope}',flush=True)
+        save()
+        print(f'OUTPUT FOLDER: {envelope}', flush=True)
+
     return envelope
 
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',required=True,type=Path)
-    p.add_argument('--check',action='store_true');a=p.parse_args();cfg=json.loads(a.config.read_text())
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--config', required=True, type=Path)
+    p.add_argument('--check', action='store_true')
+    a = p.parse_args()
+
+    cfg = json.loads(a.config.read_text())
+    cfg = resolve_cfg(cfg, verbose=True)
+
     if a.check:
-        gpu=cfg['mode'] in ['cache','live','speedtest']
-        print(json.dumps(environment(str(cfg.get('device','cpu')),gpu or cfg.get('require_cuda',False),gpu or cfg.get('require_t4',False)),indent=2))
+        gpu = cfg['mode'] in ['cache', 'live', 'speedtest']
+        print(
+            json.dumps(
+                environment(
+                    str(cfg.get('device', 'cpu')),
+                    gpu or cfg.get('require_cuda', False),
+                    gpu or cfg.get('require_t4', False),
+                ),
+                indent=2,
+            )
+        )
         if cfg.get('version'):
             print(f"ACTIVE VERSION: {cfg['version']}", flush=True)
         if cfg.get('speedtest_script'):
             print(f"SPEEDTEST SCRIPT: {cfg['speedtest_script']}", flush=True)
-    else:execute(cfg)
-if __name__=='__main__':main()
+        print(f"DATASET RESOLVED: {cfg['dataset']}", flush=True)
+        print(f"OUTPUT ROOT RESOLVED: {cfg['output_root']}", flush=True)
+    else:
+        execute(cfg)
+
+
+if __name__ == '__main__':
+    main()
