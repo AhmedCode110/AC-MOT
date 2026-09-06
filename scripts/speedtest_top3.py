@@ -6,11 +6,16 @@ read time, and excludes warmup and output serialization.
 """
 import argparse
 import json
+import sys
 import time
 from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from core import Config, Controller, atomic_json
 from experiment import dataset_manifest, detect, environment, make_tracker, new_model, sync, track, visual
