@@ -28,8 +28,8 @@ def environment(device='cpu', require_cuda=False, require_t4=False):
 
 def execute(cfg):
     mode=cfg['mode']
-    if mode not in ['evaluate_saved','replay','live','cache']:raise ValueError('Unknown mode')
-    gpu=mode in ['live','cache']
+    if mode not in ['evaluate_saved','replay','live','cache','speedtest']:raise ValueError('Unknown mode')
+    gpu=mode in ['live','cache','speedtest']
     info=environment(str(cfg.get('device','0' if gpu else 'cpu')),gpu or cfg.get('require_cuda',False),gpu or cfg.get('require_t4',False))
     dataset=Path(cfg['dataset']).expanduser().resolve()
     if not (dataset/'annotations').is_dir():raise ValueError(f'Missing dataset annotations: {dataset}')
@@ -78,15 +78,27 @@ def execute(cfg):
             if cfg.get('expected_frames') is not None and count!=cfg['expected_frames']:raise ValueError('Unexpected frame count')
             if mode=='cache' and (cfg['split']!='development' or 'test' in dataset.name.lower()):raise ValueError('Use a separate development dataset for cache search')
             seq=envelope/'sequences.json';seq.write_text(json.dumps(names))
-            args=[mode,'--dataset',dataset,'--sequences',seq,'--weights',weights,'--output',output,'--split',cfg['split']]
-            if mode=='live':args+=['--frozen',cfg['frozen'],'--repeats',str(cfg.get('repeats',3))]
-            run('experiment.py',*args)
-            if mode=='live' and cfg.get('evaluate_repeats',True):
-                import shutil
-                for repeat in range(cfg.get('repeats',3)):
-                    folder=output/f'repeat_{repeat}'
-                    for name in ['configuration.json','dataset_manifest.json']:shutil.copy2(output/name,folder/name)
-                    run('evaluate.py',folder,'--dataset',dataset,'--trackeval',cfg['trackeval'],'--output',output/f'trackeval_repeat_{repeat}')
+            if mode=='speedtest':
+                systems=envelope/'systems.json';systems.write_text(json.dumps(cfg['systems'],indent=2))
+                run('scripts/speedtest_top3.py',
+                    '--dataset',dataset,
+                    '--sequences',seq,
+                    '--weights',weights,
+                    '--systems',systems,
+                    '--output',output,
+                    '--target-fps',str(cfg.get('target_fps',25.0)),
+                    '--gate-frames',str(cfg.get('gate_frames',300)),
+                    '--progress-every',str(cfg.get('progress_every',25)))
+            else:
+                args=[mode,'--dataset',dataset,'--sequences',seq,'--weights',weights,'--output',output,'--split',cfg['split']]
+                if mode=='live':args+=['--frozen',cfg['frozen'],'--repeats',str(cfg.get('repeats',3))]
+                run('experiment.py',*args)
+                if mode=='live' and cfg.get('evaluate_repeats',True):
+                    import shutil
+                    for repeat in range(cfg.get('repeats',3)):
+                        folder=output/f'repeat_{repeat}'
+                        for name in ['configuration.json','dataset_manifest.json']:shutil.copy2(output/name,folder/name)
+                        run('evaluate.py',folder,'--dataset',dataset,'--trackeval',cfg['trackeval'],'--output',output/f'trackeval_repeat_{repeat}')
         receipt['status']='completed'
     except BaseException as exc:
         receipt['status']='failed';receipt['error_type']=type(exc).__name__;raise
@@ -98,7 +110,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',required=True,type=Path)
     p.add_argument('--check',action='store_true');a=p.parse_args();cfg=json.loads(a.config.read_text())
     if a.check:
-        gpu=cfg['mode'] in ['cache','live']
+        gpu=cfg['mode'] in ['cache','live','speedtest']
         print(json.dumps(environment(str(cfg.get('device','cpu')),gpu or cfg.get('require_cuda',False),gpu or cfg.get('require_t4',False)),indent=2))
     else:execute(cfg)
 if __name__=='__main__':main()
