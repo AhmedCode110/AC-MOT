@@ -1,0 +1,17 @@
+{
+  "version": "v16",
+  "purpose": "final paper comparison and ablation evaluation",
+  "files": {
+    "configs/paper_eval_v16.json": "b19ac79dcaa2b56602e86cfff9cf96d6943cba4e",
+    "scripts/paper_eval_v16.py": "0e1008d297799ca089036a3cf6c0a451d9fd375f",
+    "portable_v16.py": "7c4e0dfc1a511e5c034e8706d2a486cb75978be4",
+    "scripts/run.py": "047dfa160cbddd4814d3f08949cd4a6ecefbb440",
+    "notebooks/AC_MOT_v16_Paper_Eval_Colab.ipynb": "567b4b98e9ea9a50c31f7196b28a5144d0214c00",
+    "versions/v16/README.md": "a6a5d0b2bac2d82748d3cc5e960d0febd7f2f2b6"
+  },
+  "active_config": "paper_eval_v16.json",
+  "dataset_requirement": "VisDrone2019-MOT-test-dev, 17 sequences, 6635 frames",
+  "trackeval_revision": "12c8791b303e0a0b50f753af204249e622d0281a",
+  "proposed_system_is_frozen_from": "v15",
+  "selection_policy": "evaluation only; do not retune v15 from v16 results"
+}
