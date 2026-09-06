@@ -1,17 +1,25 @@
-"""Measure fresh end-to-end FPS for the three selected AC-MOT systems on a Tesla T4.
+"""Measure deployment-style end-to-end FPS for the three selected AC-MOT systems.
 
-This is a throughput gate, not the final frozen accuracy evaluation. It uses fresh
-YOLOv8n FP32 inference plus SceneAnalyzer/Controller and ByteTrack, includes frame
-read time, and excludes warmup and output serialization.
+The research architecture and tracker/controller settings are unchanged. For the
+realtime throughput test only, frames are copied from Drive to Colab local SSD
+before timing and YOLOv8n runs in FP16 on a Tesla T4, matching the performance-
+critical execution choices used by the original v10 realtime work.
+
+Measured time includes local frame read + SceneAnalyzer/Controller + one fresh
+YOLOv8n FP16 inference per frame + ByteTrack. Sequence copy, detector warmup and
+output serialization are excluded. This remains a throughput gate, not the final
+frozen accuracy evaluation.
 """
 import argparse
 import json
+import shutil
 import sys
+import tempfile
 import time
 from dataclasses import asdict
 from pathlib import Path
 
-print('[BOOT] AC-MOT speed test started.', flush=True)
+print('[BOOT] AC-MOT realtime speed test started.', flush=True)
 print('[BOOT] Loading Python dependencies...', flush=True)
 import numpy as np
 print('[OK] NumPy loaded.', flush=True)
@@ -20,12 +28,29 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 print(f'[BOOT] Repository root: {ROOT}', flush=True)
-print('[BOOT] Loading AC-MOT research modules (core.py + experiment.py)...', flush=True)
+print('[BOOT] Loading AC-MOT research modules...', flush=True)
 
-from core import Config, Controller, atomic_json
-print('[OK] core.py loaded.', flush=True)
-from experiment import dataset_manifest, detect, environment, make_tracker, new_model, sync, track, visual
-print('[OK] experiment.py loaded.', flush=True)
+from core import CLASSES, Config, Controller, atomic_json, boxes
+from experiment import dataset_manifest, environment, make_tracker, new_model, sync, track, visual
+print('[OK] AC-MOT modules loaded.', flush=True)
+
+
+def detect_realtime(model, img, size, nms):
+    """Fresh YOLOv8n FP16 inference; detector semantics otherwise match experiment.detect."""
+    r = model.predict(
+        img,
+        conf=.01,
+        iou=nms,
+        imgsz=size,
+        classes=CLASSES,
+        max_det=1000,
+        half=True,
+        device=0,
+        verbose=False,
+    )[0]
+    if not bool(model.predictor.model.fp16):
+        raise RuntimeError('Realtime speedtest expected FP16 inference on CUDA')
+    return boxes(r.boxes.data.cpu().numpy())
 
 
 def bar(done, total, width=30):
@@ -34,6 +59,21 @@ def bar(done, total, width=30):
     if filled >= width:
         return '[' + '=' * width + ']'
     return '[' + '=' * filled + '>' + '.' * max(width - filled - 1, 0) + ']'
+
+
+def copy_sequence_to_local(dataset, seq, local_root):
+    sn = seq['sequence']
+    src = dataset / 'sequences' / sn
+    dst = local_root / sn
+    if dst.exists():
+        shutil.rmtree(dst)
+    print(f'[LOCAL] Copying {sn} from Drive to Colab local SSD (excluded from FPS timing)...', flush=True)
+    shutil.copytree(src, dst)
+    paths = [dst / f for f in seq['frame_sha256']]
+    if len(paths) != seq['frames'] or any(not p.is_file() for p in paths):
+        raise RuntimeError(f'Local sequence copy verification failed: {sn}')
+    print(f'[OK] Local copy ready: {dst} | frames={len(paths)}', flush=True)
+    return paths
 
 
 def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progress_every, system_index, system_total):
@@ -46,8 +86,9 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
     print('\n' + '=' * 88, flush=True)
     print(f'[SYSTEM {system_index}/{system_total}] {c.name}', flush=True)
     print(f'[SYSTEM] Policy={c.policy} | base size={c.size} | target={target_fps:.2f} FPS', flush=True)
+    print('[SYSTEM] Realtime execution: local SSD frames + YOLOv8n FP16 + current AC-MOT pipeline.', flush=True)
     print(f'[SYSTEM] Realtime decision will be made after {gate_frames} measured frames.', flush=True)
-    print('[MODEL] Loading YOLOv8n weights onto Tesla T4. Waiting for model initialization...', flush=True)
+    print('[MODEL] Loading YOLOv8n weights onto Tesla T4...', flush=True)
     model = new_model(weights)
     print('[OK] YOLOv8n model loaded.', flush=True)
     torch.cuda.reset_peak_memory_stats()
@@ -60,87 +101,95 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
     start_wall = time.perf_counter()
 
     print(f'[RUN] Preparing {len(manifest)} sequences / {total_frames} frames.', flush=True)
-    print('[RUN] Timing will include frame read + SceneAnalyzer/Controller + YOLOv8n FP32 + ByteTrack.', flush=True)
-    print('[RUN] Warmup is excluded from measured FPS.', flush=True)
+    print('[RUN] Timing includes local frame read + SceneAnalyzer/Controller + YOLOv8n FP16 + ByteTrack.', flush=True)
+    print('[RUN] Drive-to-local copy, warmup and output serialization are excluded from measured FPS.', flush=True)
 
-    for seq_index, seq in enumerate(manifest, 1):
-        sn = seq['sequence']
-        paths = [dataset / 'sequences' / sn / f for f in seq['frame_sha256']]
-        print(f'\n[SEQUENCE {seq_index}/{len(manifest)}] {sn} | {seq["frames"]} frames', flush=True)
-        print('[SEQUENCE] Reading first frame for validation and warmup...', flush=True)
-        first = cv2.imread(str(paths[0]))
-        if first is None:
-            raise ValueError(f'Unreadable first frame: {paths[0]}')
-        print('[OK] First frame readable.', flush=True)
+    with tempfile.TemporaryDirectory(prefix='acmot_rt_') as tmp:
+        local_root = Path(tmp)
 
-        warm_sizes = [c.size] if c.policy == 'fixed' else [640, 736, 832]
-        print(f'[WARMUP] Starting detector warmup at sizes: {warm_sizes}', flush=True)
-        for size in warm_sizes:
-            for rep in range(1, 4):
-                print(f'[WARMUP] imgsz={size} | pass {rep}/3 | waiting for GPU inference...', flush=True)
-                detect(model, first, size, c.nms)
-        print('[OK] Warmup complete. Measured realtime timing starts now.', flush=True)
+        for seq_index, seq in enumerate(manifest, 1):
+            sn = seq['sequence']
+            print(f'\n[SEQUENCE {seq_index}/{len(manifest)}] {sn} | {seq["frames"]} frames', flush=True)
+            paths = copy_sequence_to_local(dataset, seq, local_root)
 
-        print('[TRACKER] Creating fresh Controller + ByteTrack state for this sequence...', flush=True)
-        control = Controller(c)
-        tracker = make_tracker(c)
-        previous = []
-        print('[OK] Tracker/controller ready.', flush=True)
+            print('[SEQUENCE] Reading first local frame for validation and warmup...', flush=True)
+            first = cv2.imread(str(paths[0]))
+            if first is None:
+                raise ValueError(f'Unreadable first local frame: {paths[0]}')
+            print('[OK] First local frame readable.', flush=True)
 
-        for frame, path in enumerate(paths, 1):
+            warm_sizes = [c.size] if c.policy == 'fixed' else [640, 736, 832]
+            print(f'[WARMUP] Starting FP16 detector warmup at sizes: {warm_sizes}', flush=True)
+            for size in warm_sizes:
+                for rep in range(1, 4):
+                    print(f'[WARMUP] imgsz={size} | pass {rep}/3 | waiting for GPU inference...', flush=True)
+                    detect_realtime(model, first, size, c.nms)
             sync()
-            t0 = time.perf_counter()
-            img = cv2.imread(str(path))
-            if img is None:
-                raise ValueError(f'Unreadable frame: {path}')
+            print('[OK] Warmup complete. Measured realtime timing starts now.', flush=True)
 
-            v = visual(img) if frame == 1 or frame % 10 == 1 else {}
-            params = control.choose(frame, v, previous)
-            dets = detect(model, img, params['size'], params['nms'])
-            tracks, kept = track(tracker, dets, img.shape[:2], params)
-            previous = kept if c.detector_feedback else tracks[:, [0, 1, 2, 3, 5, 6]]
-            sync()
+            print('[TRACKER] Creating fresh Controller + ByteTrack state for this sequence...', flush=True)
+            control = Controller(c)
+            tracker = make_tracker(c)
+            previous = []
+            print('[OK] Tracker/controller ready.', flush=True)
 
-            elapsed = time.perf_counter() - t0
-            measured_seconds += elapsed
-            measured_frames += 1
-            latencies.append(elapsed)
+            for frame, path in enumerate(paths, 1):
+                sync()
+                t0 = time.perf_counter()
 
-            fps = measured_frames / measured_seconds
-            should_print = measured_frames == 1 or measured_frames % progress_every == 0 or measured_frames == total_frames
-            if should_print:
-                status = 'GATING' if measured_frames < gate_frames else ('REALTIME' if fps >= target_fps else 'BELOW-RT')
-                elapsed_wall = time.perf_counter() - start_wall
-                eta = (elapsed_wall / measured_frames) * (total_frames - measured_frames) if measured_frames else 0.0
-                print(
-                    f'{bar(measured_frames, total_frames)} '
-                    f'{100.0 * measured_frames / total_frames:6.2f}% | '
-                    f'system={c.name} | seq={sn} | frame={frame}/{seq["frames"]} | '
-                    f'imgsz={params["size"]} | scene={params["scene"]} | SCI={params["sci"]:.3f} | '
-                    f'FPS={fps:6.2f} | target={target_fps:.2f} | {status} | ETA={eta/60:.1f}m',
-                    flush=True,
-                )
+                img = cv2.imread(str(path))
+                if img is None:
+                    raise ValueError(f'Unreadable frame: {path}')
 
-            if not gate_checked and measured_frames >= gate_frames:
-                gate_checked = True
+                v = visual(img) if frame == 1 or frame % 10 == 1 else {}
+                params = control.choose(frame, v, previous)
+                dets = detect_realtime(model, img, params['size'], params['nms'])
+                tracks, kept = track(tracker, dets, img.shape[:2], params)
+                previous = kept if c.detector_feedback else tracks[:, [0, 1, 2, 3, 5, 6]]
+
+                sync()
+                elapsed = time.perf_counter() - t0
+                measured_seconds += elapsed
+                measured_frames += 1
+                latencies.append(elapsed)
+
                 fps = measured_frames / measured_seconds
-                print(f'[GATE] {gate_frames} measured frames reached. Checking realtime requirement...', flush=True)
-                if fps < target_fps:
-                    failed_gate = True
+                should_print = measured_frames == 1 or measured_frames % progress_every == 0 or measured_frames == total_frames
+                if should_print:
+                    status = 'GATING' if measured_frames < gate_frames else ('REALTIME' if fps >= target_fps else 'BELOW-RT')
+                    elapsed_wall = time.perf_counter() - start_wall
+                    eta = (elapsed_wall / measured_frames) * (total_frames - measured_frames) if measured_frames else 0.0
                     print(
-                        f'REALTIME CHECK FAIL | system={c.name} | average_FPS={fps:.2f} | '
-                        f'target={target_fps:.2f} | stopping this system early',
+                        f'{bar(measured_frames, total_frames)} '
+                        f'{100.0 * measured_frames / total_frames:6.2f}% | '
+                        f'system={c.name} | seq={sn} | frame={frame}/{seq["frames"]} | '
+                        f'imgsz={params["size"]} | scene={params["scene"]} | SCI={params["sci"]:.3f} | '
+                        f'FPS={fps:6.2f} | target={target_fps:.2f} | {status} | ETA={eta/60:.1f}m',
                         flush=True,
                     )
-                    break
-                print(
-                    f'REALTIME CHECK PASS | system={c.name} | average_FPS={fps:.2f} | target={target_fps:.2f}',
-                    flush=True,
-                )
-                print('[RUN] Realtime gate passed. Continuing through remaining frames for a stable full-run FPS estimate.', flush=True)
 
-        if failed_gate:
-            break
+                if not gate_checked and measured_frames >= gate_frames:
+                    gate_checked = True
+                    fps = measured_frames / measured_seconds
+                    print(f'[GATE] {gate_frames} measured frames reached. Checking realtime requirement...', flush=True)
+                    if fps < target_fps:
+                        failed_gate = True
+                        print(
+                            f'REALTIME CHECK FAIL | system={c.name} | average_FPS={fps:.2f} | '
+                            f'target={target_fps:.2f} | stopping this system early',
+                            flush=True,
+                        )
+                        break
+                    print(
+                        f'REALTIME CHECK PASS | system={c.name} | average_FPS={fps:.2f} | target={target_fps:.2f}',
+                        flush=True,
+                    )
+                    print('[RUN] Realtime gate passed. Continuing through remaining frames for a stable FPS estimate.', flush=True)
+
+            shutil.rmtree(local_root / sn, ignore_errors=True)
+            print(f'[LOCAL] Released local copy for {sn}.', flush=True)
+            if failed_gate:
+                break
 
     fps = measured_frames / measured_seconds if measured_seconds else 0.0
     result = {
@@ -154,8 +203,10 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
         'fps': fps,
         'p95_ms': float(np.percentile(latencies, 95) * 1000) if latencies else None,
         'peak_gpu_bytes': int(torch.cuda.max_memory_allocated()),
-        'timing_includes': 'frame read + scene analysis/controller + YOLOv8n FP32 + ByteTrack',
-        'timing_excludes': 'detector warmup + output serialization',
+        'precision': 'FP16',
+        'frame_source': 'Colab local SSD; copied from Drive before timing',
+        'timing_includes': 'local frame read + scene analysis/controller + YOLOv8n FP16 + ByteTrack',
+        'timing_excludes': 'Drive-to-local sequence copy + detector warmup + output serialization',
     }
     print(
         f'[RESULT] {c.name} | status={result["status"]} | '
@@ -198,7 +249,7 @@ def main():
     systems = json.loads(a.systems.read_text())
     print('[OK] Systems: ' + ', '.join(x['name'] for x in systems), flush=True)
 
-    print('[DATASET] Building and verifying dataset manifest. This checks every selected sequence/frame...', flush=True)
+    print('[DATASET] Building and verifying dataset manifest from Drive...', flush=True)
     manifest = dataset_manifest(a.dataset, names)
     total_frames = sum(x['frames'] for x in manifest)
     print(f'[OK] Dataset manifest ready: {len(manifest)} sequences, {total_frames} frames.', flush=True)
@@ -209,17 +260,19 @@ def main():
 
     print('[SAVE] Writing speed-test configuration and dataset manifest...', flush=True)
     atomic_json(a.output / 'configuration.json', {
-        'purpose': 'throughput gate only; not final frozen accuracy evaluation',
+        'purpose': 'deployment-style throughput gate only; not final frozen accuracy evaluation',
         'target_fps': a.target_fps,
         'gate_frames': a.gate_frames,
         'progress_every': a.progress_every,
         'systems': systems,
-        'precision': 'FP32',
-        'timing_includes': 'frame read + scene analysis/controller + YOLOv8n + ByteTrack',
-        'timing_excludes': 'detector warmup + output serialization',
+        'precision': 'FP16',
+        'frame_source': 'copy each sequence from Drive to Colab local SSD before timing',
+        'timing_includes': 'local frame read + scene analysis/controller + YOLOv8n FP16 + ByteTrack',
+        'timing_excludes': 'Drive-to-local sequence copy + detector warmup + output serialization',
+        'inference_rule': 'exactly one fresh YOLOv8n inference per measured frame',
     })
     atomic_json(a.output / 'dataset_manifest.json', manifest)
-    print('[OK] Metadata saved. Starting Top-3 throughput test.', flush=True)
+    print('[OK] Metadata saved. Starting Top-3 realtime throughput test.', flush=True)
 
     results = []
     for idx, system in enumerate(systems, 1):
@@ -247,7 +300,7 @@ def main():
     print('PASS:', ', '.join(passed) if passed else 'none', flush=True)
     print('FAIL:', ', '.join(failed) if failed else 'none', flush=True)
     print(f'RESULTS: {a.output / "speedtest_results.json"}', flush=True)
-    print('[DONE] AC-MOT Top-3 speed test finished.', flush=True)
+    print('[DONE] AC-MOT Top-3 realtime speed test finished.', flush=True)
 
 
 if __name__ == '__main__':
