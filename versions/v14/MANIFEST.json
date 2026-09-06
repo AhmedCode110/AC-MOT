@@ -1,0 +1,14 @@
+{
+  "version": "v14",
+  "implementation_commit": "82296b2236994e95dfc2a0b0681c44de17d79855",
+  "files": {
+    "scripts/speedtest_top3_v14.py": "65ed3b044daebc8f4a0402640f0d6ee0c178dc10",
+    "configs/speedtest_top3_v14.json": "6a7c7dafdc81a5f857e278e5901f4be9046fc6ed",
+    "scripts/run.py": "3e50a8485bb02cf28785d1174fedbe426cc99a4c",
+    "notebooks/AC_MOT_Colab.ipynb": "25240a621bc77a92934341d30bd6b16caff74258"
+  },
+  "verified_run_folder": "/content/drive/MyDrive/VisDrone_Results/ACMOT_IDS/speedtests/speedtest_v14_20260906T224714_d9463022",
+  "verified_result_file_id": "13AA-pRHmwma4EBMnyXiGEfs64XjJl0r-",
+  "verified_status": "FAIL_REALTIME",
+  "adaptive_fps": 13.570234153891244
+}
