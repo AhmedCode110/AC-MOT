@@ -1,9 +1,9 @@
 {
   "mode": "evaluate_saved",
-  "dataset": "/content/drive/MyDrive/AC-MOT-data/VisDrone2019-MOT-test-dev",
-  "output_root": "/content/drive/MyDrive/AC-MOT-results",
-  "saved_run": "/content/drive/MyDrive/AC-MOT-results/existing_recording",
-  "cache": "/content/drive/MyDrive/AC-MOT-data/detection_cache_v1",
+  "dataset": "/content/drive/MyDrive/visdrone/VisDrone_Zips/VisDrone2019-MOT-test-dev/VisDrone2019-MOT-test-dev",
+  "output_root": "/content/drive/MyDrive/VisDrone_Results/ACMOT_IDS/portable_runs",
+  "saved_run": "/content/drive/MyDrive/VisDrone_Results/ACMOT_IDS/ROUND2_replay_20260906_103513",
+  "cache": "/content/drive/MyDrive/VisDrone_Results/ACMOT_IDS/detection_cache_v1",
   "weights": "/content/weights/yolov8n.pt",
   "trackeval": "/content/TrackEval",
   "device": "cpu",

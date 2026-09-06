@@ -103,3 +103,6 @@ git push origin main
 ```
 
 If publishing manually for the first time, authenticate with `gh auth login`, then run `gh repo create AhmedCode110/AC-MOT --private --source=. --remote=origin` and `git push -u origin main` (only if the repository does not already exist). Never add datasets, caches, raw rounds, live outputs, archives, weights or credentials. Review `docs/PRECOMMIT_AUDIT.md` for the initial publication inventory and `docs/CHANGES.md` for functional additions and limitations.
+
+
+The checked-in evaluation configuration now points at the existing Drive test-dev dataset and Round 2 recording verified during setup. Results use a new `ACMOT_IDS/portable_runs` folder. This evaluates saved exploratory recordings; it does not start inference. If GitHub authorization is unavailable, the notebook also accepts an explicitly supplied `BUNDLE_PATH`: export with `git bundle create /outside/repo/AC-MOT.bundle main`, copy that small source-only bundle to your private Drive, and enter its mounted path. The bundle preserves exact Git history/commit identity, has no credentials, and does not automatically fetch future GitHub changes. Set `BUNDLE_PATH=None` to return to authenticated GitHub clone/pull.
