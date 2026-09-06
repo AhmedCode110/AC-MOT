@@ -286,10 +286,10 @@ def run_one(system, dataset, manifest, weights, engine_path, target_fps, gate_fr
             for chunk_start in range(0, len(paths), decode_chunk_size):
                 chunk_paths = paths[chunk_start:chunk_start + decode_chunk_size]
                 images, chunk_decode = decode_chunk(chunk_paths)
-                decode_samples.extend(chunk_decode)
-                decode_seconds += sum(chunk_decode)
 
                 for offset, (img, decode_s) in enumerate(zip(images, chunk_decode), 0):
+                    decode_samples.append(decode_s)
+                    decode_seconds += decode_s
                     frame = chunk_start + offset + 1
                     process_start = time.perf_counter()
 
