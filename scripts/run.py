@@ -1,4 +1,4 @@
-"""Portable orchestration only; original research modules remain unchanged."""
+"""Portable orchestration for AC-MOT versions; research modules remain versioned separately."""
 import argparse
 import datetime as dt
 import importlib.metadata as md
@@ -20,7 +20,7 @@ def environment(device='cpu', require_cuda=False, require_t4=False):
     if info['packages']['ultralytics'] != '8.3.200':
         raise RuntimeError('Requires ultralytics==8.3.200')
     if require_cuda or require_t4:
-        if device != '0': raise ValueError('Preserved v12 GPU pipeline requires device 0')
+        if device != '0': raise ValueError('AC-MOT GPU pipeline requires device 0')
         if not info['cuda_available']: raise RuntimeError('CUDA required; CPU fallback is prohibited')
     if info['cuda_available']: info['gpu'] = torch.cuda.get_device_name(0)
     if require_t4 and 'T4' not in (info['gpu'] or ''): raise RuntimeError('Tesla T4 required')
@@ -35,9 +35,10 @@ def execute(cfg):
     if not (dataset/'annotations').is_dir():raise ValueError(f'Missing dataset annotations: {dataset}')
     if gpu and not (dataset/'sequences').is_dir():raise ValueError('Missing sequences directory')
     output_root=Path(cfg['output_root']).expanduser().resolve()
-    # A new envelope for every invocation prevents legacy cache/replay resume from overwriting old runs.
     output_root.mkdir(parents=True,exist_ok=True)
-    envelope=output_root/(mode+'_'+dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S')+'_'+uuid.uuid4().hex[:8])
+    version=str(cfg.get('version','')).strip()
+    tag=mode+(f'_{version}' if version else '')
+    envelope=output_root/(tag+'_'+dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S')+'_'+uuid.uuid4().hex[:8])
     envelope.mkdir(exist_ok=False)
     output=envelope/'result'
     commit=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
@@ -50,9 +51,14 @@ def execute(cfg):
     save()
     with (envelope/'environment.txt').open('w') as f:subprocess.run([sys.executable,'-m','pip','freeze'],stdout=f,check=True)
     def run(script,*args):
-        command=[sys.executable,str(ROOT/script),*map(str,args)]
+        script_path=Path(script)
+        if script_path.is_absolute() or '..' in script_path.parts:
+            raise ValueError(f'Unsafe script path: {script}')
+        target=(ROOT/script_path).resolve()
+        if ROOT not in target.parents or not target.is_file():
+            raise ValueError(f'Runner script not found inside repository: {script}')
+        command=[sys.executable,str(target),*map(str,args)]
         receipt.setdefault('commands',[]).append(command);save()
-        # Optional seeding is opt-in, applied inside the child process before running source.
         if cfg.get('seed') is not None:
             seed=int(cfg['seed']);code="import random, numpy as np, torch, runpy, sys; s=int(sys.argv.pop(1)); random.seed(s); np.random.seed(s); torch.manual_seed(s); p=sys.argv.pop(1); sys.argv[0]=p; runpy.run_path(p,run_name='__main__')"
             command=[sys.executable,'-c',code,str(seed),*command[1:]]
@@ -80,7 +86,8 @@ def execute(cfg):
             seq=envelope/'sequences.json';seq.write_text(json.dumps(names))
             if mode=='speedtest':
                 systems=envelope/'systems.json';systems.write_text(json.dumps(cfg['systems'],indent=2))
-                run('scripts/speedtest_top3.py',
+                script=cfg.get('speedtest_script','scripts/speedtest_top3.py')
+                args=[
                     '--dataset',dataset,
                     '--sequences',seq,
                     '--weights',weights,
@@ -88,7 +95,13 @@ def execute(cfg):
                     '--output',output,
                     '--target-fps',str(cfg.get('target_fps',25.0)),
                     '--gate-frames',str(cfg.get('gate_frames',300)),
-                    '--progress-every',str(cfg.get('progress_every',25)))
+                    '--progress-every',str(cfg.get('progress_every',25)),
+                ]
+                if cfg.get('backend') is not None:
+                    args+=['--backend',str(cfg['backend'])]
+                if cfg.get('engine') is not None:
+                    args+=['--engine',str(cfg['engine'])]
+                run(script,*args)
             else:
                 args=[mode,'--dataset',dataset,'--sequences',seq,'--weights',weights,'--output',output,'--split',cfg['split']]
                 if mode=='live':args+=['--frozen',cfg['frozen'],'--repeats',str(cfg.get('repeats',3))]
@@ -101,7 +114,7 @@ def execute(cfg):
                         run('evaluate.py',folder,'--dataset',dataset,'--trackeval',cfg['trackeval'],'--output',output/f'trackeval_repeat_{repeat}')
         receipt['status']='completed'
     except BaseException as exc:
-        receipt['status']='failed';receipt['error_type']=type(exc).__name__;raise
+        receipt['status']='failed';receipt['error_type']=type(exc).__name__;receipt['error_message']=str(exc);raise
     finally:
         save();print(f'OUTPUT FOLDER: {envelope}',flush=True)
     return envelope
@@ -112,5 +125,9 @@ def main():
     if a.check:
         gpu=cfg['mode'] in ['cache','live','speedtest']
         print(json.dumps(environment(str(cfg.get('device','cpu')),gpu or cfg.get('require_cuda',False),gpu or cfg.get('require_t4',False)),indent=2))
+        if cfg.get('version'):
+            print(f"ACTIVE VERSION: {cfg['version']}", flush=True)
+        if cfg.get('speedtest_script'):
+            print(f"SPEEDTEST SCRIPT: {cfg['speedtest_script']}", flush=True)
     else:execute(cfg)
 if __name__=='__main__':main()
