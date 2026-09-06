@@ -158,6 +158,11 @@ def replay(a):
                 resolution_switches=int(np.count_nonzero(np.diff(sizes))),mean_size=float(np.mean(sizes))))
         print('Replayed',c.name,flush=True)
 
+def progress_bar(done,total,width=30):
+    ratio=0.0 if total<=0 else min(max(done/total,0.0),1.0)
+    filled=int(round(ratio*width))
+    return '[' + '='*filled + '>'*(filled<width) + '.'*max(width-filled-1,0) + ']'
+
 def live(a):
     """Fresh detector + controller + tracker timing for a frozen candidate, repeated."""
     import cv2
@@ -173,6 +178,8 @@ def live(a):
     atomic_json(a.output/'configuration.json',dict(systems=[asdict(c) for c in systems],
         weights_sha256=sha(a.weights),environment=environment(),split=a.split,
         source_sha256=sha(Path(__file__)),core_sha256=sha(Path(__file__).with_name('core.py')),
+        realtime_gate=dict(min_fps=a.min_realtime_fps,check_after_frames=a.realtime_check_after_frames,
+                           enabled=not a.no_realtime_abort),
         ground_truth_filter=dict(categories=[1,4,5,6,9],score=1,occlusion_lt=2,truncation_lt=2)))
     measurements=[]
     total_frames = sum(seq['frames'] for seq in manifest)
@@ -180,9 +187,11 @@ def live(a):
     grand_done = 0
     grand_start = time.perf_counter()
     print(f'LIVE RUN START | systems={len(systems)} repeats={a.repeats} sequences={len(manifest)} frames/repeat/system={total_frames} total_frame_runs={grand_total}', flush=True)
+    print(f'REALTIME GATE | target={a.min_realtime_fps:.2f} FPS check_after={a.realtime_check_after_frames} measured frames enabled={not a.no_realtime_abort}', flush=True)
     for repeat in range(a.repeats):
         for c in systems:
             system_start = time.perf_counter()
+            realtime_checked=False
             print(f'BEGIN repeat={repeat+1}/{a.repeats} system={c.name}', flush=True)
             model=new_model(a.weights);total=0.;n=0;latencies=[]
             torch.cuda.reset_peak_memory_stats()
@@ -208,22 +217,35 @@ def live(a):
                         sync();elapsed=time.perf_counter()-start;total+=elapsed;n+=1;latencies.append(elapsed)
                         f.write(json.dumps(recording(frame,t,params,elapsed))+'\n')
                         grand_done += 1
+                        fps = n / total if total > 0 else 0.0
+                        if (not realtime_checked) and n >= a.realtime_check_after_frames:
+                            realtime_checked=True
+                            verdict='PASS' if fps >= a.min_realtime_fps else 'FAIL'
+                            print(f'  REALTIME CHECK {verdict} | system={c.name} measured_frames={n} average_FPS={fps:.2f} target={a.min_realtime_fps:.2f}', flush=True)
+                            if verdict=='FAIL' and not a.no_realtime_abort:
+                                raise RuntimeError(
+                                    f'Real-time gate failed for {c.name}: {fps:.2f} FPS < {a.min_realtime_fps:.2f} FPS '
+                                    f'after {n} measured frames. Run stopped early to avoid wasting compute.'
+                                )
                         if frame == 1 or frame == seq['frames'] or frame % 50 == 0:
                             now = time.perf_counter()
                             sys_elapsed = now - system_start
                             grand_elapsed = now - grand_start
-                            fps = n / total if total > 0 else 0.0
                             done_pct = 100.0 * grand_done / grand_total
                             eta = (grand_elapsed / grand_done) * (grand_total - grand_done) if grand_done else 0.0
+                            bar=progress_bar(grand_done,grand_total)
+                            rt='REALTIME' if fps >= a.min_realtime_fps else 'BELOW-RT'
                             print(
-                                f'  progress={done_pct:6.2f}% global={grand_done}/{grand_total} '
+                                f'  {bar} {done_pct:6.2f}% global={grand_done}/{grand_total} '
                                 f'repeat={repeat+1}/{a.repeats} system={c.name} seq={sn} frame={frame}/{seq["frames"]} '
-                                f'system_elapsed={sys_elapsed/60:.1f}m ETA={eta/60:.1f}m current_FPS={fps:.2f}',
+                                f'FPS={fps:.2f} [{rt}] target={a.min_realtime_fps:.2f} '
+                                f'system_elapsed={sys_elapsed/60:.1f}m ETA={eta/60:.1f}m',
                                 flush=True
                             )
                 print(f'  DONE SEQ {sn} elapsed={(time.perf_counter()-seq_start)/60:.1f}m', flush=True)
             measurements.append(dict(system=c.name,repeat=repeat,frames=n,seconds=total,fps=n/total,
                 p95_ms=float(np.percentile(latencies,95)*1000),peak_gpu_bytes=torch.cuda.max_memory_allocated(),
+                realtime_target_fps=a.min_realtime_fps,realtime_pass=(n/total)>=a.min_realtime_fps,
                 excludes='warmup and output serialization; includes frame read, analysis, detector and tracker'))
             atomic_json(a.output/'timing.json',measurements)
             print(f'DONE repeat={repeat+1}/{a.repeats} system={c.name} frames={n} seconds={total:.3f} fps={n/total:.3f}', flush=True)
@@ -235,11 +257,19 @@ def main():
         s=sub.add_parser(name);s.add_argument('--dataset',required=True,type=Path);s.add_argument('--sequences',required=True,type=Path)
         s.add_argument('--weights',required=True,type=Path);s.add_argument('--output',required=True,type=Path)
         s.add_argument('--split',required=True,choices=['development','test'])
-        if name=='live':s.add_argument('--frozen',required=True,type=Path);s.add_argument('--repeats',type=int,default=3)
+        if name=='live':
+            s.add_argument('--frozen',required=True,type=Path)
+            s.add_argument('--repeats',type=int,default=3)
+            s.add_argument('--min-realtime-fps',type=float,default=25.0)
+            s.add_argument('--realtime-check-after-frames',type=int,default=300)
+            s.add_argument('--no-realtime-abort',action='store_true')
     s=sub.add_parser('replay');s.add_argument('--cache',required=True,type=Path);s.add_argument('--output',required=True,type=Path)
     s.add_argument('--config',type=Path);s.add_argument('--frozen',type=Path)
     a=p.parse_args()
-    if a.command=='live' and a.repeats<1:raise ValueError('repeats must be positive')
+    if a.command=='live':
+        if a.repeats<1:raise ValueError('repeats must be positive')
+        if a.min_realtime_fps<=0:raise ValueError('min realtime FPS must be positive')
+        if a.realtime_check_after_frames<1:raise ValueError('realtime check frames must be positive')
     globals()[a.command](a)
 
 if __name__=='__main__':main()
