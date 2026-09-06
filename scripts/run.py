@@ -42,9 +42,13 @@ def resolve_cfg(cfg, verbose=True):
     if cfg.get('portable') and not cfg.get('portable_resolved'):
         if str(ROOT) not in sys.path:
             sys.path.insert(0, str(ROOT))
-        from portable_v15 import resolve_portable_config, portable_requirements_text
+        version = str(cfg.get('version', '')).lower()
+        if version == 'v16':
+            from portable_v16 import resolve_portable_config, portable_requirements_text
+        else:
+            from portable_v15 import resolve_portable_config, portable_requirements_text
         if verbose:
-            print('[PORTABLE] v15 account-specific path resolution enabled.', flush=True)
+            print(f'[PORTABLE] {version or "legacy"} account-specific path resolution enabled.', flush=True)
             print('[PORTABLE] ' + portable_requirements_text(), flush=True)
         cfg = resolve_portable_config(cfg, verbose=verbose)
     return cfg
@@ -53,9 +57,9 @@ def resolve_cfg(cfg, verbose=True):
 def execute(cfg):
     cfg = resolve_cfg(cfg, verbose=True)
     mode = cfg['mode']
-    if mode not in ['evaluate_saved', 'replay', 'live', 'cache', 'speedtest']:
+    if mode not in ['evaluate_saved', 'replay', 'live', 'cache', 'speedtest', 'paper_eval']:
         raise ValueError('Unknown mode')
-    gpu = mode in ['live', 'cache', 'speedtest']
+    gpu = mode in ['live', 'cache', 'speedtest', 'paper_eval']
     info = environment(
         str(cfg.get('device', '0' if gpu else 'cpu')),
         gpu or cfg.get('require_cuda', False),
@@ -173,27 +177,45 @@ def execute(cfg):
             seq = envelope / 'sequences.json'
             seq.write_text(json.dumps(names))
 
-            if mode == 'speedtest':
+            if mode in ['speedtest', 'paper_eval']:
                 systems = envelope / 'systems.json'
                 systems.write_text(json.dumps(cfg['systems'], indent=2))
-                script = cfg.get('speedtest_script', 'scripts/speedtest_top3.py')
-                args = [
-                    '--dataset', dataset,
-                    '--sequences', seq,
-                    '--weights', weights,
-                    '--systems', systems,
-                    '--output', output,
-                    '--target-fps', str(cfg.get('target_fps', 25.0)),
-                    '--gate-frames', str(cfg.get('gate_frames', 300)),
-                    '--progress-every', str(cfg.get('progress_every', 25)),
-                ]
-                if cfg.get('backend') is not None:
-                    args += ['--backend', str(cfg['backend'])]
-                if cfg.get('engine') is not None:
-                    args += ['--engine', str(cfg['engine'])]
-                if cfg.get('decode_chunk_size') is not None:
-                    args += ['--decode-chunk-size', str(cfg['decode_chunk_size'])]
-                run(script, *args)
+
+                if mode == 'paper_eval':
+                    args = [
+                        '--dataset', dataset,
+                        '--sequences', seq,
+                        '--weights', weights,
+                        '--systems', systems,
+                        '--output', output,
+                        '--trackeval', cfg.get('trackeval', '/content/TrackEval'),
+                        '--target-fps', str(cfg.get('target_fps', 25.0)),
+                        '--progress-every', str(cfg.get('progress_every', 50)),
+                        '--backend', str(cfg.get('backend', 'pytorch')),
+                        '--decode-chunk-size', str(cfg.get('decode_chunk_size', 16)),
+                    ]
+                    if cfg.get('engine') is not None:
+                        args += ['--engine', str(cfg['engine'])]
+                    run('scripts/paper_eval_v16.py', *args)
+                else:
+                    script = cfg.get('speedtest_script', 'scripts/speedtest_top3.py')
+                    args = [
+                        '--dataset', dataset,
+                        '--sequences', seq,
+                        '--weights', weights,
+                        '--systems', systems,
+                        '--output', output,
+                        '--target-fps', str(cfg.get('target_fps', 25.0)),
+                        '--gate-frames', str(cfg.get('gate_frames', 300)),
+                        '--progress-every', str(cfg.get('progress_every', 25)),
+                    ]
+                    if cfg.get('backend') is not None:
+                        args += ['--backend', str(cfg['backend'])]
+                    if cfg.get('engine') is not None:
+                        args += ['--engine', str(cfg['engine'])]
+                    if cfg.get('decode_chunk_size') is not None:
+                        args += ['--decode-chunk-size', str(cfg['decode_chunk_size'])]
+                    run(script, *args)
 
             else:
                 args = [
@@ -246,7 +268,7 @@ def main():
     cfg = resolve_cfg(cfg, verbose=True)
 
     if a.check:
-        gpu = cfg['mode'] in ['cache', 'live', 'speedtest']
+        gpu = cfg['mode'] in ['cache', 'live', 'speedtest', 'paper_eval']
         print(
             json.dumps(
                 environment(
@@ -261,6 +283,8 @@ def main():
             print(f"ACTIVE VERSION: {cfg['version']}", flush=True)
         if cfg.get('speedtest_script'):
             print(f"SPEEDTEST SCRIPT: {cfg['speedtest_script']}", flush=True)
+        if cfg.get('mode') == 'paper_eval':
+            print('PAPER EVAL SCRIPT: scripts/paper_eval_v16.py', flush=True)
         print(f"DATASET RESOLVED: {cfg['dataset']}", flush=True)
         print(f"OUTPUT ROOT RESOLVED: {cfg['output_root']}", flush=True)
     else:
