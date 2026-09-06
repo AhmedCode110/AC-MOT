@@ -1,0 +1,9 @@
+# FINAL configuration recovered from source notebooks
+tracker_type: bytetrack
+track_high_thresh: 0.18
+track_low_thresh: 0.04
+new_track_thresh: 0.20
+track_buffer: 45
+match_thresh: 0.86
+fuse_score: true
+

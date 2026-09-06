@@ -1,0 +1,172 @@
+[
+  {
+    "source": "macneo_wrk/07_Code/research_v12/core.py",
+    "destination": "core.py",
+    "sha256": "70fbf89c4795c03c57fed03a81f3a0a6194dffc823af06d3977a908a8e3495a3"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v12/experiment.py",
+    "destination": "experiment.py",
+    "sha256": "97522147b584a2be53d1da6b230457e607bbae815c3d7760bd5a355725c00cbe"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v12/report.py",
+    "destination": "report.py",
+    "sha256": "cbbcef7eb044026d1e82870a1cd051e470eb64824274c64f6803b67ec412f56f"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v12/test_suite.py",
+    "destination": "test_suite.py",
+    "sha256": "fdf0d8b7d4f4c1120c1c119a5124098ba583362b7a5154abc11833ce57da7193"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/evaluate.py",
+    "destination": "evaluate.py",
+    "sha256": "a15d9d15b353c76712ddfe0247e00a47ef075cf1fb5488a9e19997ee148660bb"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v12/README.md",
+    "destination": "docs/original_v12_README.md",
+    "sha256": "5ffdec88fc979731df9227158eec8249a66921e634af53115dee0389d67e33df"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/build.py",
+    "destination": "legacy/research_v11/build.py",
+    "sha256": "d51f30f2a4e924d9e1f3fe70c292d77b4535fbfdffe14f893aaad9d950b02bbd"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/AC_MOT_v11_Candidate_T4.ipynb",
+    "destination": "legacy/research_v11/AC_MOT_v11_Candidate_T4.ipynb",
+    "sha256": "5232bbaaf01c0d161be3cf76bad0184311da137dd9b29455520c688133adcdfc"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/controller.py",
+    "destination": "legacy/research_v11/controller.py",
+    "sha256": "dd44fc61079fe34a4411550e0771958f5240be9b4f24cc46324379655589c48a"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/test_research.py",
+    "destination": "legacy/research_v11/test_research.py",
+    "sha256": "8190dd90c1dff55e2d753675528f433bb0dc2bcea745a6027c0a0ac66103dcd0"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/README.md",
+    "destination": "legacy/research_v11/README.md",
+    "sha256": "8715a1fe5e52911457bfa0a5e672b1873b89c50f5bed96c41a19b3505634d5dc"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/evaluate.py",
+    "destination": "legacy/research_v11/evaluate.py",
+    "sha256": "a15d9d15b353c76712ddfe0247e00a47ef075cf1fb5488a9e19997ee148660bb"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v11/AC_MOT_v11_Candidate_T4.pre_validation.ipynb",
+    "destination": "legacy/research_v11/AC_MOT_v11_Candidate_T4.pre_validation.ipynb",
+    "sha256": "a0d4a5db7aed152b3737c87b90e9bd3068e2cd9fd764aa1c6e81361877a65874"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/evaluate_recorded.py",
+    "destination": "legacy/recorded_runs/evaluate_recorded.py",
+    "sha256": "e37da4cbe74ae76c1f3bbb6d19ce19ae4470775d3f9183c2c1fd0532a9c8b8d4"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/render_recorded.py",
+    "destination": "legacy/recorded_runs/render_recorded.py",
+    "sha256": "d179f75612526a8ec030ef0f7a2d8354609fda966e81e072ef6c0bf3b1d6009e"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/record_full17.py",
+    "destination": "legacy/recorded_runs/record_full17.py",
+    "sha256": "2f45a4ad83450453ff75521c58c824f0ad7b62e59e22d0e08f9bffe10978bcf5"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/AC_MOT_FULL17_Recorded_Replay_20260905.ipynb",
+    "destination": "legacy/recorded_runs/AC_MOT_FULL17_Recorded_Replay_20260905.ipynb",
+    "sha256": "bda304eb8d3d701efeed457c72cf3ea42c78c01e58fc17743102e82886f713ce"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/README.md",
+    "destination": "legacy/recorded_runs/README.md",
+    "sha256": "3bbc7627a1cc13374842b9363efd14bb092f97e602898def830dc9e1b13f1359"
+  },
+  {
+    "source": "macneo_wrk/07_Code/recorded_runs/build_notebook.py",
+    "destination": "legacy/recorded_runs/build_notebook.py",
+    "sha256": "526954c789e6091c7c5045cbfdfb85e5b0055067c6243b7976eb90398745d0ad"
+  },
+  {
+    "source": "macneo_wrk/07_Code/notebooks/AC_MOT_v10_run1_baseline_default_20260602.ipynb",
+    "destination": "legacy/notebooks/AC_MOT_v10_run1_baseline_default_20260602.ipynb",
+    "sha256": "89ca2341da5afcee1b755fdff694ecc8f6fb2336a1ee0ed79ec37f97762af89f"
+  },
+  {
+    "source": "macneo_wrk/07_Code/notebooks/AC_MOT_video_tracker.ipynb",
+    "destination": "legacy/notebooks/AC_MOT_video_tracker.ipynb",
+    "sha256": "703a02fd19377c33a98ce571f8950962fcc8e2b6a71ea0f78ef6cb3d5eaed875"
+  },
+  {
+    "source": "macneo_wrk/07_Code/notebooks/AC_MOT_v10.ipynb",
+    "destination": "legacy/notebooks/AC_MOT_v10.ipynb",
+    "sha256": "33d72e3f2ae8de2b329dfacb0651a2c5d55367fcd645aec6a078c2eca2969ca6"
+  },
+  {
+    "source": "macneo_wrk/07_Code/configs/bytetrack_final.yaml",
+    "destination": "legacy/configs/bytetrack_final.yaml",
+    "sha256": "e03c53a5b053bd464ff61ad597232d419e0d674d6254050e14a1cd97eb9c808f"
+  },
+  {
+    "source": "macneo_wrk/07_Code/configs/bytetrack.yaml",
+    "destination": "legacy/configs/bytetrack.yaml",
+    "sha256": "990cdf0f83ab36b742e4c4f7a9319d61aefdc5066433bf9b24e29272b1eba4e6"
+  },
+  {
+    "source": "macneo_wrk/05_Experiments/Source_Notebooks/FINAL_run1_A0_A1_20260602.ipynb",
+    "destination": "legacy/source_notebooks/FINAL_run1_A0_A1_20260602.ipynb",
+    "sha256": "aa846accacb302901c96dad4baf9fb8ddcfd021c5cb37006f923d951371a64af"
+  },
+  {
+    "source": "macneo_wrk/05_Experiments/Source_Notebooks/FINAL_run4_DeepSORT_20260603.ipynb",
+    "destination": "legacy/source_notebooks/FINAL_run4_DeepSORT_20260603.ipynb",
+    "sha256": "5deda0d75d0bec62d4e44ede1505bfbd896f76bf776606007c5201a2a6989eca"
+  },
+  {
+    "source": "macneo_wrk/05_Experiments/Source_Notebooks/AC_MOT_v10_sota_comparison_20260602.ipynb",
+    "destination": "legacy/source_notebooks/AC_MOT_v10_sota_comparison_20260602.ipynb",
+    "sha256": "a826b2ab7d0d7ade22dff8a054ada20c7d8e4bebe9267ad701410cfa6bc44e22"
+  },
+  {
+    "source": "macneo_wrk/05_Experiments/Source_Notebooks/FINAL_merge_results_20260602.ipynb",
+    "destination": "legacy/source_notebooks/FINAL_merge_results_20260602.ipynb",
+    "sha256": "65dacb1b2a923897085d29260c2cdd625cf5502b161acdf0dfd53f83bce92ec7"
+  },
+  {
+    "source": "AC_MOT_v10_FULL17_runner_embedded2.ipynb",
+    "destination": "legacy/runners/AC_MOT_v10_FULL17_runner_embedded2.ipynb",
+    "sha256": "bbfdaa2ae4565507854fba2ec62ec7b0dc4e46e4da9d853507eed65aae678bd5"
+  },
+  {
+    "source": "AC_MOT_v10_FULL17_runner.ipynb",
+    "destination": "legacy/runners/AC_MOT_v10_FULL17_runner.ipynb",
+    "sha256": "1ed4b47f88f11b3f4358420dc56888c329bcd11c86f6260e71247f1dae1e3f48"
+  },
+  {
+    "source": "AC_MOT_v10_FULL17_runner_embedded.ipynb",
+    "destination": "legacy/runners/AC_MOT_v10_FULL17_runner_embedded.ipynb",
+    "sha256": "3196dc46b7f807895a7f8874d4206c45b812585cad23d28ad484ff47bfdab96b"
+  },
+  {
+    "source": "AC_MOT_v10_FULL17_runner_final.ipynb",
+    "destination": "legacy/runners/AC_MOT_v10_FULL17_runner_final.ipynb",
+    "sha256": "7d5a21f0449c69bb15281ccfbda4dd45d9e2670caa36cde7677517a6a49bbf6f"
+  },
+  {
+    "source": "windows/04_CODE/AC_MOT_v9_FULL17_2026-05-20.ipynb",
+    "destination": "legacy/v9/AC-MOT_v9_FULL17_2026-05-20.ipynb",
+    "sha256": "29fd8b11b39e5ea7a39643e9e4d82753a39a939a20c8f5fd0c1b602003b2ee0b"
+  },
+  {
+    "source": "macneo_wrk/07_Code/research_v12/AC_MOT_v12_Colab.ipynb",
+    "destination": "legacy/v12/AC_MOT_v12_Colab.ipynb",
+    "sha256": "c3db6612a9407a0cf3e5fbc9f52c7cb218b7d16828e6c5c1a5eaabad6dc2d340"
+  }
+]

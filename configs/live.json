@@ -1,0 +1,19 @@
+{
+  "mode": "live",
+  "dataset": "/content/drive/MyDrive/AC-MOT-data/VisDrone2019-MOT-test-dev",
+  "output_root": "/content/drive/MyDrive/AC-MOT-results",
+  "saved_run": "/content/drive/MyDrive/AC-MOT-results/existing_recording",
+  "cache": "/content/drive/MyDrive/AC-MOT-data/detection_cache_v1",
+  "weights": "/content/weights/yolov8n.pt",
+  "trackeval": "/content/TrackEval",
+  "device": "0",
+  "require_cuda": true,
+  "require_t4": true,
+  "seed": null,
+  "split": "test",
+  "frozen": "/content/drive/MyDrive/AC-MOT-results/development_selection/frozen.json",
+  "repeats": 3,
+  "expected_sequences": 17,
+  "expected_frames": 6635,
+  "evaluate_repeats": true
+}
