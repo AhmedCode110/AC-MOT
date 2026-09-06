@@ -17,7 +17,7 @@
   "gate_frames": 300,
   "progress_every": 25,
   "speedtest_script": "scripts/speedtest_top3_v15.py",
-  "backend": "auto",
+  "backend": "pytorch",
   "engine": "/content/weights/yolov8n_v15_dynamic_fp16.engine",
   "decode_chunk_size": 16,
   "systems": [
@@ -38,7 +38,7 @@
       "fuse": true,
       "adaptive_birth": true,
       "realtime_governor": true,
-      "backend": "auto",
+      "backend": "pytorch",
       "min_runtime_size": 320,
       "detector_budget_fraction": 0.70
     },
@@ -59,7 +59,7 @@
       "fuse": true,
       "adaptive_birth": false,
       "realtime_governor": false,
-      "backend": "auto"
+      "backend": "pytorch"
     },
     {
       "name": "FIXED_832_REFERENCE_V15",
@@ -78,7 +78,7 @@
       "fuse": true,
       "adaptive_birth": false,
       "realtime_governor": false,
-      "backend": "auto"
+      "backend": "pytorch"
     }
   ]
 }
