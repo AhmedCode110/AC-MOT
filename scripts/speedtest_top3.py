@@ -11,29 +11,45 @@ import time
 from dataclasses import asdict
 from pathlib import Path
 
+print('[BOOT] AC-MOT speed test started.', flush=True)
+print('[BOOT] Loading Python dependencies...', flush=True)
 import numpy as np
+print('[OK] NumPy loaded.', flush=True)
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+print(f'[BOOT] Repository root: {ROOT}', flush=True)
+print('[BOOT] Loading AC-MOT research modules (core.py + experiment.py)...', flush=True)
 
 from core import Config, Controller, atomic_json
+print('[OK] core.py loaded.', flush=True)
 from experiment import dataset_manifest, detect, environment, make_tracker, new_model, sync, track, visual
+print('[OK] experiment.py loaded.', flush=True)
 
 
 def bar(done, total, width=30):
     frac = 0.0 if total <= 0 else min(max(done / total, 0.0), 1.0)
     filled = int(round(frac * width))
+    if filled >= width:
+        return '[' + '=' * width + ']'
     return '[' + '=' * filled + '>' + '.' * max(width - filled - 1, 0) + ']'
 
 
-def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progress_every):
+def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progress_every, system_index, system_total):
     import cv2
     import torch
 
     c = Config(**system).validate()
     total_frames = sum(x['frames'] for x in manifest)
+
+    print('\n' + '=' * 88, flush=True)
+    print(f'[SYSTEM {system_index}/{system_total}] {c.name}', flush=True)
+    print(f'[SYSTEM] Policy={c.policy} | base size={c.size} | target={target_fps:.2f} FPS', flush=True)
+    print(f'[SYSTEM] Realtime decision will be made after {gate_frames} measured frames.', flush=True)
+    print('[MODEL] Loading YOLOv8n weights onto Tesla T4. Waiting for model initialization...', flush=True)
     model = new_model(weights)
+    print('[OK] YOLOv8n model loaded.', flush=True)
     torch.cuda.reset_peak_memory_stats()
 
     measured_seconds = 0.0
@@ -43,23 +59,33 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
     failed_gate = False
     start_wall = time.perf_counter()
 
-    print(f'\nSPEEDTEST START | system={c.name} | target={target_fps:.2f} FPS | gate={gate_frames} frames', flush=True)
+    print(f'[RUN] Preparing {len(manifest)} sequences / {total_frames} frames.', flush=True)
+    print('[RUN] Timing will include frame read + SceneAnalyzer/Controller + YOLOv8n FP32 + ByteTrack.', flush=True)
+    print('[RUN] Warmup is excluded from measured FPS.', flush=True)
 
-    for seq in manifest:
+    for seq_index, seq in enumerate(manifest, 1):
         sn = seq['sequence']
         paths = [dataset / 'sequences' / sn / f for f in seq['frame_sha256']]
+        print(f'\n[SEQUENCE {seq_index}/{len(manifest)}] {sn} | {seq["frames"]} frames', flush=True)
+        print('[SEQUENCE] Reading first frame for validation and warmup...', flush=True)
         first = cv2.imread(str(paths[0]))
         if first is None:
             raise ValueError(f'Unreadable first frame: {paths[0]}')
+        print('[OK] First frame readable.', flush=True)
 
         warm_sizes = [c.size] if c.policy == 'fixed' else [640, 736, 832]
+        print(f'[WARMUP] Starting detector warmup at sizes: {warm_sizes}', flush=True)
         for size in warm_sizes:
-            for _ in range(3):
+            for rep in range(1, 4):
+                print(f'[WARMUP] imgsz={size} | pass {rep}/3 | waiting for GPU inference...', flush=True)
                 detect(model, first, size, c.nms)
+        print('[OK] Warmup complete. Measured realtime timing starts now.', flush=True)
 
+        print('[TRACKER] Creating fresh Controller + ByteTrack state for this sequence...', flush=True)
         control = Controller(c)
         tracker = make_tracker(c)
         previous = []
+        print('[OK] Tracker/controller ready.', flush=True)
 
         for frame, path in enumerate(paths, 1):
             sync()
@@ -90,6 +116,7 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
                     f'{bar(measured_frames, total_frames)} '
                     f'{100.0 * measured_frames / total_frames:6.2f}% | '
                     f'system={c.name} | seq={sn} | frame={frame}/{seq["frames"]} | '
+                    f'imgsz={params["size"]} | scene={params["scene"]} | SCI={params["sci"]:.3f} | '
                     f'FPS={fps:6.2f} | target={target_fps:.2f} | {status} | ETA={eta/60:.1f}m',
                     flush=True,
                 )
@@ -97,6 +124,7 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
             if not gate_checked and measured_frames >= gate_frames:
                 gate_checked = True
                 fps = measured_frames / measured_seconds
+                print(f'[GATE] {gate_frames} measured frames reached. Checking realtime requirement...', flush=True)
                 if fps < target_fps:
                     failed_gate = True
                     print(
@@ -109,6 +137,7 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
                     f'REALTIME CHECK PASS | system={c.name} | average_FPS={fps:.2f} | target={target_fps:.2f}',
                     flush=True,
                 )
+                print('[RUN] Realtime gate passed. Continuing through remaining frames for a stable full-run FPS estimate.', flush=True)
 
         if failed_gate:
             break
@@ -129,16 +158,19 @@ def run_one(system, dataset, manifest, weights, target_fps, gate_frames, progres
         'timing_excludes': 'detector warmup + output serialization',
     }
     print(
-        f'SPEEDTEST DONE | system={c.name} | status={result["status"]} | '
+        f'[RESULT] {c.name} | status={result["status"]} | '
         f'frames={measured_frames} | FPS={fps:.2f} | p95={result["p95_ms"]:.2f} ms',
         flush=True,
     )
+    print('[CLEANUP] Releasing YOLO model and GPU cache before next system...', flush=True)
     del model
     torch.cuda.empty_cache()
+    print('[OK] Cleanup complete.', flush=True)
     return result
 
 
 def main():
+    print('[ARGS] Reading speed-test arguments...', flush=True)
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--dataset', required=True, type=Path)
     p.add_argument('--sequences', required=True, type=Path)
@@ -149,16 +181,33 @@ def main():
     p.add_argument('--gate-frames', required=True, type=int)
     p.add_argument('--progress-every', type=int, default=25)
     a = p.parse_args()
+    print('[OK] Arguments loaded.', flush=True)
 
     if a.target_fps <= 0 or a.gate_frames < 1 or a.progress_every < 1:
         raise ValueError('Invalid speed-test thresholds')
 
+    print('[GPU] Checking CUDA, package versions, and Tesla T4 requirement...', flush=True)
     environment()
-    names = json.loads(a.sequences.read_text())
-    systems = json.loads(a.systems.read_text())
-    manifest = dataset_manifest(a.dataset, names)
-    a.output.mkdir(parents=True, exist_ok=False)
+    print('[OK] Environment check passed.', flush=True)
 
+    print(f'[DATASET] Reading sequence list from: {a.sequences}', flush=True)
+    names = json.loads(a.sequences.read_text())
+    print(f'[OK] {len(names)} sequences selected.', flush=True)
+
+    print(f'[SYSTEMS] Reading Top-3 configurations from: {a.systems}', flush=True)
+    systems = json.loads(a.systems.read_text())
+    print('[OK] Systems: ' + ', '.join(x['name'] for x in systems), flush=True)
+
+    print('[DATASET] Building and verifying dataset manifest. This checks every selected sequence/frame...', flush=True)
+    manifest = dataset_manifest(a.dataset, names)
+    total_frames = sum(x['frames'] for x in manifest)
+    print(f'[OK] Dataset manifest ready: {len(manifest)} sequences, {total_frames} frames.', flush=True)
+
+    print(f'[OUTPUT] Creating result folder: {a.output}', flush=True)
+    a.output.mkdir(parents=True, exist_ok=False)
+    print('[OK] Output folder created.', flush=True)
+
+    print('[SAVE] Writing speed-test configuration and dataset manifest...', flush=True)
     atomic_json(a.output / 'configuration.json', {
         'purpose': 'throughput gate only; not final frozen accuracy evaluation',
         'target_fps': a.target_fps,
@@ -170,9 +219,10 @@ def main():
         'timing_excludes': 'detector warmup + output serialization',
     })
     atomic_json(a.output / 'dataset_manifest.json', manifest)
+    print('[OK] Metadata saved. Starting Top-3 throughput test.', flush=True)
 
     results = []
-    for system in systems:
+    for idx, system in enumerate(systems, 1):
         result = run_one(
             system,
             a.dataset,
@@ -181,9 +231,13 @@ def main():
             a.target_fps,
             a.gate_frames,
             a.progress_every,
+            idx,
+            len(systems),
         )
         results.append(result)
+        print('[SAVE] Saving current speed-test results to Drive...', flush=True)
         atomic_json(a.output / 'speedtest_results.json', results)
+        print('[OK] Results saved.', flush=True)
 
     passed = [r['system'] for r in results if r['status'] == 'PASS_REALTIME']
     failed = [r['system'] for r in results if r['status'] != 'PASS_REALTIME']
@@ -193,6 +247,7 @@ def main():
     print('PASS:', ', '.join(passed) if passed else 'none', flush=True)
     print('FAIL:', ', '.join(failed) if failed else 'none', flush=True)
     print(f'RESULTS: {a.output / "speedtest_results.json"}', flush=True)
+    print('[DONE] AC-MOT Top-3 speed test finished.', flush=True)
 
 
 if __name__ == '__main__':
