@@ -123,6 +123,31 @@ summary = pd.DataFrame(summary)
 base = summary.iloc[0]
 summary['mota_delta'] = summary['mota'] - float(base['mota'])
 summary['ids_delta'] = summary['ids'] - int(base['ids'])
+summary['realtime_20fps'] = summary['fps'] >= 20.0
+summary['strict_realtime_25fps'] = summary['fps'] >= 25.0
+
+# Report every objective separately. A single winner is only declared when a
+# method is best on the requested metric; this avoids hiding the IDS trade-off.
+realtime = summary[summary['realtime_20fps']].copy()
+best_realtime = (realtime.sort_values(['mota', 'hota', 'ids', 'fps'],
+                                      ascending=[False, False, True, False])
+                 .iloc[0]['system'] if len(realtime) else None)
+best_mota = summary.loc[summary['mota'].idxmax(), 'system']
+best_hota = summary.loc[summary['hota'].idxmax(), 'system']
+best_ids = summary.loc[summary['ids'].idxmin(), 'system']
+best_fps = summary.loc[summary['fps'].idxmax(), 'system']
+
+def dominates(a, b):
+    return (a['mota'] >= b['mota'] and a['hota'] >= b['hota'] and
+            a['ids'] <= b['ids'] and a['fps'] >= b['fps'] and
+            (a['mota'] > b['mota'] or a['hota'] > b['hota'] or
+             a['ids'] < b['ids'] or a['fps'] > b['fps']))
+
+pareto = [a['system'] for _, a in summary.iterrows()
+          if not any(dominates(b, a) for _, b in summary.iterrows() if b['system'] != a['system'])]
+acmot = summary[summary['system'] == 'A3_AdaptResolution'].iloc[0]
+acmot_dominates_all = all(dominates(acmot, b) for _, b in summary.iterrows()
+                          if b['system'] != 'A3_AdaptResolution')
 
 stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 merged_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_per_sequence.csv'
@@ -140,10 +165,26 @@ Path(manifest_path).write_text(json.dumps({
     'new_input_csv': str(new_path),
     'duplicate_check': 'passed',
     'metric_note': 'macro means for rates; sums for IDS/FN/FP; no old input overwritten',
+    'realtime_policy': 'acceptable realtime is >=20 FPS; strict realtime is >=25 FPS',
+    'best_realtime_20fps': best_realtime,
+    'best_mota': best_mota,
+    'best_hota': best_hota,
+    'lowest_ids': best_ids,
+    'best_fps': best_fps,
+    'pareto_frontier': pareto,
+    'acmot_dominates_all_objectives': bool(acmot_dominates_all),
 }, indent=2) + '\n')
 
 print('\nMERGED 17-SEQUENCE ABLATION')
 print(summary.to_string(index=False, float_format=lambda x: f'{x:.4f}'))
+print('\nOBJECTIVE WINNERS')
+print('Best acceptable realtime (>=20 FPS):', best_realtime or 'NONE')
+print('Best MOTA:', best_mota)
+print('Best HOTA:', best_hota)
+print('Lowest IDS:', best_ids)
+print('Best FPS:', best_fps)
+print('Pareto frontier:', ', '.join(pareto))
+print('AC-MOT dominates all objectives:', acmot_dominates_all)
 print('\nSaved:')
 print(merged_path)
 print(summary_path)
