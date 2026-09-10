@@ -122,7 +122,14 @@ for system, g in merged.groupby('system', sort=False):
 summary = pd.DataFrame(summary)
 base = summary.iloc[0]
 summary['mota_delta'] = summary['mota'] - float(base['mota'])
+summary['idf1_delta'] = summary['idf1'] - float(base['idf1'])
+summary['hota_delta'] = summary['hota'] - float(base['hota'])
+summary['recall_delta'] = summary['recall'] - float(base['recall'])
+summary['precision_delta'] = summary['precision'] - float(base['precision'])
+summary['fps_delta'] = summary['fps'] - float(base['fps'])
 summary['ids_delta'] = summary['ids'] - int(base['ids'])
+summary['ids_reduction'] = int(base['ids']) - summary['ids']
+summary['ids_reduction_pct'] = (int(base['ids']) - summary['ids']) / max(1, int(base['ids'])) * 100.0
 summary['realtime_20fps'] = summary['fps'] >= 20.0
 summary['strict_realtime_25fps'] = summary['fps'] >= 25.0
 
@@ -153,6 +160,8 @@ stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 merged_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_per_sequence.csv'
 summary_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_summary.csv'
 manifest_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_manifest.json'
+excel_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_comparison.xlsx'
+chart_path = DRIVE_RESULTS / f'acmot_v10_ablation_merged17_{stamp}_comparison.png'
 merged.to_csv(merged_path, index=False)
 summary.to_csv(summary_path, index=False)
 Path(manifest_path).write_text(json.dumps({
@@ -175,6 +184,91 @@ Path(manifest_path).write_text(json.dumps({
     'acmot_dominates_all_objectives': bool(acmot_dominates_all),
 }, indent=2) + '\n')
 
+# Create a reproducible Excel handoff from the real 17-sequence outputs.
+# This does not invent or overwrite metrics; it only formats `merged`/`summary`.
+import matplotlib.pyplot as plt
+
+parameter_rows = [
+    dict(system='A0_Baseline_Default', tracker='baseline', adaptive_threshold=False,
+         adaptive_resolution=False, scene_analysis=False, reid=False,
+         protocol_note='Default baseline; fixed detector/tracker settings'),
+    dict(system='A1_TunedTracker', tracker='acmot', adaptive_threshold=False,
+         adaptive_resolution=False, scene_analysis=False, reid=False,
+         protocol_note='Tuned tracker only'),
+    dict(system='A2_AdaptThreshold', tracker='acmot', adaptive_threshold=True,
+         adaptive_resolution=False, scene_analysis=True, reid=False,
+         protocol_note='Tuned tracker + adaptive threshold/scene analysis'),
+    dict(system='A3_AdaptResolution', tracker='acmot', adaptive_threshold=True,
+         adaptive_resolution=True, scene_analysis=True, reid=False,
+         protocol_note='Full AC-MOT: adaptive threshold + adaptive resolution'),
+]
+parameters = pd.DataFrame(parameter_rows)
+metric_cols = ['mota', 'idf1', 'hota', 'recall', 'precision', 'fps', 'ids']
+step_effect = summary[['system'] + metric_cols].copy()
+step_effect.insert(1, 'previous_system', ['—'] + summary['system'].iloc[:-1].tolist())
+for metric in metric_cols:
+    step_effect[f'{metric}_change_vs_previous'] = summary[metric].diff()
+winners = pd.DataFrame([
+    {'objective': 'Best acceptable realtime (>=20 FPS)', 'winner': best_realtime or 'NONE'},
+    {'objective': 'Best strict realtime (>=25 FPS)', 'winner': (summary[summary['strict_realtime_25fps']]
+        .sort_values(['mota', 'hota', 'ids', 'fps'], ascending=[False, False, True, False])
+        .iloc[0]['system'] if summary['strict_realtime_25fps'].any() else 'NONE')},
+    {'objective': 'Best MOTA', 'winner': best_mota},
+    {'objective': 'Best HOTA', 'winner': best_hota},
+    {'objective': 'Lowest IDS', 'winner': best_ids},
+    {'objective': 'Best FPS', 'winner': best_fps},
+    {'objective': 'Pareto frontier', 'winner': ', '.join(pareto)},
+    {'objective': 'AC-MOT dominates all objectives', 'winner': bool(acmot_dominates_all)},
+])
+
+with pd.ExcelWriter(excel_path, engine='xlsxwriter') as writer:
+    summary.to_excel(writer, sheet_name='Summary', index=False)
+    merged.to_excel(writer, sheet_name='Per_Sequence', index=False)
+    parameters.to_excel(writer, sheet_name='Parameters', index=False)
+    step_effect.to_excel(writer, sheet_name='Step_Effects', index=False)
+    winners.to_excel(writer, sheet_name='Objective_Winners', index=False)
+    manifest = pd.DataFrame([{
+        'merged_csv': str(merged_path), 'summary_csv': str(summary_path),
+        'manifest_json': str(manifest_path), 'sequence_count': int(merged['sequence'].nunique()),
+        'systems': ', '.join(required_systems), 'metric_protocol': 'macro mean rates; sum IDS/FN/FP',
+    }])
+    manifest.to_excel(writer, sheet_name='Manifest', index=False)
+    workbook = writer.book
+    header_fmt = workbook.add_format({'bold': True, 'bg_color': '#1F4E78', 'font_color': 'white'})
+    for sheet_name, frame in [('Summary', summary), ('Per_Sequence', merged),
+                              ('Parameters', parameters), ('Step_Effects', step_effect), ('Objective_Winners', winners),
+                              ('Manifest', manifest)]:
+        sheet = writer.sheets[sheet_name]
+        sheet.freeze_panes(1, 0)
+        sheet.autofilter(0, 0, len(frame), max(0, len(frame.columns) - 1))
+        sheet.set_column(0, max(0, len(frame.columns) - 1), 18)
+        for col_idx, col_name in enumerate(frame.columns):
+            sheet.write(0, col_idx, col_name, header_fmt)
+    for col in ['mota', 'idf1', 'hota', 'recall', 'precision', 'mota_delta']:
+        if col in summary:
+            idx = summary.columns.get_loc(col)
+            writer.sheets['Summary'].set_column(idx, idx, 14, workbook.add_format({'num_format': '0.0000'}))
+    chart_sheet = workbook.add_worksheet('Charts')
+    chart_sheet.write('A1', '17-sequence AC-MOT ablation comparison')
+    chart_sheet.write('A2', 'Charts use the actual merged summary generated in this run.')
+    chart_sheet.insert_chart('A4', {'type': 'column', 'subtype': 'clustered',
+        'title': {'name': 'MOTA / HOTA'}, 'y_axis': {'name': 'score'},
+        'categories': "='Summary'!$A$2:$A$5",
+        'series': [{'name': 'MOTA', 'values': "='Summary'!$C$2:$C$5"},
+                   {'name': 'HOTA', 'values': "='Summary'!$E$2:$E$5"}]})
+    chart_sheet.insert_chart('J4', {'type': 'column', 'subtype': 'clustered',
+        'title': {'name': 'FPS / IDS'}, 'y_axis': {'name': 'value'},
+        'categories': "='Summary'!$A$2:$A$5",
+        'series': [{'name': 'FPS', 'values': "='Summary'!$K$2:$K$5"},
+                   {'name': 'IDS', 'values': "='Summary'!$H$2:$H$5"}]})
+
+fig, axes = plt.subplots(1, 4, figsize=(18, 4))
+for ax, metric, title in zip(axes, ['mota', 'hota', 'ids', 'fps'], ['MOTA', 'HOTA', 'IDS', 'FPS']):
+    values = summary[metric]
+    ax.bar(summary['system'], values, color=['#777777', '#4C78A8', '#F58518', '#54A24B'])
+    ax.set_title(title); ax.tick_params(axis='x', rotation=35); ax.grid(axis='y', alpha=.25)
+fig.tight_layout(); fig.savefig(chart_path, dpi=180, bbox_inches='tight'); plt.close(fig)
+
 print('\nMERGED 17-SEQUENCE ABLATION')
 print(summary.to_string(index=False, float_format=lambda x: f'{x:.4f}'))
 print('\nOBJECTIVE WINNERS')
@@ -189,3 +283,5 @@ print('\nSaved:')
 print(merged_path)
 print(summary_path)
 print(manifest_path)
+print(excel_path)
+print(chart_path)
