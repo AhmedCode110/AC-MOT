@@ -12,6 +12,10 @@ from datetime import datetime
 import json
 import pandas as pd
 
+# Keep every generated artifact from this experiment in one Drive folder.
+DRIVE_RESULTS = Path('/content/drive/MyDrive/concept experiment base 17 sequence')
+DRIVE_RESULTS.mkdir(parents=True, exist_ok=True)
+
 MISSING_SEQS = [
     'uav0000073_04464_v',
     'uav0000120_04775_v',
@@ -27,11 +31,17 @@ VAL_SEQS = [by_name[n] for n in MISSING_SEQS]
 assert len(VAL_SEQS) == 5 and len({s.name for s in VAL_SEQS}) == 5
 
 # The old 12-sequence per-sequence outputs are required for a valid merge.
-# Change these two paths to the exact files in Drive.
-OLD_12_PER_SEQUENCE_CSVS = [
-    DRIVE_RESULTS / 'FINAL_RUN1_A0A1_20260603_081343_per_seq.csv',
-    DRIVE_RESULTS / 'FINAL_RUN2_A2A3_20260603_080537_per_seq.csv',
+# The preserved inputs may stay anywhere in MyDrive; generated files go only
+# to DRIVE_RESULTS above.
+OLD_NAMES = [
+    'FINAL_RUN1_A0A1_20260603_081343_per_seq.csv',
+    'FINAL_RUN2_A2A3_20260603_080537_per_seq.csv',
 ]
+OLD_12_PER_SEQUENCE_CSVS = []
+for old_name in OLD_NAMES:
+    matches = list(Path('/content/drive/MyDrive').rglob(old_name))
+    assert len(matches) == 1, f'Expected one old CSV named {old_name}, found {len(matches)}'
+    OLD_12_PER_SEQUENCE_CSVS.append(matches[0])
 
 print('Running exactly these five sequences:')
 for s in VAL_SEQS:
