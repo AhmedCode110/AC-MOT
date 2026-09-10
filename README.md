@@ -10,6 +10,10 @@ v12 does not replace the adopted A3_AdaptResolution research result. Its SCI, cl
 
 The preserved evaluation pools GT classes [1,4,5,6,9], score == 1, occlusion < 2, truncation < 2. TrackEval is pinned to `12c8791b303e0a0b50f753af204249e622d0281a`. It combines sequences using upstream metric implementations. This custom class-agnostic protocol lacks official VisDrone ignored-region/class-wise preprocessing; do not call its outputs official VisDrone benchmark scores. No new measured results are claimed.
 
+## Four-way ablation study
+
+The requested `A0 -> A1 -> A2 -> A3` comparison is published as a preserved, traceable 12-sequence evidence snapshot in [`docs/ABLATION_STUDY.md`](docs/ABLATION_STUDY.md) and [`docs/ablation_4way_legacy_12seq.csv`](docs/ablation_4way_legacy_12seq.csv). It is clearly separated from the portable v12 implementation and the authoritative 17-sequence live benchmark; the two protocols must not be mixed.
+
 ## Local development
 
 Use Python 3.12 (tested locally). Python 3.10+ syntax is required. Create an environment with a platform-compatible matched torch/torchvision pair; macOS does not provide CUDA. Colab supplies a CUDA pair. These two packages are intentionally runtime-dependent, rather than pinning a CPU wheel that could break Colab. Exact installed versions are saved per run; frozen development/live environment equality remains enforced by the original pipeline.
