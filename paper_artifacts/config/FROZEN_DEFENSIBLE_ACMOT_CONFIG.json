@@ -1,0 +1,192 @@
+{
+  "method": "AC-MOT Defensible Empirical Calibration + Joint SCI Optimization",
+  "search_split": "VisDrone2019-MOT-val",
+  "test_used_during_search": false,
+  "detector": "fixed pretrained YOLOv8n",
+  "tracker": "fixed tuned ByteTrack",
+  "tracker_attribution_note": "ByteTrack is frozen during SCI study; tracker tuning evidence is a separate experiment.",
+  "smoothing_window": 7,
+  "analysis_stride": 10,
+  "resolution_levels": [
+    512,
+    928,
+    960
+  ],
+  "supported_confidence_values": [
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45
+  ],
+  "supported_nms_values": [
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7
+  ],
+  "cue_calibration_source": "fixed detector outputs + validation image statistics; no GT crowd counts",
+  "tiny_object_definition": "box area < 32x32 pixels; externally documented small-object proxy",
+  "maximum_trial_budget": 50,
+  "selection_rule": "Validation only: FPS gate and IDS<=Old-A3, then highest MOTA; tie lower IDS, HOTA, IDF1, FPS.",
+  "old_A3_reference": {
+    "HOTA": 0.33064013219122707,
+    "DetA": 0.21973183200630925,
+    "AssA": 0.5078911270405013,
+    "MOTA": 0.18164674437597447,
+    "IDF1": 0.36296242459481065,
+    "IDS": 271,
+    "FN": 46609,
+    "FP": 8232,
+    "FPS": 42.08545786066066,
+    "mean_imgsz": 725.0372452565003,
+    "mean_conf": 0.21781132809317205,
+    "mean_nms_iou": 0.4736518059568403
+  },
+  "selected_trial": 24,
+  "validation_result": {
+    "MOTA": 0.23038087460093548,
+    "IDS": 270,
+    "FPS": 37.16857745688161,
+    "HOTA": 0.3611015551055777,
+    "IDF1": 0.4075780119438273
+  },
+  "optimized_parameters": {
+    "weight_crowd": 0.12949277455301997,
+    "weight_tiny": 0.22174766876599927,
+    "weight_edge": 0.43371337893805056,
+    "weight_night": 0.05355765312756694,
+    "weight_blur": 0.16148852461536325,
+    "conf_easy": 0.3,
+    "conf_hard": 0.4,
+    "nms_easy": 0.35,
+    "nms_hard": 0.35,
+    "threshold_mid": 0.13534938199219218,
+    "threshold_high": 0.28728676236279177
+  },
+  "operating_ablation": {
+    "version": 1,
+    "validation_only": true,
+    "test_used": false,
+    "detector": "fixed pretrained YOLOv8n",
+    "tracker": "fixed tuned ByteTrack",
+    "selection_principle": "Broad one-at-a-time validation screens first; joint optimization then uses only empirically supported detector-control choices.",
+    "resolution_candidates_screened": [
+      512,
+      544,
+      576,
+      608,
+      640,
+      672,
+      704,
+      736,
+      768,
+      800,
+      832,
+      864,
+      896,
+      928,
+      960
+    ],
+    "selected_resolution_levels": [
+      512,
+      928,
+      960
+    ],
+    "confidence_candidates_screened": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5
+    ],
+    "supported_confidence_values": [
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45
+    ],
+    "nms_candidates_screened": [
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8
+    ],
+    "supported_nms_values": [
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7
+    ],
+    "cue_calibration_anchor": {
+      "resolution": 960,
+      "confidence": 0.35,
+      "nms_iou": 0.35
+    },
+    "reference_static_settings": {
+      "confidence": 0.25,
+      "nms_iou": 0.7,
+      "resolution": 640,
+      "role": "static screening reference only; not forced as the final AC-MOT setting"
+    },
+    "fps_gate": 25.0,
+    "screening_rule_for_conf_nms": "Keep values meeting the FPS gate and at least the static-reference MOTA; if fewer than 3 survive, retain the top 3 feasible values by MOTA, lower IDS, HOTA, IDF1, FPS.",
+    "resolution_selection_rule": "Choose a low-compute feasible level, the highest-quality feasible level, and the highest-quality feasible intermediate/distinct level; then sort ascending.",
+    "protocol": "custom class-agnostic AC-MOT evaluation; not official VisDrone leaderboard"
+  },
+  "cue_calibration_summary": {
+    "brightness": {
+      "min": 44.28849322451494,
+      "q25": 85.43032722348198,
+      "median": 107.64019589317209,
+      "q75": 185.0966893325617,
+      "max": 186.29875771604938
+    },
+    "blur": {
+      "min": 258.02922926306843,
+      "q25": 1165.9184745071445,
+      "median": 1980.4984376437615,
+      "q75": 2064.1304502489606,
+      "max": 3110.4064048872997
+    },
+    "edge": {
+      "min": 24.107372283935547,
+      "q25": 60.19818592071533,
+      "median": 66.15607070922852,
+      "q75": 68.26342391967773,
+      "max": 112.79639434814453
+    },
+    "crowd_detector_count": {
+      "min": 0.0,
+      "q25": 3.0,
+      "median": 10.5,
+      "q75": 19.0,
+      "max": 41.0
+    }
+  },
+  "study_signature": "1cf0f834d6b7e458b8fd9b1287c83c609632bc089bc7043eb9b48dabb727bfd7",
+  "evaluation_protocol": "Custom class-agnostic AC-MOT TrackEval protocol; not official VisDrone leaderboard."
+}
