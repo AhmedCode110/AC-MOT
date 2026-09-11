@@ -1,0 +1,76 @@
+{
+  "status": "FINAL_TEST_DONE",
+  "protocol_version": "acmot_final_test_3worker_v1",
+  "protocol_sha256": "f985b25651d622368448a21ac62712e1b9ae00849ca1012fdaaf3f511bb10720",
+  "protocol": "custom class-agnostic AC-MOT evaluation; not official VisDrone leaderboard",
+  "systems": [
+    "Baseline_Default",
+    "Old_ACMOT_Frozen",
+    "New_ACMOT_Frozen"
+  ],
+  "results": {
+    "Baseline_Default": {
+      "MOTA": 0.19728947882463468,
+      "HOTA": 0.284299789559542,
+      "IDF1": 0.3272396450211992,
+      "IDS": 1235,
+      "FN": 155051,
+      "FP": 16308,
+      "FPS": 36.52831343247701
+    },
+    "Old_ACMOT_Frozen": {
+      "MOTA": 0.23236161366236618,
+      "HOTA": 0.3269841823297656,
+      "IDF1": 0.3951646071005992,
+      "IDS": 1061,
+      "FN": 138967,
+      "FP": 25025,
+      "FPS": 41.95654034208856
+    },
+    "New_ACMOT_Frozen": {
+      "MOTA": 0.2694847777354033,
+      "HOTA": 0.33835058630489423,
+      "IDF1": 0.41545937046563247,
+      "IDS": 1184,
+      "FN": 136858,
+      "FP": 19029,
+      "FPS": 38.98451548937831
+    }
+  },
+  "gpu_by_system": {
+    "Baseline_Default": "Tesla T4",
+    "Old_ACMOT_Frozen": "Tesla T4",
+    "New_ACMOT_Frozen": "Tesla T4"
+  },
+  "deltas": {
+    "New_minus_Baseline": {
+      "MOTA": 0.07219529891076862,
+      "HOTA": 0.054050796745352236,
+      "IDF1": 0.0882197254444333,
+      "IDS": -51,
+      "FN": -18193,
+      "FP": 2721,
+      "FPS": 2.4562020569012972
+    },
+    "New_minus_Old_ACMOT": {
+      "MOTA": 0.03712316407303712,
+      "HOTA": 0.011366403975128614,
+      "IDF1": 0.020294763365033275,
+      "IDS": 123,
+      "FN": -2109,
+      "FP": -5996,
+      "FPS": -2.9720248527102484
+    },
+    "Old_ACMOT_minus_Baseline": {
+      "MOTA": 0.0350721348377315,
+      "HOTA": 0.04268439277022362,
+      "IDF1": 0.06792496207940002,
+      "IDS": -174,
+      "FN": -16084,
+      "FP": 8717,
+      "FPS": 5.428226909611546
+    }
+  },
+  "selection_or_tuning_on_test": false,
+  "warning": "Held-out results are now exposed. Do not retune and later label another run as an unbiased final test."
+}
