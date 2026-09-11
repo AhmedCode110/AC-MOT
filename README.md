@@ -1,112 +1,309 @@
-# AC-MOT
+# AC-MOT: Adaptive Complexity-Aware Multi-Object Tracking
 
-Adaptive multi-object tracking research using YOLOv8n, ByteTrack, a Scene Complexity Index (SCI), and a controller that selects inference resolution/settings from causal scene observations. GitHub stores code; Google Colab runs GPU experiments; Google Drive stores datasets, weights, caches and outputs; the laptop supports development and analysis.
+**Paper release candidate — final held-out evaluation locked on 2026-09-11.**
 
-## Research scope and preservation
+AC-MOT is a real-time multi-object tracking research pipeline built around **YOLOv8n**, **ByteTrack**, and a lightweight **Scene Complexity Index (SCI)** controller. The project studies whether detector operating points can be selected from scene-derived cues while preserving real-time performance and improving tracking quality.
 
-The root modules are the existing **experimental v12** pipeline, copied without code changes. `core.py` contains SCI and controller logic; `experiment.py` provides cache, CPU replay and live inference; `evaluate.py` is the original v11 TrackEval adapter used by v12; `report.py` performs existing development selection. `legacy/` preserves v9/v10/v11, recorded-run sources and the current embedded v12 notebook as references. Notebook outputs were cleared in these publish copies only; original notebooks remain untouched. Source hashes and original locations are in `docs/source_provenance.json`.
+This branch is based on the frozen research commit:
 
-v12 does not replace the adopted A3_AdaptResolution research result. Its SCI, class restriction, pinned tracker environment and fixed NMS differ from legacy experiments. No formulas, thresholds, matching behavior, metrics or old results have been normalized. See `docs/original_v12_README.md`. The legacy top-three live notebook describes an **exploratory test-dev comparison**, not a held-out final benchmark. The portable runner requires an existing frozen selection and does not manufacture development evidence.
+```text
+a6c1fa49fce1d402513c2df05b7d04b962a6e89e
+```
 
-The preserved evaluation pools GT classes [1,4,5,6,9], score == 1, occlusion < 2, truncation < 2. TrackEval is pinned to `12c8791b303e0a0b50f753af204249e622d0281a`. It combines sequences using upstream metric implementations. This custom class-agnostic protocol lacks official VisDrone ignored-region/class-wise preprocessing; do not call its outputs official VisDrone benchmark scores. No new measured results are claimed.
+The frozen held-out protocol was created before test-dev exposure, and the final lock explicitly records that no selection or tuning was performed on the held-out test set.
 
-## Four-way ablation study
+> **Evaluation caveat:** all reported MOTA/HOTA/IDF1 results in this release use the project's **custom class-agnostic AC-MOT TrackEval protocol**. They are **not official VisDrone leaderboard scores**.
 
-The requested `A0 -> A1 -> A2 -> A3` comparison is published as a preserved, traceable 12-sequence evidence snapshot in [`docs/ABLATION_STUDY.md`](docs/ABLATION_STUDY.md) and [`docs/ablation_4way_legacy_12seq.csv`](docs/ablation_4way_legacy_12seq.csv). It is clearly separated from the portable v12 implementation and the authoritative 17-sequence live benchmark; the two protocols must not be mixed.
+---
 
-## Local development
+## Final held-out result
 
-Use Python 3.12 (tested locally). Python 3.10+ syntax is required. Create an environment with a platform-compatible matched torch/torchvision pair; macOS does not provide CUDA. Colab supplies a CUDA pair. These two packages are intentionally runtime-dependent, rather than pinning a CPU wheel that could break Colab. Exact installed versions are saved per run; frozen development/live environment equality remains enforced by the original pipeline.
+Dataset split: `VisDrone2019-MOT-test-dev`  
+Sequences: **17**  
+Frames: **6635**  
+GPU class: **NVIDIA Tesla T4**  
+Real-time gate: **25 processing FPS**
+
+| System | MOTA ↑ | HOTA ↑ | IDF1 ↑ | IDS ↓ | FN ↓ | FP ↓ | FPS ↑ |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Baseline_Default | 19.729% | 28.430% | 32.724% | 1235 | 155,051 | **16,308** | 36.53 |
+| Old_ACMOT_Frozen | 23.236% | 32.698% | 39.516% | **1061** | 138,967 | 25,025 | **41.96** |
+| **New_ACMOT_Frozen** | **26.948%** | **33.835%** | **41.546%** | 1184 | **136,858** | 19,029 | 38.98 |
+
+### New AC-MOT vs baseline
+
+- MOTA: **+7.2195 percentage points**
+- HOTA: **+5.4051 percentage points**
+- IDF1: **+8.8220 percentage points**
+- IDS: **1235 → 1184** (`-51`)
+- FN: **155051 → 136858** (`-18193`)
+- FP: **16308 → 19029** (`+2721`)
+- FPS: **36.53 → 38.98**
+
+### New AC-MOT vs historical Old AC-MOT
+
+The new system achieves higher MOTA, HOTA, and IDF1, and lower FN/FP than the old heuristic system. The historical Old AC-MOT configuration still has the **lowest absolute IDS** and the **highest FPS**. The release therefore does **not** claim that New AC-MOT wins every metric.
+
+Canonical final artifacts are in [`paper_artifacts/final/`](paper_artifacts/final/).
+
+---
+
+## System overview
+
+```text
+Frame
+  ↓
+Scene analysis / SCI
+  ↓
+Frozen controller
+  ↓
+YOLOv8n detector
+  ↓
+ByteTrack association
+  ↓
+{id, box}
+```
+
+The final optimized system uses:
+
+- Detector: fixed pretrained **YOLOv8n**
+- Tracker: fixed tuned **ByteTrack**
+- SCI smoothing window: **7**
+- Analysis stride: **10**
+- Resolution levels: **512 / 928 / 960**
+- Validation-selected Trial: **24**
+- Real-time constraint: **FPS ≥ 25**
+
+### Frozen optimized SCI parameters
+
+```text
+crowd = 0.12949277455301997
+tiny  = 0.22174766876599927
+edge  = 0.43371337893805056
+night = 0.05355765312756694
+blur  = 0.16148852461536325
+
+conf_easy = 0.30
+conf_hard = 0.40
+
+nms_easy = 0.35
+nms_hard = 0.35
+
+threshold_mid  = 0.13534938199219218
+threshold_high = 0.28728676236279177
+```
+
+**Important:** the final optimized configuration does **not** implement adaptive NMS in practice because `nms_easy == nms_hard == 0.35`. The adaptive behavior retained by the frozen controller is therefore not described as “adaptive NMS” in the paper release.
+
+The canonical frozen configuration is preserved in [`paper_artifacts/config/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json`](paper_artifacts/config/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json).
+
+---
+
+## Validation and model selection
+
+Optimization was performed on `VisDrone2019-MOT-val`, not on test-dev.
+
+The frozen selection rule was:
+
+1. satisfy the real-time gate,
+2. satisfy the IDS constraint relative to historical Old-A3,
+3. maximize MOTA,
+4. use lower IDS, then HOTA, IDF1, and FPS as tie-breakers.
+
+The frozen candidate was **Optuna Trial 24**:
+
+| Metric | Trial 24 validation |
+|---|---:|
+| MOTA | 23.0381% |
+| HOTA | 36.1102% |
+| IDF1 | 40.7578% |
+| IDS | 270 |
+| FPS | 37.1686 |
+
+No held-out test result was used to select these parameters.
+
+---
+
+## New component ablation
+
+This validation-only ablation was completed before the final held-out protocol was frozen.
+
+| Variant | MOTA | HOTA | IDF1 | IDS | FPS |
+|---|---:|---:|---:|---:|---:|
+| A0 — Static anchor | **23.081%** | 36.078% | 40.600% | **266** | **37.92** |
+| A1 — Adaptive confidence | 23.013% | 36.109% | 40.727% | 271 | 35.35 |
+| A2 — Adaptive confidence + NMS stage | 23.013% | 36.109% | 40.727% | 271 | 35.53 |
+| A3 — Full New AC-MOT | 23.038% | **36.110%** | **40.758%** | 270 | 35.45 |
+| HIST — Old AC-MOT W7/S10 | 18.165% | 33.064% | 36.296% | 271 | 37.98 |
+
+The ablation is intentionally reported without claiming that the adaptive configuration beats every static operating point on every metric. Raw values are preserved in [`paper_artifacts/validation/NEW_ACMOT_COMPONENT_ABLATION.csv`](paper_artifacts/validation/NEW_ACMOT_COMPONENT_ABLATION.csv).
+
+---
+
+## Historical Old AC-MOT ablation
+
+| Stage | Description | MOTA | HOTA | IDF1 | IDS | FPS |
+|---|---|---:|---:|---:|---:|---:|
+| OLD-A0 | Static detector + default ByteTrack | 17.633% | 29.837% | 30.892% | 283 | 44.09 |
+| OLD-A1 | Static detector + tuned ByteTrack | 17.802% | 30.864% | 32.854% | 217 | 44.51 |
+| OLD-A2 | Adaptive conf/NMS, resolution fixed | 17.636% | 31.384% | 33.727% | **210** | 40.65 |
+| OLD-A2R | Adaptive resolution only | **18.425%** | 32.446% | 35.669% | 241 | 39.56 |
+| OLD-A3 | Full historical Old AC-MOT | 18.165% | **33.064%** | **36.296%** | 271 | 37.96 |
+
+Raw values are preserved in [`paper_artifacts/validation/OLD_ACMOT_COMPONENT_ABLATION.csv`](paper_artifacts/validation/OLD_ACMOT_COMPONENT_ABLATION.csv).
+
+---
+
+## Frozen held-out protocol
+
+Three systems were declared before held-out evaluation:
+
+1. `Baseline_Default`
+   - confidence `0.25`
+   - NMS IoU `0.45`
+   - image size `640`
+   - default ByteTrack profile
+2. `Old_ACMOT_Frozen`
+   - historical heuristic SCI controller
+   - tuned ByteTrack
+   - smoothing `7`, stride `10`
+   - resolutions `640 / 736 / 832`
+3. `New_ACMOT_Frozen`
+   - validation-selected empirical SCI controller
+   - tuned ByteTrack
+   - smoothing `7`, stride `10`
+   - resolutions `512 / 928 / 960`
+
+The protocol records:
+
+```text
+selection_or_tuning_on_test = false
+official_visdrone = false
+minimum_processing_fps = 25
+required_gpu_class = NVIDIA T4
+TrackEval commit = 12c8791b303e0a0b50f753af204249e622d0281a
+```
+
+Ground-truth filtering:
+
+```text
+categories = [1, 4, 5, 6, 9]
+score = 1
+occlusion < 2
+truncation < 2
+```
+
+See [`paper_artifacts/final/FINAL_TEST_3WORKER_PROTOCOL.json`](paper_artifacts/final/FINAL_TEST_3WORKER_PROTOCOL.json).
+
+---
+
+## Reproducibility identity
+
+Frozen research source:
+
+```text
+Repository: https://github.com/AhmedCode110/AC-MOT
+Frozen branch: acmot-final-frozen-2026-09-11
+Frozen commit: a6c1fa49fce1d402513c2df05b7d04b962a6e89e
+Paper-release branch: paper-release-2026-09-11
+```
+
+Pinned evaluator:
+
+```text
+TrackEval commit:
+12c8791b303e0a0b50f753af204249e622d0281a
+```
+
+Canonical prerequisite hashes recorded by the frozen protocol:
+
+```text
+FROZEN_DEFENSIBLE_ACMOT_CONFIG.json
+8eeb7b916e7085b290313349cb0ebb95fa97f7f3956caefedd902fcf2890379c
+
+DETECTOR_DERIVED_CUE_CALIBRATION.json
+fd42b22987365236944e90d3ebd646a28a56e5b60986cf1ad9f05881e7958c78
+
+NEW_ACMOT_COMPONENT_ABLATION_DONE.json
+4757d76f3414e3d040d3fc16f2662c84cf8a814800a08b38e77c7f288bb09ad6
+
+FINAL_TEST_3WORKER_PROTOCOL.json
+f985b25651d622368448a21ac62712e1b9ae00849ca1012fdaaf3f511bb10720
+```
+
+The final held-out lock is [`paper_artifacts/final/FINAL_TEST_DONE.json`](paper_artifacts/final/FINAL_TEST_DONE.json). Once this file exists, this test-dev result is considered exposed and locked. Future tuning must use a new protocol/split and must not be described as the original unbiased final held-out evaluation.
+
+---
+
+## Repository layout
+
+```text
+AC-MOT/
+├── core*.py, experiment*.py, evaluate.py
+├── scripts/                     # experiment, validation and final-test code
+├── notebooks/                   # Colab entry points and Optuna workflows
+├── configs/                     # runtime/config templates
+├── legacy/                      # preserved historical implementations
+├── docs/                        # historical and protocol documentation
+└── paper_artifacts/
+    ├── config/                  # frozen publication configuration
+    ├── validation/              # validation ablations and selection evidence
+    └── final/                   # locked held-out protocol + results
+```
+
+The dataset, model weights, raw frame-level checkpoints, and large caches are not committed to GitHub. They must be obtained separately and are intentionally excluded from source control.
+
+---
+
+## Running / auditing the code
+
+For source-level inspection:
 
 ```bash
 git clone https://github.com/AhmedCode110/AC-MOT.git
 cd AC-MOT
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
+git checkout paper-release-2026-09-11
 python -m pip install -r requirements.txt
-python -m unittest test_suite -v
-python experiment.py --help
 python evaluate.py --help
-python scripts/setup_trackeval.py /tmp/acmot-TrackEval
-code .
 ```
 
-Local work includes SCI/controller development, config validation, CSV analysis, plotting, CPU cache replay and TrackEval. Do not run `cache` or `live` on the laptop. The original GPU code requires device 0 and a Tesla T4, and uses **FP32**. FP16/TensorRT are not enabled by this conversion: they require a separately validated protocol. No optional TensorRT packages are installed.
-
-## Dataset and output layout
-
-```text
-Google Drive/
-  AC-MOT-data/
-    VisDrone2019-MOT-test-dev/
-      sequences/<sequence>/0000001.jpg
-      annotations/<sequence>.txt
-    detection_cache_v1/        # original cache; format may differ from v12
-  AC-MOT-results/
-    existing_recording/
-    development_selection/frozen.json
-    <mode>_<UTC timestamp>_<unique id>/
-      run_metadata.json
-      environment.txt
-      result/
-```
-
-Existing legacy caches are not automatically compatible with v12's six-bank post-NMS format. Do not rename/rebuild them to force compatibility. v12 replay checks environment and cache hashes. Data and generated results are intentionally excluded from GitHub. This conversion found no local `.pt` weights; all `.pt` files are ignored. The runner downloads standard `yolov8n.pt` only when needed and absent, outside source; research code records its hash.
-
-## Run experiments and evaluation
-
-Copy `configs/colab.json` or `configs/live.json` to a local or Drive JSON file, then edit its paths. Paths should be absolute. `mode`, `dataset`, `output_root`, `weights`, `device`, `cache`, `saved_run`, `frozen`, `trackeval`, GPU requirements and optional seed are centralized there.
+For exact frozen-source inspection:
 
 ```bash
-python scripts/run.py --config /absolute/path/my-config.json --check
-python scripts/run.py --config /absolute/path/my-config.json
+git checkout acmot-final-frozen-2026-09-11
+git rev-parse HEAD
+# expected:
+# a6c1fa49fce1d402513c2df05b7d04b962a6e89e
 ```
 
-- `evaluate_saved`: set an existing v12-compatible recording folder, dataset and pinned TrackEval path; CPU-safe.
-- `replay`: set a v12-compatible cache; optional `systems` JSON or existing `frozen` selection. Replay FPS is not deployment FPS.
-- `live`: use `configs/live.json`, an existing development selection and matching weights/environment. Requires T4/CUDA device 0; checks 17 sequences/6635 frames and performs three repeats by default, then evaluates each repeat.
-- `cache`: explicitly opt in, set `split: development`, a separate development dataset and device `0`; this is expensive. This cleanup does not execute it.
+The final-test scripts are under `scripts/`. Do **not** rerun or retune the original held-out protocol and then describe the new run as the same unbiased final evaluation.
 
-Every runner invocation creates a unique envelope and prints its exact location, saving commit hash, dirty flag, config, timestamp, environment/GPU, commands, dataset path, status and optional seed. The seed defaults to null to preserve existing behavior; opt-in seeding is not a promise of bitwise determinism. Original modules additionally hash data/model/source where implemented. Full image hashing and Drive reads can be slow. Use an untouched commit and the same saved environment for comparisons.
+---
 
-Direct original CLI remains available for compatibility:
+## What is and is not claimed
 
-```bash
-python experiment.py live --dataset /absolute/VisDrone2019-MOT-test-dev --sequences /absolute/sequences.json --weights /absolute/yolov8n.pt --output /absolute/NEW-run --split test --frozen /absolute/frozen.json --repeats 3
-python evaluate.py /absolute/recording --dataset /absolute/VisDrone2019-MOT-test-dev --trackeval /tmp/acmot-TrackEval --output /absolute/NEW-evaluation
-python report.py --run /absolute/development-replay --evaluation /absolute/evaluation --output /absolute/NEW-selection
-```
+This release supports the following statement:
 
-Prefer the wrapper for safe unique outputs and extra provenance. Original cache/replay CLIs retain their existing resume behavior. Do not reuse old result paths for new experiments.
+> On the locked 17-sequence held-out evaluation under the custom class-agnostic AC-MOT protocol, New AC-MOT achieved the highest MOTA, HOTA, and IDF1 while remaining real-time. Historical Old AC-MOT achieved the lowest absolute IDS and highest FPS.
 
-## Google Colab and multiple accounts
+This release does **not** claim:
 
-1. Open `notebooks/AC_MOT_Colab.ipynb` through Colab's GitHub picker after authorizing access, or upload that lightweight notebook from your laptop. For private repositories a public Colab badge alone cannot grant access.
-2. Select a T4 runtime for live/cache; mount Drive with the Google account that can access the data.
-3. Clone/pull using the notebook cell. For private GitHub access, enter a read-only Contents token in its hidden prompt. Nothing is saved in URLs, notebook source or Git config. Repeat authentication in each new session.
-4. Install requirements and the pinned TrackEval checkout. Restart the runtime if previously imported dependencies conflict.
-5. Edit the centralized paths. Share the dataset Drive folder with the current Google account, optionally add a My Drive shortcut, and verify the actual mounted location. Results need a writable folder; it can belong to another account if permissions allow.
-6. Optionally copy JPEGs to a unique `/content` folder before benchmarking; ensure adequate runtime disk space. The original Drive dataset remains intact. `/content` is ephemeral.
-7. Run environment verification, then explicitly execute the experiment. Outputs are written directly under the configured Drive results root in a fresh folder.
+- official VisDrone leaderboard results,
+- that New AC-MOT has the lowest IDS,
+- that New AC-MOT improves every metric over every static operating point,
+- adaptive NMS in the final optimized system,
+- test-time tuning or selection.
 
-GitHub identity and Google Drive identity are independent. Each Colab Google account needs Drive access; the authenticating GitHub identity needs repository access. The same repository works across accounts. Do not commit notebook outputs containing private data or credentials.
+---
 
-## GitHub workflow
+## Citation
 
-The clean repository is separate from the original research workspace's existing Git history, which contains presentation/binary material. No original history or files were rewritten.
+If you use this repository, cite the associated AC-MOT paper/thesis once its bibliographic record is available. A `CITATION.cff` file is included in this paper-release branch for repository citation metadata.
 
-```bash
-git status --short
-git diff
-python scripts/audit.py
-git add <specific-source-files>
-git diff --cached --stat
-git commit -m "Describe the code change"
-git push origin main
-```
+## Authors
 
-If publishing manually for the first time, authenticate with `gh auth login`, then run `gh repo create AhmedCode110/AC-MOT --private --source=. --remote=origin` and `git push -u origin main` (only if the repository does not already exist). Never add datasets, caches, raw rounds, live outputs, archives, weights or credentials. Review `docs/PRECOMMIT_AUDIT.md` for the initial publication inventory and `docs/CHANGES.md` for functional additions and limitations.
+Ahmed Gouda Ismail  
+Computers Engineering and Artificial Intelligence Department  
+Military Technical College, Cairo, Egypt
 
-
-The checked-in evaluation configuration now points at the existing Drive test-dev dataset and Round 2 recording verified during setup. Results use a new `ACMOT_IDS/portable_runs` folder. This evaluates saved exploratory recordings; it does not start inference. If GitHub authorization is unavailable, the notebook also accepts an explicitly supplied `BUNDLE_PATH`: export with `git bundle create /outside/repo/AC-MOT.bundle main`, copy that small source-only bundle to your private Drive, and enter its mounted path. The bundle preserves exact Git history/commit identity, has no credentials, and does not automatically fetch future GitHub changes. Set `BUNDLE_PATH=None` to return to authenticated GitHub clone/pull.
+Research collaborators/supervision information can be added to the final paper citation without changing the frozen experimental artifacts.
