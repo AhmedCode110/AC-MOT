@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use AC-MOT or its released experimental artifacts, please cite the associated paper/thesis and this repository."
+title: "AC-MOT: Adaptive Complexity-Aware Multi-Object Tracking"
+type: software
+authors:
+  - family-names: "Gouda Ismail"
+    given-names: "Ahmed"
+repository-code: "https://github.com/AhmedCode110/AC-MOT"
+version: "paper-release-2026-09-11"
+date-released: "2026-09-11"
