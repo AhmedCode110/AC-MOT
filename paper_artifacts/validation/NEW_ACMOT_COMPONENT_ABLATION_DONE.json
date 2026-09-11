@@ -1,0 +1,14 @@
+{
+  "status": "DONE",
+  "csv": "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers/NEW_ACMOT_COMPONENT_ABLATION.csv",
+  "report": "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers/NEW_ACMOT_COMPONENT_ABLATION_REPORT.json",
+  "systems": [
+    "A0_STATIC_ANCHOR",
+    "A1_ADAPT_CONF",
+    "A2_ADAPT_CONF_NMS",
+    "A3_FULL_NEW_ACMOT",
+    "HIST_OLD_ACMOT_W7_S10"
+  ],
+  "validation_only": true,
+  "test_dev_accessed": false
+}
