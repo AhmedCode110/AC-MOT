@@ -1,1 +1,0 @@
-This branch is being assembled for the paper release. Do not cite until RELEASE_STATUS.md says VERIFIED.
