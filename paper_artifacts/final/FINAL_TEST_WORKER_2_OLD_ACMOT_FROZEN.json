@@ -1,0 +1,23 @@
+{
+  "status": "FINAL_TEST_WORKER_COMPLETE",
+  "protocol_version": "acmot_final_test_3worker_v1",
+  "protocol_sha256": "f985b25651d622368448a21ac62712e1b9ae00849ca1012fdaaf3f511bb10720",
+  "worker_id": 2,
+  "system": "Old_ACMOT_Frozen",
+  "test_dir": "/content/drive/MyDrive/VisDrone2019-MOT-test-dev",
+  "sequence_count": 17,
+  "gpu": "Tesla T4",
+  "frozen_config_sha256": "8eeb7b916e7085b290313349cb0ebb95fa97f7f3956caefedd902fcf2890379c",
+  "calibration_sha256": "fd42b22987365236944e90d3ebd646a28a56e5b60986cf1ad9f05881e7958c78",
+  "metrics": {
+    "MOTA": 0.23236161366236618,
+    "HOTA": 0.3269841823297656,
+    "IDF1": 0.3951646071005992,
+    "IDS": 1061,
+    "FN": 138967,
+    "FP": 25025,
+    "FPS": 41.95654034208856
+  },
+  "selection_or_tuning_on_test": false,
+  "warning": "Held-out test data has now been exposed for this locked system. Do not retune based on this result."
+}
