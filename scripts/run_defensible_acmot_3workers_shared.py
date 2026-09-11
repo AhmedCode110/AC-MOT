@@ -1,10 +1,10 @@
-"""Distributed 3-worker launcher for the existing defensible AC-MOT pipeline.
+"""Distributed 3-worker launcher for the defensible AC-MOT pipeline.
 
 IMPORTANT
 ---------
 This file does NOT replace or modify the original one-command full pipeline.
-It only orchestrates the same existing stage scripts across three independent
-workers/runtimes that can see the same shared result folder.
+It orchestrates the validation stages across three independent workers/runtimes
+that can see the same shared result folder.
 
 Worker assignment
 -----------------
@@ -22,6 +22,8 @@ Scientific behavior is preserved:
 - validation only for stages 1-3
 - test-dev is NOT accessed here
 - full mode keeps the existing single-study 50-trial Optuna behavior
+- Stage 1 uses the timing-fair launcher: exact tested resolution warm-up and
+  unused visual SceneAnalyzer computation excluded from static-screen timing
 
 Provider note
 -------------
@@ -52,7 +54,10 @@ SHARED_ROOT = Path(
     )
 )
 
-OPERATING = ROOT / "scripts" / "scientific_operating_ablation_portable_colab.py"
+# Worker 1 intentionally uses the timing-fair Stage-1 launcher.  The launcher
+# executes the original scientific Stage-1 sweep unchanged while fixing only
+# FPS isolation: exact tested-shape warm-up and no unused visual SCI analysis.
+OPERATING = ROOT / "scripts" / "scientific_operating_ablation_fair_timing.py"
 TEMPORAL = ROOT / "scripts" / "temporal_ablation_portable_colab.py"
 JOINT = ROOT / "scripts" / "optuna_sci_empirical_portable_colab.py"
 
@@ -153,6 +158,8 @@ print("Worker          :", WORKER_ID, flush=True)
 print("Mode            :", "SMOKE" if SMOKE else "FULL", flush=True)
 print("Shared folder   :", SHARED_ROOT, flush=True)
 print("Test-dev        : NOT ACCESSED", flush=True)
+if WORKER_ID == 1:
+    print("Stage-1 timing  : FAIR (exact-shape warm-up; unused visual analysis excluded)", flush=True)
 print("#" * 110 + "\n", flush=True)
 
 if WORKER_ID == 1:
@@ -163,7 +170,7 @@ if WORKER_ID == 1:
         raise RuntimeError(f"Worker 1 finished but expected output is missing: {expected}")
     write_marker(
         "WORKER1_OPERATING_SMOKE_DONE.json" if SMOKE else "WORKER1_OPERATING_DONE.json",
-        {"stage": "operating_ablation", "expected_output": str(expected)},
+        {"stage": "operating_ablation", "expected_output": str(expected), "timing_fair": True},
     )
 
 elif WORKER_ID == 2:
