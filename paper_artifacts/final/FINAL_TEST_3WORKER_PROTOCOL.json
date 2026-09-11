@@ -1,0 +1,54 @@
+{
+  "protocol_version": "acmot_final_test_3worker_v1",
+  "purpose": "One locked held-out comparison of project baseline, historical AC-MOT, and new frozen AC-MOT.",
+  "test_access_during_preparation": false,
+  "selection_or_tuning_on_test": false,
+  "official_visdrone": false,
+  "evaluation_protocol": "custom class-agnostic AC-MOT research protocol",
+  "repository_commit_at_freeze": "a6c1fa49fce1d402513c2df05b7d04b962a6e89e",
+  "artifact_hashes": {
+    "FROZEN_DEFENSIBLE_ACMOT_CONFIG.json": "8eeb7b916e7085b290313349cb0ebb95fa97f7f3956caefedd902fcf2890379c",
+    "DETECTOR_DERIVED_CUE_CALIBRATION.json": "fd42b22987365236944e90d3ebd646a28a56e5b60986cf1ad9f05881e7958c78",
+    "NEW_ACMOT_COMPONENT_ABLATION_DONE.json": "4757d76f3414e3d040d3fc16f2662c84cf8a814800a08b38e77c7f288bb09ad6"
+  },
+  "ground_truth_filter": {
+    "categories": [1, 4, 5, 6, 9],
+    "score": 1,
+    "occlusion_lt": 2,
+    "truncation_lt": 2
+  },
+  "minimum_processing_fps": 25.0,
+  "required_gpu_class": "NVIDIA T4",
+  "pinned_trackeval_commit": "12c8791b303e0a0b50f753af204249e622d0281a",
+  "systems": [
+    {
+      "worker_id": 1,
+      "name": "Baseline_Default",
+      "description": "Static project baseline: conf=0.25, NMS IoU=0.45, imgsz=640, default ByteTrack profile.",
+      "tracker_profile": "default",
+      "controller": "static_project_baseline"
+    },
+    {
+      "worker_id": 2,
+      "name": "Old_ACMOT_Frozen",
+      "description": "Historical heuristic AC-MOT controller with tuned ByteTrack, W=7, stride=10, original adaptive confidence/NMS/resolution mapping.",
+      "tracker_profile": "tuned",
+      "controller": "core_v17.PresentationController",
+      "smoothing_window": 7,
+      "analysis_stride": 10,
+      "resolution_levels": [640, 736, 832]
+    },
+    {
+      "worker_id": 3,
+      "name": "New_ACMOT_Frozen",
+      "description": "Validation-selected frozen empirical SCI controller with tuned ByteTrack; no test-time tuning.",
+      "tracker_profile": "tuned",
+      "controller": "FrozenSCIController",
+      "smoothing_window": 7,
+      "analysis_stride": 10,
+      "resolution_levels": [512, 928, 960]
+    }
+  ],
+  "merge_rule": "Merge all three predeclared systems; do not select or retune based on partial test results.",
+  "warning": "After any worker accesses test-dev, do not change parameters and later call another run an unbiased held-out final test."
+}
