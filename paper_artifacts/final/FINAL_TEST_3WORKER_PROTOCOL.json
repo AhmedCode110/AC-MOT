@@ -12,7 +12,13 @@
     "NEW_ACMOT_COMPONENT_ABLATION_DONE.json": "4757d76f3414e3d040d3fc16f2662c84cf8a814800a08b38e77c7f288bb09ad6"
   },
   "ground_truth_filter": {
-    "categories": [1, 4, 5, 6, 9],
+    "categories": [
+      1,
+      4,
+      5,
+      6,
+      9
+    ],
     "score": 1,
     "occlusion_lt": 2,
     "truncation_lt": 2
@@ -36,7 +42,11 @@
       "controller": "core_v17.PresentationController",
       "smoothing_window": 7,
       "analysis_stride": 10,
-      "resolution_levels": [640, 736, 832]
+      "resolution_levels": [
+        640,
+        736,
+        832
+      ]
     },
     {
       "worker_id": 3,
@@ -46,7 +56,11 @@
       "controller": "FrozenSCIController",
       "smoothing_window": 7,
       "analysis_stride": 10,
-      "resolution_levels": [512, 928, 960]
+      "resolution_levels": [
+        512,
+        928,
+        960
+      ]
     }
   ],
   "merge_rule": "Merge all three predeclared systems; do not select or retune based on partial test results.",
