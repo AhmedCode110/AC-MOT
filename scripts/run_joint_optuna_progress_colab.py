@@ -10,7 +10,8 @@ It provides:
 - overall Optuna percentage,
 - completed-trial ETA based on measured trial durations,
 - best feasible MOTA / IDS / FPS seen so far,
-- live streaming of the underlying sequence/frame SCI progress.
+- live streaming of the underlying sequence/frame SCI progress,
+- a heartbeat during silent stages such as validation-manifest hashing.
 
 Usage in Colab:
     from google.colab import drive
@@ -26,9 +27,11 @@ Usage in Colab:
 from __future__ import annotations
 
 import os
+import queue
 import re
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -45,6 +48,7 @@ TOTAL_TRIALS = int(os.environ.get("ACMOT_OPTUNA_TRIALS", "50"))
 
 # More frequent frame-level progress than the base script's conservative default.
 os.environ.setdefault("ACMOT_PROGRESS_EVERY", "50")
+HEARTBEAT_SECONDS = float(os.environ.get("ACMOT_HEARTBEAT_SECONDS", "5"))
 
 
 def fmt_seconds(seconds: float | None) -> str:
@@ -104,6 +108,7 @@ print("=" * 96, flush=True)
 print("AC-MOT JOINT OPTUNA — LIVE PROGRESS RUNNER", flush=True)
 print(f"Trials              : {TOTAL_TRIALS}", flush=True)
 print(f"Frame progress every: {os.environ['ACMOT_PROGRESS_EVERY']} frames", flush=True)
+print(f"Heartbeat every     : {HEARTBEAT_SECONDS:g}s during silent stages", flush=True)
 print(f"Smoke test          : {os.environ.get('ACMOT_SMOKE_TEST', '0')}", flush=True)
 print("Validation only     : YES", flush=True)
 print("Test-dev            : NOT ACCESSED BY THE OPTIMIZATION SCRIPT", flush=True)
@@ -127,6 +132,9 @@ trial_started_at: float | None = None
 trial_durations: list[float] = []
 current_trial: int | None = None
 completed = 0
+current_stage = "starting child process"
+last_output_at = time.perf_counter()
+heartbeat_count = 0
 
 current_result: dict[str, float | int | bool] = {}
 best: dict | None = None
@@ -136,9 +144,61 @@ trial_result_re = re.compile(r"\[TRIAL\s+(\d+)\]")
 
 assert process.stdout is not None
 
-for raw_line in process.stdout:
+# Read child output on a thread so the main loop can emit progress heartbeats
+# even when the child is busy in a silent stage (e.g. hashing the manifest).
+line_queue: queue.Queue[str | None] = queue.Queue()
+
+
+def _reader() -> None:
+    try:
+        for line in process.stdout:
+            line_queue.put(line)
+    finally:
+        line_queue.put(None)
+
+
+threading.Thread(target=_reader, daemon=True).start()
+
+while True:
+    try:
+        raw_line = line_queue.get(timeout=HEARTBEAT_SECONDS)
+    except queue.Empty:
+        heartbeat_count += 1
+        silent_for = time.perf_counter() - last_output_at
+        elapsed = time.perf_counter() - started_at
+        spinner = "|/-\\"[heartbeat_count % 4]
+        print(
+            f"[HEARTBEAT {spinner}] stage={current_stage} | "
+            f"silent={fmt_seconds(silent_for)} | total_elapsed={fmt_seconds(elapsed)} | "
+            f"process={'RUNNING' if process.poll() is None else 'EXITED'}",
+            flush=True,
+        )
+        continue
+
+    if raw_line is None:
+        break
+
+    last_output_at = time.perf_counter()
     line = raw_line.rstrip("\n")
     print(raw_line, end="", flush=True)
+
+    # Human-readable stage tracking. These labels are informational only and do
+    # not affect the optimization or evaluation logic.
+    stripped = line.strip()
+    if stripped.startswith("Protocol"):
+        current_stage = "building validation manifest / hashing frame files"
+    elif stripped.startswith("[OK] Validation sequences"):
+        current_stage = "validation cue calibration"
+    elif stripped.startswith("[CALIBRATION]"):
+        current_stage = "validation cue calibration"
+    elif "OLD A3" in stripped and "REFERENCE" in stripped:
+        current_stage = "loading/running Old A3 validation reference"
+    elif stripped.startswith("JOINT OPTUNA TRIAL"):
+        current_stage = "Optuna trial evaluation"
+    elif stripped.startswith("[TRIAL"):
+        current_stage = "trial metrics / feasibility check"
+    elif stripped.startswith("SMOKE TEST COMPLETE"):
+        current_stage = "smoke test complete"
 
     m = trial_header_re.search(line)
     if m:
@@ -159,7 +219,6 @@ for raw_line in process.stdout:
         current_result["trial"] = current_trial
         continue
 
-    stripped = line.strip()
     try:
         if stripped.startswith("MOTA ="):
             current_result["MOTA"] = float(stripped.split("=", 1)[1].replace("%", "").strip())
