@@ -1,31 +1,27 @@
-"""Live-progress runner for AC-MOT portable joint Optuna search in Google Colab.
+"""Live-progress runner for the complete AC-MOT validation workflow in Colab.
 
-This wrapper does not change the scientific method. It only improves runtime
-visibility while delegating all optimization/evaluation work to
-scripts/optuna_sci_joint_portable_colab.py.
+Stages
+------
+1) Temporal ablation: choose SCI smoothing_window and analysis_stride on validation.
+2) Freeze/reuse the temporal choice.
+3) Joint Optuna: tune SCI weights + detector-control mapping on validation.
 
-It provides:
-- denser per-frame progress by default (every 50 measured frames),
-- current trial / total trials,
-- overall Optuna percentage,
-- completed-trial ETA based on measured trial durations,
-- best feasible MOTA / IDS / FPS seen so far,
-- live streaming of the underlying sequence/frame SCI progress,
-- a heartbeat during silent stages such as validation-manifest hashing.
+The final test set is never accessed by either optimization stage.
 
-Usage in Colab:
-    from google.colab import drive
-    drive.mount('/content/drive')
+Smoke mode:
+- runs a 4-combination temporal smoke test,
+- does NOT freeze temporal settings,
+- then runs the requested small joint-Optuna smoke test using W=7/S=10.
 
-    # clone/pull repo first, then:
-    import os
-    os.environ['ACMOT_OPTUNA_TRIALS'] = '2'   # use 50 for full search
-    os.environ['ACMOT_SMOKE_TEST'] = '1'      # use 0 for full search
-    %run /content/AC-MOT/scripts/run_joint_optuna_progress_colab.py
+Full mode:
+- runs/reuses the full 25-combination temporal ablation,
+- exports the selected W/S to the joint Optuna stage,
+- then runs the requested joint Optuna budget.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import queue
 import re
@@ -36,19 +32,27 @@ import time
 from pathlib import Path
 
 ROOT = Path(os.environ.get("ACMOT_REPO", "/content/AC-MOT"))
-TARGET = ROOT / "scripts" / "optuna_sci_joint_portable_colab.py"
+JOINT_TARGET = ROOT / "scripts" / "optuna_sci_joint_portable_colab.py"
+TEMPORAL_TARGET = ROOT / "scripts" / "temporal_ablation_portable_colab.py"
+DRIVE = Path(os.environ.get("ACMOT_DRIVE", "/content/drive/MyDrive"))
+RESULT_ROOT = Path(
+    os.environ.get("ACMOT_RESULT_ROOT", str(DRIVE / "AC-MOT-results" / "optuna_sci_joint"))
+)
+TEMPORAL_FROZEN = RESULT_ROOT / "FROZEN_TEMPORAL_CONFIG.json"
 
-if not TARGET.exists():
-    raise RuntimeError(
-        f"Joint Optuna script not found: {TARGET}\n"
-        "Update the repository first with: git -C /content/AC-MOT pull --ff-only"
-    )
+for target in (JOINT_TARGET, TEMPORAL_TARGET):
+    if not target.exists():
+        raise RuntimeError(
+            f"Required script not found: {target}\n"
+            "Update the repository first with: git -C /content/AC-MOT pull --ff-only"
+        )
 
 TOTAL_TRIALS = int(os.environ.get("ACMOT_OPTUNA_TRIALS", "50"))
-
-# More frequent frame-level progress than the base script's conservative default.
-os.environ.setdefault("ACMOT_PROGRESS_EVERY", "50")
+SMOKE_TEST = os.environ.get("ACMOT_SMOKE_TEST", "0") == "1"
 HEARTBEAT_SECONDS = float(os.environ.get("ACMOT_HEARTBEAT_SECONDS", "5"))
+
+# Dense frame-level progress from paper_eval_v17.
+os.environ.setdefault("ACMOT_PROGRESS_EVERY", "50")
 
 
 def fmt_seconds(seconds: float | None) -> str:
@@ -72,158 +76,206 @@ def bar(done: int, total: int, width: int = 32) -> str:
     return "[" + "=" * filled + ">" * (filled < width) + "." * max(width - filled - 1, 0) + "]"
 
 
-def print_overall(
-    completed: int,
-    total: int,
-    started_at: float,
-    trial_durations: list[float],
-    best: dict | None,
-) -> None:
-    pct = 100.0 * completed / total if total else 0.0
-    elapsed = time.perf_counter() - started_at
-    eta = None
-    if trial_durations and completed < total:
-        # Measured ETA only: average duration of completed trials.
-        eta = (sum(trial_durations) / len(trial_durations)) * (total - completed)
+def stream_process(cmd, env, label, parse_line=None):
+    """Stream a child process and emit heartbeats during silent phases."""
+    process = subprocess.Popen(
+        cmd,
+        cwd=str(ROOT),
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+    )
+    assert process.stdout is not None
 
-    print("\n" + "-" * 96, flush=True)
+    q: queue.Queue[str | None] = queue.Queue()
+
+    def reader():
+        try:
+            for line in process.stdout:
+                q.put(line)
+        finally:
+            q.put(None)
+
+    threading.Thread(target=reader, daemon=True).start()
+
+    start = time.perf_counter()
+    last_output = start
+    finished_stream = False
+
+    while not finished_stream:
+        try:
+            item = q.get(timeout=1.0)
+        except queue.Empty:
+            item = "__NO_LINE__"
+
+        now = time.perf_counter()
+        if item is None:
+            finished_stream = True
+            continue
+
+        if item == "__NO_LINE__":
+            silent = now - last_output
+            if silent >= HEARTBEAT_SECONDS:
+                print(
+                    f"[HEARTBEAT] stage={label} | process=RUNNING | "
+                    f"silent={silent:.0f}s | total_elapsed={fmt_seconds(now-start)}",
+                    flush=True,
+                )
+                last_output = now
+            continue
+
+        print(item, end="", flush=True)
+        last_output = now
+        if parse_line is not None:
+            parse_line(item.rstrip("\n"))
+
+    return_code = process.wait()
+    if return_code != 0:
+        raise RuntimeError(f"{label} failed with return code {return_code}")
+    return return_code
+
+
+# =============================================================================
+# STAGE 1 — TEMPORAL ABLATION
+# =============================================================================
+print("=" * 100, flush=True)
+print("AC-MOT COMPLETE VALIDATION WORKFLOW", flush=True)
+print(f"Joint Optuna trials      : {TOTAL_TRIALS}", flush=True)
+print(f"Frame progress every     : {os.environ['ACMOT_PROGRESS_EVERY']} frames", flush=True)
+print(f"Smoke test               : {int(SMOKE_TEST)}", flush=True)
+print("Validation only          : YES", flush=True)
+print("Test-dev                 : NOT ACCESSED", flush=True)
+print("=" * 100, flush=True)
+
+child_env = os.environ.copy()
+
+if SMOKE_TEST:
+    run_temporal_smoke = os.environ.get("ACMOT_SKIP_TEMPORAL_SMOKE", "0") != "1"
+    if run_temporal_smoke:
+        print("\n[STAGE 1/2] Temporal ablation SMOKE TEST: 4 combinations, no freeze.\n", flush=True)
+        temporal_env = child_env.copy()
+        temporal_env["ACMOT_TEMPORAL_SMOKE"] = "1"
+        stream_process(
+            [sys.executable, "-u", str(TEMPORAL_TARGET)],
+            temporal_env,
+            "temporal smoke ablation",
+        )
+    else:
+        print("[STAGE 1/2] Temporal smoke explicitly skipped.", flush=True)
+
+    # Smoke mode validates the pipeline but does not make a scientific selection.
+    # Keep the old W=7/S=10 only for this smoke run.
+    child_env["ACMOT_SMOOTHING_WINDOW"] = "7"
+    child_env["ACMOT_ANALYSIS_STRIDE"] = "10"
+    print("[SMOKE] Joint stage uses temporary W=7/S=10; nothing is frozen.", flush=True)
+
+else:
+    if TEMPORAL_FROZEN.exists():
+        frozen = json.loads(TEMPORAL_FROZEN.read_text())
+        selected = frozen["selected"]
+        print("\n[STAGE 1/2] Reusing frozen validation temporal selection.", flush=True)
+    else:
+        print("\n[STAGE 1/2] Full temporal ablation: 25 validation combinations.\n", flush=True)
+        temporal_env = child_env.copy()
+        temporal_env["ACMOT_TEMPORAL_SMOKE"] = "0"
+        stream_process(
+            [sys.executable, "-u", str(TEMPORAL_TARGET)],
+            temporal_env,
+            "full temporal ablation",
+        )
+        if not TEMPORAL_FROZEN.exists():
+            raise RuntimeError("Temporal ablation finished but FROZEN_TEMPORAL_CONFIG.json was not created.")
+        frozen = json.loads(TEMPORAL_FROZEN.read_text())
+        selected = frozen["selected"]
+
+    child_env["ACMOT_SMOOTHING_WINDOW"] = str(int(selected["smoothing_window"]))
+    child_env["ACMOT_ANALYSIS_STRIDE"] = str(int(selected["analysis_stride"]))
+
     print(
-        f"[OVERALL OPTUNA] {bar(completed, total)} {pct:6.2f}% | "
-        f"completed={completed}/{total} | elapsed={fmt_seconds(elapsed)} | ETA={fmt_seconds(eta)}",
+        "[TEMPORAL SELECTED] "
+        f"smoothing_window={child_env['ACMOT_SMOOTHING_WINDOW']} | "
+        f"analysis_stride={child_env['ACMOT_ANALYSIS_STRIDE']} | "
+        f"analysis_interval={float(selected['analysis_interval_seconds']):.3f}s | "
+        f"history_span={float(selected['causal_history_span_seconds']):.3f}s",
         flush=True,
     )
-    if best is None:
-        print("[BEST FEASIBLE] none yet (must satisfy FPS>=25 and IDS<=Old-A3)", flush=True)
-    else:
-        print(
-            "[BEST FEASIBLE] "
-            f"trial={best['trial']:03d} | MOTA={best['MOTA']:.3f}% | "
-            f"IDS={best['IDS']} | FPS={best['FPS']:.2f}",
-            flush=True,
-        )
-    print("-" * 96 + "\n", flush=True)
 
 
-print("=" * 96, flush=True)
-print("AC-MOT JOINT OPTUNA — LIVE PROGRESS RUNNER", flush=True)
-print(f"Trials              : {TOTAL_TRIALS}", flush=True)
-print(f"Frame progress every: {os.environ['ACMOT_PROGRESS_EVERY']} frames", flush=True)
-print(f"Heartbeat every     : {HEARTBEAT_SECONDS:g}s during silent stages", flush=True)
-print(f"Smoke test          : {os.environ.get('ACMOT_SMOKE_TEST', '0')}", flush=True)
-print("Validation only     : YES", flush=True)
-print("Test-dev            : NOT ACCESSED BY THE OPTIMIZATION SCRIPT", flush=True)
-print("=" * 96, flush=True)
+# =============================================================================
+# STAGE 2 — JOINT OPTUNA
+# =============================================================================
+print("\n" + "=" * 100, flush=True)
+print("[STAGE 2/2] JOINT SCI + DETECTOR-CONTROL OPTUNA", flush=True)
+print("=" * 100, flush=True)
+print("Trials              :", TOTAL_TRIALS, flush=True)
+print("Smoothing window    :", child_env["ACMOT_SMOOTHING_WINDOW"], flush=True)
+print("Analysis stride     :", child_env["ACMOT_ANALYSIS_STRIDE"], flush=True)
+print("Smoke test          :", int(SMOKE_TEST), flush=True)
+print("FPS gate            : >=", child_env.get("ACMOT_MIN_FPS", "25"), flush=True)
+print("Test-dev            : NOT ACCESSED", flush=True)
+print("=" * 100, flush=True)
 
-cmd = [sys.executable, "-u", str(TARGET)]
-env = os.environ.copy()
-
-process = subprocess.Popen(
-    cmd,
-    cwd=str(ROOT),
-    env=env,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT,
-    text=True,
-    bufsize=1,
-)
-
-started_at = time.perf_counter()
 trial_started_at: float | None = None
 trial_durations: list[float] = []
-current_trial: int | None = None
 completed = 0
-current_stage = "starting child process"
-last_output_at = time.perf_counter()
-heartbeat_count = 0
-
 current_result: dict[str, float | int | bool] = {}
 best: dict | None = None
+joint_started = time.perf_counter()
 
 trial_header_re = re.compile(r"JOINT OPTUNA TRIAL\s+(\d+)\s*/\s*(\d+)")
 trial_result_re = re.compile(r"\[TRIAL\s+(\d+)\]")
 
-assert process.stdout is not None
 
-# Read child output on a thread so the main loop can emit progress heartbeats
-# even when the child is busy in a silent stage (e.g. hashing the manifest).
-line_queue: queue.Queue[str | None] = queue.Queue()
+def print_overall():
+    pct = 100.0 * completed / TOTAL_TRIALS if TOTAL_TRIALS else 0.0
+    elapsed = time.perf_counter() - joint_started
+    eta = None
+    if trial_durations and completed < TOTAL_TRIALS:
+        eta = (sum(trial_durations) / len(trial_durations)) * (TOTAL_TRIALS - completed)
 
-
-def _reader() -> None:
-    try:
-        for line in process.stdout:
-            line_queue.put(line)
-    finally:
-        line_queue.put(None)
-
-
-threading.Thread(target=_reader, daemon=True).start()
-
-while True:
-    try:
-        raw_line = line_queue.get(timeout=HEARTBEAT_SECONDS)
-    except queue.Empty:
-        heartbeat_count += 1
-        silent_for = time.perf_counter() - last_output_at
-        elapsed = time.perf_counter() - started_at
-        spinner = "|/-\\"[heartbeat_count % 4]
+    print("\n" + "-" * 100, flush=True)
+    print(
+        f"[OVERALL OPTUNA] {bar(completed, TOTAL_TRIALS)} {pct:6.2f}% | "
+        f"completed={completed}/{TOTAL_TRIALS} | elapsed={fmt_seconds(elapsed)} | ETA={fmt_seconds(eta)}",
+        flush=True,
+    )
+    if best is None:
+        print("[BEST FEASIBLE] none yet | requirement: FPS>=25 and IDS<=Old-A3", flush=True)
+    else:
         print(
-            f"[HEARTBEAT {spinner}] stage={current_stage} | "
-            f"silent={fmt_seconds(silent_for)} | total_elapsed={fmt_seconds(elapsed)} | "
-            f"process={'RUNNING' if process.poll() is None else 'EXITED'}",
+            f"[BEST FEASIBLE] trial={best['trial']:03d} | MOTA={best['MOTA']:.3f}% | "
+            f"IDS={best['IDS']} | FPS={best['FPS']:.2f}",
             flush=True,
         )
-        continue
+    print("-" * 100 + "\n", flush=True)
 
-    if raw_line is None:
-        break
 
-    last_output_at = time.perf_counter()
-    line = raw_line.rstrip("\n")
-    print(raw_line, end="", flush=True)
-
-    # Human-readable stage tracking. These labels are informational only and do
-    # not affect the optimization or evaluation logic.
-    stripped = line.strip()
-    if stripped.startswith("Protocol"):
-        current_stage = "building validation manifest / hashing frame files"
-    elif stripped.startswith("[OK] Validation sequences"):
-        current_stage = "validation cue calibration"
-    elif stripped.startswith("[CALIBRATION]"):
-        current_stage = "validation cue calibration"
-    elif "OLD A3" in stripped and "REFERENCE" in stripped:
-        current_stage = "loading/running Old A3 validation reference"
-    elif stripped.startswith("JOINT OPTUNA TRIAL"):
-        current_stage = "Optuna trial evaluation"
-    elif stripped.startswith("[TRIAL"):
-        current_stage = "trial metrics / feasibility check"
-    elif stripped.startswith("SMOKE TEST COMPLETE"):
-        current_stage = "smoke test complete"
+def parse_joint_line(line: str):
+    global trial_started_at, completed, current_result, best
 
     m = trial_header_re.search(line)
     if m:
         one_based = int(m.group(1))
-        current_trial = one_based - 1
+        current_result = {"trial": one_based - 1}
         trial_started_at = time.perf_counter()
-        current_result = {"trial": current_trial}
         print(
-            f"\n[TRIAL START] {bar(one_based - 1, TOTAL_TRIALS)} "
-            f"trial={one_based}/{TOTAL_TRIALS}\n",
+            f"[TRIAL START] {bar(one_based - 1, TOTAL_TRIALS)} trial={one_based}/{TOTAL_TRIALS}",
             flush=True,
         )
-        continue
+        return
 
     m = trial_result_re.search(line)
     if m:
-        current_trial = int(m.group(1))
-        current_result["trial"] = current_trial
-        continue
+        current_result["trial"] = int(m.group(1))
+        return
 
+    stripped = line.strip()
     try:
         if stripped.startswith("MOTA ="):
             current_result["MOTA"] = float(stripped.split("=", 1)[1].replace("%", "").strip())
         elif stripped.startswith("IDS ="):
-            # Example: IDS = 268 (limit 271)
             current_result["IDS"] = int(stripped.split("=", 1)[1].strip().split()[0])
         elif stripped.startswith("FPS ="):
             current_result["FPS"] = float(stripped.split("=", 1)[1].strip().split()[0])
@@ -234,7 +286,6 @@ while True:
             if trial_started_at is not None:
                 trial_durations.append(time.perf_counter() - trial_started_at)
                 trial_started_at = None
-
             completed += 1
 
             if feasible and all(k in current_result for k in ("trial", "MOTA", "IDS", "FPS")):
@@ -245,42 +296,26 @@ while True:
                     "FPS": float(current_result["FPS"]),
                 }
                 if best is None or (
-                    candidate["MOTA"],
-                    -candidate["IDS"],
-                    candidate["FPS"],
+                    candidate["MOTA"], -candidate["IDS"], candidate["FPS"]
                 ) > (
-                    best["MOTA"],
-                    -best["IDS"],
-                    best["FPS"],
+                    best["MOTA"], -best["IDS"], best["FPS"]
                 ):
                     best = candidate
-
-            print_overall(
-                completed=completed,
-                total=TOTAL_TRIALS,
-                started_at=started_at,
-                trial_durations=trial_durations,
-                best=best,
-            )
+            print_overall()
     except Exception:
         # Progress parsing must never interrupt the scientific run.
         pass
 
-return_code = process.wait()
 
-print("\n" + "=" * 96, flush=True)
-if return_code == 0:
-    print("AC-MOT JOINT OPTUNA FINISHED SUCCESSFULLY", flush=True)
-else:
-    print(f"AC-MOT JOINT OPTUNA FAILED | return_code={return_code}", flush=True)
-print_overall(
-    completed=completed,
-    total=TOTAL_TRIALS,
-    started_at=started_at,
-    trial_durations=trial_durations,
-    best=best,
+stream_process(
+    [sys.executable, "-u", str(JOINT_TARGET)],
+    child_env,
+    "joint Optuna optimization",
+    parse_line=parse_joint_line,
 )
-print("=" * 96, flush=True)
 
-if return_code != 0:
-    raise SystemExit(return_code)
+print("\n" + "=" * 100, flush=True)
+print("AC-MOT VALIDATION WORKFLOW FINISHED SUCCESSFULLY", flush=True)
+print_overall()
+print("Test-dev was NOT accessed by this workflow.", flush=True)
+print("=" * 100, flush=True)
