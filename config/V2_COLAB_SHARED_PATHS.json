@@ -1,0 +1,15 @@
+{
+  "purpose": "Canonical Google Drive layout for AC-MOT V2 Colab runs across accounts",
+  "mount_root": "/content/drive/MyDrive",
+  "shared_root": "/content/drive/MyDrive/AC-MOT-shared",
+  "data_root": "/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data",
+  "validation_dataset": "/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-val",
+  "held_out_test_dev": "/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-test-dev",
+  "v1_result_root": "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers",
+  "v2_default_result_root": "/content/drive/MyDrive/AC-MOT-results/V2_MULTI_OBJECTIVE_MOTA_IDS",
+  "notes": [
+    "Use the same MyDrive shortcut layout in every Colab account.",
+    "V2 optimization and smoke tests use validation_dataset only.",
+    "held_out_test_dev is recorded for provenance only and must not be used for V2 tuning, debugging, or candidate selection."
+  ]
+}
