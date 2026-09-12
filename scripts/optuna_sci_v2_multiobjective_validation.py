@@ -62,9 +62,6 @@ PROGRESS_EVERY = int(os.environ.get("ACMOT_PROGRESS_EVERY", "50"))
 FORCE_RESET_STUDY = os.environ.get("ACMOT_V2_FORCE_RESET_STUDY", "0") == "1"
 
 RUN_ROOT = V2_ROOT / "SMOKE" if SMOKE else V2_ROOT
-RUN_ROOT.mkdir(parents=True, exist_ok=True)
-(RUN_ROOT / "plots").mkdir(exist_ok=True)
-(RUN_ROOT / "logs").mkdir(exist_ok=True)
 
 SPACE_PATH = V1_ROOT / "SCIENTIFIC_SEARCH_SPACE.json"
 TEMPORAL_PATH = V1_ROOT / "FROZEN_TEMPORAL_CONFIG.json"
@@ -86,6 +83,17 @@ if not ROOT.is_dir():
 for name, path in REQUIRED_INPUTS.items():
     if not path.is_file():
         raise RuntimeError(f"Missing frozen V1 input {name}: {path}")
+
+v1_resolved = V1_ROOT.resolve()
+v2_resolved = V2_ROOT.resolve()
+if v2_resolved == v1_resolved or v1_resolved in v2_resolved.parents:
+    raise RuntimeError(
+        f"Unsafe V2 output root {V2_ROOT}: it must be separate from and outside V1 root {V1_ROOT}."
+    )
+
+RUN_ROOT.mkdir(parents=True, exist_ok=True)
+(RUN_ROOT / "plots").mkdir(exist_ok=True)
+(RUN_ROOT / "logs").mkdir(exist_ok=True)
 
 if "test-dev" in str(VAL_DIR).lower():
     raise RuntimeError(f"V2 refuses held-out test-dev path: {VAL_DIR}")
@@ -189,6 +197,20 @@ if (SMOOTHING_WINDOW, ANALYSIS_STRIDE) != (7, 10):
     )
 
 INPUT_HASHES = {name: sha256_file(path) for name, path in REQUIRED_INPUTS.items()}
+if V1_TRIALS_PATH.is_file():
+    INPUT_HASHES["EMPIRICAL_OPTUNA_TRIALS.csv"] = sha256_file(V1_TRIALS_PATH)
+
+EXPECTED_CANONICAL_HASHES = {
+    "FROZEN_DEFENSIBLE_ACMOT_CONFIG.json": "8eeb7b916e7085b290313349cb0ebb95fa97f7f3956caefedd902fcf2890379c",
+    "DETECTOR_DERIVED_CUE_CALIBRATION.json": "fd42b22987365236944e90d3ebd646a28a56e5b60986cf1ad9f05881e7958c78",
+}
+for name, expected in EXPECTED_CANONICAL_HASHES.items():
+    observed = INPUT_HASHES[name]
+    if observed != expected:
+        raise RuntimeError(
+            f"Frozen V1 input hash mismatch for {name}: expected {expected}, observed {observed}"
+        )
+
 (RUN_ROOT / "V2_INPUT_HASHES.json").write_text(json.dumps(INPUT_HASHES, indent=2))
 
 SEARCH_SPACE_SNAPSHOT = {
