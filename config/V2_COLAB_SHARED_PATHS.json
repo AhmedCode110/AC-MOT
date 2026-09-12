@@ -6,9 +6,25 @@
   "validation_dataset": "/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-val",
   "held_out_test_dev": "/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-test-dev",
   "v1_result_root": "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers",
-  "v2_default_result_root": "/content/drive/MyDrive/AC-MOT-results/V2_MULTI_OBJECTIVE_MOTA_IDS",
+  "v2_default_result_root": "/content/drive/MyDrive/AC-MOT-shared/V2_MULTI_OBJECTIVE_MOTA_IDS",
+  "storage_policy": {
+    "allowed_project_root": "/content/drive/MyDrive/AC-MOT-shared",
+    "search_scope": "AC-MOT-shared only",
+    "write_scope": "AC-MOT-shared only",
+    "v1_result_root_mode": "read-only reference",
+    "new_v2_writes": "V2_MULTI_OBJECTIVE_MOTA_IDS and its subfolders"
+  },
+  "drive_folder_ids": {
+    "shared_root": "1Ry6tnO69Fpx9FFn2nKTPkRxy2n8o9Ah1",
+    "data_root": "1aGTEWIz-EzVGguknIIrgI71dhxlzFd3i",
+    "validation_dataset": "1TCRyp9yxdoYyDF9McTHcd8wb8T3sG1xm",
+    "v1_result_root": "1RRjzBy1Q_K4415A1x4FCD7B4xb60QYBs"
+  },
   "notes": [
-    "Use the same MyDrive shortcut layout in every Colab account.",
+    "Use the same MyDrive/AC-MOT-shared shortcut layout in every Colab account.",
+    "For AC-MOT project work, search only inside AC-MOT-shared.",
+    "Write all new AC-MOT project artifacts inside AC-MOT-shared.",
+    "Treat defensible_acmot_3workers as the frozen V1 reference and do not overwrite its artifacts.",
     "V2 optimization and smoke tests use validation_dataset only.",
     "held_out_test_dev is recorded for provenance only and must not be used for V2 tuning, debugging, or candidate selection."
   ]
