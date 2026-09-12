@@ -22,6 +22,66 @@ V1 must never be modified.
 
 V2 is the editable post-V1 research branch.
 
+## Canonical Google Drive storage policy
+
+All AC-MOT Colab accounts use the same shortcut root:
+
+`/content/drive/MyDrive/AC-MOT-shared`
+
+For AC-MOT project work:
+
+- search for project files only inside `AC-MOT-shared`
+- read project inputs only from `AC-MOT-shared`
+- write all new project artifacts only inside `AC-MOT-shared`
+- do not write new artifacts elsewhere in MyDrive
+- treat `defensible_acmot_3workers` as frozen V1 evidence and do not overwrite it
+
+Canonical shared root Drive folder ID:
+
+`1Ry6tnO69Fpx9FFn2nKTPkRxy2n8o9Ah1`
+
+Canonical data root:
+
+`/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data`
+
+Drive folder ID:
+
+`1aGTEWIz-EzVGguknIIrgI71dhxlzFd3i`
+
+Validation dataset:
+
+`/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-val`
+
+Drive folder ID:
+
+`1TCRyp9yxdoYyDF9McTHcd8wb8T3sG1xm`
+
+Held-out test-dev dataset, recorded for provenance only and forbidden for V2 tuning/debugging/selection:
+
+`/content/drive/MyDrive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-test-dev`
+
+Frozen V1 results/reference root:
+
+`/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers`
+
+Drive folder ID:
+
+`1RRjzBy1Q_K4415A1x4FCD7B4xb60QYBs`
+
+Default V2 write root:
+
+`/content/drive/MyDrive/AC-MOT-shared/V2_MULTI_OBJECTIVE_MOTA_IDS`
+
+The canonical cross-account launcher is:
+
+`scripts/run_v2_colab_shared.py`
+
+The canonical path registry is:
+
+`config/V2_COLAB_SHARED_PATHS.json`
+
+Use the launcher for Colab runs so the shared-root policy is enforced automatically.
+
 ## Scientific distinction from V1
 
 V1 used a multi-value Optuna study that recorded MOTA, IDS, and FPS, but its frozen candidate-selection rule was constrained and MOTA-prioritized:
@@ -54,6 +114,10 @@ V2 reuses the frozen V1 inputs rather than rerunning earlier selection stages:
 - `FROZEN_TEMPORAL_CONFIG.json`
 - `DETECTOR_DERIVED_CUE_CALIBRATION.json`
 - `FROZEN_DEFENSIBLE_ACMOT_CONFIG.json`
+
+These are read from:
+
+`/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers`
 
 The controlled temporal design remains:
 
@@ -120,32 +184,30 @@ V2 is validation-only.
 
 Do not access `VisDrone2019-MOT-test-dev` for optimization, debugging, candidate selection, or smoke testing.
 
-The V2 script contains an explicit path rejection for `test-dev`.
+The V2 optimizer contains explicit rejection for a `test-dev` validation path.
 
-V2 writes to a separate result root and does not overwrite V1 artifacts.
-
-Default V2 result root:
-
-`/content/drive/MyDrive/AC-MOT-results/V2_MULTI_OBJECTIVE_MOTA_IDS`
+The canonical launcher additionally enforces that V2 writes stay under `AC-MOT-shared` and never inside the frozen V1 root.
 
 ## Smoke test
 
 Run a small smoke study first on a CUDA/T4 Colab runtime.
 
-Example:
+After cloning the V2 branch and mounting Drive:
 
 ```python
 import os
 os.environ["ACMOT_V2_SMOKE_TEST"] = "1"
 os.environ["ACMOT_V2_OPTUNA_TRIALS"] = "3"
-os.environ["ACMOT_V1_RESULT_ROOT"] = "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers"
-os.environ["ACMOT_V2_RESULT_ROOT"] = "/content/drive/MyDrive/AC-MOT-results/V2_MULTI_OBJECTIVE_MOTA_IDS"
-%run /content/AC-MOT/scripts/optuna_sci_v2_multiobjective_validation.py
+%run /content/AC-MOT/scripts/run_v2_colab_shared.py
 ```
 
-Smoke outputs are stored under the `SMOKE` subfolder and must not be reported as scientific results.
+Smoke outputs are stored under:
 
-Smoke mode does not create `V2_DONE.json`.
+`/content/drive/MyDrive/AC-MOT-shared/V2_MULTI_OBJECTIVE_MOTA_IDS/SMOKE`
+
+Smoke results must not be reported as scientific results.
+
+Smoke mode does not create the final `V2_DONE.json`.
 
 ## Full validation run
 
@@ -155,10 +217,12 @@ Only after smoke validation succeeds:
 import os
 os.environ["ACMOT_V2_SMOKE_TEST"] = "0"
 os.environ["ACMOT_V2_OPTUNA_TRIALS"] = "50"
-os.environ["ACMOT_V1_RESULT_ROOT"] = "/content/drive/MyDrive/AC-MOT-shared/defensible_acmot_3workers"
-os.environ["ACMOT_V2_RESULT_ROOT"] = "/content/drive/MyDrive/AC-MOT-results/V2_MULTI_OBJECTIVE_MOTA_IDS"
-%run /content/AC-MOT/scripts/optuna_sci_v2_multiobjective_validation.py
+%run /content/AC-MOT/scripts/run_v2_colab_shared.py
 ```
+
+Full results are written under:
+
+`/content/drive/MyDrive/AC-MOT-shared/V2_MULTI_OBJECTIVE_MOTA_IDS`
 
 ## Expected full-run outputs
 
@@ -186,6 +250,8 @@ If V2 is later evaluated on the already-exposed VisDrone test-dev split, that ev
 ## Current status
 
 V2 code has been implemented on the V2 branch.
+
+Canonical cross-account Drive paths and shared-root-only storage policy are now recorded in the project.
 
 No V2 scientific trial has been run yet.
 
