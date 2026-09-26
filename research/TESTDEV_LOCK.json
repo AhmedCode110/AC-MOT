@@ -1,0 +1,44 @@
+{
+  "status": "LOCKED_BEFORE_TESTDEV_EVALUATION",
+  "created": "2026-09-27",
+  "rule": "Test-dev is evaluated exactly once with the systems below. No system, parameter or selection may change after any test-dev metric is seen. Any post-hoc bug fix must be documented as a correction with both results reported.",
+  "code_commit": "c1e799d3ba74d4c220b6be88f1659cdde1b20bf9",
+  "code_tag": "universal-acmot-v3-freeze",
+  "file_sha256": {
+    "configs/universal_acmot_policy.json": "a7e6b8dbb9d6675e5e80e6e761e8952172df9b3ec21b21c128259793acbbf556",
+    "universal_policy_pipeline.py": "d4e8b5ddde2329736fb0c7ed878b4a1faaa969a780b7af5b0d26d45b94eafa34",
+    "adapters/detectors/online_normalizer.py": "8825835354785b4a6a83cd396d622401e8f261d7bbe34db40f80ce68bb99f582",
+    "adapters/trackers/bytetrack.py": "4764c523456984e9119be5eb8a91eb9f7ffd51158a7ade87ba280010ef90b6d5",
+    "adapters/trackers/botsort.py": "18bdc4cec15bf8d505b2ab721fc5003c8d175660f0aca6be0a4e9db3ef79283a"
+  },
+  "dataset": {
+    "name": "VisDrone2019-MOT-test-dev",
+    "path": "GoogleDrive-a7medgouda1 .shortcut-targets-by-id/1IvH3DmlX4Ce5k2cZWDvu0ixfbvxZ-67m/visdrone goda1/VisDrone_Zips/VisDrone2019-MOT-test-dev/VisDrone2019-MOT-test-dev",
+    "sequences": 17,
+    "frames": 6635,
+    "annotation_fingerprint_sha256": "89d9dccbad509f1f8d34bb2afde32cb82490d34242b266345188107df3b40c24"
+  },
+  "detectors": {
+    "yolov8": "yolov8n.pt sha256 f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36",
+    "rtdetr": "rtdetr-l.pt sha256 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f"
+  },
+  "evaluation": "custom class-agnostic internal protocol (NOT official VisDrone): HOTA TrackEval 12c8791; MOTA/IDF1/IDS/FP/FN/P/R motmetrics 1.4.0",
+  "primary_comparison": "UniversalACMOT_v3 (ByteTrack) vs each baseline, per detector, paired sequence bootstrap (10000 resamples, seed 42) of pooled HOTA, IDF1, MOTA",
+  "systems": {
+    "default": "raw scores, res 640, ByteTrack ultralytics defaults (0.25/0.1/0.25, buffer 30, match 0.8)",
+    "shared_static_832": "raw threshold 0.5 (low 0.1, new 0.5), res 832, buffer 30, match 0.8 — best single shared raw setting on val",
+    "shared_static_736": "same, res 736 (compute-matched to the AC resolution usage)",
+    "oracle": "detector-specific reference selected on val: yolov8 res 832 high 0.4; rtdetr res 832 high 0.5 (low=min(0.1,high/2), new=high)",
+    "V1": "online histogram normalization only (POLICIES['V1'])",
+    "V2b": "POLICIES['V2b'] (density thresholds + Top-K)",
+    "V2cA": "POLICIES['V2cA'] (density Top-K only)",
+    "universal_v1_superseded": "V1 base + raw ratio gate rho 0.6, feedback accepted (tag universal-acmot-v1-freeze)",
+    "V3_off": "ECDF normalizer, no gate (ablation)",
+    "V3_ecdf_ratio06": "ECDF normalizer + raw ratio gate rho 0.6 (ablation)",
+    "V3": "FINAL: configs/universal_acmot_policy.json"
+  },
+  "trackers": {
+    "bytetrack": "all systems",
+    "botsort": "default, shared_static_832, V3 (tracker-portability, no policy change)"
+  }
+}
