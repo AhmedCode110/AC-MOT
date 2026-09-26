@@ -201,3 +201,52 @@ class OnlineScoreNormalizer:
             )
 
         return result
+
+
+class EmpiricalCDFNormalizer:
+    """
+    Order-only online score normalization (V3).
+
+    Maps a raw score to its mid-rank position among raw candidate scores
+    sampled from PREVIOUS frames (one frame every `update_every`, the last
+    `window` samples — the same data and memory span as the 64-bin
+    histogram, without binning). Depends only on the order of scores, so it
+    is exactly invariant to any strictly increasing recalibration of the
+    detector. Frame 1 (no history) uses within-frame mid-ranks.
+    """
+
+    def __init__(self, update_every: int = 10, window: int = 20):
+        self.update_every = int(update_every)
+        self.window = int(window)
+        self.reset()
+
+    def reset(self):
+        from collections import deque
+        self.samples = deque(maxlen=self.window)
+        self.sorted = np.empty(0)
+        self.frame_count = 0
+        self.initialized = False
+
+    @staticmethod
+    def _midrank(sorted_ref, scores):
+        lo = np.searchsorted(sorted_ref, scores, side="left")
+        hi = np.searchsorted(sorted_ref, scores, side="right")
+        return (lo + hi) / (2.0 * len(sorted_ref))
+
+    def process(self, detections: DetectionList) -> DetectionList:
+        self.frame_count += 1
+        if not detections:
+            return []
+        scores = np.fromiter((d.confidence for d in detections),
+                             dtype=np.float64, count=len(detections))
+        ref = self.sorted if self.initialized else np.sort(scores)
+        norm = np.clip(self._midrank(ref, scores), 1e-6, 1.0 - 1e-6)
+        out = [Detection(x1=d.x1, y1=d.y1, x2=d.x2, y2=d.y2,
+                         confidence=float(s), class_id=d.class_id)
+               for d, s in zip(detections, norm)]
+        # Frame t is folded in after use (affects frames > t only).
+        if self.frame_count == 1 or self.frame_count % self.update_every == 0:
+            self.samples.append(scores)
+            self.sorted = np.sort(np.concatenate(self.samples))
+            self.initialized = True
+        return out

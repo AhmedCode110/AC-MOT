@@ -60,3 +60,18 @@ whose MOTA is exactly 0). Selection becomes lexicographic: (1) minimise
 the number of catastrophic cells on the selection sequences, (2) maximise
 J4. Applied identically inside every LOSO fold (training sequences only).
 Both the Amendment-1 result and this result are reported.
+
+## Amendment 3 (2026-09-27) — V3 calibration-invariant family (before any test-dev metric)
+Trigger: score-calibration stress test on val (E20) showed the v1 freeze
+(hist normalizer + raw ratio gate) is not invariant to temperature
+recalibration (YOLO HOTA 32.1→25.7 at T=0.5; RT-DETR MOTA 24.1→7.9 at T=2),
+while a shared static raw threshold collapses under scale ×0.5.
+Design requirement declared: decisions must be exactly invariant to the
+Platt/temperature family logit' = a·logit + b (a>0). V3 = order-only ECDF
+normaliser + zlogit gate (demote) + no raw floor in the policy; exact
+invariance verified (byte-identical tracks under T=2 and T=0.5).
+Selection family (only these are selectable): V3 gate-only,
+τ ∈ {0.5, 0.75, 1.0, 1.25, 1.5, 2.0}. Same lexicographic rule (fewest
+catastrophic cells, then J4; J3 reported), same LOSO folds.
+Ablations (not selectable): ECDF + ratio ρ ∈ {0.5, 0.6, 0.7}.
+The v1 tag (universal-acmot-v1-freeze) is superseded; kept as history.

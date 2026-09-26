@@ -26,14 +26,27 @@ from universal_policy_pipeline import (POLICIES, UniversalPolicyPipeline,
 class CachedDetector:
     """Replays tools/cache_detections.py output for one sequence."""
 
-    def __init__(self, npz_path):
+    # Monotone score transforms emulating detectors with a different
+    # confidence calibration (stress test only; default = identity).
+    TRANSFORMS = {
+        None: lambda s: s,
+        "temp2": lambda s: 1 / (1 + np.exp(-np.log(s / (1 - s)) / 2.0)),
+        "temp05": lambda s: 1 / (1 + np.exp(-np.log(s / (1 - s)) / 0.5)),
+        "scale05": lambda s: 0.5 * s,
+        "pow3": lambda s: s ** 3,
+    }
+
+    def __init__(self, npz_path, transform=None):
         z = np.load(npz_path)
         self.visual = z["visual"]
         self.shape = tuple(int(v) for v in z["shape"])
         self.frames = int(z["frames"])
         self.by_res = {}
         for r in (640, 736, 832):
-            a = z[f"det_{r}"]
+            a = z[f"det_{r}"].copy()
+            if transform is not None:
+                sc = np.clip(a[:, 5], 1e-6, 1 - 1e-6)
+                a[:, 5] = self.TRANSFORMS[transform](sc)
             self.by_res[r] = {int(f): a[a[:, 0] == f]
                               for f in np.unique(a[:, 0])}
         self.frame = 0

@@ -20,8 +20,14 @@ import numpy as np
 from core import Controller
 from adapters.detectors.candidate_density import CandidateDensityController
 from adapters.detectors.generic_controls import resolve_generic_score_controls
-from adapters.detectors.online_normalizer import OnlineScoreNormalizer
+from adapters.detectors.online_normalizer import (EmpiricalCDFNormalizer,
+                                                  OnlineScoreNormalizer)
 from adapters.types import Detection
+
+
+def _logit(x):
+    x = np.clip(np.asarray(x, dtype=np.float64), 1e-9, 1 - 1e-9)
+    return np.log(x / (1 - x))
 
 
 def replace_det(d, confidence):
@@ -65,6 +71,21 @@ class PolicySpec:
     leader_rho: float = 0.0
     leader_mode: str = "demote"
     leader_decay: float = 0.9
+    # V3 (calibration invariance):
+    # normalizer "hist" = 64-bin histogram (V1..V2g); "ecdf" = order-only
+    # empirical CDF (exactly invariant to monotone recalibration).
+    normalizer: str = "hist"
+    # gate_stat "ratio" = raw s / leader (invariant to scaling only);
+    # "zlogit" = (logit s - EMA leader logit) / IQR(logits of candidates in
+    # the previous gate_window frames): exactly invariant to any Platt /
+    # temperature recalibration logit' = a*logit + b (a > 0).
+    # Demote if z < -gate_tau.
+    gate_stat: str = "ratio"
+    gate_tau: float = 0.0
+    gate_window: int = 10
+    # Raw-score floor applied inside the policy (a raw-scale constant).
+    # V3 sets 0: candidate emission is left to the detector adapter.
+    policy_raw_floor: float = 0.01
 
 
 POLICIES = {
@@ -126,8 +147,12 @@ class UniversalPolicyPipeline:
 
     def reset(self):
         self.controller = Controller(self.config)
-        self.normalizer = OnlineScoreNormalizer(bins=64, decay=0.95,
-                                                update_every=10)
+        self.normalizer = (
+            EmpiricalCDFNormalizer(update_every=10, window=20)
+            if self.policy.normalizer == "ecdf" else
+            OnlineScoreNormalizer(bins=64, decay=0.95, update_every=10))
+        self.gate_ref_logit = None
+        self.gate_logits = deque(maxlen=self.policy.gate_window)
         self.density = CandidateDensityController(**self.density_kwargs)
         self.reliability = TemporalReliability(self.policy.reliability_ema)
         self.trust = 1.0
@@ -172,7 +197,7 @@ class UniversalPolicyPipeline:
     def process(self, frame_number, image, visual):
         p = self.policy
         params = self.controller.choose(frame_number, visual, self.previous)
-        raw = self.detector.detect(image, confidence=self.raw_confidence_floor,
+        raw = self.detector.detect(image, confidence=p.policy_raw_floor,
                                    suppression=params["nms"],
                                    resolution=params["size"])
         normalized = self.normalizer.process(raw)
@@ -193,7 +218,32 @@ class UniversalPolicyPipeline:
 
         demoted = 0
         leader_ref = self.leader_ref
-        if p.leader_rho > 0 and leader_ref is not None and raw:
+        if p.gate_stat == "zlogit" and p.gate_tau > 0 and raw \
+                and self.gate_ref_logit is not None and self.gate_logits:
+            lg = _logit(np.array([r.confidence for r in raw]))
+            q75, q25 = np.percentile(np.concatenate(self.gate_logits),
+                                     [75, 25])
+            z = (lg - self.gate_ref_logit) / max(q75 - q25, 1e-6)
+            gated = []
+            for zi, d in zip(z, normalized):
+                if zi >= -p.gate_tau:
+                    gated.append(d)
+                elif p.leader_mode == "demote":
+                    demoted += 1
+                    gated.append(replace_det(d, min(d.confidence,
+                                                    high - 1e-6)))
+                else:
+                    demoted += 1
+            normalized = gated
+        if p.gate_stat == "zlogit" and raw:
+            lg_all = _logit(np.array([r.confidence for r in raw]))
+            top = float(lg_all.max())
+            self.gate_ref_logit = top if self.gate_ref_logit is None else (
+                p.leader_decay * self.gate_ref_logit
+                + (1 - p.leader_decay) * top)
+            self.gate_logits.append(lg_all)
+        if p.gate_stat == "ratio" and p.leader_rho > 0 \
+                and leader_ref is not None and raw:
             floor = p.leader_rho * leader_ref
             gated = []
             for r, d in zip(raw, normalized):

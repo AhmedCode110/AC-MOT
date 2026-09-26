@@ -26,13 +26,32 @@ import numpy as np
 
 DATASET = "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val"
 DETECTORS = ["yolov8", "rtdetr"]
-OUT = Path("outputs/opt")
+OUT = Path("outputs/opt" if os.environ.get("ACMOT_GRID", "v1") == "v1"
+           else f"outputs/opt_{os.environ['ACMOT_GRID']}")
 
 RHOS = [0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 KAPPAS = [0.5, 1.0, 2.0]
 
 
+FAMILY = os.environ.get("ACMOT_GRID", "v1")
+TAUS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
+
+
 def grid():
+    if FAMILY == "v3":
+        v3 = dict(feedback="accepted", normalizer="ecdf", gate_stat="zlogit",
+                  policy_raw_floor=0.0)
+        cfgs = [dict(id="v3_off", base="V1", selectable=False,
+                     overrides=dict(v3, gate_tau=0.0), density_kwargs={})]
+        cfgs += [dict(id=f"v3_t{t:.2f}", base="V1", selectable=True,
+                      overrides=dict(v3, gate_tau=t), density_kwargs={})
+                 for t in TAUS]
+        cfgs += [dict(id=f"abl_ecdf_ratio_r{r:.1f}", base="V1",
+                      selectable=False,
+                      overrides=dict(feedback="accepted", normalizer="ecdf",
+                                     leader_rho=r, policy_raw_floor=0.0),
+                      density_kwargs={}) for r in (0.5, 0.6, 0.7)]
+        return cfgs
     cfgs = []
     for rho in RHOS:
         cfgs.append(dict(id=f"gate_r{rho:.1f}", base="V1",
@@ -123,8 +142,11 @@ def load_all():
     return S
 
 
-def metrics_on(S, cid, det, seqs):
+def metrics_on(S, cid, det, seqs, root=None):
     from tools.seqstats import combine
+    if root is not None:   # reference V1 always from the v1 grid
+        return combine([pickle.load(open(Path(root) / "stats" / cid / det /
+                                          f"{s}.pkl", "rb")) for s in seqs])
     return combine([S[(cid, det, s)] for s in seqs])
 
 
@@ -158,9 +180,11 @@ def n_catastrophic(S, cid, seqs):
 def choose(S, seqs, obj):
     lexi = obj.startswith("L_")
     base_obj = obj[2:] if lexi else obj
-    ref = {d: metrics_on(S, "gate_r0.0", d, seqs) for d in DETECTORS}
+    ref = {d: metrics_on(S, "gate_r0.0", d, seqs, "outputs/opt") for d in DETECTORS}
     best, best_key = None, None
     for c in grid():
+        if not c.get("selectable", True):
+            continue
         per = {d: metrics_on(S, c["id"], d, seqs) for d in DETECTORS}
         if not feasible(per):
             continue

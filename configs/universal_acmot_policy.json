@@ -1,14 +1,18 @@
 {
-  "name": "UniversalACMOT_v1_frozen",
+  "name": "UniversalACMOT_v3_frozen",
   "frozen_utc": "2026-09-27",
-  "selected_by": "research/OPTIMIZATION_PROTOCOL.md (Amendment 2: lexicographic min catastrophic cells, then J3/J4 — both agree)",
+  "selected_by": "research/OPTIMIZATION_PROTOCOL.md Amendment 3: V3 calibration-invariant family, lexicographic (fewest MOTA<0 cells, then J4; J3 agrees), LOSO 7/7 folds agree",
   "base": "V1",
   "overrides": {
-    "name": "UniversalACMOT_v1",
-    "leader_rho": 0.6,
+    "name": "UniversalACMOT_v3",
+    "feedback": "accepted",
+    "normalizer": "ecdf",
+    "gate_stat": "zlogit",
+    "gate_tau": 0.75,
+    "gate_window": 10,
     "leader_mode": "demote",
     "leader_decay": 0.9,
-    "feedback": "accepted"
+    "policy_raw_floor": 0.0
   },
   "density_kwargs": {}
 }
