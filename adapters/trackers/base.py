@@ -9,6 +9,8 @@ class TrackerAdapter(ABC):
         self,
         detections: DetectionList,
         frame_shape,
+        high_thresh: float | None = None,
+        new_track_thresh: float | None = None,
     ) -> TrackList:
         raise NotImplementedError
 
