@@ -79,9 +79,19 @@ class ByteTrackAdapter(TrackerAdapter):
         self,
         detections: DetectionList,
         frame_shape,
+        association_threshold: float | None = None,
+        birth_threshold: float | None = None,
+        image=None,
+        *,
         high_thresh: float | None = None,
         new_track_thresh: float | None = None,
     ) -> TrackList:
+        # Generic names map onto ByteTrack's own; legacy keyword names are
+        # kept so the V1 pipeline and equivalence tests are unchanged.
+        if high_thresh is None:
+            high_thresh = association_threshold
+        if new_track_thresh is None:
+            new_track_thresh = birth_threshold
 
         dets = self._detections_to_numpy(detections)
 
@@ -92,8 +102,8 @@ class ByteTrackAdapter(TrackerAdapter):
             self.tracker.args.new_track_thresh = float(new_track_thresh)
 
         result = np.asarray(
-            self.tracker.update(
-                Boxes(dets, tuple(frame_shape))
+            self._update_backend(
+                Boxes(dets, tuple(frame_shape)), image
             ),
             dtype=float,
         ).reshape(-1, 8)
@@ -120,6 +130,9 @@ class ByteTrackAdapter(TrackerAdapter):
             )
 
         return tracks
+
+    def _update_backend(self, boxes, image):
+        return self.tracker.update(boxes)
 
     def reset(self):
         self.tracker = self._make_tracker()

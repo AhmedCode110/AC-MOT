@@ -1,0 +1,14 @@
+{
+  "name": "UniversalACMOT_v1_frozen",
+  "frozen_utc": "2026-09-27",
+  "selected_by": "research/OPTIMIZATION_PROTOCOL.md (Amendment 2: lexicographic min catastrophic cells, then J3/J4 — both agree)",
+  "base": "V1",
+  "overrides": {
+    "name": "UniversalACMOT_v1",
+    "leader_rho": 0.6,
+    "leader_mode": "demote",
+    "leader_decay": 0.9,
+    "feedback": "accepted"
+  },
+  "density_kwargs": {}
+}
