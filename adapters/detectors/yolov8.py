@@ -6,6 +6,7 @@ import torch
 from ultralytics import YOLO
 
 from adapters.detectors.base import DetectorAdapter
+from adapters.detectors.capabilities import DetectorCapabilities
 from adapters.types import Detection, DetectionList
 
 
@@ -23,6 +24,15 @@ def auto_device() -> str:
 
 
 class YOLOv8Adapter(DetectorAdapter):
+
+    @property
+    def capabilities(self) -> DetectorCapabilities:
+        return DetectorCapabilities(
+            adaptive_confidence=True,
+            adaptive_resolution=True,
+            adaptive_suppression=True,
+        )
+
     """
     YOLOv8 detector adapter for Universal AC-MOT.
 
