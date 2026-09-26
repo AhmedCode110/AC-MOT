@@ -37,3 +37,4 @@ venv/
 *.pem
 *.key
 .DS_Store
+rtdetr-l.pt
