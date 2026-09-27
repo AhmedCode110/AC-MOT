@@ -8,11 +8,11 @@ Note on C: Amendment 6 uses C = "generic engineering safety bound"; the V4
 audit used C = "globally optimised". Below, C(safety) and C(opt) are kept apart.
 C(opt) values are NOT allowed in V5-TF.
 
-## ⚠ Category E items that block the V5-TF freeze
+## Historical E39 items excluded from the locked V5-TF rule
 | Parameter | Component | Value | E39 evidence | Required action |
 |---|---|---|---|---|
-| Otsu window | `universal_policy_pipeline.py` (`gate_window`) | 10 frames | sensitive: 5 adds a catastrophic cell; 20 passes | keep only for recorded F3; replace dependency in a new predeclared family, never choose 20 post-hoc |
-| OTSU_BINS | `online_calibration.py` | 64 | sensitive: 32 changes RT-DETR HOTA −0.63 and adds catastrophic cells; 128 passes | keep only for recorded F3; replace fixed-bin dependency, never choose 128 post-hoc |
+| Otsu window | `universal_policy_pipeline.py` (`gate_window`) | 10 frames in recorded F3 | sensitive in E39; not used by E41 | excluded from locked E41; do not tune or reuse for V5-TF |
+| OTSU_BINS | `online_calibration.py` | 64 in recorded F3 | sensitive in E39; not used by E41 | excluded from locked E41; do not tune or reuse for V5-TF |
 
 ## Category E values outside the V5-TF decision path
 
@@ -36,8 +36,8 @@ These values do not block the freeze while they remain excluded from V5-TF.
 | MAD scale | RobustHistory | 1.4826 | A | Gaussian consistency constant | — | none | kept |
 | RobustHistory window | `online_calibration.py` | 100 samples | A | declared default | E39: 50 and 200 pass both detectors with no extra catastrophic cell | insensitive | kept |
 | RobustHistory warm-up | `online_calibration.py` | 5 samples | A | declared default | E39: 3 and 10 pass; effectively identical | insensitive | kept |
-| Otsu window | candidate handling | 10 frames | E | declared default, retained not selected | E39 sensitive | 5 sensitive, 20 passes | freeze blocker |
-| OTSU_BINS | candidate handling | 64 | E | declared default, retained not selected | E39 sensitive | 32 sensitive, 128 passes | freeze blocker |
+| Otsu window | candidate handling | none in E41 | — | exact current-frame rule | E41 | not applicable | removed from V5-TF |
+| OTSU_BINS | candidate handling | none in E41 | — | exact sorted observations | E41 | not applicable | removed from V5-TF |
 | F3 cap | association tolerance | 0.95 | C(safety) | Amendment 6 | keeps match < 1 | — | experimental |
 | m0 | association tolerance | tracker-native 0.8 | D | tracker default | — | — | experimental |
 | Tracker retention / match | ByteTrack, BoT-SORT | native 30 / 0.8 | D | tracker defaults | — | — | experimental |

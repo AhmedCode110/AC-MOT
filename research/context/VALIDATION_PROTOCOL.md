@@ -18,9 +18,9 @@ V4 is a comparison baseline/ablation only; no step below selects between V4 and 
    (3) simplicity F3 < F5; F5 needs mean pixel cost ≤ 1.01·736².
    Then the constant audit (Amendment 7 §6) on the chosen family.
    Outcome (E36/E39): F3 selected; F5 did not beat F3 or random F5R.
-   RobustHistory window/warm-up are insensitive A; OTSU_BINS/Otsu window are
-   sensitive E and block the frozen policy under C5. Any replacement is a new
-   family declared before another development-40 run; no E39 value is adopted.
+   RobustHistory window/warm-up are insensitive A; the E39 OTSU_BINS/Otsu
+   window findings apply only to recorded F3. E41 removes both dependencies
+   with exact current-frame Otsu and is the locked pre-freeze candidate.
 4. E41 (Amendment 8, predeclared before execution): exact 3-class Otsu on the
    current frame's logits, with thresholds restricted to gaps between sorted
    observations. It uses no histogram-bin count and no historical Otsu window.

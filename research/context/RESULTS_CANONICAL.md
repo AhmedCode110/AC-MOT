@@ -49,9 +49,9 @@ seed 42.
 - E36 selected F3 over F5, but F3 has 17 catastrophic sequence-detector cells
   versus V4's 3 and worst-detector relative ½(HOTA+IDF1) gain −0.339%.
   This is development evidence, not protected confirmation; report honestly.
-- E39's instruction to keep/report sensitive defaults does not override HARD
-  C5's ban on category-E deployment constants. OTSU_BINS and Otsu window block
-  the V5-TF lock/freeze until a predeclared training-free revision removes them.
+- E39's sensitive OTSU_BINS and Otsu-window findings apply to recorded F3 only.
+  E41 is the predeclared training-free revision that removes both dependencies;
+  the V5-TF policy is now locked to E41 pending the fixed T4 fidelity gate.
 - UAVDT "never evaluated by any system" (Amendment 5) vs legacy branch
   `origin/freeze/final-after-uavdt-2026-09-12` (legacy AC-MOT UAVDT run):
   both true only if "system" means Universal AC-MOT. See DATASETS_AND_SPLITS.md.

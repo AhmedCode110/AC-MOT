@@ -1,0 +1,13 @@
+{
+ "policy": "configs/universal_acmot_policy_v5tf.json",
+ "family": "E41",
+ "status": "PRE_FREEZE_LOCK_PENDING_T4_FIDELITY_GATE",
+ "protocol": "Amendment 8",
+ "development_evidence": "outputs/v5tf_dev/E41/",
+ "protected_quality_evaluations_run": false,
+ "forbidden_before_freeze": ["confirmation-16", "Faster R-CNN quality", "BoT-SORT V5-TF quality", "UAVDT quality", "test-dev V5-TF"],
+ "next_gate": "Amendment-5f fixed-threshold T4 fidelity gate",
+ "rule": "Exact 3-class Otsu on current-frame detector logits; thresholds are gaps between sorted observations; motion-aware association; fixed 736 development budget.",
+ "no_search": true,
+ "no_training": true
+}
