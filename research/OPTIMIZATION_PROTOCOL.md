@@ -246,3 +246,16 @@ If not adopted, V4 remains the final system and V5 is reported as a
 documented negative result. After the decision: secondary check on val,
 then Faster R-CNN, BoT-SORT, UAVDT transfer and official T4 timing for the
 final system; no tuning is reopened after any of these.
+
+### Amendment 5e — C3 specification (Optuna installed; declared before S3 runs)
+C3 per adapted target: z = Σ w_c·u_c / Σ w_c over the inner-fold eligible
+cues, u_c = cue mapped through 21 quantile knots of the TRAINING windows
+(optionally inverted, 1−u_c); decision = high value if z > θ else low value.
+Search space: w_c ∈ [0,1], orientation ∈ {+,−}, θ ∈ [0,1], low/high ∈ the
+target's value grid. Objective: total training-window regret with the same
+cost as C1/C2 ((FP+FN)+(IDFP+IDFN)). Optuna 5.0.0, TPESampler(seed=0),
+150 trials per study, persistent storage sqlite outputs/v5/optuna_v5.db,
+one study per (target, fold) named v5_C3_<target>_<fold-seed>; the search
+space is stored in each study's user attributes. The best trial of each
+study is used as-is (no manual selection). Family choice among C1/C2/C3
+follows Amendment 5d (outer-fold lexicographic rule).

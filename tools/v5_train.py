@@ -247,6 +247,10 @@ def fit_controller(family, target, seqs, inner_folds, seed):
     if not el:
         return None, None
     names = [c for c, _, _ in el]
+    if family == "C3":
+        node = fit_c3(target, names, values, X, R,
+                      study_name=f"v5_C3_{target}_{seed}")
+        return node, dict(cues=names, root=names[0])
     j = ALL_CUES.index(names[0])
     th, a, b, _ = fit_stump(X[:, j], R)
     node = {"feature": names[0], "threshold": float(th),
@@ -269,6 +273,66 @@ def fit_controller(family, target, seqs, inner_folds, seed):
     return node, dict(cues=names, root=names[0])
 
 
+OPTUNA_DB = "sqlite:///outputs/v5/optuna_v5.db"
+C3_TRIALS = 150
+
+
+def fit_c3(target, names, values, X, R, study_name):
+    """C3 (Amendment 5d/5e): linear scene score over the eligible cues.
+    Search space (logged in the study's user attrs): per cue weight in
+    [0, 1] and orientation {+, -}; threshold in [0, 1]; low/high value
+    indices over the target's grid. Cues are normalised by 21 quantile
+    knots of the TRAINING windows. Objective: total training-window regret
+    (same cost as C1/C2). TPE sampler, seed 0, SQLite storage."""
+    import optuna
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+    Path("outputs/v5").mkdir(parents=True, exist_ok=True)
+    cols = [ALL_CUES.index(c) for c in names]
+    knots = {c: np.nanquantile(X[:, j], np.linspace(0, 1, 21)).tolist()
+             for c, j in zip(names, cols)}
+    U = np.column_stack([np.interp(X[:, j], knots[c], np.linspace(0, 1, 21))
+                         for c, j in zip(names, cols)])
+    valid = np.isfinite(X[:, cols])
+
+    def score(p):
+        w = np.array([p[f"w_{c}"] for c in names])
+        inv = np.array([p[f"inv_{c}"] for c in names], bool)
+        V = np.where(inv, 1 - U, U)
+        W = np.where(valid, w, 0.0)
+        den = W.sum(1)
+        z = np.where(den > 0, (np.where(valid, V, 0) * W).sum(1) /
+                     np.maximum(den, 1e-12), -1.0)
+        pred = np.where(z > p["threshold"], p["hi"], p["lo"])
+        return float(R[np.arange(len(R)), pred].sum())
+
+    def objective(trial):
+        p = {f"w_{c}": trial.suggest_float(f"w_{c}", 0.0, 1.0) for c in names}
+        p.update({f"inv_{c}": trial.suggest_categorical(f"inv_{c}",
+                                                        [False, True])
+                  for c in names})
+        p["threshold"] = trial.suggest_float("threshold", 0.0, 1.0)
+        p["lo"] = trial.suggest_int("lo", 0, len(values) - 1)
+        p["hi"] = trial.suggest_int("hi", 0, len(values) - 1)
+        return score(p)
+
+    study = optuna.create_study(
+        study_name=study_name, storage=OPTUNA_DB, direction="minimize",
+        sampler=optuna.samplers.TPESampler(seed=0), load_if_exists=True)
+    study.set_user_attr("search_space", dict(
+        cues=names, weights="[0,1]", orientation="{False,True}",
+        threshold="[0,1]", lo_hi=f"value index 0..{len(values) - 1}",
+        values=values, objective="training-window regret (FP+FN)+(IDFP+IDFN)"))
+    remaining = C3_TRIALS - len(study.trials)
+    if remaining > 0:
+        study.optimize(objective, n_trials=remaining)
+    b = study.best_params
+    return {"type": "linear", "threshold": b["threshold"],
+            "le": values[b["lo"]], "gt": values[b["hi"]],
+            "terms": [{"feature": c, "weight": b[f"w_{c}"],
+                       "invert": b[f"inv_{c}"], "knots": knots[c]}
+                      for c in names]}
+
+
 def spec_ov(spec):
     ov = v4_overrides()
     ov["controller_spec"] = json.dumps({"targets": spec})
@@ -280,6 +344,11 @@ def stage_s3():
     cand = s2["candidates"]
     outer = folds5(DEV)
     families = ["C1", "C2"]
+    try:
+        import optuna  # noqa: F401  (C3 only if installed before S3)
+        families.append("C3")
+    except ImportError:
+        pass
     record = {f: [] for f in families}
     jobs = [("v4_ref", v4_overrides(), d, s) for d in DETS for s in DEV]
     for k, fold in enumerate(outer):
@@ -333,7 +402,7 @@ def choose_family():
     q = lambda m: 0.5 * (m["HOTA"] + m["IDF1"])
     ref = {d: combine([load("v4_ref", d, s) for s in DEV]) for d in DETS}
     keys = {}
-    for i, fam in enumerate(["C1", "C2"]):
+    for i, fam in enumerate([f for f in ("C1", "C2", "C3") if f in record]):
         cells = [(d, s, f"s3_{fam}_fold{r['fold']}") for r in record[fam]
                  for s in r["held_out"] for d in DETS]
         ncat = sum(combine([load(t, d, s)])["MOTA"] < 0 for d, s, t in cells)
