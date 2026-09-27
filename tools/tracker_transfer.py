@@ -35,7 +35,7 @@ def run_one(job):
     from run_universal_acmot import build_config
     from tools.run_policy_validation import CachedDetector
     from tools.seqstats import sequence_stats
-    from universal_acmot import load_policy
+    from universal_acmot import V3_POLICY_FILE, load_policy
     from universal_policy_pipeline import UniversalPolicyPipeline
 
     cls = {"botsort": BoTSORTAdapter, "bytetrack": ByteTrackAdapter}[
@@ -45,7 +45,7 @@ def run_one(job):
     lines = []
     if system == "universal":
         cfg = build_config()
-        policy, dk = load_policy()
+        policy, dk = load_policy(V3_POLICY_FILE)
         tr = cls(high=cfg.high, low=cfg.low, new=cfg.new, buffer=cfg.buffer,
                  match=cfg.match, fuse=cfg.fuse)
         pipe = UniversalPolicyPipeline(cfg, cd, tr, policy,

@@ -25,7 +25,7 @@ POLICY_MODULES = [
     "adapters/detectors/generic_controls.py",
     "adapters/detectors/online_normalizer.py",
 ]
-FORBIDDEN = re.compile(r"yolo|rtdetr|rt-detr|rt_detr|detr|bytetrack|"
+FORBIDDEN = re.compile(r"yolo|rtdetr|rt-detr|rt_detr|detr|rcnn|bytetrack|"
                        r"byte_tracker|botsort|bot_sort", re.I)
 
 

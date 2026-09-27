@@ -47,3 +47,10 @@ byte-identical. Valid only while NMS is fixed at 0.45 (guarded in code).
 | E23 | V3 stress test | Exact invariance at dataset level | val-7 × 2 × 5 | identical metrics for T=2, T=0.5; stable under scale/pow (≤2 YOLO cells MOTA<0) | Calibration-invariance claim supported for the Platt family |
 
 Test-dev annotation fingerprint (sha256 of per-file sha256 list): 89d9dccb…c24; 4 files restored from the official zip in 2026-09-06 (logs in dataset root).
+| E24 | controller ablation on V3 (ACMOT_GRID=audit) | Does the legacy SCI add value on top of V3 | val-7 × 2 | SCI resolution ≈ uniform 640/736 mix at equal pixel cost; fixed 736 ≥ SCI; SCI sensitivity ≈ constant 0.4 | SCI unjustified by evidence |
+| E25 | per-frame cue→resolution-benefit audit (tools/cue_benefit_audit.py) | Which causal cue predicts where 832 helps | cache val-7 × 2 | within-sequence |ρ|<0.3, signs flip across sequences and detectors | No reliable cue |
+| E26 | matched-compute single-cue vs RANDOM allocation (ACMOT_GRID=cues) | End-to-end cue usefulness | val-7 × 2 | random 33.06/39.71 HOTA ≥ every cue incl. legacy SCI (selection 0/2 for all) | SCI removed from decision path (Amendment 4) |
+| E27 | NMS 0.45 vs detector-native 0.7 (tools/audit/nms_audit.py) | Is the legacy suppression request justified | YOLO val-7 at 736/832 | 0.45 wins 6/7 sequences at both levels (+0.6/+1.4 HOTA, +1.4/+2.0 IDF1) | Keep 0.45 (category C) |
+| E28 | V4 memory-length / resolution sensitivity (ACMOT_GRID=v4sens) | Are memory lengths arbitrary-but-harmless | val-7 × 2 | all within ±0.4 HOTA, 0 catastrophic cells; 832 > 736 > 640 for YOLO | Memory lengths kept as structural (documented) |
+| E29 | V4 nested LOSO (360 configs, tools/v4_select.py) | Select shared global parameters | val-7 × 2 | τ .75 (5/7), s .4 (5/7), assoc .10 (5/7), birth flat, tracker AC (7/7); outer-CV YOLO 15.23/31.84/34.05, RT 20.82/37.91/40.94 | V4 frozen |
+| E30 | V4 checks | live == replay; temperature invariance; separation tests | RT-DETR 0137 live; 0268 both | byte-identical; identical hashes; 3/3 PASS | Ready for held-out |

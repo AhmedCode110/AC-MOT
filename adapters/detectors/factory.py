@@ -19,6 +19,9 @@ def infer_detector_family(weights: str) -> str:
 
     name = Path(weights).name.lower()
 
+    if "fasterrcnn" in name or "faster_rcnn" in name:
+        return "fasterrcnn"
+
     if (
         "rtdetr" in name
         or "rt-detr" in name
@@ -89,6 +92,10 @@ def create_detector(
         return RTDETRAdapter(
             weights
         )
+
+    if family in {"fasterrcnn", "faster_rcnn", "faster-rcnn"}:
+        from adapters.detectors.fasterrcnn import FasterRCNNAdapter
+        return FasterRCNNAdapter(weights)
 
     raise ValueError(
         f"Unsupported detector family: {family}"

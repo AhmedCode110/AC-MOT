@@ -36,7 +36,8 @@ class CachedDetector:
         "pow3": lambda s: s ** 3,
     }
 
-    def __init__(self, npz_path, transform=None):
+    def __init__(self, npz_path, transform=None, cached_nms=0.45):
+        self.CACHED_NMS = float(cached_nms)
         z = np.load(npz_path)
         self.visual = z["visual"]
         self.shape = tuple(int(v) for v in z["shape"])
@@ -68,9 +69,12 @@ class CachedDetector:
                 for r in rows if r[5] >= confidence]
 
 
-def make_tracker(cfg):
-    return ByteTrackAdapter(high=cfg.high, low=cfg.low, new=cfg.new,
-                            buffer=cfg.buffer, match=cfg.match, fuse=cfg.fuse)
+def make_tracker(cfg, policy=None, cls=ByteTrackAdapter):
+    native = policy is not None and \
+        getattr(policy, "tracker_defaults", "ac") == "native"
+    return cls(high=cfg.high, low=cfg.low, new=cfg.new,
+               buffer=30 if native else cfg.buffer,
+               match=0.8 if native else cfg.match, fuse=cfg.fuse)
 
 
 def run(policy, dataset, cache_dir, output_dir, sequences=None,
@@ -105,7 +109,8 @@ def run(policy, dataset, cache_dir, output_dir, sequences=None,
         else:
             det = live
             frames = sorted((dataset / "sequences" / seq).glob("*.jpg"))
-        pipe = UniversalPolicyPipeline(cfg, det, make_tracker(cfg), policy,
+        pipe = UniversalPolicyPipeline(cfg, det, make_tracker(cfg, policy),
+                                       policy,
                                        density_kwargs=density_kwargs)
         rows = []
         with open(out / "tracks" / f"{seq}.txt", "w") as f:

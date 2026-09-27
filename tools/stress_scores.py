@@ -56,9 +56,9 @@ def run_one(job):
 
     if system == "universal":
         from run_universal_acmot import build_config
-        from universal_acmot import load_policy
+        from universal_acmot import V3_POLICY_FILE, load_policy
         from universal_policy_pipeline import UniversalPolicyPipeline
-        policy, dk = load_policy()
+        policy, dk = load_policy(V3_POLICY_FILE)
         cfg = build_config()
         pipe = UniversalPolicyPipeline(cfg, cd, make_tracker(cfg), policy,
                                        density_kwargs=dk)

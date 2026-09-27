@@ -1,0 +1,29 @@
+{
+  "name": "UniversalACMOT_v4_frozen",
+  "frozen_utc": "2026-09-27",
+  "selected_by": "research/OPTIMIZATION_PROTOCOL.md Amendment 4 (nested sequence-level LOSO, both detectors, lexicographic: fewest MOTA<0 cells then J4). Fold frequencies: tau 5/7, s 5/7, assoc 5/7, tracker 7/7; birth offset flat -> removed (birth = association). NMS 0.45 kept by E27 (6/7 sequences at 736 and 832). Memory lengths insensitive (E28).",
+  "base": "V1",
+  "overrides": {
+    "name": "UniversalACMOT_v4",
+    "scene_controller": false,
+    "feedback": "accepted",
+    "normalizer": "ecdf",
+    "ecdf_stride": 10,
+    "ecdf_window": 20,
+    "gate_stat": "zlogit",
+    "gate_tau": 0.75,
+    "gate_window": 10,
+    "leader_mode": "demote",
+    "leader_decay": 0.9,
+    "policy_raw_floor": 0.0,
+    "fixed_sensitivity": 0.4,
+    "assoc_offset": 0.10,
+    "birth_offset": 0.0,
+    "tracker_defaults": "ac",
+    "nms_request": 0.45,
+    "fixed_resolution": 736
+  },
+  "resolution_levels": [640, 736, 832],
+  "resolution_note": "fixed_resolution is the compute-budget level; evaluated at all three levels. Live use: UniversalACMOT(resolution='auto', target_fps=...) picks the largest level whose measured detector latency meets the budget.",
+  "density_kwargs": {}
+}

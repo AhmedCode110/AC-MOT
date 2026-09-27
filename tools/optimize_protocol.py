@@ -38,6 +38,68 @@ TAUS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
 
 
 def grid():
+    if FAMILY == "v4sens":
+        final = dict(feedback="accepted", normalizer="ecdf",
+                     gate_stat="zlogit", policy_raw_floor=0.0,
+                     scene_controller=False, fixed_resolution=736,
+                     gate_tau=0.75, fixed_sensitivity=0.4,
+                     assoc_offset=0.10, birth_offset=0.0,
+                     tracker_defaults="ac")
+        var = [("ref", {})]
+        var += [(f"res{r}", dict(fixed_resolution=r)) for r in (640, 832)]
+        var += [(f"ecdfwin{w}", dict(ecdf_window=w)) for w in (5, 10, 40)]
+        var += [(f"ecdfstride{k}", dict(ecdf_stride=k)) for k in (5, 20)]
+        var += [(f"gatewin{w}", dict(gate_window=w)) for w in (5, 20, 40)]
+        var += [(f"leaderdecay{d}", dict(leader_decay=d))
+                for d in (0.8, 0.95)]
+        return [dict(id=f"s_{n}", base="V1", selectable=False,
+                     overrides=dict(final, **o), density_kwargs={})
+                for n, o in var]
+    if FAMILY == "v4":
+        base = dict(feedback="accepted", normalizer="ecdf",
+                    gate_stat="zlogit", policy_raw_floor=0.0,
+                    scene_controller=False, fixed_resolution=736)
+        cfgs = []
+        for tau, s_, ao, bo, tr in itertools.product(
+                [0.5, 0.75, 1.0, 1.25, 1.5], [0.3, 0.4, 0.5, 0.6],
+                [0.10, 0.18, 0.26], [0.0, 0.05, 0.10], ["ac", "native"]):
+            cfgs.append(dict(
+                id=f"v4_t{tau}_s{s_}_a{ao}_b{bo}_{tr}", base="V1",
+                selectable=True, params=dict(tau=tau, s=s_, assoc=ao,
+                                             birth=bo, tracker=tr),
+                overrides=dict(base, gate_tau=tau, fixed_sensitivity=s_,
+                               assoc_offset=ao, birth_offset=bo,
+                               tracker_defaults=tr),
+                density_kwargs={}))
+        return cfgs
+    if FAMILY == "cues":
+        v3 = dict(feedback="accepted", normalizer="ecdf", gate_stat="zlogit",
+                  gate_tau=0.75, policy_raw_floor=0.0, fixed_sensitivity=0.4)
+        names = ["random", "cue:n_fb", "cue:tiny", "cue:neg_log_area",
+                 "cue:edges", "cue:darkness", "cue:blurriness",
+                 "cue:legacy_sci"]
+        return [dict(id="c_" + n.replace("cue:", ""), base="V1",
+                     selectable=False,
+                     overrides=dict(v3, res_policy=n), density_kwargs={})
+                for n in names]
+    if FAMILY == "audit":
+        v3 = dict(feedback="accepted", normalizer="ecdf", gate_stat="zlogit",
+                  gate_tau=0.75, policy_raw_floor=0.0)
+        cfgs = [dict(id="a_v3", base="V1", overrides=v3, density_kwargs={})]
+        for r in (640, 736, 832):
+            cfgs.append(dict(id=f"a_res{r}", base="V1",
+                             overrides=dict(v3, fixed_resolution=r),
+                             density_kwargs={}))
+        for fs in (0.3, 0.4, 0.5):
+            cfgs.append(dict(id=f"a_sens{fs:.1f}", base="V1",
+                             overrides=dict(v3, fixed_sensitivity=fs),
+                             density_kwargs={}))
+            for r in (640, 736, 832):
+                cfgs.append(dict(id=f"a_res{r}_sens{fs:.1f}", base="V1",
+                                 overrides=dict(v3, fixed_resolution=r,
+                                                fixed_sensitivity=fs),
+                                 density_kwargs={}))
+        return [dict(c, selectable=False) for c in cfgs]
     if FAMILY == "v3":
         v3 = dict(feedback="accepted", normalizer="ecdf", gate_stat="zlogit",
                   policy_raw_floor=0.0)
@@ -85,8 +147,8 @@ def run_one(args):
                      **cfg["overrides"])
     det_cache = CachedDetector(f"outputs/det_cache/{det}/{seq}.npz")
     cfg_ac = build_config()
-    pipe = UniversalPolicyPipeline(cfg_ac, det_cache, make_tracker(cfg_ac),
-                                   policy,
+    pipe = UniversalPolicyPipeline(cfg_ac, det_cache,
+                                   make_tracker(cfg_ac, policy), policy,
                                    density_kwargs=cfg["density_kwargs"])
     image = np.empty(det_cache.shape + (0,), dtype=np.uint8)
     lines, audit = [], []
@@ -107,6 +169,9 @@ def run_one(args):
     st = sequence_stats(DATASET, seq, tmp)
     os.unlink(tmp)
     st["mean_sci"] = float(np.mean([a["sci"] for a in audit]))
+    st["pixel_cost"] = float(np.mean([(a["resolution"] / 832.0) ** 2
+                                      for a in audit]))
+    st["frames"] = len(audit)
     raw = np.array([a["raw_count"] for a in audit], float)
     acc = np.array([a["accepted_after_topk"] for a in audit], float)
     st["keep_pct"] = float(np.mean(np.where(raw > 0, 100 * acc /

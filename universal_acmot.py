@@ -35,8 +35,9 @@ from run_universal_acmot import analyze_visual, build_config
 from universal_policy_pipeline import (POLICIES, PolicySpec,
                                        UniversalPolicyPipeline, replace)
 
-DEFAULT_POLICY_FILE = Path(__file__).with_name("configs") / \
-    "universal_acmot_policy.json"
+CONFIGS = Path(__file__).with_name("configs")
+V3_POLICY_FILE = CONFIGS / "universal_acmot_policy.json"      # V3 checkpoint
+DEFAULT_POLICY_FILE = CONFIGS / "universal_acmot_policy_v4.json"  # final
 
 
 def load_policy(path=DEFAULT_POLICY_FILE):
@@ -46,12 +47,53 @@ def load_policy(path=DEFAULT_POLICY_FILE):
     return policy, spec.get("density_kwargs", {})
 
 
+class ResolutionBudget:
+    """
+    Detector control by compute budget (V4). The scene-complexity rule was
+    removed (no scene cue beat random allocation at matched compute), so
+    the controller spends pixels by budget: it times the detector at each
+    level on the first frames (online self-calibration, detector-agnostic)
+    and keeps the largest level whose median latency fits 1/target_fps.
+    """
+
+    def __init__(self, levels=(640, 736, 832), target_fps=None, probes=3):
+        self.levels = sorted(levels)
+        self.target_fps = target_fps
+        self.probes = int(probes)
+        self.samples = {r: [] for r in self.levels}
+        self.chosen = None if target_fps else self.levels[-1]
+
+    def level_for(self, frame_number):
+        if self.chosen is not None:
+            return self.chosen
+        k = (frame_number - 1) // (self.probes + 1)   # +1 warm-up per level
+        return self.levels[min(k, len(self.levels) - 1)]
+
+    def observe(self, level, seconds, frame_number):
+        if self.chosen is not None:
+            return
+        if (frame_number - 1) % (self.probes + 1) != 0:  # skip warm-up
+            self.samples[level].append(seconds)
+        if all(len(v) >= self.probes for v in self.samples.values()):
+            import numpy as np
+            budget = 1.0 / self.target_fps
+            ok = [r for r in self.levels
+                  if np.median(self.samples[r]) <= budget]
+            self.chosen = ok[-1] if ok else self.levels[0]
+
+
 class UniversalACMOT:
     def __init__(self, detector, tracker, policy: PolicySpec | None = None,
-                 density_kwargs: dict | None = None, policy_file=None):
+                 density_kwargs: dict | None = None, policy_file=None,
+                 resolution=None, target_fps=None):
         if policy is None:
             policy, dk = load_policy(policy_file or DEFAULT_POLICY_FILE)
             density_kwargs = dk if density_kwargs is None else density_kwargs
+        self.budget = None
+        if resolution == "auto":
+            self.budget = ResolutionBudget(target_fps=target_fps)
+        elif resolution:
+            policy = replace(policy, fixed_resolution=int(resolution))
         self.config = build_config()
         self.pipeline = UniversalPolicyPipeline(
             self.config, detector, tracker, policy,
@@ -60,9 +102,18 @@ class UniversalACMOT:
         self.last = None
 
     def __call__(self, frame):
+        from time import perf_counter
         self.frame_number += 1
+        if self.budget is not None:
+            level = self.budget.level_for(self.frame_number)
+            self.pipeline.policy = replace(self.pipeline.policy,
+                                           fixed_resolution=level)
+        t0 = perf_counter()
         self.last = self.pipeline.process(self.frame_number, frame,
                                           analyze_visual(frame))
+        if self.budget is not None:
+            self.budget.observe(level, perf_counter() - t0,
+                                self.frame_number)
         return self.last["tracks"]
 
     def reset(self):

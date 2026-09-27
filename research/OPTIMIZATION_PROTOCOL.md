@@ -75,3 +75,27 @@ Selection family (only these are selectable): V3 gate-only,
 catastrophic cells, then J4; J3 reported), same LOSO folds.
 Ablations (not selectable): ECDF + ratio ρ ∈ {0.5, 0.6, 0.7}.
 The v1 tag (universal-acmot-v1-freeze) is superseded; kept as history.
+
+## Amendment 4 (2026-09-27) — whole-controller generalization audit → V4 (before any test-dev metric)
+Evidence (val only): E24 controller ablation — the legacy SCI resolution
+rule is no better than a uniform 640/736 mix at equal pixel cost, and the
+SCI→sensitivity mapping equals a constant 0.4. E25 per-frame audit — no
+causal scene cue predicts the benefit of 832 over 640 consistently (|ρ|<0.3
+within sequences, signs flip across sequences and detectors). E26 matched-
+compute end-to-end test — no single cue (crowd, tiny, area, edges,
+darkness, blurriness) nor the legacy SCI beats RANDOM 50% allocation on both
+detectors (selection frequency 0/2 for every cue). Decision: remove the
+scene controller from the decision path. Resolution is a compute-budget
+input (fixed per deployment; latency-feedback controller for live use).
+V4 search space (shared by both detectors, resolution 736 for selection):
+  τ ∈ {0.5, 0.75, 1.0, 1.25, 1.5}; sensitivity s ∈ {0.3, 0.4, 0.5, 0.6};
+  association offset ∈ {0.10, 0.18, 0.26}; birth offset ∈ {0.0, 0.05, 0.10};
+  tracker retention/match ∈ {legacy AC (45, 0.86), tracker-native (30, 0.8)}.
+Selection: nested sequence-level LOSO; in each outer fold the config is
+chosen on the 6 training sequences × 2 detectors by the lexicographic rule
+(1) fewest catastrophic (MOTA<0) cells, (2) max J4 (worst-detector relative
+gain of ½(HOTA+IDF1) over V1). Outer held-out sequences give the CV
+estimate. Stability: per-parameter fold choices, median, range, frequency;
+objective sensitivity around the optimum. A parameter whose fold choices
+are unstable is not averaged — the mechanism is redesigned or the
+parameter is fixed at the value with the flattest objective, and reported.

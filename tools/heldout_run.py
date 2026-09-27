@@ -33,7 +33,15 @@ def policy_for(system):
     from universal_policy_pipeline import POLICIES, replace
     ecdf = dict(feedback="accepted", normalizer="ecdf", policy_raw_floor=0.0)
     if system == "V3":
-        return load_policy()
+        from universal_acmot import V3_POLICY_FILE
+        return load_policy(V3_POLICY_FILE)
+    if system.startswith("V4"):
+        pol, dk = load_policy()          # frozen V4 (default policy file)
+        parts = system.split("_")
+        pol = replace(pol, fixed_resolution=int(parts[1]))
+        if "nogate" in parts:
+            pol = replace(pol, gate_tau=0.0)
+        return pol, dk
     table = {
         "V1": POLICIES["V1"],
         "V2b": POLICIES["V2b"],
@@ -50,10 +58,9 @@ def policy_for(system):
 
 def jobs_from_lock(lock, dets, seqs):
     jobs = []
-    for s in lock["systems"]:
-        jobs += [(s, "bytetrack", d, q) for d in dets for q in seqs]
-    for s in ("default", "shared_static_832", "V3"):
-        jobs += [(s, "botsort", d, q) for d in dets for q in seqs]
+    for tr, systems in lock["tracker_systems"].items():
+        for s in systems:
+            jobs += [(s, tr, d, q) for d in dets for q in seqs]
     return jobs
 
 
@@ -138,9 +145,7 @@ def report(out, dets, seqs, lock, n_boot):
     S = lambda tr, sy, d: [pickle.load(open(
         Path(out) / "stats" / tr / sy / d / f"{q}.pkl", "rb")) for q in seqs]
     rows = []
-    for tr in ("bytetrack", "botsort"):
-        systems = list(lock["systems"]) if tr == "bytetrack" else \
-            ["default", "shared_static_832", "V3"]
+    for tr, systems in lock["tracker_systems"].items():
         for sy in systems:
             for d in dets:
                 st = S(tr, sy, d)
@@ -155,21 +160,20 @@ def report(out, dets, seqs, lock, n_boot):
                       f"ncat {ncat}", flush=True)
     json.dump(rows, open(Path(out) / "pooled_metrics.json", "w"), indent=1)
     boots = []
-    print("\nPaired sequence bootstrap: V3 minus baseline "
+    print("\nPaired sequence bootstrap: system minus baseline "
           f"({n_boot} resamples, seed 42, 95% CI)")
-    for tr in ("bytetrack",):
-        for base in [s for s in lock["systems"] if s != "V3"]:
-            for d in dets:
-                for metric in ("HOTA", "IDF1", "MOTA"):
-                    diff, lo, hi, p_le0 = bootstrap(S(tr, "V3", d),
-                                                    S(tr, base, d), metric,
-                                                    n=n_boot)
-                    boots.append(dict(tracker=tr, baseline=base, detector=d,
-                                      metric=metric, diff=diff, ci_lo=lo,
-                                      ci_hi=hi, p_le0=p_le0))
-                    print(f"  {d:<7} vs {base:<24} {metric:<5} "
-                          f"Δ {diff:7.2f}  CI [{lo:7.2f}, {hi:7.2f}]  "
-                          f"P(Δ≤0) {p_le0:.3f}", flush=True)
+    for tr, sysname, base in lock["bootstrap_pairs"]:
+        for d in dets:
+            for metric in ("HOTA", "IDF1", "MOTA"):
+                diff, lo, hi, p_le0 = bootstrap(S(tr, sysname, d),
+                                                S(tr, base, d), metric,
+                                                n=n_boot)
+                boots.append(dict(tracker=tr, system=sysname, baseline=base,
+                                  detector=d, metric=metric, diff=diff,
+                                  ci_lo=lo, ci_hi=hi, p_le0=p_le0))
+                print(f"  {tr:<9} {d:<7} {sysname:<10} vs {base:<18} "
+                      f"{metric:<5} Δ {diff:7.2f}  CI [{lo:7.2f}, {hi:7.2f}]"
+                      f"  P(Δ≤0) {p_le0:.3f}", flush=True)
     json.dump(boots, open(Path(out) / "bootstrap.json", "w"), indent=1)
 
 
@@ -185,7 +189,7 @@ def main():
     a = ap.parse_args()
     lock = json.load(open(a.lock))
     verify_lock(lock)
-    dets = ["yolov8", "rtdetr"]
+    dets = lock.get("detectors_run", ["yolov8", "rtdetr"])
     seqs = sorted(p.name for p in Path(a.dataset, "sequences").iterdir()
                   if p.is_dir())
     if not a.report_only:

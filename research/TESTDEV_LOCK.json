@@ -1,5 +1,5 @@
 {
-  "status": "LOCKED_BEFORE_TESTDEV_EVALUATION",
+  "status": "SUPERSEDED_BEFORE_ANY_TESTDEV_EVALUATION",
   "created": "2026-09-27",
   "rule": "Test-dev is evaluated exactly once with the systems below. No system, parameter or selection may change after any test-dev metric is seen. Any post-hoc bug fix must be documented as a correction with both results reported.",
   "code_commit": "c1e799d3ba74d4c220b6be88f1659cdde1b20bf9",
@@ -26,7 +26,7 @@
   "primary_comparison": "UniversalACMOT_v3 (ByteTrack) vs each baseline, per detector, paired sequence bootstrap (10000 resamples, seed 42) of pooled HOTA, IDF1, MOTA",
   "systems": {
     "default": "raw scores, res 640, ByteTrack ultralytics defaults (0.25/0.1/0.25, buffer 30, match 0.8)",
-    "shared_static_832": "raw threshold 0.5 (low 0.1, new 0.5), res 832, buffer 30, match 0.8 — best single shared raw setting on val",
+    "shared_static_832": "raw threshold 0.5 (low 0.1, new 0.5), res 832, buffer 30, match 0.8 \u2014 best single shared raw setting on val",
     "shared_static_736": "same, res 736 (compute-matched to the AC resolution usage)",
     "oracle": "detector-specific reference selected on val: yolov8 res 832 high 0.4; rtdetr res 832 high 0.5 (low=min(0.1,high/2), new=high)",
     "V1": "online histogram normalization only (POLICIES['V1'])",
@@ -40,5 +40,6 @@
   "trackers": {
     "bytetrack": "all systems",
     "botsort": "default, shared_static_832, V3 (tracker-portability, no policy change)"
-  }
+  },
+  "superseded_by": "research/TESTDEV_LOCK_V4.json (whole-model generalization audit, Amendment 4). No test-dev metric was computed under this lock."
 }

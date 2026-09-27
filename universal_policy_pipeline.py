@@ -86,6 +86,33 @@ class PolicySpec:
     # Raw-score floor applied inside the policy (a raw-scale constant).
     # V3 sets 0: candidate emission is left to the detector adapter.
     policy_raw_floor: float = 0.01
+    # Controller audit switches (0 = legacy SCI-driven behaviour):
+    # fixed_resolution: bypass SCI resolution selection.
+    # fixed_sensitivity: bypass the SCI -> generic sensitivity mapping.
+    fixed_resolution: int = 0
+    fixed_sensitivity: float = 0.0
+    # Cue audit: "cue:<name>" allocates 832 when the cue is at or above its
+    # own running median (this sequence, analysis steps so far), else 640;
+    # "random" allocates 832 with probability 0.5 per analysis step
+    # (deterministic hash). Empty = legacy SCI resolution rule.
+    res_policy: str = ""
+    # V4: no scene controller in the decision path (cue audit E25/E26:
+    # no scene cue beats random resolution allocation at matched compute).
+    # Resolution comes from fixed_resolution (compute budget) and the
+    # score thresholds from fixed_sensitivity + the two offsets below.
+    scene_controller: bool = True
+    assoc_offset: float = 0.18
+    birth_offset: float = 0.05
+    # Tracker retention/association: "ac" = legacy AC values (buffer 45,
+    # match 0.86); "native" = the tracker's own defaults (30, 0.8).
+    tracker_defaults: str = "ac"
+    # ECDF memory: one score sample every ecdf_stride frames, last
+    # ecdf_window samples (default = 200-frame span, same as V1 histogram).
+    # Generic suppression request passed to the detector adapter when the
+    # scene controller is off (0.45 = legacy AC request).
+    nms_request: float = 0.45
+    ecdf_stride: int = 10
+    ecdf_window: int = 20
 
 
 POLICIES = {
@@ -148,9 +175,12 @@ class UniversalPolicyPipeline:
     def reset(self):
         self.controller = Controller(self.config)
         self.normalizer = (
-            EmpiricalCDFNormalizer(update_every=10, window=20)
+            EmpiricalCDFNormalizer(update_every=self.policy.ecdf_stride,
+                                   window=self.policy.ecdf_window)
             if self.policy.normalizer == "ecdf" else
             OnlineScoreNormalizer(bins=64, decay=0.95, update_every=10))
+        self.cue_hist = []
+        self.cue_size = 640
         self.gate_ref_logit = None
         self.gate_logits = deque(maxlen=self.policy.gate_window)
         self.density = CandidateDensityController(**self.density_kwargs)
@@ -159,6 +189,22 @@ class UniversalPolicyPipeline:
         self.leader_ref = None
         self.tracker.reset()
         self.previous = []
+
+    def _cues(self, visual):
+        """Causal scene cues: detector feedback from frames < t and image
+        statistics of frame t."""
+        b = np.asarray(self.previous, dtype=float).reshape(-1, 6)
+        area = (b[:, 2] - b[:, 0]) * (b[:, 3] - b[:, 1])
+        return dict(
+            n_fb=float(len(b)),
+            tiny=float((area < 1024).mean()) if len(b) else 0.0,
+            neg_log_area=float(-np.median(np.log(np.maximum(area, 1))))
+            if len(b) else 0.0,
+            edges=float(visual["edges"]),
+            darkness=float(-visual["brightness"]),
+            blurriness=float(-visual["blur"]),
+            legacy_sci=float(self.controller.sci),
+        )
 
     def _thresholds(self, base, dens, rel):
         p = self.policy
@@ -196,7 +242,28 @@ class UniversalPolicyPipeline:
 
     def process(self, frame_number, image, visual):
         p = self.policy
-        params = self.controller.choose(frame_number, visual, self.previous)
+        if p.scene_controller:
+            params = self.controller.choose(frame_number, visual,
+                                            self.previous)
+        else:
+            params = dict(size=int(p.fixed_resolution or 736),
+                          nms=float(p.nms_request),
+                          sci=0.0, scene="clear")
+        if p.fixed_resolution:
+            params = dict(params, size=int(p.fixed_resolution))
+        cues = self._cues(visual) if p.scene_controller else {}
+        if p.res_policy:
+            if frame_number == 1 or frame_number % 10 == 1:
+                if p.res_policy == "random":
+                    h = (frame_number * 2654435761) & 0xFFFFFFFF
+                    self.cue_size = 832 if (h >> 16) & 1 else 640
+                else:
+                    c = cues[p.res_policy.split(":", 1)[1]]
+                    self.cue_hist.append(c)
+                    med = float(np.median(self.cue_hist))
+                    self.cue_size = 832 if c >= med and \
+                        len(self.cue_hist) > 1 else 640
+            params = dict(params, size=self.cue_size)
         raw = self.detector.detect(image, confidence=p.policy_raw_floor,
                                    suppression=params["nms"],
                                    resolution=params["size"])
@@ -204,6 +271,13 @@ class UniversalPolicyPipeline:
         base = resolve_generic_score_controls(
             sci=params["sci"], scene=params["scene"],
             recovery=self.config.recovery)
+        if p.fixed_sensitivity:
+            fs = float(p.fixed_sensitivity)
+            hi = min(0.95, 1 - fs + p.assoc_offset)
+            base = type(base)(sensitivity=fs, low_threshold=1 - fs,
+                              high_threshold=hi,
+                              new_track_threshold=min(0.98,
+                                                      hi + p.birth_offset))
 
         rel = self.reliability.value
         dens = None
@@ -320,6 +394,7 @@ class UniversalPolicyPipeline:
             feedback_count=len(feedback),
             reliability=rel,
             trust=trust_used,
+            **{f"cue_{k}": v for k, v in cues.items()},
             leader_ref=(leader_ref if leader_ref is not None else np.nan),
             demoted=demoted,
             obs_survival=self.reliability.survival,
