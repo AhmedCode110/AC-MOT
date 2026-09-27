@@ -80,7 +80,8 @@ class CachedDetector:
         return dict(edges=v[0], brightness=v[1], blur=v[2])
 
     def detect(self, image, confidence, suppression, resolution):
-        if abs(float(suppression) - self.CACHED_NMS) > 1e-9:
+        if suppression is not None and \
+                abs(float(suppression) - self.CACHED_NMS) > 1e-9:
             raise RuntimeError(
                 f"Cache holds NMS={self.CACHED_NMS} outputs; policy asked "
                 f"for NMS={suppression}. Run live instead.")
@@ -94,9 +95,11 @@ class CachedDetector:
 def make_tracker(cfg, policy=None, cls=ByteTrackAdapter):
     native = policy is not None and \
         getattr(policy, "tracker_defaults", "ac") == "native"
+    if native:      # tracker's own defaults (ultralytics bytetrack.yaml)
+        return cls(high=0.25, low=0.1, new=0.25, buffer=30, match=0.8,
+                   fuse=True)
     return cls(high=cfg.high, low=cfg.low, new=cfg.new,
-               buffer=30 if native else cfg.buffer,
-               match=0.8 if native else cfg.match, fuse=cfg.fuse)
+               buffer=cfg.buffer, match=cfg.match, fuse=cfg.fuse)
 
 
 def run(policy, dataset, cache_dir, output_dir, sequences=None,

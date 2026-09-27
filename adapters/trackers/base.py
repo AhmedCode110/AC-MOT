@@ -34,6 +34,13 @@ class TrackerAdapter(ABC):
     ) -> TrackList:
         raise NotImplementedError
 
+    native_match: float = 0.8
+
+    def set_association_tolerance(self, value: float) -> None:
+        """Generic association-tolerance command (max matching cost);
+        default: unsupported."""
+        return None
+
     def set_retention(self, frames: int) -> None:
         """Generic retention command: how many frames a lost track is kept.
         Adapters translate it to their own API; default: unsupported."""

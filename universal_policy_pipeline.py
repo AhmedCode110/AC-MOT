@@ -110,12 +110,18 @@ class PolicySpec:
     # ecdf_window samples (default = 200-frame span, same as V1 histogram).
     # Generic suppression request passed to the detector adapter when the
     # scene controller is off (0.45 = legacy AC request).
-    nms_request: float = 0.45
+    nms_request: float | None = 0.45   # None = detector-native suppression
     # V5 development: log the generic scene/tracking state every frame and
     # (optionally) let a learned controller override per-frame decisions.
     scene_state: bool = False
     controller_spec: str = ""        # JSON; empty = no V5 controller
     tracker_buffer: int = 0           # fixed retention override (frames)
+    # V5-TF (Amendment 6): training-free online candidate handling.
+    # "otsu3_window": 3-class Otsu on candidate logits of frames < t;
+    # "otsu3_frame": on frame t's own candidates. Empty = legacy paths.
+    candidate_mode: str = ""
+    # F3: association tolerance scaled by relative global motion.
+    assoc_motion: bool = False
     ecdf_stride: int = 10
     ecdf_window: int = 20
 
@@ -193,6 +199,10 @@ class UniversalPolicyPipeline:
         self.cue_size = 640
         self.gate_ref_logit = None
         self.gate_logits = deque(maxlen=self.policy.gate_window)
+        from online_calibration import RobustHistory
+        self.otsu_window = deque(maxlen=self.policy.gate_window)
+        self.motion_hist = RobustHistory()
+        self.tf_log = {}
         self.density = CandidateDensityController(**self.density_kwargs)
         self.reliability = TemporalReliability(self.policy.reliability_ema)
         self.trust = 1.0
@@ -201,6 +211,35 @@ class UniversalPolicyPipeline:
         if self.policy.tracker_buffer:
             self.tracker.set_retention(self.policy.tracker_buffer)
         self.previous = []
+
+    def _otsu_bands(self, raw, normalized, mode):
+        """V5-TF candidate handling: 3-class Otsu on logits (frames < t for
+        the window mode; frame t for the frame mode). Returns the banded
+        candidates and the tracker thresholds (band boundaries)."""
+        from online_calibration import logits, otsu3
+        if not raw:
+            return [], 0.1, 0.5, 0.5, np.empty(0)
+        L = logits([r.confidence for r in raw])
+        ref = (np.concatenate(self.otsu_window)
+               if mode == "otsu3_window" and self.otsu_window else L)
+        th = otsu3(ref)
+        out = []
+        if th is None:
+            t1, t2, eta = -np.inf, -np.inf, 0.0
+        else:
+            t1, t2, eta = th
+        n_prim = n_sec = 0
+        for li, d in zip(L, normalized):
+            u = d.confidence
+            if li >= t2:
+                out.append(replace_det(d, 0.5 + 0.5 * u))
+                n_prim += 1
+            elif li >= t1:
+                out.append(replace_det(d, 0.1 + 0.4 * u))
+                n_sec += 1
+        self.tf_log.update(otsu_t1=t1, otsu_t2=t2, otsu_eta=eta,
+                           n_primary=n_prim, n_secondary=n_sec)
+        return out, 0.1, 0.5, 0.5, L
 
     def _cues(self, visual):
         """Causal scene cues: detector feedback from frames < t and image
@@ -259,7 +298,8 @@ class UniversalPolicyPipeline:
                                             self.previous)
         else:
             params = dict(size=int(p.fixed_resolution or 736),
-                          nms=float(p.nms_request),
+                          nms=(None if p.nms_request is None
+                               else float(p.nms_request)),
                           sci=0.0, scene="clear")
         use_state = p.scene_state or self.v5 is not None
         state = {}
@@ -316,15 +356,29 @@ class UniversalPolicyPipeline:
                 budget_scale=self.trust)
 
         low, high, new = self._thresholds(base, dens, rel)
+        otsu_L = None
+        if p.candidate_mode:
+            normalized, low, high, new, otsu_L = self._otsu_bands(
+                raw, normalized, p.candidate_mode)
+        if p.assoc_motion:
+            m = (visual or {}).get("motion")
+            r = self.motion_hist.ratio(m)
+            m0 = self.tracker.native_match
+            self.tracker.set_association_tolerance(
+                min(0.95, 1.0 - (1.0 - m0) / max(1.0, r)))
+            self.tf_log["motion_ratio"] = r
+            self.motion_hist.push(m)
 
         demoted = 0
         leader_ref = self.leader_ref
+        if p.candidate_mode:            # V5-TF: no gate / density path
+            leader_ref = None
         norm_u = [d.confidence for d in normalized]
         gate_ref_prev = self.gate_ref_logit
         gate_iqr_prev = (float(np.subtract(*np.percentile(
             np.concatenate(self.gate_logits), [75, 25])))
             if self.gate_logits else 1.0)
-        if p.gate_stat == "zlogit" and p.gate_tau > 0 and raw \
+        if not p.candidate_mode and p.gate_stat == "zlogit" and p.gate_tau > 0 and raw \
                 and self.gate_ref_logit is not None and self.gate_logits:
             lg = _logit(np.array([r.confidence for r in raw]))
             q75, q25 = np.percentile(np.concatenate(self.gate_logits),
@@ -379,6 +433,8 @@ class UniversalPolicyPipeline:
             image=image if getattr(self.tracker, "needs_image", False)
             else None)
 
+        if otsu_L is not None:
+            self.otsu_window.append(otsu_L)
         if use_state:
             self.analyzer.observe_detector(
                 np.array([[r.x1, r.y1, r.x2, r.y2] for r in raw]).reshape(-1, 4),
@@ -438,6 +494,7 @@ class UniversalPolicyPipeline:
             **{f"cue_{k}": v for k, v in cues.items()},
             **{f"s_{k}": v for k, v in state.items()},
             **{f"d_{k}": v for k, v in decision.items()},
+            **{f"tf_{k}": v for k, v in self.tf_log.items()},
             leader_ref=(leader_ref if leader_ref is not None else np.nan),
             demoted=demoted,
             obs_survival=self.reliability.survival,

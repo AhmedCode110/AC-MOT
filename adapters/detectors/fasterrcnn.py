@@ -60,6 +60,7 @@ class FasterRCNNAdapter(DetectorAdapter):
         state = torch.load(weights, map_location="cpu")
         model.load_state_dict(state)
         self.model = model.eval().to(self.device)
+        self.native_nms = float(model.roi_heads.nms_thresh)   # torchvision 0.5
 
     @property
     def capabilities(self) -> DetectorCapabilities:
@@ -73,7 +74,8 @@ class FasterRCNNAdapter(DetectorAdapter):
         m = self.model
         m.transform.min_size = (int(resolution),)
         m.transform.max_size = int(resolution)
-        m.roi_heads.nms_thresh = float(suppression)
+        m.roi_heads.nms_thresh = (self.native_nms if suppression is None
+                                  else float(suppression))
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         x = torch.from_numpy(np.ascontiguousarray(rgb)).permute(2, 0, 1)
         x = x.to(self.device, dtype=torch.float32).div_(255.0)

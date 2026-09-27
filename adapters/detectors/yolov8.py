@@ -66,10 +66,11 @@ class YOLOv8Adapter(DetectorAdapter):
         resolution: int,
     ) -> DetectionList:
 
+        nms_kw = {} if suppression is None else {"iou": float(suppression)}
         result = self.model.predict(
             frame,
             conf=self.inference_conf_floor,
-            iou=float(suppression),
+            **nms_kw,
             imgsz=int(resolution),
             classes=self.classes,
             max_det=self.max_det,

@@ -134,6 +134,13 @@ class ByteTrackAdapter(TrackerAdapter):
     def _update_backend(self, boxes, image):
         return self.tracker.update(boxes)
 
+    @property
+    def native_match(self) -> float:
+        return self.match
+
+    def set_association_tolerance(self, value: float) -> None:
+        self.tracker.args.match_thresh = float(value)
+
     def set_retention(self, frames: int) -> None:
         # ultralytics BYTETracker: max_time_lost = frame_rate/30 * buffer
         self.tracker.max_time_lost = int(self.frame_rate / 30.0 * int(frames))
