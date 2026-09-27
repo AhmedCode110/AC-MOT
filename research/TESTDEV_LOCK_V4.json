@@ -1,0 +1,59 @@
+{
+  "status": "LOCKED_BEFORE_TESTDEV_EVALUATION",
+  "created": "2026-09-27",
+  "rule": "VisDrone test-dev is evaluated exactly once with the systems below. No system, parameter, cue or selection may change after any test-dev metric is seen. Any post-hoc bug fix is documented as a correction with both results reported.",
+  "code_commit": "fc003bf96621214dc09a0e55f720128093972927",
+  "code_tag": "universal-acmot-v4-freeze",
+  "file_sha256": {
+    "configs/universal_acmot_policy_v4.json": "a9b456e77ba7b8dddb0ec291967d0f9c41e48309d64683e9d0d87e0fdfa456bb",
+    "universal_policy_pipeline.py": "f7f4337d32169e4cb4bf103ad7851fd1b885177ae87716ec7c6b38157de3cf89",
+    "universal_acmot.py": "85abdf9c787053274e0b2e74c3912c501f8fab98c97b2e5c43d82efb2cec0e46",
+    "adapters/detectors/online_normalizer.py": "8825835354785b4a6a83cd396d622401e8f261d7bbe34db40f80ce68bb99f582",
+    "adapters/trackers/bytetrack.py": "4764c523456984e9119be5eb8a91eb9f7ffd51158a7ade87ba280010ef90b6d5",
+    "adapters/trackers/botsort.py": "18bdc4cec15bf8d505b2ab721fc5003c8d175660f0aca6be0a4e9db3ef79283a",
+    "adapters/detectors/fasterrcnn.py": "d1a6c5067dd0683ffca3addad098f62158e2734528765d0e283f1aa7c7991831",
+    "tools/heldout_run.py": "2c4941e730aab042a2163fb5183d38c82f7df637b4fd3ec687b2db3252dd0ede"
+  },
+  "dataset": {
+    "name": "VisDrone2019-MOT-test-dev",
+    "sequences": 17,
+    "frames": 6635,
+    "annotation_fingerprint_sha256": "89d9dccbad509f1f8d34bb2afde32cb82490d34242b266345188107df3b40c24"
+  },
+  "detectors_run": ["yolov8", "rtdetr"],
+  "detector_weights": {
+    "yolov8": "yolov8n.pt sha256 f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36",
+    "rtdetr": "rtdetr-l.pt sha256 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f",
+    "fasterrcnn_unseen": "fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth sha256 dd69338a24b8d7381807e247652bdc356325bcbaf1cd3e092e00e0a1a58706bf (evaluated separately as the unseen-detector transfer test with the same V4 systems; never used for any selection)"
+  },
+  "evaluation": "custom class-agnostic internal protocol (NOT official VisDrone): HOTA TrackEval 12c8791; MOTA/IDF1/IDS/FP/FN/P/R motmetrics 1.4.0",
+  "systems": {
+    "default": "raw scores, res 640, ByteTrack ultralytics defaults (0.25/0.1/0.25, buffer 30, match 0.8)",
+    "shared_static_736": "raw threshold 0.5 (low 0.1, new 0.5), res 736, buffer 30, match 0.8 (compute-matched to V4_736)",
+    "shared_static_832": "same at res 832 — best single shared raw setting on val",
+    "oracle": "DETECTOR-SPECIFIC reference selected on val (not universal): yolov8 832/0.4, rtdetr 832/0.5",
+    "V1": "online histogram normalization only",
+    "V2b": "density thresholds + Top-K",
+    "V3": "ECDF + z-logit gate + legacy SCI controller (tag universal-acmot-v3-freeze)",
+    "V4_640 / V4_736 / V4_832": "FINAL V4 at each compute-budget level",
+    "V4_736_nogate": "V4 without the gate (ablation: normalization + thresholds only)"
+  },
+  "tracker_systems": {
+    "bytetrack": ["default", "shared_static_736", "shared_static_832", "oracle", "V1", "V2b", "V3", "V4_640", "V4_736", "V4_832", "V4_736_nogate"],
+    "botsort": ["default", "shared_static_832", "V4_736", "V4_832"]
+  },
+  "primary_hypotheses": "H1: V4_736 > default and > V1 and > V2b on HOTA/IDF1 for both detectors. H2: V4 at matched compute is not worse than shared_static at the same level. H3: zero catastrophic (MOTA<0) sequences for V4. H4 (reference): gap V4_832 vs detector-specific oracle.",
+  "bootstrap_pairs": [
+    ["bytetrack", "V4_736", "default"],
+    ["bytetrack", "V4_736", "V1"],
+    ["bytetrack", "V4_736", "V2b"],
+    ["bytetrack", "V4_736", "V3"],
+    ["bytetrack", "V4_736", "shared_static_736"],
+    ["bytetrack", "V4_832", "shared_static_832"],
+    ["bytetrack", "V4_832", "oracle"],
+    ["bytetrack", "V4_736", "V4_736_nogate"],
+    ["botsort", "V4_736", "default"],
+    ["botsort", "V4_832", "shared_static_832"]
+  ],
+  "bootstrap": "paired over the 17 sequences, 10000 resamples, seed 42, pooled metrics recomputed per resample, 95% percentile CI"
+}
