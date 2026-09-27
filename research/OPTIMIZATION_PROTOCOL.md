@@ -109,3 +109,38 @@ sequences. RT-DETR counts as "not applicable", not as support. If the rule
 fails, NMS 0.45 is reported as a YOLO-derived limitation and adapter-native
 suppression is recorded as the recommended design for a future version
 (V5), which would require its own development selection and a new held-out set.
+
+## Amendment 5 (2026-09-27) — V5 Generalized Scene-Adaptive Universal AC-MOT
+Direction set by the project owner: the contribution is scene-adaptive control
+BEFORE and around the detector–tracker chain. E24–E26 only show that the
+LEGACY cues/SCI do not predict when higher resolution helps; they do not show
+that scene adaptation is useless. V4 (compute-budget only) is kept as an
+ablation/alternative branch; V5 is developed separately.
+
+Data status (fixed now, before any V5 work):
+* VisDrone test-dev was evaluated once for V4 (E31). It is NOT a clean
+  held-out set for V5; any V5 test-dev number will be labelled post-hoc.
+* Clean for V5 final evidence (never evaluated by any system): UAVDT test
+  split, Faster R-CNN (unseen detector, any dataset). Tracker transfer:
+  BoT-SORT (val results for V3 exist; V5 not yet seen).
+* V5 development uses ONLY VisDrone val (7 sequences) with YOLOv8n +
+  RT-DETR-L jointly. Faster R-CNN, UAVDT and test-dev are never used to
+  select cues, weights, controller form, targets or thresholds.
+
+V5 development stages:
+ S1 adaptation-value (headroom) analysis per control target (resolution,
+    sensitivity, gate τ, association strictness, retention; NMS if pre-NMS
+    caches are added): per-window oracle vs best global value, GT offline.
+ S2 cue utility per target: image / detector-output / tracker-state cue
+    families, LOSO-cross-validated predictive value, detector consistency,
+    redundancy, overhead.
+ S3 controller: scene-state vector → per-target mapping; cue subset,
+    weights, thresholds by Optuna (TPE, fixed seed, SQLite) inside nested
+    LOSO with both detectors; lexicographic objective (catastrophic cells;
+    robust cross-detector HOTA/IDF1/MOTA; IDS; recall; detector variance;
+    complexity). J2 (unnormalised max-min) is not reused.
+ S4 formal comparison at matched compute: static / legacy SCI / V4 compute
+    only / V5 and V5 family ablations (visual only, detector-feedback only,
+    tracker-feedback only, minus each family, adaptive vs fixed per target).
+ S5 freeze V5 (tag universal-acmot-v5-scene-generalized-freeze), then
+    Faster R-CNN, BoT-SORT, UAVDT transfer; test-dev post-hoc only.
