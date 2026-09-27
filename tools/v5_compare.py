@@ -2,6 +2,8 @@
 compute), with per-sequence paired differences and a sequence bootstrap."""
 from __future__ import annotations
 
+import os
+
 import pickle
 import sys
 from pathlib import Path
@@ -10,7 +12,8 @@ import numpy as np
 
 from tools.seqstats import combine
 
-DATASET = Path("/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val")
+DATASET = Path(os.environ.get(
+    "V5_DATASET", "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val"))
 SEQS = sorted(p.name for p in (DATASET / "sequences").iterdir() if p.is_dir())
 DETS = ["yolov8", "rtdetr"]
 

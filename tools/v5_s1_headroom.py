@@ -26,7 +26,9 @@ from pathlib import Path
 
 import numpy as np
 
-DATASET = "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val"
+CACHE = os.environ.get("V5_CACHE", "outputs/det_cache")
+DATASET = os.environ.get("V5_DATASET",
+                         "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val")
 OUT = Path(os.environ.get("V5_S1_OUT", "outputs/v5/s1"))
 DETS = ["yolov8", "rtdetr"]
 TARGETS = {
@@ -119,7 +121,7 @@ def run_one(job):
                                            replace)
     field, _ = TARGETS[target]
     pol = replace(POLICIES["V1"], **dict(base_overrides(), **{field: value}))
-    cd = CachedDetector(f"outputs/det_cache/{det}/{seq}.npz")
+    cd = CachedDetector(f"{CACHE}/{det}/{seq}.npz")
     cfg = build_config()
     pipe = UniversalPolicyPipeline(cfg, cd, make_tracker(cfg, pol), pol)
     img = np.empty(cd.shape + (0,), np.uint8)

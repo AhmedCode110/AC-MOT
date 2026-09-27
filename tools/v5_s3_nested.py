@@ -26,7 +26,9 @@ from scene_state import ALL_CUES, FAMILIES
 from tools.v5_s1_headroom import DETS, TARGETS
 from tools.v5_s2_cues import apply, build, fit_stump
 
-DATASET = "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val"
+CACHE = os.environ.get("V5_CACHE", "outputs/det_cache")
+DATASET = os.environ.get("V5_DATASET",
+                         "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val")
 OUT = Path(os.environ.get("V5_S3_OUT", "outputs/v5/s3"))
 ADAPT = os.environ.get("V5_ADAPT", "sensitivity,gate_tau,assoc_offset").split(",")
 FIELD = {"sensitivity": "fixed_sensitivity", "gate_tau": "gate_tau",
@@ -114,7 +116,7 @@ def replay(args):
     o = json.load(open("configs/universal_acmot_policy_v4.json"))["overrides"]
     o.update(scene_state=True, controller_spec=json.dumps({"targets": spec}))
     pol = replace(POLICIES["V1"], **o)
-    cd = CachedDetector(f"outputs/det_cache/{det}/{seq}.npz")
+    cd = CachedDetector(f"{CACHE}/{det}/{seq}.npz")
     cfg = build_config()
     pipe = UniversalPolicyPipeline(cfg, cd, make_tracker(cfg, pol), pol)
     img = np.empty(cd.shape + (0,), np.uint8)
