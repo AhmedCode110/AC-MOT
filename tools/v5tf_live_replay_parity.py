@@ -28,7 +28,7 @@ DATASET = Path(
     "My Drive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-train"
 )
 CACHE = ROOT / "outputs" / "det_cache_train_res"
-OUT = ROOT / "outputs" / "v5tf_dev" / "live_replay_parity_v1.json"
+OUT = ROOT / "outputs" / "v5tf_dev" / "live_replay_parity_v2.json"
 DETECTORS = ("yolov8", "rtdetr")
 SEQUENCE_COUNT = 2
 FRAME_COUNT = 20
@@ -81,6 +81,8 @@ def main() -> int:
 
     for detector in DETECTORS:
         for sequence in sequences:
+            from ultralytics.trackers.basetrack import BaseTrack
+
             cache_path = CACHE / detector / f"{sequence}.npz"
             live_detector = CachedDetector(cache_path)
             replay_detector = CachedDetector(cache_path)
@@ -95,7 +97,14 @@ def main() -> int:
             frame_paths = sorted((DATASET / "sequences" / sequence).glob("*.jpg"))
             tested = min(FRAME_COUNT, len(frame_paths), live_detector.frames)
             case_mismatches = []
+            live_frames = []
+            replay_frames = []
 
+            # Ultralytics allocates IDs from one process-global counter. Run
+            # the two equivalent paths sequentially with the same initial ID
+            # state; interleaving them produces an irrelevant constant ID
+            # offset even when every box and decision is exactly equal.
+            BaseTrack.reset_id()
             for frame_number, frame_path in enumerate(frame_paths[:tested], start=1):
                 image = cv2.imread(str(frame_path))
                 if image is None:
@@ -103,18 +112,30 @@ def main() -> int:
 
                 live_detector.frame = frame_number
                 live_tracks = live(image)
-                live_result = live.last
+                live_frames.append({
+                    "tracks": track_rows(live_tracks),
+                    "audit": dict(live.last["audit"]),
+                })
 
+            BaseTrack.reset_id()
+            for frame_number, frame_path in enumerate(frame_paths[:tested], start=1):
+                image = cv2.imread(str(frame_path))
                 replay_detector.frame = frame_number
                 replay_result = replay.process(
                     frame_number, image, replay_detector.visual_dict(frame_number)
                 )
+                replay_frames.append({
+                    "tracks": track_rows(replay_result["tracks"]),
+                    "audit": dict(replay_result["audit"]),
+                })
 
-                live_rows = track_rows(live_tracks)
-                replay_rows = track_rows(replay_result["tracks"])
+            for frame_number, (live_frame, replay_frame) in enumerate(
+                    zip(live_frames, replay_frames), start=1):
+                live_rows = live_frame["tracks"]
+                replay_rows = replay_frame["tracks"]
                 same_tracks = rows_equal(live_rows, replay_rows)
                 same_audit, audit_mismatches = audit_equal(
-                    live_result["audit"], replay_result["audit"]
+                    live_frame["audit"], replay_frame["audit"]
                 )
                 if not same_tracks or not same_audit:
                     case_mismatches.append({
@@ -140,6 +161,11 @@ def main() -> int:
         "check": "V5-TF F3 live image_stats motion vs cached visual-cue replay",
         "data_role": "VisDrone2019-MOT-train development-40 only",
         "quality_metrics_computed": False,
+        "comparison_note": (
+            "Paths run sequentially after BaseTrack.reset_id because "
+            "Ultralytics track IDs use a process-global counter. The preserved "
+            "v1 artifact interleaved paths and therefore measured only an ID offset."
+        ),
         "policy_family": "F3",
         "sequences": sequences,
         "frames_per_sequence": FRAME_COUNT,
