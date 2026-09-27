@@ -132,24 +132,27 @@ def report():
     q = lambda m: 0.5 * (m["HOTA"] + m["IDF1"])
     systems = ["static_default", "shared_static", "V4"] + ORDER
     ref = {d: combine([load("V4", d, s) for s in DEV]) for d in DETS}
-    keys = {}
+    keys, eligible, costs = {}, {}, {}
     for sy in systems:
         per = {d: combine([load(sy, d, s) for s in DEV]) for d in DETS}
         ncat = sum(combine([load(sy, d, s)])["MOTA"] < 0 for d in DETS for s in DEV)
         rg = min((q(per[d]) - q(ref[d])) / q(ref[d]) for d in DETS)
         cost = {d: pixel_cost(sy, d) for d in DETS} if sy in ORDER else \
             {d: 1.0 for d in DETS}
-        if sy in SELECTABLE and max(cost.values()) <= 1.01:
+        if sy in SELECTABLE:
             keys[sy] = (-ncat, round(rg, 6), -SELECTABLE.index(sy))
+            eligible[sy] = bool(max(cost.values()) <= 1.01)   # Amendment 7 §5
+            costs[sy] = cost
         print(f"{sy:<15} ncat {ncat:2d} worst-det rel.gain vs V4 {100 * rg:+6.2f}% "
               f"cost {'/'.join(f'{cost[d]:.3f}' for d in DETS)} | "
               + " | ".join(f"{d} MOTA {per[d]['MOTA']:6.2f} HOTA {per[d]['HOTA']:5.2f}"
                            f" IDF1 {per[d]['IDF1']:5.2f} IDS {per[d]['IDS']:5d} "
                            f"R {per[d]['Recall']:4.1f} P {per[d]['Precision']:4.1f}"
                            for d in DETS))
-    choice = max(keys, key=keys.get)
+    choice = max((k for k in keys if eligible[k]), key=keys.get)
     print("DECLARED-RULE FAMILY CHOICE (selectable F3/F5):", choice, keys)
-    json.dump(dict(choice=choice, keys=keys), open(OUT / "family_choice.json",
+    json.dump(dict(choice=choice, keys=keys, eligible=eligible, pixel_cost=costs),
+              open(OUT / "family_choice.json",
                                                    "w"), indent=1)
 
 

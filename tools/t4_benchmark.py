@@ -8,6 +8,12 @@ policy code is untouched) and times, per frame:
   tracker    : TrackerAdapter.update
   adaptive   : everything else inside UniversalACMOT (normalizer, gate,
                thresholds, bookkeeping) = total - detector - tracker
+               (= AC overhead), split for V5-TF into
+    scene      : scene/state analyzer (live frame motion, image_stats)
+    calib      : online normalisation / self-calibration (ECDF, Otsu bands,
+                 scene-state update)
+    decision   : AC decision (R-res level choice)
+  (component wrappers are applied to this benchmark instance only.)
   total      : UniversalACMOT(frame) wall time (frame already decoded)
 Reports mean / P95 per component, FPS = 1 / mean total, adaptive share,
 and peak CUDA memory.
@@ -53,6 +59,30 @@ class Timed:
         return wrapped
 
 
+class ComponentTimer:
+    """Per-frame accumulation of wrapped callables' CPU wall time."""
+
+    def __init__(self):
+        self.frame = {}
+        self.frames = []
+
+    def wrap(self, name, fn):
+        def timed(*a, **k):
+            t = perf_counter()
+            try:
+                return fn(*a, **k)
+            finally:
+                self.frame[name] = self.frame.get(name, 0.0) + perf_counter() - t
+        return timed
+
+    def next_frame(self):
+        self.frames.append(self.frame)
+        self.frame = {}
+
+    def series(self, name, start):
+        return [f.get(name, 0.0) for f in self.frames[start:]]
+
+
 def stats(x):
     x = np.asarray(x) * 1000
     return dict(mean_ms=float(x.mean()), p95_ms=float(np.percentile(x, 95)),
@@ -68,9 +98,23 @@ def run(weights, tracker_name, level, frames, warmup, policy_file=None):
     det = Timed(create_detector(weights), "detect")
     cls = {"bytetrack": ByteTrackAdapter, "botsort": BoTSORTAdapter}[
         tracker_name]
-    trk = Timed(cls(buffer=45, match=0.86), "update")
+    from universal_acmot import DEFAULT_POLICY_FILE, load_policy
+    pol, _ = load_policy(policy_file or DEFAULT_POLICY_FILE)
+    kw = (dict(high=0.25, low=0.1, new=0.25, buffer=30, match=0.8, fuse=True)
+          if pol.tracker_defaults == "native"      # V5-TF: tracker defaults
+          else dict(buffer=45, match=0.86))        # V4: legacy AC values
+    trk = Timed(cls(**kw), "update")
     system = UniversalACMOT(det, trk, resolution=level,
                             policy_file=policy_file)
+    import scene_state
+    ct = ComponentTimer()
+    pipe = system.pipeline
+    orig_stats = scene_state.image_stats
+    scene_state.image_stats = ct.wrap("scene", orig_stats)
+    pipe.normalizer.process = ct.wrap("calib", pipe.normalizer.process)
+    for name, comp in (("_otsu_bands", "calib"), ("_tf_observe", "calib"),
+                       ("_tf_level", "decision")):
+        setattr(pipe, name, ct.wrap(comp, getattr(pipe, name)))
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
     total = []
@@ -78,14 +122,19 @@ def run(weights, tracker_name, level, frames, warmup, policy_file=None):
         t = perf_counter()
         system(img)
         dt = perf_counter() - t
+        ct.next_frame()
         if i >= warmup:
             total.append(dt)
+    scene_state.image_stats = orig_stats
     d, k = det.times[warmup:], trk.times[warmup:]
     adaptive = np.asarray(total) - np.asarray(d) - np.asarray(k)
     return dict(
         detector=Path(weights).name, tracker=tracker_name, level=level,
         frames=len(total), total=stats(total), detector_time=stats(d),
         tracker_time=stats(k), adaptive_time=stats(adaptive),
+        scene_time=stats(ct.series("scene", warmup)),
+        calib_time=stats(ct.series("calib", warmup)),
+        decision_time=stats(ct.series("decision", warmup)),
         fps=float(1.0 / np.mean(total)),
         adaptive_share_of_total=float(adaptive.mean() / np.mean(total)),
         peak_cuda_mem_mb=(torch.cuda.max_memory_allocated() / 2 ** 20
@@ -130,7 +179,10 @@ def main():
                       f"{r['detector_time']['mean_ms']:6.1f}  trk "
                       f"{r['tracker_time']['mean_ms']:5.2f}  adaptive "
                       f"{r['adaptive_time']['mean_ms']:5.2f} ms "
-                      f"({100 * r['adaptive_share_of_total']:.2f}%)",
+                      f"({100 * r['adaptive_share_of_total']:.2f}%) [scene "
+                      f"{r['scene_time']['mean_ms']:.2f} calib "
+                      f"{r['calib_time']['mean_ms']:.2f} decision "
+                      f"{r['decision_time']['mean_ms']:.3f} ms]",
                       flush=True)
     json.dump(dict(env=env, results=rows), open(a.out, "w"), indent=1)
 
