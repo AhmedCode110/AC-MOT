@@ -59,7 +59,7 @@ def stats(x):
                 median_ms=float(np.median(x)))
 
 
-def run(weights, tracker_name, level, frames, warmup):
+def run(weights, tracker_name, level, frames, warmup, policy_file=None):
     from adapters.detectors.factory import create_detector
     from adapters.trackers.botsort import BoTSORTAdapter
     from adapters.trackers.bytetrack import ByteTrackAdapter
@@ -69,7 +69,8 @@ def run(weights, tracker_name, level, frames, warmup):
     cls = {"bytetrack": ByteTrackAdapter, "botsort": BoTSORTAdapter}[
         tracker_name]
     trk = Timed(cls(buffer=45, match=0.86), "update")
-    system = UniversalACMOT(det, trk, resolution=level)
+    system = UniversalACMOT(det, trk, resolution=level,
+                            policy_file=policy_file)
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
     total = []
@@ -101,6 +102,8 @@ def main():
     ap.add_argument("--frames", type=int, default=300)
     ap.add_argument("--warmup", type=int, default=20)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--policy-files", nargs="+",
+                    default=["configs/universal_acmot_policy_v4.json"])
     a = ap.parse_args()
     paths = sorted((Path(a.dataset) / "sequences" / a.sequence)
                    .glob("*.jpg"))[:a.frames + a.warmup]
@@ -114,10 +117,12 @@ def main():
     if not env["gpu"] or "T4" not in env["gpu"]:
         print("WARNING: not a T4 — numbers are NOT official.")
     rows = []
-    for w in a.weights:
+    for pf in a.policy_files:
+     for w in a.weights:
         for tr in a.trackers:
             for lv in a.levels:
-                r = run(w, tr, lv, frames, a.warmup)
+                r = run(w, tr, lv, frames, a.warmup, pf)
+                r["policy_file"] = pf
                 rows.append(r)
                 print(f"{r['detector']:<45} {tr:<9} {lv} FPS {r['fps']:6.1f} "
                       f"total {r['total']['mean_ms']:6.1f}/"

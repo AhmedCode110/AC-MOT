@@ -259,3 +259,25 @@ one study per (target, fold) named v5_C3_<target>_<fold-seed>; the search
 space is stored in each study's user attributes. The best trial of each
 study is used as-is (no manual selection). Family choice among C1/C2/C3
 follows Amendment 5d (outer-fold lexicographic rule).
+
+### Amendment 5f — cross-hardware cache-fidelity gate (declared before any V5 result)
+Development caches for V5 are built on Mac/MPS. Before the V5 freeze, a
+gate compares Mac-MPS and Colab-T4-CUDA caches of the SAME frozen models and
+settings on a fixed representative subset: 4 development sequences, one per
+length quartile (seed 5): uav0000020_00406_v, uav0000315_00000_v,
+uav0000316_01288_v, uav0000342_04692_v; YOLOv8n and RT-DETR-L at 736.
+(Confirmation sequences are never used for the gate.)
+Measured: per-frame detection counts; one-to-one IoU matching (Hungarian)
+of detections — match rate, median/5th-percentile IoU, |Δscore|, rank
+(Spearman) agreement of scores, class agreement; replayed tracks and
+MOTA/HOTA/IDF1/IDS for V4 and for the candidate V5 controller; agreement of
+V5 per-frame decisions.
+PASS iff, for both detectors: ≥ 99% of detections matched with IoU ≥ 0.95,
+class agreement ≥ 99.5%, median |Δscore| ≤ 0.01; and for V4 and candidate
+V5 pooled over the subset |ΔHOTA|, |ΔIDF1|, |ΔMOTA| ≤ 0.5 and |ΔIDS| ≤ 5%;
+V5 per-frame decision agreement ≥ 95%.
+If FAIL: the development caches are rebuilt on T4 and S1–S3 re-run on them
+before any freeze. Prior evidence (E05): MPS-cache replay reproduced the
+Colab/CUDA V1/V2b/V2c val metrics exactly (RT-DETR one row within ~1 FP).
+Official timing (detector, tracker, AC overhead, total, P95, FPS, GPU memory)
+is T4 only.

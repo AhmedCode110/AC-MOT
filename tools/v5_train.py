@@ -23,10 +23,11 @@ from pathlib import Path
 import numpy as np
 
 from scene_state import ALL_CUES
+from v5_controller import V5Controller
 
 TRAIN = ("/Users/ahmedgouda/Library/CloudStorage/GoogleDrive-a7medgouda1@"
          "gmail.com/My Drive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-train")
-CACHE = "outputs/det_cache_train"
+CACHE = os.environ.get("V5_TRAIN_CACHE", "outputs/det_cache_train")
 OUT = Path("outputs/v5_train")
 SPLIT = json.load(open("research/TRAIN_SPLIT_V5.json"))
 DEV, CONF = SPLIT["development"], SPLIT["confirmation"]
@@ -477,6 +478,55 @@ def stage_confirm():
               default=float)
 
 
+def stage_gate():
+    """Track-level part of the cross-hardware gate (Amendment 5f): replay V4
+    and the candidate V5 on the MPS and the T4 caches of the gate subset."""
+    import subprocess
+    from tools.fidelity_gate import GATE
+    from tools.seqstats import combine
+    v5 = json.load(open("configs/universal_acmot_policy_v5.json"))["overrides"]
+    v5 = dict(v5, scene_state=True)
+    res = {}
+    for hw, root in (("mps", "outputs/det_cache_train"),
+                     ("cuda", "outputs/det_cache_train_t4")):
+        env = dict(os.environ, V5_TRAIN_CACHE=root)
+        code = ("import tools.v5_train as T, json, sys; "
+                "T.run_jobs([tuple(j) for j in json.load(sys.stdin)])")
+        jobs = [(f"gate_{hw}_{n}", ov, d, s) for n, ov in
+                (("v4", v4_overrides()), ("v5", v5)) for d in DETS for s in GATE]
+        subprocess.run([sys.executable, "-c", code], input=json.dumps(jobs),
+                       text=True, env=env, check=True)
+    ok = True
+    for n in ("v4", "v5"):
+        for d in DETS:
+            a = combine([load(f"gate_mps_{n}", d, s) for s in GATE])
+            b = combine([load(f"gate_cuda_{n}", d, s) for s in GATE])
+            dd = {k: a[k] - b[k] for k in ("HOTA", "IDF1", "MOTA")}
+            dids = abs(a["IDS"] - b["IDS"]) / max(a["IDS"], 1)
+            ok &= all(abs(v) <= 0.5 for v in dd.values()) and dids <= 0.05
+            res[f"{n}/{d}"] = dict(delta=dd, ids_rel=dids)
+            print(f"gate {n} {d}: ΔHOTA {dd['HOTA']:+.3f} ΔIDF1 {dd['IDF1']:+.3f}"
+                  f" ΔMOTA {dd['MOTA']:+.3f} |ΔIDS| {100 * dids:.1f}%")
+    agree = []
+    for d in DETS:
+        for s in GATE:
+            x = load(f"gate_mps_v5", d, s)["states"]
+            y = load(f"gate_cuda_v5", d, s)["states"]
+            spec = V5Controller.from_json(v5["controller_spec"])
+            agree += [spec.decide(p) == spec.decide(q) for p, q in zip(x, y)]
+    frac = float(np.mean(agree)) if agree else 1.0
+    ok &= frac >= 0.95
+    res["v5_decision_agreement"] = frac
+    det = json.load(open("outputs/analysis/fidelity_gate_detection.json"))
+    res["detection_level_pass"] = det["detection_level_pass"]
+    res["PASS"] = bool(ok and det["detection_level_pass"])
+    print(f"V5 decision agreement {100 * frac:.1f}% ->",
+          "GATE PASS" if res["PASS"] else "GATE FAIL")
+    json.dump(res, open(OUT / "fidelity_gate.json", "w"), indent=1,
+              default=float)
+
+
 if __name__ == "__main__":
+    from v5_controller import V5Controller  # noqa: F401  (gate stage)
     {"s1": stage_s1, "s2": stage_s2, "s3": stage_s3, "final": stage_final,
-     "confirm": stage_confirm}[sys.argv[1]]()
+     "gate": stage_gate, "confirm": stage_confirm}[sys.argv[1]]()
