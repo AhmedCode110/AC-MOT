@@ -100,6 +100,7 @@ class UniversalACMOT:
             density_kwargs=density_kwargs)
         self.frame_number = 0
         self.last = None
+        self.prev_small = None
 
     def __call__(self, frame):
         from time import perf_counter
@@ -111,8 +112,16 @@ class UniversalACMOT:
         t0 = perf_counter()
         # Image statistics are only consumed by the legacy scene controller
         # (V1-V3); V4 does not compute them (no behavioural difference).
-        visual = analyze_visual(frame) if \
-            self.pipeline.policy.scene_controller else {}
+        pol = self.pipeline.policy
+        if pol.scene_controller:
+            visual = analyze_visual(frame)
+        elif pol.assoc_motion:
+            # V5-TF: frame-t motion vs t-1 with the same function that built
+            # the cached visual cues (live == replay).
+            from scene_state import image_stats
+            visual, self.prev_small = image_stats(frame, self.prev_small)
+        else:
+            visual = {}
         self.last = self.pipeline.process(self.frame_number, frame, visual)
         if self.budget is not None:
             self.budget.observe(level, perf_counter() - t0,
@@ -123,3 +132,4 @@ class UniversalACMOT:
         self.pipeline.reset()
         self.frame_number = 0
         self.last = None
+        self.prev_small = None

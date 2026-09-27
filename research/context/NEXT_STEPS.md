@@ -37,6 +37,7 @@ If it died, re-run the queues and then those commands. Record E36 (families)
 and E39 (constant audit) in EXPERIMENT_REGISTRY.md.
 
 ## AFTER THAT
+0. Live V5-TF: `universal_acmot.py` now computes frame motion via scene_state.image_stats when assoc_motion is on (was always empty → F3 inert live). Still TODO: a live==replay parity check for a V5-TF family on a few development frames, and per-component AC timers (scene analyzer / normaliser+Otsu / AC decision) in the pipeline audit for tools/t4_benchmark.py.
 1. Parameter audit update (PARAMETER_STATUS.md) from the E39 audit.
 2. Add per-component AC timers to the T4 benchmark (no behaviour change).
 3. Write the V5-TF policy file + lock; T4 fidelity gate (E38) → tag

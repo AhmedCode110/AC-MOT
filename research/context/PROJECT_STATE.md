@@ -1,11 +1,11 @@
 # PROJECT STATE — read this first
 
 <!-- AUTO:BEGIN (tools/update_project_context.py — do not edit by hand) -->
-LAST VERIFIED COMMIT: 8e3ab8786edcee6dac8d729ed78cd6f84ea93794
-CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 1, behind 0)
-LAST CONTEXT UPDATE: 2026-09-27 07:46 UTC
+LAST VERIFIED COMMIT: 679a86822aa5c955e6e0a79a3e960ebc649d013c
+CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 2, behind 0)
+LAST CONTEXT UPDATE: 2026-09-27 07:47 UTC
 LATEST FROZEN TAG (git): universal-acmot-v4-freeze → fc003bf
-WORKING TREE: 29 uncommitted path(s) — see GIT_STATE.md
+WORKING TREE: 10 uncommitted path(s) — see GIT_STATE.md
 <!-- AUTO:END -->
 
 FINAL TARGET: V5-TF — the final research target and contribution (Amendment 7). V4 = historical baseline / ablation ONLY, never a fallback.
