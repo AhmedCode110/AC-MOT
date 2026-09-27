@@ -294,3 +294,66 @@ is T4 only.
   them, and no design or tuning decision may use their timing or fidelity
   output other than the declared gate PASS/FAIL. Their performance
   evaluation is strictly post-freeze, under the transfer locks.
+
+## Amendment 6 (2026-09-27) — HARD REQUIREMENT: training-free online self-calibrating AC (V5-TF)
+Owner requirement: the deployed AC layer must be training-free, online
+self-calibrating, causal, plug-and-play, detector- and tracker-agnostic and
+real-time. No offline-fitted controller (stumps, trees, regressions, Optuna
+best-trial weights), no dataset/detector/tracker-specific tuning, no labels,
+no GT at deployment. Allowed constants: A structural/mathematical,
+B online data-derived, C generic engineering safety bounds, D API-required.
+"Worked best on VisDrone" constants (E) are not allowed in V5-TF.
+Consequences for V4's VisDrone-selected values (τ 0.75, s 0.4, association
+offset 0.10, NMS 0.45, tracker 45/0.86): they are category E under this rule
+and are NOT used by V5-TF. V4 remains a reference/ablation.
+S1/S2/S3, C1–C3 and Optuna remain DISCOVERY tools only (headroom, cue
+utility, rule stability, sensitivity). No final fit on the 40 development
+sequences; the S3 learned controller is only a research upper bound (D).
+No V5 result on train existed when this amendment was written (only
+YOLOv8n train caches 35/56).
+
+V5-TF core (declared before any result):
+ * Normalisation: order-only causal ECDF (V3/V4, invariant).
+ * Candidate handling by 3-class Otsu on candidate LOGITS pooled over the
+   causal window (the same 10-frame memory as the other stream statistics;
+   frames < t): thresholds T1 < T2 maximise between-class variance; bin
+   edges span the window's own logit range (affine-equivariant ⇒ exactly
+   invariant to Platt/temperature recalibration). logit ≥ T2 → primary
+   (association + birth); T1 ≤ logit < T2 → extend-only (secondary
+   association); < T1 → discarded. Three classes mirror the tracker's
+   high/low/discard structure (structural, A). First frames (empty window):
+   within-frame Otsu.
+ * Tracker: native defaults (ByteTrack/BoT-SORT: buffer 30, match 0.8,
+   low 0.1); class bands passed as scores: primary 0.5+0.5u, secondary
+   0.1+0.4u (u = ECDF rank), association = birth threshold 0.5 (band
+   boundary, A).
+ * Detector suppression: detector-native (YOLO 0.7, Faster R-CNN 0.5,
+   RT-DETR none) (D).
+ * Resolution: compute budget (V4 latency controller); evaluated at 736.
+ * Online scene-state vector (robust z vs. own causal history — rolling
+   median/MAD): density (primary count), size (median log area fraction),
+   score reliability (Otsu separability η), motion (global motion ratio to
+   its rolling median), association (track survival). Logged for all
+   families; used by rules only where declared.
+Candidate rule families (validated, not fitted, on the 40 development
+sequences):
+ F1  Otsu-3 bands (window) — core only.
+ F2  F1 with within-frame Otsu (frame t's own candidates) instead of window.
+ F3  F1 + motion-aware association: match_t = min(0.95, 1 − (1 − m0)/max(1, r_t)),
+     r_t = motion / rolling median motion (m0 = tracker-native 0.8; 0.95 =
+     safety bound C).
+ F4  F1 + leader-relative demotion kept (z-logit gate with τ derived online
+     as the Otsu T2 expressed in z units — no fixed τ).
+Family choice on the 40 development sequences (both detectors, 736):
+ lexicographic — (1) fewest catastrophic (MOTA<0) cells, (2) worst-detector
+ relative ½(HOTA+IDF1) gain vs V4, (3) simplicity (F1 < F2 < F3 < F4).
+Comparison set at matched compute (736): A static (default & shared-static),
+B legacy SCI (V3), C V4 compute-only, D S3 learned controller (research
+upper bound only), E V5-TF.
+Freeze (tag universal-acmot-v5tf-freeze) only after: rule design fixed and
+the Amendment-5f T4 fidelity gate passed. Then the 16 confirmation
+sequences once: V5-TF vs V4 with the Amendment-5a rule. If V5-TF does not
+beat V4, that is reported as the result ("training-free adaptation matches/
+does not match tuned V4"); no switch to a trained controller. Then val
+(secondary), Faster R-CNN, BoT-SORT, UAVDT, official T4 timing — no
+retuning after any of them.
