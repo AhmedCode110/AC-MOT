@@ -175,7 +175,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-022 E36 selects F3 | REJECTS | Rule: F5 scene-adaptive resolution R-res |
 | Decision: D-022 E36 selects F3 | SUPPORTED_BY | Experiment: E36 V5-TF dev validation |
 | Decision: D-023 E39 C5 blockers | SUPPORTED_BY | Experiment: E39 constant audit |
-| Decision: D-023 E39 C5 blockers | REQUIRES | Experiment: E41 constant-free family |
+| Decision: D-023 E39 C5 blockers | REQUIRES | Experiment: E41 exact-Otsu family |
 | Decision: D-024 live replay parity | SUPPORTED_BY | Experiment: E40 F3 live replay parity |
 | Constraint: C0 final target V5-TF | APPLIES_TO | Version: V5-TF |
 | Constraint: C0 final target V5-TF | APPLIES_TO | Version: V4 |
@@ -184,7 +184,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Protocol: Amendment 7 | GOVERNS | Experiment: E39 constant audit |
 | Experiment: E39 constant audit | EVALUATES | Version: V5-TF |
 | Project: Universal AC-MOT | LATEST_FROZEN_VERSION | Version: V4 |
-| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E41 constant-free family |
+| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E41 exact-Otsu family |
 | Version: V1 | SUPERSEDES | Version: Legacy AC-MOT |
 | Version: V3 | SUPERSEDES | Version: V1 |
 | Version: V4 | SUPERSEDES | Version: V3 |

@@ -2,8 +2,8 @@
 
 Generated: 2026-09-27 20:23 UTC
 Repository: https://github.com/AhmedCode110/AC-MOT.git
-Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 13 / behind 0
-HEAD: 240eba9cb2b4912c8ba2d07cb0d8085d22561b0d
+Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 14 / behind 0
+HEAD: b4a8052740f851810d961ec6695ba660f08c01d6
 
 ## Tags (creation order)
 | Tag | Commit | Date |
@@ -14,6 +14,7 @@ HEAD: 240eba9cb2b4912c8ba2d07cb0d8085d22561b0d
 | universal-acmot-v4-freeze | fc003bf96621214dc09a0e55f720128093972927 | 2026-09-27 |
 
 ## Recent commits
+- b4a8052 2026-09-27 Record E41 development validation and next gate
 - 240eba9 2026-09-27 Declare E41 exact-Otsu training-free family
 - ecffd8e 2026-09-27 Refresh canonical git state
 - eae9f15 2026-09-27 Record E36 E39 and F3 parity results
@@ -28,19 +29,10 @@ HEAD: 240eba9cb2b4912c8ba2d07cb0d8085d22561b0d
 - 679a868 2026-09-27 Amendment 7: V5-TF is the final target (V4 baseline only); scene-adaptive resolution R-res, F5/F5R, constant audit — declared before any V5-TF result
 - 8e3ab87 2026-09-27 Add canonical project memory (research/context) and Graphify integration
 - 71faf44 2026-09-27 V5-TF implementation: online 3-class Otsu bands, native NMS/tracker defaults, motion-aware association; dev validation script (before any train result)
-- fbbd70a 2026-09-27 V5-TF cache queue: detector-native suppression caches (caching only)
 
 ## Working tree
 Uncommitted paths (NOT part of any context commit; provenance must be checked before committing them):
-- `M research/context/AGENT_STATE.md`
-- ` M research/context/DECISIONS.md`
-- ` M research/context/EXPERIMENT_REGISTRY.md`
-- ` M research/context/GIT_STATE.md`
-- ` M research/context/KNOWLEDGE_GRAPH.md`
-- ` M research/context/NEXT_STEPS.md`
-- ` M research/context/PROJECT_STATE.md`
-- ` M research/context/RESULTS_CANONICAL.md`
-- ` M research/context/SESSION_HANDOFF.md`
+- `M research/context/KNOWLEDGE_GRAPH.md`
 - ` M tests/test_full_pipeline_equivalence.py`
 - ` M universal_pipeline.py`
 - `?? tools/audit/nms_audit_frcnn.py`
