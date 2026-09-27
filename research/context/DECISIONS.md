@@ -164,3 +164,19 @@ Decision: one-at-a-time sensitivity of OTSU_BINS, Otsu window, RobustHistory
 window, warm-up on the chosen family; E28 criterion (|ΔHOTA| ≤ 0.4, no new
 catastrophic cell) → structural A; otherwise keep the declared default and
 report as category E. Never adopt the best-scoring value.
+
+### D-021 — Reporting/measurement fixes before E36; single-writer rule covers interactive sessions
+Date 2026-09-27 · Commit 1eaa3c6
+(a) `family_choice.json` records F3 and F5 always, with the Amendment-7 §5
+eligibility flag and pixel cost; an over-cap F5 is marked ineligible, not
+omitted (the supervisor requires both keys). The choice rule is unchanged
+(mock-tested: over-cap F5 → choice F3). (b) `tools/t4_benchmark.py` gains
+scene-analyzer / online-normalisation / AC-decision timers (instance wrappers,
+measurement only) and builds the tracker with native defaults when the policy
+uses them. No V5-TF result existed. (c) Disclosure: these two files were first
+edited by an interactive Claude session while the supervisor held the writer
+lock (no concurrent write occurred; the supervisor was only polling). They were
+committed only after the supervisor was stopped with
+`tools/stop_autonomous_v5tf.sh` and the lock was re-acquired. Rule from now on:
+ANY interactive agent (Claude or Codex) must stop the supervisor or hold
+`outputs/autonomous_v5tf/repo_writer.lock` before modifying tracked files.

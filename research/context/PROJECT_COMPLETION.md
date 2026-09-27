@@ -20,6 +20,7 @@ the evidence.
 | A9 | Family choice among selectable F3/F5 (declared rule) | TODO | outputs/v5tf_dev/family_choice.json |
 | A10 | Constant audit (OTSU_BINS, Otsu window, RobustHistory window, warm-up) | TODO | Amendment 7 §6, tools/v5tf_dev.py sens |
 | A11 | Parameter audit: every V5-TF constant in A/B/C/D or reported E | TODO | PARAMETER_STATUS.md |
+| A6b | Live == replay parity for the chosen V5-TF family (few development frames) | TODO | live motion path 81a6c53 |
 | A12 | Optional research upper bound D (S3 on development-40, never final) | TODO (optional) | E37 |
 
 ## B. Freeze gate
@@ -36,7 +37,7 @@ the evidence.
 | C3 | Unseen detector: Faster R-CNN ResNet50-FPN v2 | TODO |
 | C4 | Tracker transfer: BoT-SORT | TODO |
 | C5 | Unseen dataset: UAVDT test | TODO |
-| C6 | Official T4 timing: scene analyzer, normaliser, AC decision, detector, tracker, total, P95, FPS, GPU memory, AC overhead % | TODO (tools/t4_benchmark.py needs per-component AC timers) |
+| C6 | Official T4 timing: scene analyzer, normaliser, AC decision, detector, tracker, total, P95, FPS, GPU memory, AC overhead % | TODO (harness ready, 1eaa3c6; needs a T4 run after freeze) |
 | C7 | VisDrone test-dev post-hoc (labelled post-hoc) | TODO |
 
 ## D. Final report answers (must all be evidence-backed)

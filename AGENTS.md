@@ -13,6 +13,13 @@ Every new coding/research session MUST, before modifying code or running experim
    (`graphify query "<question>"`, `graphify explain "<node>"`)
 7. only then modify code or run experiments.
 
+Single writer (applies to Claude AND Codex, interactive or not): if
+`outputs/autonomous_v5tf/repo_writer.lock/pid` names a live process, do NOT
+modify tracked files. Stop the supervisor with `tools/stop_autonomous_v5tf.sh`
+(never touch the waiter or cache queues), verify no `codex exec` child runs,
+hold the lock, make and commit the change, release the lock, then restart the
+supervisor with `tools/start_autonomous_v5tf.sh`.
+
 Task-dependent reading:
 - architecture → `ARCHITECTURE.md`, `DECISIONS.md`
 - evaluation → `VALIDATION_PROTOCOL.md`, `DATASETS_AND_SPLITS.md` (and PROTECTED_EVALUATIONS.md first)

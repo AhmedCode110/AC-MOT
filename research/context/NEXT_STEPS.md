@@ -18,9 +18,11 @@ rule, then freeze. Full checklist: PROJECT_COMPLETION.md.
 - Unjustified constants (RobustHistory window 100, warm-up 5, Otsu window 10,
   OTSU_BINS 64): resolved only by the Amendment-7 §6 audit (insensitive → A;
   sensitive → kept and reported as E). Z_REF/DECAY are outside V5-TF.
-- `tools/t4_benchmark.py` reports only detector / tracker / "adaptive"
-  time; official V5-TF timing needs separate scene-analyzer, normaliser and
-  AC-decision timers (PROJECT_COMPLETION C6).
+- Official T4 timing still to run (harness ready: scene / calib / decision /
+  detector / tracker / total / P95 timers, commit 1eaa3c6; Mac numbers are
+  development-only).
+- Single-writer rule: any interactive session must stop the supervisor or hold
+  its lock before editing tracked files (AGENTS.md, D-021).
 - Uncommitted working-tree code of unknown provenance: `universal_pipeline.py`
   (+effective-controls reporting, legacy-SCI path),
   `tests/test_full_pipeline_equivalence.py`; untracked `tools/calibrate_detector_*.py`,
@@ -43,7 +45,7 @@ then launches one serialized non-interactive Codex continuation at a time.
 State: `research/context/AGENT_STATE.md`; logs: `outputs/autonomous_v5tf/`.
 
 ## AFTER THAT
-0. Live V5-TF: `universal_acmot.py` now computes frame motion via scene_state.image_stats when assoc_motion is on (was always empty → F3 inert live). Still TODO: a live==replay parity check for a V5-TF family on a few development frames, and per-component AC timers (scene analyzer / normaliser+Otsu / AC decision) in the pipeline audit for tools/t4_benchmark.py.
+0. Live V5-TF: `universal_acmot.py` computes frame motion via scene_state.image_stats when assoc_motion is on. Still TODO: a live==replay parity check for the chosen family on a few development frames (needs merged caches). Per-component timers: DONE (1eaa3c6). Pending no-behaviour-change optimisation: V5-TF only needs motion, but image_stats also computes edges/blur (cost to check on T4).
 1. Parameter audit update (PARAMETER_STATUS.md) from the E39 audit.
 2. Add per-component AC timers to the T4 benchmark (no behaviour change).
 3. Write the V5-TF policy file + lock; T4 fidelity gate (E38) → tag

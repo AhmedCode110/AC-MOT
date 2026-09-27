@@ -48,6 +48,13 @@ NEXT_STEPS.md + PROJECT_COMPLETION.md → caches (736 + 640/832) → E36 family
 validation → F3/F5 choice → E39 constant audit → T4 gate → freeze →
 confirmation-16 once (reported vs V4).
 
+## Coordination (autonomous supervisor)
+`tools/autonomous_v5tf_supervisor.py` holds `outputs/autonomous_v5tf/repo_writer.lock`
+while waiting for the E36/E39 waiter, then launches one Codex child. Interactive
+sessions must stop it (`tools/stop_autonomous_v5tf.sh`), hold the lock, commit,
+release, and restart it (`tools/start_autonomous_v5tf.sh`) — never touching the
+waiter or cache queues (D-021). Status: `.venv/bin/python tools/autonomous_v5tf_supervisor.py --status`.
+
 ## Prohibitions
 No training of the AC layer; no `v5_train.py final`; no protected metrics;
 no relaxing gate thresholds; no editing frozen versions/locks; no invented
