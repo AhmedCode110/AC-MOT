@@ -180,3 +180,39 @@ committed only after the supervisor was stopped with
 `tools/stop_autonomous_v5tf.sh` and the lock was re-acquired. Rule from now on:
 ANY interactive agent (Claude or Codex) must stop the supervisor or hold
 `outputs/autonomous_v5tf/repo_writer.lock` before modifying tracked files.
+
+### D-022 — E36 selects F3; tested R-res scene adaptation does not beat random
+Date 2026-09-27 · Evidence E36 · `outputs/v5tf_dev/family_choice.json`
+Question: which declared selectable family, F3 or F5, survives the Amendment-7
+rule? Decision: F3. F3 has 17 catastrophic sequence-detector cells and
+worst-detector relative ½(HOTA+IDF1) gain −0.339% versus V4; F5 has 18 and
+−2.646%. F5 is compute-eligible (mean pixel costs 0.954 YOLO / 0.952 RT-DETR)
+but loses before the compute tie-break. Random control F5R has 17 cells,
+−1.683%, cost 0.996/0.996, so the tested object-size R-res rule does not beat
+random allocation. Consequence: F3 is the current V5-TF candidate; F5 is a
+negative scene-resolution result, not forced to win. Limitation: F3 also has
+far more catastrophic cells than V4 (17 vs 3) and does not improve the
+worst-detector pooled criterion; this is reported, not hidden and not used to
+fall back to V4. Status: development result, not frozen.
+
+### D-023 — E39 resolves history constants but exposes two C5 blockers
+Date 2026-09-27 · Evidence E39 · `outputs/v5tf_dev/constant_audit.json`
+Decision: RobustHistory window=100 and warm-up=5 are category A with
+insensitivity evidence. OTSU_BINS=64 and Otsu window=10 are sensitive category
+E; defaults are retained only as the experimental F3 definition, never
+re-selected to the best sensitivity value. HARD_CONSTRAINTS C5 forbids
+category-E constants in the frozen V5-TF, so the policy lock, fidelity gate and
+freeze remain blocked. The next attempt must be a new training-free family
+declared and committed before running, removing both fixed dependencies rather
+than tuning their values post-hoc.
+
+### D-024 — F3 live motion path equals cached replay; first harness failure preserved
+Date 2026-09-27 · Evidence E40 · commits fd44a11, 50f2a6f
+The first parity artifact interleaved two ByteTrack instances in one process;
+Ultralytics uses a process-global ID counter, producing a constant ID offset
+despite identical boxes and control audits. That failed artifact is preserved
+as `live_replay_parity_v1.json`. The corrected, precommitted v2 harness runs
+the two paths sequentially from the same ID state. Result: exact tracks and
+selected control-audit fields on 80/80 frames (2 development sequences × 20
+frames × 2 detectors), no GT or quality metric. Decision: the live motion fix
+81a6c53 is behaviourally equivalent to cached replay on the declared subset.

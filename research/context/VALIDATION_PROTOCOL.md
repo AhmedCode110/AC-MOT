@@ -17,6 +17,10 @@ V4 is a comparison baseline/ablation only; no step below selects between V4 and 
    (2) worst-detector relative ½(HOTA+IDF1) gain vs V4 on the same sequences,
    (3) simplicity F3 < F5; F5 needs mean pixel cost ≤ 1.01·736².
    Then the constant audit (Amendment 7 §6) on the chosen family.
+   Outcome (E36/E39): F3 selected; F5 did not beat F3 or random F5R.
+   RobustHistory window/warm-up are insensitive A; OTSU_BINS/Otsu window are
+   sensitive E and block the frozen policy under C5. Any replacement is a new
+   family declared before another development-40 run; no E39 value is adopted.
 4. Comparison at matched compute (736): A static (default; shared-static raw
    0.5), B legacy SCI (V3; multi-resolution caches → val only), C V4
    compute-only, D S3 learned controller (research upper bound, never

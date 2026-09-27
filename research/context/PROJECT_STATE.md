@@ -1,16 +1,16 @@
 # PROJECT STATE — read this first
 
 <!-- AUTO:BEGIN (tools/update_project_context.py — do not edit by hand) -->
-LAST VERIFIED COMMIT: 1eaa3c6e61a5a5067a450225fde72f39887b9041
-CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 7, behind 0)
-LAST CONTEXT UPDATE: 2026-09-27 09:55 UTC
+LAST VERIFIED COMMIT: 50f2a6fa095f52ec5e1f6f6b682a8f1f0ce58274
+CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 10, behind 0)
+LAST CONTEXT UPDATE: 2026-09-27 20:14 UTC
 LATEST FROZEN TAG (git): universal-acmot-v4-freeze → fc003bf
-WORKING TREE: 14 uncommitted path(s) — see GIT_STATE.md
+WORKING TREE: 21 uncommitted path(s) — see GIT_STATE.md
 <!-- AUTO:END -->
 
 FINAL TARGET: V5-TF — the final research target and contribution (Amendment 7). V4 = historical baseline / ablation ONLY, never a fallback.
 CURRENT RESEARCH VERSION: V5-TF (training-free online self-calibrating Universal AC-MOT) — EXPERIMENTAL, not frozen
-CURRENT PHASE: V5-TF pre-freeze blocker work — Amendment 7 declared (scene-adaptive resolution rule R-res, families F3/F5, constant audit); caches for development-40 in progress; no V5-TF result yet
+CURRENT PHASE: V5-TF pre-freeze rule revision — E36/E39 complete; F3 selected, F5 scene-adaptive resolution did not beat F3 or random control; live/replay parity PASS; OTSU_BINS and Otsu window remain sensitive category-E blockers under C5
 
 ## What is the project?
 Universal AC-MOT: an adaptive-control (AC) layer placed around a FROZEN
@@ -51,7 +51,7 @@ Adapter (F3: motion-aware association) → Tracker → Tracks → causal feedbac
 
 ## Datasets seen / protected (details: DATASETS_AND_SPLITS.md, PROTECTED_EVALUATIONS.md)
 - Development (seen): VisDrone2019-MOT-val (all V1–V5 development);
-  VisDrone2019-MOT-train development-40 (V5-TF validation, no results yet).
+  VisDrone2019-MOT-train development-40 (V5-TF E36/E39 complete).
 - Seen once: VisDrone2019-MOT-test-dev (V4 held-out, E31) → post-hoc only for V5-TF.
 - PROTECTED until V5-TF freeze: train confirmation-16; Faster R-CNN quality;
   BoT-SORT quality for V5-TF; UAVDT quality.

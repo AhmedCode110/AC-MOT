@@ -8,13 +8,18 @@ Note on C: Amendment 6 uses C = "generic engineering safety bound"; the V4
 audit used C = "globally optimised". Below, C(safety) and C(opt) are kept apart.
 C(opt) values are NOT allowed in V5-TF.
 
-## ⚠ Category E / unverified items that touch V5-TF (resolved only by the Amendment-7 §6 audit: insensitive → A; sensitive → default kept and reported as E)
-| Parameter | Component | Value | Problem | Required action |
+## ⚠ Category E items that block the V5-TF freeze
+| Parameter | Component | Value | E39 evidence | Required action |
 |---|---|---|---|---|
-| RobustHistory window | `online_calibration.py` | 100 samples | memory of the motion-ratio / scene-state history (NOT the Otsu window, which is 10 frames as in Amendment 6); Amendment 6 gives no length → no evidence yet | justify as structural memory + sensitivity sweep on development-40, or derive from stream |
-| RobustHistory warm-up | `online_calibration.py` | 5 samples | minimum sample count, no evidence | treat as structural warm-up (A) with rationale, or sweep |
-| Otsu window | `universal_policy_pipeline.py` (`gate_window`) | 10 frames | inherited from V4 gate (E28 covers V4 gate, not Otsu) | sensitivity on development-40 |
-| OTSU_BINS | `online_calibration.py` | 64 | code comment claims "sensitivity-checked"; no registry evidence found | NEEDS VERIFICATION |
+| Otsu window | `universal_policy_pipeline.py` (`gate_window`) | 10 frames | sensitive: 5 adds a catastrophic cell; 20 passes | keep only for recorded F3; replace dependency in a new predeclared family, never choose 20 post-hoc |
+| OTSU_BINS | `online_calibration.py` | 64 | sensitive: 32 changes RT-DETR HOTA −0.63 and adds catastrophic cells; 128 passes | keep only for recorded F3; replace fixed-bin dependency, never choose 128 post-hoc |
+
+## Category E values outside the V5-TF decision path
+
+These values do not block the freeze while they remain excluded from V5-TF.
+
+| Parameter | Component | Value | Evidence | Required action |
+|---|---|---|---|---|
 | Z_REF | `scene_state.py` | 0.75 (= V4 τ) | outside V5-TF (Amendment 7 §3: V5-TF scene state is computed in online_calibration.py) | none while scene_state.py stays out of V5-TF decisions |
 | DECAY | `scene_state.py` | 0.9 | outside V5-TF (same) | none |
 
@@ -29,6 +34,10 @@ C(opt) values are NOT allowed in V5-TF.
 | First-frame fallback | candidate handling | within-frame Otsu | A | Amendment 6 | — | — | experimental |
 | Logit clip | `online_calibration.logits` | 1e-9 | A | numerical | — | none | kept |
 | MAD scale | RobustHistory | 1.4826 | A | Gaussian consistency constant | — | none | kept |
+| RobustHistory window | `online_calibration.py` | 100 samples | A | declared default | E39: 50 and 200 pass both detectors with no extra catastrophic cell | insensitive | kept |
+| RobustHistory warm-up | `online_calibration.py` | 5 samples | A | declared default | E39: 3 and 10 pass; effectively identical | insensitive | kept |
+| Otsu window | candidate handling | 10 frames | E | declared default, retained not selected | E39 sensitive | 5 sensitive, 20 passes | freeze blocker |
+| OTSU_BINS | candidate handling | 64 | E | declared default, retained not selected | E39 sensitive | 32 sensitive, 128 passes | freeze blocker |
 | F3 cap | association tolerance | 0.95 | C(safety) | Amendment 6 | keeps match < 1 | — | experimental |
 | m0 | association tolerance | tracker-native 0.8 | D | tracker default | — | — | experimental |
 | Tracker retention / match | ByteTrack, BoT-SORT | native 30 / 0.8 | D | tracker defaults | — | — | experimental |
@@ -42,6 +51,10 @@ C(opt) values are NOT allowed in V5-TF.
 | Budget guard | compute constraint | mean pixel cost ≤ B² | C(safety) | compute budget | matched compute | — | declared |
 | F5R block length | control only | 10 frames, fixed seed | A | same memory as the rule (E26 design) | — | — | control, not deployed |
 | Motion cue | `tools/visual_cues.py` | phase-correlation shift / image diagonal | A | definition | — | — | experimental |
+
+E39 authority: `outputs/v5tf_dev/constant_audit.json`; per-variant PKLs under
+`outputs/v5tf_dev/S:F3:*`. Amendment 7 says sensitive defaults are kept and
+reported, but this does not waive HARD_CONSTRAINTS C5 for the frozen system.
 
 ## V4 values — category E under Amendment 6 (V4 only, never V5-TF)
 τ 0.75 · s 0.4 · association offset 0.10 · NMS request 0.45 · tracker 45 / 0.86

@@ -21,6 +21,7 @@ declared in the protocol before running.
 | FX-14 | V5 S3 | adapt gate τ by a cue | 4 different cues across folds | unstable cue mapping | τ not adapted | no |
 | FX-15 | V4 on test-dev (E31) | V4 ≥ shared static at matched compute (H2) | RT-DETR −2.49 HOTA, −4.02 IDF1 (sig.) | recall-limited: τ, s at catastrophe-constraint edge | V4's VisDrone constants not universally good → category E | not for V4 (frozen) |
 | FX-16 | V5-TF F4 | z-gate with online τ adds something to F1 | identical to F1 by construction (71faf44) | redundancy | — | no |
+| FX-17 | V5-TF F5, E36 | online-normalised object-size tertiles improve resolution allocation | F5: 18 catastrophic cells, worst-detector relative ½(HOTA+IDF1) −2.646%, versus F3 17/−0.339% and random F5R 17/−1.683%; F5 cost stayed under budget | tested size state did not beat random allocation or fixed-resolution F3 | scene-aware R-res adds insufficient benefit under the tested training-free rule | only as a new family declared before another development-40 run |
 
 Gate ablation note (not a failure of the method): V4 without the gate
 collapses like V1 (test-dev RT-DETR 12 catastrophic sequences, E31).

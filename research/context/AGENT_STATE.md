@@ -4,10 +4,10 @@ This file is the machine-readable handoff between the V5-TF supervisor and
 successive non-interactive Codex runs. Values after `=` must remain one line.
 
 PROJECT_COMPLETE=false
-STATUS=WAITING_FOR_E36_E39
-CURRENT_STAGE=wait_for_current_v5tf_waiter
-LAST_COMPLETED_STAGE=live_motion_fix_verified
-NEXT_STAGE=verify_E36_E39_artifacts_then_refresh_context
+STATUS=READY_FOR_AGENT
+CURRENT_STAGE=post_E36_E39_context_and_parity_complete
+LAST_COMPLETED_STAGE=E40_live_replay_parity_pass
+NEXT_STAGE=predeclare_constant_free_candidate_family
 CURRENT_AGENT_PROCESS=none
 BLOCKER=none
-UPDATED_AT=2026-09-27T08:35:00Z
+UPDATED_AT=2026-09-27T18:00:00Z

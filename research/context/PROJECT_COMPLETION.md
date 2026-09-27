@@ -15,12 +15,12 @@ the evidence.
 | A4 | Motion-aware association (F3) implemented | DONE | 71faf44 |
 | A5 | Scene-adaptive resolution R-res + random control F5R declared | DONE | Amendment 7 §4 |
 | A6 | R-res, scene-state vector logging implemented | DONE (crash-tested, no metrics) | online_calibration.py, universal_policy_pipeline.py, tools/v5tf_dev.py |
-| A7 | Multi-resolution (640/832) development caches | IN PROGRESS | tools/mac_cache_queue_v5tf_res.sh → tools/merge_cache_levels.py → outputs/det_cache_train_res/ |
-| A8 | E36 family validation (F1, F2, F3, F5, F5R + static, V4) | TODO | tools/v5tf_dev.py run/report |
-| A9 | Family choice among selectable F3/F5 (declared rule) | TODO | outputs/v5tf_dev/family_choice.json |
-| A10 | Constant audit (OTSU_BINS, Otsu window, RobustHistory window, warm-up) | TODO | Amendment 7 §6, tools/v5tf_dev.py sens |
-| A11 | Parameter audit: every V5-TF constant in A/B/C/D or reported E | TODO | PARAMETER_STATUS.md |
-| A6b | Live == replay parity for the chosen V5-TF family (few development frames) | TODO | live motion path 81a6c53 |
+| A7 | Multi-resolution (640/832) development caches | DONE | 56/56 per detector; merged in outputs/det_cache_train_res/ |
+| A8 | E36 family validation (F1, F2, F3, F5, F5R + static, V4) | DONE | outputs/v5tf_dev/, D-022 |
+| A9 | Family choice among selectable F3/F5 (declared rule) | DONE — F3 | outputs/v5tf_dev/family_choice.json |
+| A10 | Constant audit (OTSU_BINS, Otsu window, RobustHistory window, warm-up) | DONE | outputs/v5tf_dev/constant_audit.json, D-023 |
+| A11 | Parameter audit: every V5-TF constant in A/B/C/D or reported E | BLOCKED | bins/window sensitive E; C5 forbids freeze |
+| A6b | Live == replay parity for the chosen V5-TF family (few development frames) | DONE | outputs/v5tf_dev/live_replay_parity_v2.json (80/80 PASS) |
 | A12 | Optional research upper bound D (S3 on development-40, never final) | TODO (optional) | E37 |
 
 ## B. Freeze gate

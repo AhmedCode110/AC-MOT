@@ -37,16 +37,28 @@ protocol constants.
 Legacy SCI ≤ random (E24–E26); learned V5 controllers on val lose ≈2
 ½(HOTA+IDF1) points vs V4 (E34–E35, overfitting by scarcity); S2 candidate
 cues: det_gap, det_count, trk_survival, trk_match, img_motion,
-img_motion_resp; rejected: edges, brightness, blur. V5-TF: no results yet.
+img_motion_resp; rejected: edges, brightness, blur.
 
-## Running jobs (as of 2026-09-27 06:53 UTC; verify with `ps -Aww -o pid,etime,command`)
-- `tools/mac_cache_queue_v5tf.sh` — train caches then transfer caches (caching only).
-- waiter → `tools/v5tf_dev.py run` when train caches reach 56/56.
+E36/E39 completed 2026-09-27. F3 selected over F5: catastrophic cells 17 vs
+18; worst-detector relative ½(HOTA+IDF1) vs V4 −0.339% vs −2.646%. F5 cost
+was eligible (0.954/0.952), but random F5R was better (17 cells, −1.683%):
+tested scene-adaptive resolution did not add real benefit. F3 is the current
+candidate but has 17 catastrophic cells vs V4's 3. E39: history window and
+warm-up insensitive A; OTSU_BINS and Otsu window sensitive E, blocking freeze
+under C5. Live/replay F3 parity passes exactly on 80/80 frames (E40); v1
+harness failure is preserved and explained by process-global track IDs.
+
+## Running jobs
+The E36/E39 waiter is finished. `tools/mac_cache_queue_v5tf.sh` may still be
+building allowed transfer caches; verify with `ps -Aww -o pid,etime,command`.
+Never restart it while alive. The autonomous supervisor is restarted only
+after the interactive writer releases its lock.
 
 ## Next exact step
-NEXT_STEPS.md + PROJECT_COMPLETION.md → caches (736 + 640/832) → E36 family
-validation → F3/F5 choice → E39 constant audit → T4 gate → freeze →
-confirmation-16 once (reported vs V4).
+Predeclare and implement a new training-free candidate-band family that removes
+the fixed OTSU_BINS and fixed Otsu-window dependencies. Commit before running
+development-40; compare to F3 with the existing rule. No policy lock, T4 gate,
+freeze or protected evaluation until C5 is satisfied.
 
 ## Coordination (autonomous supervisor)
 `tools/autonomous_v5tf_supervisor.py` holds `outputs/autonomous_v5tf/repo_writer.lock`
@@ -54,6 +66,8 @@ while waiting for the E36/E39 waiter, then launches one Codex child. Interactive
 sessions must stop it (`tools/stop_autonomous_v5tf.sh`), hold the lock, commit,
 release, and restart it (`tools/start_autonomous_v5tf.sh`) — never touching the
 waiter or cache queues (D-021). Status: `.venv/bin/python tools/autonomous_v5tf_supervisor.py --status`.
+The former `codex exec -a never` incompatibility was fixed in fd44a11 by using
+the supported non-interactive bypass flag.
 
 ## Prohibitions
 No training of the AC layer; no `v5_train.py final`; no protected metrics;

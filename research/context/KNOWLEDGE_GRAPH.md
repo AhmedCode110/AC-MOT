@@ -21,7 +21,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Architecture: V5-TF target architecture | CURRENT | frame scene state analyzer online self-calibration AC controller before detector candidate handling tracker feedback | ARCHITECTURE.md |
 | Component: Scene State Analyzer | EXPERIMENTAL | causal image motion detector tracker cues frames before t | ARCHITECTURE.md |
 | Component: Online Self-Calibration | EXPERIMENTAL | rolling median MAD robust z ECDF Otsu over causal windows no training | ARCHITECTURE.md |
-| Component: Universal AC Controller | EXPERIMENTAL | declared rule family F1 F2 F3 no fitted parameters | ARCHITECTURE.md |
+| Component: Universal AC Controller | EXPERIMENTAL | F3 selected by E36 but fixed Otsu bins and memory block freeze under C5 | ARCHITECTURE.md |
 | Component: Compute Latency Constraint | CURRENT | resolution budget 640 736 832 largest level meeting target FPS | ARCHITECTURE.md |
 | Component: ECDF Normaliser | CURRENT | order-only causal score normalisation exact Platt temperature invariance | ARCHITECTURE.md |
 | Component: Otsu-3 Candidate Bands | EXPERIMENTAL | three-class Otsu on candidate logits primary extend-only discard | ARCHITECTURE.md |
@@ -31,8 +31,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Component: Tracker Adapter | CURRENT | tracker-agnostic interface native defaults set_retention association tolerance | ARCHITECTURE.md |
 | Rule: F1 Otsu window bands | CANDIDATE | three-class Otsu on logits of causal window frames before t | ARCHITECTURE.md |
 | Rule: F2 Otsu frame bands | CANDIDATE | three-class Otsu within frame t candidates | ARCHITECTURE.md |
-| Rule: F3 motion-aware association | CANDIDATE | F1 plus association tolerance scaled by motion ratio to rolling median cap 0.95 | ARCHITECTURE.md |
-| Rule: F5 scene-adaptive resolution R-res | CANDIDATE | F3 plus resolution before detector from object-size state ECDF tertile 640 736 832 with compute budget guard | ARCHITECTURE.md |
+| Rule: F3 motion-aware association | SELECTED EXPERIMENTAL | E36-selected current candidate F1 plus association tolerance scaled by motion ratio; category-E Otsu constants block freeze | DECISIONS.md |
+| Rule: F5 scene-adaptive resolution R-res | FAILED DEVELOPMENT | F3 plus object-size ECDF resolution; E36 worse than F3 and random F5R at matched compute | FAILED_EXPERIMENTS.md |
 | Rule: F5R random resolution control | CONTROL | F3 plus random resolution levels same budget guard not selectable | ARCHITECTURE.md |
 | Rule: F4 online z-gate | DROPPED | identical to F1 by construction | DECISIONS.md |
 | Cue: det_gap | CANDIDATE | detector leader gap signal beyond null both detectors | DECISIONS.md |
@@ -47,10 +47,10 @@ Edit this file when the project state changes, then rebuild the graph.
 | Cue: crowd count n/30 | REJECTED | legacy SCI crowd cue sign flips below random | DECISIONS.md |
 | Cue: tiny object area | REJECTED | legacy SCI tiny cue no consistent benefit | DECISIONS.md |
 | Cue: temporal persistence | REJECTED | high for clutter scene property not failure signal | FAILED_EXPERIMENTS.md |
-| Parameter: RobustHistory window 100 | UNJUSTIFIED | category E unverified memory length must be justified before V5-TF freeze | PARAMETER_STATUS.md |
-| Parameter: RobustHistory warm-up 5 | UNJUSTIFIED | category E unverified minimum samples | PARAMETER_STATUS.md |
-| Parameter: Otsu window 10 frames | NEEDS VERIFICATION | memory inherited from V4 gate needs sensitivity | PARAMETER_STATUS.md |
-| Parameter: OTSU_BINS 64 | NEEDS VERIFICATION | histogram resolution sensitivity evidence missing | PARAMETER_STATUS.md |
+| Parameter: RobustHistory window 100 | CATEGORY A | E39 insensitive at 50 and 200 both detectors no added catastrophic cell | PARAMETER_STATUS.md |
+| Parameter: RobustHistory warm-up 5 | CATEGORY A | E39 insensitive at 3 and 10 | PARAMETER_STATUS.md |
+| Parameter: Otsu window 10 frames | CATEGORY E FREEZE BLOCKER | E39 sensitive default retained only for recorded F3 not deployable under C5 | PARAMETER_STATUS.md |
+| Parameter: OTSU_BINS 64 | CATEGORY E FREEZE BLOCKER | E39 sensitive default retained only for recorded F3 not deployable under C5 | PARAMETER_STATUS.md |
 | Parameter: Z_REF 0.75 | CATEGORY E | equals V4 tau logging only must not enter V5-TF rule | PARAMETER_STATUS.md |
 | Parameter: V4 tau 0.75 | CATEGORY E FOR V5-TF | VisDrone-selected gate threshold V4 only | PARAMETER_STATUS.md |
 | Parameter: V4 sensitivity 0.4 | CATEGORY E FOR V5-TF | VisDrone-selected V4 only | PARAMETER_STATUS.md |
@@ -82,10 +82,15 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E32 S1 headroom | DONE DEVELOPMENT | headroom for tau association resolution sensitivity retention none | EXPERIMENT_REGISTRY.md |
 | Experiment: E33 S2 cue utility | DONE DEVELOPMENT | candidate cues det_gap det_count trk_survival trk_match motion | EXPERIMENT_REGISTRY.md |
 | Experiment: E34-E35 S3 learned controller | FAILED | learned controllers lose to V4 on val overfitting by scarcity | FAILED_EXPERIMENTS.md |
-| Experiment: E36 V5-TF dev validation | PENDING NEXT | next experiment F1 F2 F3 F5 F5R on development-40 waits for 736 and 640/832 train caches | NEXT_STEPS.md |
+| Experiment: E36 V5-TF dev validation | DONE DEVELOPMENT | F3 selected; F5 worse than F3 and random F5R; F3 does not improve worst-detector criterion vs V4 | EXPERIMENT_REGISTRY.md |
 | Experiment: E37 discovery S1-S3 on train | PLANNED OPTIONAL | research upper bound only never final fit | EXPERIMENT_REGISTRY.md |
 | Experiment: E38 T4 fidelity gate | PENDING | Mac MPS vs Colab T4 cache fidelity before freeze | EXPERIMENT_REGISTRY.md |
+| Experiment: E39 constant audit | DONE DEVELOPMENT | history window and warm-up insensitive A; Otsu bins and window sensitive E freeze blockers | EXPERIMENT_REGISTRY.md |
+| Experiment: E40 F3 live replay parity | PASS DEVELOPMENT | exact tracks and controls on 80 of 80 frames two sequences two detectors no quality metric | EXPERIMENT_REGISTRY.md |
+| Experiment: E41 constant-free family | PLANNED NEXT | new training-free candidate handling removing fixed bins and fixed memory must be declared before run | NEXT_STEPS.md |
 | Result: V4 test-dev pooled metrics | HELD-OUT | outputs/heldout_v4/pooled_metrics.json | RESULTS_CANONICAL.md |
+| Result: V5-TF E36 family choice | DEVELOPMENT | F3 selected 17 catastrophic cells worst-detector relative gain minus 0.339 percent; F5 18 and minus 2.646 percent | RESULTS_CANONICAL.md |
+| Result: V5-TF E39 constant audit | DEVELOPMENT | Otsu bins and window sensitive category E; history and warm-up insensitive A | RESULTS_CANONICAL.md |
 | Failure: V1 candidate explosion | FAILED | equal percentage not equal count | FAILED_EXPERIMENTS.md |
 | Failure: V2 density budgets | FAILED | double budget additive offsets over-suppress | FAILED_EXPERIMENTS.md |
 | Failure: V2f closed-loop trust windup | FAILED | reliability conflates hard scene with false candidates | FAILED_EXPERIMENTS.md |
@@ -96,6 +101,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Failure: learned controller overfitting by scarcity | FAILED | stumps beat global value in training folds lose held-out | FAILED_EXPERIMENTS.md |
 | Failure: unstable gate tau cue | FAILED | four different cues across folds tau not adapted | FAILED_EXPERIMENTS.md |
 | Failure: V4 RT-DETR below shared static | FAILED HYPOTHESIS | H2 rejected recall-limited category E constants | FAILED_EXPERIMENTS.md |
+| Failure: F5 size-state resolution below random | FAILED HYPOTHESIS | E36 F5 worse than fixed F3 and random F5R despite eligible compute | FAILED_EXPERIMENTS.md |
 | Decision: D-005 remove legacy SCI | ACTIVE | legacy SCI removed from V4 decision path | DECISIONS.md |
 | Decision: D-009 keep scene adaptation V4 is ablation | ACTIVE | why V4 is not the final architecture: V4 compute-only is an ablation, deleting scene adaptation rejected as final direction, V4 constants are VisDrone-tuned category E | DECISIONS.md |
 | Decision: D-010 cue status | ACTIVE | candidate and rejected cues from S2 | DECISIONS.md |
@@ -107,11 +113,14 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-018 final target V5-TF | ACTIVE | final target is V5-TF; V4 baseline ablation only never fallback; confirmation reported not a gate | DECISIONS.md |
 | Decision: D-019 scene-state control R-res | ACTIVE | frozen V5-TF must contain scene-state control; selectable F3 F5 | DECISIONS.md |
 | Decision: D-020 constant audit rule | ACTIVE | sensitivity audit insensitive to structural else reported category E never tuned | DECISIONS.md |
+| Decision: D-022 E36 selects F3 | ACTIVE | F3 selected honestly; F5 scene-adaptive resolution did not beat random control | DECISIONS.md |
+| Decision: D-023 E39 C5 blockers | ACTIVE | Otsu bins and window sensitive E block policy lock and freeze | DECISIONS.md |
+| Decision: D-024 live replay parity | ACTIVE | F3 live motion path exactly equals cached replay on declared development subset | DECISIONS.md |
 | Decision: D-017 repository is project memory | ACTIVE | context files over chat history | DECISIONS.md |
 | Constraint: C0 final target V5-TF | HARD | FINAL TARGET = V5-TF; V4 historical baseline ablation only; never revert to V4 | HARD_CONSTRAINTS.md |
 | Constraint: C1 training-free final AC layer | HARD | AC training NOT allowed no fitted controller no labels no GT at deployment | HARD_CONSTRAINTS.md |
 | Constraint: C3 causality | HARD | frame t uses only frames up to t no future no GT | HARD_CONSTRAINTS.md |
-| Constraint: C5 no category E constants | HARD | no worked-best-on-VisDrone numbers in V5-TF; unjustified parameters remain RobustHistory window warm-up Otsu window OTSU_BINS Z_REF | HARD_CONSTRAINTS.md |
+| Constraint: C5 no category E constants | HARD | E39 resolved history and warm-up as A; sensitive Otsu window and bins remain freeze blockers | HARD_CONSTRAINTS.md |
 | Constraint: C6 AC before detector | HARD | not merely a post-detector score filter V4 is ablation | HARD_CONSTRAINTS.md |
 | Constraint: C7 Optuna research-only | HARD | S1 S2 S3 C1 C2 C3 Optuna discovery tools only | HARD_CONSTRAINTS.md |
 | Constraint: C8 protected evaluations | HARD | protected datasets and evaluations currently: confirmation-16, UAVDT test, Faster R-CNN, BoT-SORT; test-dev used once; no quality metrics before freeze | HARD_CONSTRAINTS.md |
@@ -121,7 +130,6 @@ Edit this file when the project state changes, then rebuild the graph.
 | Protocol: Amendment 5d | PARTLY SUPERSEDED | 40/16 train split protocol | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 5f | ACTIVE | cross-hardware fidelity gate | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 7 | CURRENT | V5-TF final target, scene-adaptive resolution R-res, families F3 F5 F5R, constant audit | VALIDATION_PROTOCOL.md |
-| Experiment: E39 constant audit | PENDING | OTSU_BINS Otsu window RobustHistory window warm-up sensitivity on chosen family | EXPERIMENT_REGISTRY.md |
 | Protocol: Amendment 6 | CURRENT | V5-TF training-free protocol families comparison freeze | VALIDATION_PROTOCOL.md |
 | Tag: v1.0.0-acmot-frozen | FROZEN | legacy AC-MOT tag | FROZEN_VERSIONS.md |
 | Tag: universal-acmot-v1-freeze | FROZEN | V1 tag | FROZEN_VERSIONS.md |
@@ -163,6 +171,12 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-019 scene-state control R-res | SELECTS | Rule: F5 scene-adaptive resolution R-res |
 | Decision: D-019 scene-state control R-res | RECORDED_IN | Protocol: Amendment 7 |
 | Decision: D-020 constant audit rule | GOVERNS | Experiment: E39 constant audit |
+| Decision: D-022 E36 selects F3 | SELECTS | Rule: F3 motion-aware association |
+| Decision: D-022 E36 selects F3 | REJECTS | Rule: F5 scene-adaptive resolution R-res |
+| Decision: D-022 E36 selects F3 | SUPPORTED_BY | Experiment: E36 V5-TF dev validation |
+| Decision: D-023 E39 C5 blockers | SUPPORTED_BY | Experiment: E39 constant audit |
+| Decision: D-023 E39 C5 blockers | REQUIRES | Experiment: E41 constant-free family |
+| Decision: D-024 live replay parity | SUPPORTED_BY | Experiment: E40 F3 live replay parity |
 | Constraint: C0 final target V5-TF | APPLIES_TO | Version: V5-TF |
 | Constraint: C0 final target V5-TF | APPLIES_TO | Version: V4 |
 | Constraint: C0 final target V5-TF | DERIVED_FROM | Decision: D-018 final target V5-TF |
@@ -170,7 +184,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Protocol: Amendment 7 | GOVERNS | Experiment: E39 constant audit |
 | Experiment: E39 constant audit | EVALUATES | Version: V5-TF |
 | Project: Universal AC-MOT | LATEST_FROZEN_VERSION | Version: V4 |
-| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E36 V5-TF dev validation |
+| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E41 constant-free family |
 | Version: V1 | SUPERSEDES | Version: Legacy AC-MOT |
 | Version: V3 | SUPERSEDES | Version: V1 |
 | Version: V4 | SUPERSEDES | Version: V3 |
@@ -241,9 +255,9 @@ Edit this file when the project state changes, then rebuild the graph.
 | Constraint: C9 T4 official timing | APPLIES_TO | Experiment: E38 T4 fidelity gate |
 | Constraint: C11 honest reporting | APPLIES_TO | Version: V5-TF |
 | Constraint: C1 training-free final AC layer | DERIVED_FROM | Decision: D-015 training-free final AC |
-| Constraint: C5 no category E constants | FLAGS | Parameter: RobustHistory window 100 |
-| Constraint: C5 no category E constants | FLAGS | Parameter: RobustHistory warm-up 5 |
-| Constraint: C5 no category E constants | FLAGS | Parameter: Z_REF 0.75 |
+| Constraint: C5 no category E constants | FLAGS | Parameter: OTSU_BINS 64 |
+| Constraint: C5 no category E constants | FLAGS | Parameter: Otsu window 10 frames |
+| Constraint: C5 no category E constants | EXCLUDES_FROM_V5_TF | Parameter: Z_REF 0.75 |
 | Constraint: C5 no category E constants | EXCLUDES | Parameter: V4 tau 0.75 |
 | Constraint: C5 no category E constants | EXCLUDES | Parameter: V4 sensitivity 0.4 |
 | Constraint: C5 no category E constants | EXCLUDES | Parameter: V4 association offset 0.10 |
@@ -289,6 +303,12 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E36 V5-TF dev validation | USES | Detector: YOLOv8n |
 | Experiment: E36 V5-TF dev validation | USES | Detector: RT-DETR-L |
 | Experiment: E36 V5-TF dev validation | USES | Tracker: ByteTrack |
+| Experiment: E36 V5-TF dev validation | PRODUCES | Result: V5-TF E36 family choice |
+| Experiment: E39 constant audit | PRODUCES | Result: V5-TF E39 constant audit |
+| Experiment: E39 constant audit | USES | Split: VisDrone2019-MOT-train development-40 |
+| Experiment: E40 F3 live replay parity | EVALUATES | Rule: F3 motion-aware association |
+| Experiment: E40 F3 live replay parity | USES | Split: VisDrone2019-MOT-train development-40 |
+| Failure: F5 size-state resolution below random | DERIVED_FROM | Experiment: E36 V5-TF dev validation |
 | Experiment: E37 discovery S1-S3 on train | USES | Split: VisDrone2019-MOT-train development-40 |
 | Experiment: E38 T4 fidelity gate | USES | Split: VisDrone2019-MOT-train development-40 |
 | Failure: V1 candidate explosion | DERIVED_FROM | Version: V1 |
