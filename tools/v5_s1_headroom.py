@@ -48,12 +48,16 @@ def base_overrides():
 
 
 def per_frame_events(seq, tracks_file, n_frames):
+    return per_frame_events_ds(DATASET, seq, tracks_file, n_frames)
+
+
+def per_frame_events_ds(dataset, seq, tracks_file, n_frames):
     import motmetrics as mm
 
     from tools.eval_local import load_gt, load_tracks
     from tools.seqstats import apply_ignore_regions
-    gt = load_gt(Path(DATASET) / "annotations" / f"{seq}.txt")
-    tr = apply_ignore_regions(DATASET, seq, load_tracks(tracks_file))
+    gt = load_gt(Path(dataset) / "annotations" / f"{seq}.txt")
+    tr = apply_ignore_regions(dataset, seq, load_tracks(tracks_file))
     acc = mm.MOTAccumulator(auto_id=False)
     for t in range(1, n_frames + 1):
         g, p = gt[gt[:, 0] == t], (tr[tr[:, 0] == t] if len(tr) else tr)
