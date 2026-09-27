@@ -425,3 +425,12 @@ caches YOLOv8n 0.45 56/56, RT-DETR-L 26/56, YOLOv8n native 0/56).
    committed to this protocol before they are run; every attempt is reported;
    no parameter search. Val, confirmation-16, Faster R-CNN, BoT-SORT, UAVDT and
    test-dev remain as in Amendments 5d/5g/6.
+## Amendment 8 — E41 exact-Otsu candidate bands (2026-09-27)
+
+The pre-freeze E41 family is declared before execution on development-40. It
+uses exact 3-class Otsu on the current frame's detector logits, with thresholds
+restricted to gaps between sorted observations. It therefore has no fixed
+histogram-bin count and no historical Otsu memory window. E41 is training-free,
+causal, detector-/tracker-agnostic, and is compared with the recorded F3 under
+the existing catastrophic-cell, worst-detector relative-gain, then simplicity
+rule. No parameter search and no protected evaluation is permitted.

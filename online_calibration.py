@@ -54,6 +54,33 @@ def otsu3(values, bins=OTSU_BINS):
     return float(t1), float(t2), eta
 
 
+def exact_otsu3(values):
+    """Exact 3-class Otsu from one causal sample; no bins or memory window."""
+    v = np.sort(np.asarray(values, dtype=np.float64))
+    v = v[np.isfinite(v)]
+    if len(v) < 3 or v[-1] - v[0] < 1e-12:
+        return None
+    prefix = np.concatenate(([0.0], np.cumsum(v)))
+    n = len(v)
+    total_mean = prefix[n] / n
+    best = (-np.inf, None, None)
+    for i in range(1, n - 1):
+        for j in range(i + 1, n):
+            counts = (i, j - i, n - j)
+            means = (prefix[i] / i, (prefix[j] - prefix[i]) / (j - i),
+                     (prefix[n] - prefix[j]) / (n - j))
+            between = sum(c * (m - total_mean) ** 2
+                          for c, m in zip(counts, means)) / n
+            if between > best[0]:
+                best = (between, i, j)
+    _, i, j = best
+    if i is None:
+        return None
+    total = float(np.var(v))
+    eta = float(best[0] / total) if total > 0 else 0.0
+    return float((v[i - 1] + v[i]) / 2), float((v[j - 1] + v[j]) / 2), eta
+
+
 class RobustHistory:
     """Causal rolling median/MAD of a scalar (window of past values)."""
 

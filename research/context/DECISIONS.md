@@ -7,6 +7,16 @@ a NEW entry with "Supersedes: D-xxx"; the old entry gets only a trailing
 E32+: research/context/EXPERIMENT_REGISTRY.md.
 
 ---
+### D-025 — E41 exact-Otsu candidate-band family declared
+Date 2026-09-27 · Amendment 8 · pre-execution declaration
+Question: can the category-E dependencies in F3 be removed without fitting?
+Decision: evaluate E41, exact 3-class Otsu on current-frame logits, with class
+boundaries restricted to gaps between sorted observations. It has no fixed
+histogram-bin count and no historical Otsu window. The existing E36
+catastrophic-cell / worst-detector relative-gain / simplicity rule compares
+E41 against the recorded F3; no parameter search or protected data is allowed.
+Status: DECLARED, pending development-40 validation.
+
 ### D-001 — Original AC-MOT: handcrafted SCI controller around YOLOv8n + ByteTrack
 Date 2026-09-11 · Commit a6c1fa4 (tag v1.0.0-acmot-frozen)
 Question: can a lightweight SCI adapt detector operation online? Evidence:

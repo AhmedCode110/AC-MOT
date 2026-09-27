@@ -42,12 +42,14 @@ FAMILIES = {
     "F5R": dict(TF_BASE, candidate_mode="otsu3_window", assoc_motion=True,
                 res_policy="random3"),
 }
+FAMILIES["E41"] = dict(TF_BASE, candidate_mode="exact3_frame",
+                        assoc_motion=True)
 BUDGET = 736
 SENS = {"otsu_bins": [32, 128], "gate_window": [5, 20],
         "tf_history": [50, 200], "tf_warmup": [3, 10]}   # defaults 64/10/100/5
 STATIC = {"static_default": dict(high=0.25, low=0.1, new=0.25),
           "shared_static": dict(high=0.5, low=0.1, new=0.5)}
-ORDER = ["F1", "F2", "F3", "F5", "F5R"]   # all families, simplicity order
+ORDER = ["F1", "F2", "F3", "F5", "F5R", "E41"]
 SELECTABLE = ["F3", "F5"]                  # Amendment 7 §5 (scene-state control)
 
 

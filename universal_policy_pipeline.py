@@ -118,7 +118,9 @@ class PolicySpec:
     tracker_buffer: int = 0           # fixed retention override (frames)
     # V5-TF (Amendment 6): training-free online candidate handling.
     # "otsu3_window": 3-class Otsu on candidate logits of frames < t;
-    # "otsu3_frame": on frame t's own candidates. Empty = legacy paths.
+    # "otsu3_frame": on frame t's own candidates.
+    # "exact3_frame": exact current-frame Otsu; no bins or Otsu memory.
+    # Empty = legacy paths.
     candidate_mode: str = ""
     # F3: association tolerance scaled by relative global motion.
     assoc_motion: bool = False
@@ -234,14 +236,15 @@ class UniversalPolicyPipeline:
         """V5-TF candidate handling: 3-class Otsu on logits (frames < t for
         the window mode; frame t for the frame mode). Returns the banded
         candidates and the tracker thresholds (band boundaries)."""
-        from online_calibration import logits, otsu3
+        from online_calibration import exact_otsu3, logits, otsu3
         if not raw:
             self.tf_primary = []
             return [], 0.1, 0.5, 0.5, np.empty(0)
         L = logits([r.confidence for r in raw])
         ref = (np.concatenate(self.otsu_window)
                if mode == "otsu3_window" and self.otsu_window else L)
-        th = otsu3(ref, bins=self.policy.otsu_bins)
+        th = (exact_otsu3(L) if mode == "exact3_frame"
+              else otsu3(ref, bins=self.policy.otsu_bins))
         out = []
         if th is None:
             t1, t2, eta = -np.inf, -np.inf, 0.0

@@ -28,12 +28,10 @@ freeze. Full checklist: PROJECT_COMPLETION.md.
   context/V5-TF changes; record `git status --short` next to E36.
 
 ## NEXT EXACT ACTION
-Write a protocol amendment and implementation for a new training-free,
-detector-/tracker-agnostic candidate-band family that removes both the fixed
-histogram-bin count and fixed Otsu memory length. Commit the declaration and
-implementation before running it on development-40. Compare it against F3
-under the existing catastrophic-cell / worst-detector / simplicity rule; no
-parameter search and no protected data.
+Run the predeclared E41 exact-Otsu family on development-40 after committing
+Amendment 8 and its implementation. Compare it against F3 under the existing
+catastrophic-cell / worst-detector / simplicity rule; no parameter search and
+no protected data.
 
 ## AFTER THAT
 0. Live V5-TF parity: DONE (`outputs/v5tf_dev/live_replay_parity_v2.json`,
