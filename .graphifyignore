@@ -1,0 +1,32 @@
+# Graphify index scope for Universal AC-MOT (gitignore syntax; read after .gitignore).
+# Index: current Python source, research/ (incl. research/context/), configs JSON.
+# Exclude: generated artifacts, caches, weights, videos, notebooks, frozen legacy snapshots.
+outputs/
+weights/
+graphify-out/
+.venv/
+__pycache__/
+*.pt
+*.pth
+*.npz
+*.npy
+*.mp4
+*.ipynb
+*.csv
+legacy/
+versions/
+notebooks/
+figures/
+docs/*.csv
+# Archived original AC-MOT v12–v17 pipeline (history; described in
+# research/context/ARCHITECTURE.md §A). core.py stays indexed (legacy SCI).
+scripts/
+experiment.py
+evaluate.py
+report.py
+core_v17.py
+portable_v15.py
+portable_v16.py
+portable_v17.py
+test_portability.py
+test_suite.py

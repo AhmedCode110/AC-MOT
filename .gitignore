@@ -38,3 +38,6 @@ venv/
 *.key
 .DS_Store
 rtdetr-l.pt
+
+# Graphify graph (rebuild: tools/build_context_graph.py)
+graphify-out/
