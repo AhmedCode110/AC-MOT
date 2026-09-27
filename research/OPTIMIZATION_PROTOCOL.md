@@ -144,3 +144,27 @@ V5 development stages:
     tracker-feedback only, minus each family, adaptive vs fixed per target).
  S5 freeze V5 (tag universal-acmot-v5-scene-generalized-freeze), then
     Faster R-CNN, BoT-SORT, UAVDT transfer; test-dev post-hoc only.
+
+### Amendment 5a — S3 nested procedure and V5 adoption rule (declared before S3 runs)
+S1 result: headroom exists for gate τ, association offset, resolution and
+sensitivity (per-sequence 0.4–2.3 MOTA pts); retention ≈ 0 → stays global.
+S2 result (all 7 sequences, diagnostic only): single-cue signal beyond the
+permutation null and positive for BOTH detectors only for detector-output
+(det_gap, det_count), tracker-state (trk_survival, trk_match) and motion
+(img_motion, img_motion_resp) cues; edges/brightness/blur negative everywhere.
+Because S2 saw all 7 sequences, cue choice is REDONE inside every outer fold:
+ outer LOSO fold (held-out h): on the 6 training sequences × 2 detectors,
+   for each target: inner-LOSO cv_gain and permutation null (100) per cue;
+   eligible = cv_gain > null95 and gain > 0 for both detectors; pick the
+   eligible cue with max inner cv_gain, fit the cost-sensitive stump on the
+   6 sequences; no eligible cue → target stays at its V4 value.
+   Cost = window errors FP+FN+IDSW (S1 runs); non-adapted targets at V4
+   values; resolution fixed at 736 for the primary (exactly compute-matched)
+   comparison; a budgeted resolution variant is secondary.
+ End-to-end replay of the fold controller on h (both detectors).
+V5 is adopted over V4 iff on the pooled 7 outer held-out sequences:
+ (1) catastrophic (MOTA<0) cells V5 ≤ V4, and
+ (2) ½(HOTA+IDF1) V5 ≥ V4 for BOTH detectors;
+ a paired sequence bootstrap of the difference is reported (not a gate).
+Stability: cue chosen per target per outer fold is reported; a target whose
+cue differs across most folds is not adapted in the final V5.
