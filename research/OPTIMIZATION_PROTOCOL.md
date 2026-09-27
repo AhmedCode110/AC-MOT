@@ -200,3 +200,49 @@ is post-hoc only for V5.
 The S1/S2/S3 procedure is re-run unchanged on train (outer LOSO over train
 sequences, both detectors, cost (FP+FN)+(IDFP+IDFN)); the adoption rule of
 Amendment 5a is applied on the val confirmation set.
+
+### Amendment 5d — V5 protocol on VisDrone-MOT-train (declared before any V5 result on train)
+Correction: VisDrone val is NOT an independent confirmation set for V5 (two
+V5 attempts were evaluated on it and influenced this redesign). Val is a
+SECONDARY check only. Clean tests: Faster R-CNN, BoT-SORT, UAVDT.
+
+Split (research/TRAIN_SPLIT_V5.json, tools/make_train_split.py, seed
+20260927, stratified by sequence-length quartiles, metadata only):
+  development = 40 sequences (17,167 frames) — all fitting/selection;
+  confirmation = 16 sequences (7,034 frames) — untouched until V5 freeze.
+Frames are never split.
+
+On the development subset only (YOLOv8n + RT-DETR-L jointly, one shared
+controller, no detector/tracker-specific values):
+ S1 fixed-value runs around V4 (736): sensitivity, association offset,
+    gate τ, retention; per-frame cost (FP+FN)+(IDFP+IDFN). A target is a
+    candidate for adaptation only if its per-sequence headroom is ≥ 0.5
+    points of #GT for both detectors (else it stays at the V4 value).
+ S2 cue utility with sequence-level 5-fold CV inside development (seeded),
+    permutation null (200); eligible cue = gain > null95 and > 0 for both
+    detectors.
+ S3 controller families (declared): C1 single-cue stump per target;
+    C2 depth-2 tree per target over eligible cues (min leaf = 10% of the
+    training windows); C3 Optuna-TPE linear scene score (non-negative
+    weights on development-quantile-normalised eligible cues, thresholds to
+    value levels; seed 0; SQLite outputs/v5/optuna_v5.db; 150 trials per
+    fold) — C3 is included ONLY if Optuna is installed before S3 starts.
+    Family choice and stability: outer 5-fold sequence CV inside
+    development; inner selection on 4/5; end-to-end replays of held-out
+    folds; lexicographic: (1) fewest catastrophic (MOTA<0) cells,
+    (2) worst-detector relative gain of ½(HOTA+IDF1) over V4 on the same
+    sequences, (3) lower complexity. A target whose selected cue differs
+    across the majority of outer folds is not adapted.
+    Resolution: a secondary budgeted variant (V5-R) allocating 832/640 by
+    the learned demand with mean pixel cost ≤ that of V4_736 (0.78), compared
+    at matched compute; the primary V5 runs at 736 (exactly V4's compute).
+ Final V5 = the selected procedure fitted on all 40 development sequences;
+ committed and tagged universal-acmot-v5-scene-generalized-freeze BEFORE the
+ confirmation subset is evaluated.
+Confirmation (once): 16 sequences, V5 vs V4 at 736; adopted iff
+ (1) catastrophic cells V5 ≤ V4 and (2) ½(HOTA+IDF1) V5 ≥ V4 for both
+ detectors (pooled); paired sequence bootstrap reported.
+If not adopted, V4 remains the final system and V5 is reported as a
+documented negative result. After the decision: secondary check on val,
+then Faster R-CNN, BoT-SORT, UAVDT transfer and official T4 timing for the
+final system; no tuning is reopened after any of these.
