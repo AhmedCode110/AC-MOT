@@ -99,3 +99,13 @@ estimate. Stability: per-parameter fold choices, median, range, frequency;
 objective sensitivity around the optimum. A parameter whose fold choices
 are unstable is not averaged — the mechanism is redesigned or the
 parameter is fixed at the value with the flattest objective, and reported.
+
+## Post-freeze audit rule for the NMS request (declared 2026-09-27, before any Faster R-CNN result; V4 is NOT changed by it)
+E27 selected 0.45 on YOLO only (RT-DETR is NMS-free). 0.45 may be described
+as a shared robust choice only if, for EVERY NMS-bearing detector family,
+V4 with 0.45 is not worse than V4 with that family's API-native NMS
+(YOLO 0.7, torchvision Faster R-CNN 0.5) on ½(HOTA+IDF1) in ≥ 4/7 val
+sequences. RT-DETR counts as "not applicable", not as support. If the rule
+fails, NMS 0.45 is reported as a YOLO-derived limitation and adapter-native
+suppression is recorded as the recommended design for a future version
+(V5), which would require its own development selection and a new held-out set.
