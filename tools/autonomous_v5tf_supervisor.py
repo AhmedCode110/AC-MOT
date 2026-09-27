@@ -334,7 +334,7 @@ def invoke_codex(run_number: int) -> int:
     last_message = OUT / f"agent-run-{run_number:03d}-last-message.txt"
     command = [
         codex_binary(), "exec", "-C", str(ROOT),
-        "-s", "danger-full-access", "-a", "never",
+        "--dangerously-bypass-approvals-and-sandbox",
         "-o", str(last_message), "-",
     ]
     with run_log.open("w", encoding="utf-8") as handle:
