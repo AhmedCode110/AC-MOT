@@ -109,8 +109,11 @@ class UniversalACMOT:
             self.pipeline.policy = replace(self.pipeline.policy,
                                            fixed_resolution=level)
         t0 = perf_counter()
-        self.last = self.pipeline.process(self.frame_number, frame,
-                                          analyze_visual(frame))
+        # Image statistics are only consumed by the legacy scene controller
+        # (V1-V3); V4 does not compute them (no behavioural difference).
+        visual = analyze_visual(frame) if \
+            self.pipeline.policy.scene_controller else {}
+        self.last = self.pipeline.process(self.frame_number, frame, visual)
         if self.budget is not None:
             self.budget.observe(level, perf_counter() - t0,
                                 self.frame_number)
