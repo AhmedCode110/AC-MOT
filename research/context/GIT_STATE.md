@@ -2,8 +2,8 @@
 
 Generated: 2026-09-27 20:14 UTC
 Repository: https://github.com/AhmedCode110/AC-MOT.git
-Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 10 / behind 0
-HEAD: 50f2a6fa095f52ec5e1f6f6b682a8f1f0ce58274
+Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 11 / behind 0
+HEAD: eae9f15d64adb154764e044548d7d4a03cae3330
 
 ## Tags (creation order)
 | Tag | Commit | Date |
@@ -14,6 +14,7 @@ HEAD: 50f2a6fa095f52ec5e1f6f6b682a8f1f0ce58274
 | universal-acmot-v4-freeze | fc003bf96621214dc09a0e55f720128093972927 | 2026-09-27 |
 
 ## Recent commits
+- eae9f15 2026-09-27 Record E36 E39 and F3 parity results
 - 50f2a6f 2026-09-27 Correct F3 parity harness for global track IDs
 - fd44a11 2026-09-27 Fix autonomous Codex resume and add F3 parity check
 - 1473a06 2026-09-27 Context: D-021 (reporting/timer fixes, single-writer rule for all agents), next steps, completion, handoff
@@ -28,24 +29,10 @@ HEAD: 50f2a6fa095f52ec5e1f6f6b682a8f1f0ce58274
 - fbbd70a 2026-09-27 V5-TF cache queue: detector-native suppression caches (caching only)
 - 3684684 2026-09-27 Amendment 6: training-free online self-calibrating AC (V5-TF) as hard requirement; rule families and comparison declared before any train result
 - 8293c7c 2026-09-27 Amendment 5g: gate thresholds are protocol constants; pre-freeze Faster R-CNN/BoT-SORT use limited to timing and cache fidelity
-- feff14f 2026-09-27 Amendment 5f: cross-hardware fidelity gate (subset, thresholds, tools) and T4 gate+benchmark notebook
 
 ## Working tree
 Uncommitted paths (NOT part of any context commit; provenance must be checked before committing them):
-- `M research/context/AGENT_STATE.md`
-- ` M research/context/DECISIONS.md`
-- ` M research/context/EXPERIMENT_REGISTRY.md`
-- ` M research/context/FAILED_EXPERIMENTS.md`
-- ` M research/context/GIT_STATE.md`
-- ` M research/context/KNOWLEDGE_GRAPH.md`
-- ` M research/context/NEXT_STEPS.md`
-- ` M research/context/PARAMETER_STATUS.md`
-- ` M research/context/PROJECT_COMPLETION.md`
-- ` M research/context/PROJECT_STATE.md`
-- ` M research/context/RESULTS_CANONICAL.md`
-- ` M research/context/SESSION_HANDOFF.md`
-- ` M research/context/VALIDATION_PROTOCOL.md`
-- ` M tests/test_full_pipeline_equivalence.py`
+- `M tests/test_full_pipeline_equivalence.py`
 - ` M universal_pipeline.py`
 - `?? tools/audit/nms_audit_frcnn.py`
 - `?? tools/build_calibration_split.py`
