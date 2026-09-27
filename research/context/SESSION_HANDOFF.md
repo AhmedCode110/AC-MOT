@@ -48,6 +48,10 @@ warm-up insensitive A; OTSU_BINS and Otsu window sensitive E, blocking freeze
 under C5. Live/replay F3 parity passes exactly on 80/80 frames (E40); v1
 harness failure is preserved and explained by process-global track IDs.
 
+E41 exact-Otsu was declared and validated after commit 240eba9: 80/80
+development artifacts, 15 catastrophic cells, and +0.69% worst-detector
+relative gain vs V4. It does not change the prior F3-vs-F5 choice.
+
 ## Running jobs
 The E36/E39 waiter is finished. `tools/mac_cache_queue_v5tf.sh` may still be
 building allowed transfer caches; verify with `ps -Aww -o pid,etime,command`.
@@ -55,10 +59,9 @@ Never restart it while alive. The autonomous supervisor is restarted only
 after the interactive writer releases its lock.
 
 ## Next exact step
-Predeclare and implement a new training-free candidate-band family that removes
-the fixed OTSU_BINS and fixed Otsu-window dependencies. Commit before running
-development-40; compare to F3 with the existing rule. No policy lock, T4 gate,
-freeze or protected evaluation until C5 is satisfied.
+Record the E41 parameter/audit decision, write the V5-TF policy lock, and run
+the fixed-threshold T4 fidelity gate. No protected quality evaluation before
+the freeze tag.
 
 ## Coordination (autonomous supervisor)
 `tools/autonomous_v5tf_supervisor.py` holds `outputs/autonomous_v5tf/repo_writer.lock`

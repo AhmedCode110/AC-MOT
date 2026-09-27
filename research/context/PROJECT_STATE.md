@@ -1,16 +1,16 @@
 # PROJECT STATE — read this first
 
 <!-- AUTO:BEGIN (tools/update_project_context.py — do not edit by hand) -->
-LAST VERIFIED COMMIT: eae9f15d64adb154764e044548d7d4a03cae3330
-CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 11, behind 0)
-LAST CONTEXT UPDATE: 2026-09-27 20:14 UTC
+LAST VERIFIED COMMIT: 240eba9cb2b4912c8ba2d07cb0d8085d22561b0d
+CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 13, behind 0)
+LAST CONTEXT UPDATE: 2026-09-27 20:23 UTC
 LATEST FROZEN TAG (git): universal-acmot-v4-freeze → fc003bf
-WORKING TREE: 8 uncommitted path(s) — see GIT_STATE.md
+WORKING TREE: 17 uncommitted path(s) — see GIT_STATE.md
 <!-- AUTO:END -->
 
 FINAL TARGET: V5-TF — the final research target and contribution (Amendment 7). V4 = historical baseline / ablation ONLY, never a fallback.
 CURRENT RESEARCH VERSION: V5-TF (training-free online self-calibrating Universal AC-MOT) — EXPERIMENTAL, not frozen
-CURRENT PHASE: V5-TF pre-freeze rule revision — E36/E39 complete; F3 selected, F5 scene-adaptive resolution did not beat F3 or random control; live/replay parity PASS; OTSU_BINS and Otsu window remain sensitive category-E blockers under C5
+CURRENT PHASE: V5-TF pre-freeze rule revision — E36/E39/E41 complete; E41 exact-Otsu produced 80/80 development artifacts, 15 catastrophic cells, and +0.69% worst-detector relative gain vs V4; policy lock and T4 fidelity gate remain pending
 
 ## What is the project?
 Universal AC-MOT: an adaptive-control (AC) layer placed around a FROZEN
@@ -57,7 +57,9 @@ Adapter (F3: motion-aware association) → Tracker → Tracks → causal feedbac
   BoT-SORT quality for V5-TF; UAVDT quality.
 
 ## Exact next step
-See NEXT_STEPS.md and PROJECT_COMPLETION.md.
+Record E41 as the validated candidate-band revision, write the V5-TF policy
+lock, then run the fixed-threshold T4 fidelity gate; protected quality
+evaluations remain forbidden until the freeze tag.
 
 ## Must NOT be changed
 HARD_CONSTRAINTS.md (C0 final target = V5-TF; training-free; causality; no

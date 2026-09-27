@@ -20,6 +20,7 @@ Evaluator for every row: internal class-agnostic protocol, HOTA TrackEval
 | V5 S3 attempts (E34, E35) | 62111e8 | DEVELOPMENT (val), FAILED | `outputs/v5/s3/full/`, `outputs/v5/s3b/full/` | Amendments 5b/5c |
 | V5-TF dev validation (E36) | 71faf44 + Amendment 7 | DEVELOPMENT-40, COMPLETE | `outputs/v5tf_dev/` PKLs, `outputs/v5tf_dev/family_choice.json` | F3 selected; F5 did not beat F3 or F5R; D-022 |
 | V5-TF constant audit (E39) | Amendment 7 | DEVELOPMENT-40, COMPLETE | `outputs/v5tf_dev/constant_audit.json` | bins/window sensitive E; history/warm-up insensitive A; D-023 |
+| V5-TF exact-Otsu family (E41) | 240eba9 + Amendment 8 | DEVELOPMENT-40, COMPLETE | `outputs/v5tf_dev/E41/` | 80/80 PKLs; 15 catastrophic cells; worst-detector relative gain vs V4 +0.69%; no protected data; D-025 |
 | V5-TF live/replay parity (E40) | fd44a11 / 50f2a6f | DEVELOPMENT FIDELITY, PASS | `outputs/v5tf_dev/live_replay_parity_v2.json` | exact tracks + controls, 80/80 frames; v1 preserved as harness failure |
 | Faster R-CNN, UAVDT, BoT-SORT (V5-TF) | — | PROTECTED | none may exist before V5-TF freeze | — |
 | Official T4 timing | — | none official yet | will be `t4_benchmark*.json` from a T4 run | — |

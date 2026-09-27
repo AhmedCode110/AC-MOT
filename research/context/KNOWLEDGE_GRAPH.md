@@ -87,7 +87,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E38 T4 fidelity gate | PENDING | Mac MPS vs Colab T4 cache fidelity before freeze | EXPERIMENT_REGISTRY.md |
 | Experiment: E39 constant audit | DONE DEVELOPMENT | history window and warm-up insensitive A; Otsu bins and window sensitive E freeze blockers | EXPERIMENT_REGISTRY.md |
 | Experiment: E40 F3 live replay parity | PASS DEVELOPMENT | exact tracks and controls on 80 of 80 frames two sequences two detectors no quality metric | EXPERIMENT_REGISTRY.md |
-| Experiment: E41 constant-free family | PLANNED NEXT | new training-free candidate handling removing fixed bins and fixed memory must be declared before run | NEXT_STEPS.md |
+| Experiment: E41 exact-Otsu family | DONE DEVELOPMENT | exact current-frame 3-class Otsu; 80/80 artifacts, 15 catastrophic cells, +0.69 percent worst-detector relative gain vs V4; no fixed bins or Otsu memory | EXPERIMENT_REGISTRY.md |
 | Result: V4 test-dev pooled metrics | HELD-OUT | outputs/heldout_v4/pooled_metrics.json | RESULTS_CANONICAL.md |
 | Result: V5-TF E36 family choice | DEVELOPMENT | F3 selected 17 catastrophic cells worst-detector relative gain minus 0.339 percent; F5 18 and minus 2.646 percent | RESULTS_CANONICAL.md |
 | Result: V5-TF E39 constant audit | DEVELOPMENT | Otsu bins and window sensitive category E; history and warm-up insensitive A | RESULTS_CANONICAL.md |

@@ -15,7 +15,9 @@ boundaries restricted to gaps between sorted observations. It has no fixed
 histogram-bin count and no historical Otsu window. The existing E36
 catastrophic-cell / worst-detector relative-gain / simplicity rule compares
 E41 against the recorded F3; no parameter search or protected data is allowed.
-Status: DECLARED, pending development-40 validation.
+Status: VALIDATED in E41: 80/80 PKLs, 15 catastrophic cells, and +0.69%
+worst-detector relative gain vs V4. E41 is retained as the candidate-band
+family for the next policy audit; no protected data was used.
 
 ### D-001 — Original AC-MOT: handcrafted SCI controller around YOLOv8n + ByteTrack
 Date 2026-09-11 · Commit a6c1fa4 (tag v1.0.0-acmot-frozen)

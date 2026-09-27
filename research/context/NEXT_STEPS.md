@@ -28,10 +28,10 @@ freeze. Full checklist: PROJECT_COMPLETION.md.
   context/V5-TF changes; record `git status --short` next to E36.
 
 ## NEXT EXACT ACTION
-Run the predeclared E41 exact-Otsu family on development-40 after committing
-Amendment 8 and its implementation. Compare it against F3 under the existing
-catastrophic-cell / worst-detector / simplicity rule; no parameter search and
-no protected data.
+E41 is complete: 80/80 development-40 replays produced; 15 catastrophic cells
+and +0.69% worst-detector relative gain vs V4. Record the E41 decision and
+parameter audit outcome, then write the V5-TF policy lock and prepare the T4
+fidelity gate. Do not run protected quality evaluations before the freeze.
 
 ## AFTER THAT
 0. Live V5-TF parity: DONE (`outputs/v5tf_dev/live_replay_parity_v2.json`,
