@@ -36,4 +36,3 @@ done
 
 echo "Supervisor is still stopping. No force-kill was issued; check status/logs."
 exit 2
-

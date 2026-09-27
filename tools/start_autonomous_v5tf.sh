@@ -18,4 +18,3 @@ echo $! > outputs/autonomous_v5tf/launcher.pid
 echo "Started V5-TF autonomous supervisor: pid $!"
 echo "Status: .venv/bin/python tools/autonomous_v5tf_supervisor.py --status"
 echo "Log: outputs/autonomous_v5tf/supervisor.log"
-

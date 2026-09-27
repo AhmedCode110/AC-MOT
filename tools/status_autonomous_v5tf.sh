@@ -17,4 +17,3 @@ fi
 
 echo "recent log:"
 tail -20 outputs/autonomous_v5tf/supervisor.log 2>/dev/null || true
-
