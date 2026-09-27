@@ -45,6 +45,9 @@ class CachedDetector:
         self.classes = (set(json.loads(task.read_text())["classes"])
                         if task.exists() else None)
         self.visual = z["visual"]
+        vc = Path(npz_path).parent.parent / "visual_cues" / \
+            f"{Path(npz_path).stem}.npz"
+        self.visual_cues = np.load(vc)["cues"] if vc.exists() else None
         self.shape = tuple(int(v) for v in z["shape"])
         self.frames = int(z["frames"])
         self.by_res = {}
@@ -65,6 +68,16 @@ class CachedDetector:
     # (RT-DETR ignores suppression). A policy that requests any other NMS
     # value (e.g. Config.adaptive_nms) cannot be replayed from this cache.
     CACHED_NMS = 0.45
+
+    def visual_dict(self, i):
+        """Image statistics for frame i (1-based); motion only if the
+        visual-cue cache exists (otherwise NaN, never guessed)."""
+        if self.visual_cues is not None:
+            e, b, bl, m, r = self.visual_cues[i - 1]
+            return dict(edges=e, brightness=b, blur=bl, motion=m,
+                        motion_resp=r)
+        v = self.visual[i - 1]
+        return dict(edges=v[0], brightness=v[1], blur=v[2])
 
     def detect(self, image, confidence, suppression, resolution):
         if abs(float(suppression) - self.CACHED_NMS) > 1e-9:
@@ -126,8 +139,7 @@ def run(policy, dataset, cache_dir, output_dir, sequences=None,
             for i, item in enumerate(frames, start=1):
                 if live is None:
                     det.frame = i
-                    v = det.visual[i - 1]
-                    visual = dict(edges=v[0], brightness=v[1], blur=v[2])
+                    visual = det.visual_dict(i)
                     image = np.empty(det.shape + (0,), dtype=np.uint8)
                 else:
                     image = cv2.imread(str(item))

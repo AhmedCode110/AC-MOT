@@ -168,3 +168,35 @@ V5 is adopted over V4 iff on the pooled 7 outer held-out sequences:
  a paired sequence bootstrap of the difference is reported (not a gate).
 Stability: cue chosen per target per outer fold is reported; a target whose
 cue differs across most folds is not adapted in the final V5.
+
+### Amendment 5b — S3 attempt 1 failed the adoption rule; attempt 2 (disclosed)
+Attempt 1 (window cost FP+FN+IDSW, MOTA-aligned): outer-CV ½(HOTA+IDF1)
+vs V4: YOLO −2.42 [−4.86, −0.61], RT-DETR −2.64 [−8.30, +0.57]; MOTA +0.1/+0.7,
+IDS −38%/−36%, recall −3.8/−3.6. NOT adopted. Diagnosis: the learning
+cost was MOTA-aligned while the adoption criterion is HOTA/IDF1.
+Gate τ cue was unstable across folds (4 different answers) → τ is not
+adapted in any later attempt.
+Attempt 2 (the only further attempt on these outer folds): identical nested
+procedure, window cost = (FP+FN) + (IDFP+IDFN), the latter from the global
+optimal identity mapping (same definition as motmetrics IDF1; verified).
+Targets: sensitivity, association offset (τ fixed at 0.75). Same adoption
+rule. Because the outer folds were already seen once, attempt 2's outer-CV
+result is reported with this disclosure; the clean confirmation of any
+adopted V5 is the untouched Faster R-CNN / UAVDT / BoT-SORT transfer.
+
+### Amendment 5c — attempt 2 not adopted; V5 development moves to VisDrone-MOT-train
+Attempt 2 outer-CV ½(HOTA+IDF1) vs V4: YOLO −2.26 [−4.77, −0.38]; RT-DETR
+−0.60 [−2.15, +1.10] (MOTA +2.8). NOT adopted; no further attempt on the val
+outer folds. Diagnosis: S1 headroom is real and the sensitivity cue family
+is stable (detector-output cues 6/7 folds), but 7 sequences (~190 windows)
+are too few to learn the mapping — S2 stumps beat the global value on the
+training folds 7/7 yet lose on held-out sequences (overfitting by scarcity).
+Decision: V5 is developed on VisDrone2019-MOT-train (56 sequences; never
+used by any system; detectors are COCO-trained, so these videos are unseen
+data for the policy). VisDrone val becomes V5's CONFIRMATION set against V4
+(V4 was selected on val, i.e. the comparison favours V4). UAVDT test,
+Faster R-CNN and BoT-SORT remain untouched transfer tests; VisDrone test-dev
+is post-hoc only for V5.
+The S1/S2/S3 procedure is re-run unchanged on train (outer LOSO over train
+sequences, both detectors, cost (FP+FN)+(IDFP+IDFN)); the adoption rule of
+Amendment 5a is applied on the val confirmation set.

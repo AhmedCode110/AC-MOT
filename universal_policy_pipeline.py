@@ -111,6 +111,11 @@ class PolicySpec:
     # Generic suppression request passed to the detector adapter when the
     # scene controller is off (0.45 = legacy AC request).
     nms_request: float = 0.45
+    # V5 development: log the generic scene/tracking state every frame and
+    # (optionally) let a learned controller override per-frame decisions.
+    scene_state: bool = False
+    controller_spec: str = ""        # JSON; empty = no V5 controller
+    tracker_buffer: int = 0           # fixed retention override (frames)
     ecdf_stride: int = 10
     ecdf_window: int = 20
 
@@ -179,6 +184,11 @@ class UniversalPolicyPipeline:
                                    window=self.policy.ecdf_window)
             if self.policy.normalizer == "ecdf" else
             OnlineScoreNormalizer(bins=64, decay=0.95, update_every=10))
+        from scene_state import SceneStateAnalyzer
+        from v5_controller import V5Controller
+        self.analyzer = SceneStateAnalyzer()
+        self.v5 = (V5Controller.from_json(self.policy.controller_spec)
+                   if self.policy.controller_spec else None)
         self.cue_hist = []
         self.cue_size = 640
         self.gate_ref_logit = None
@@ -188,6 +198,8 @@ class UniversalPolicyPipeline:
         self.trust = 1.0
         self.leader_ref = None
         self.tracker.reset()
+        if self.policy.tracker_buffer:
+            self.tracker.set_retention(self.policy.tracker_buffer)
         self.previous = []
 
     def _cues(self, visual):
@@ -249,6 +261,21 @@ class UniversalPolicyPipeline:
             params = dict(size=int(p.fixed_resolution or 736),
                           nms=float(p.nms_request),
                           sci=0.0, scene="clear")
+        use_state = p.scene_state or self.v5 is not None
+        state = {}
+        decision = {}
+        if use_state:
+            self.analyzer.observe_image(visual, image.shape[:2])
+            state = self.analyzer.state()
+        if self.v5 is not None:
+            decision = self.v5.decide(state)
+            p = replace(p, **{k: v for k, v in decision.items()
+                              if k in ("fixed_sensitivity", "gate_tau",
+                                       "assoc_offset")})
+            if "resolution" in decision:
+                params = dict(params, size=int(decision["resolution"]))
+            if "retention" in decision:
+                self.tracker.set_retention(int(decision["retention"]))
         if p.fixed_resolution:
             params = dict(params, size=int(p.fixed_resolution))
         cues = self._cues(visual) if p.scene_controller else {}
@@ -292,6 +319,11 @@ class UniversalPolicyPipeline:
 
         demoted = 0
         leader_ref = self.leader_ref
+        norm_u = [d.confidence for d in normalized]
+        gate_ref_prev = self.gate_ref_logit
+        gate_iqr_prev = (float(np.subtract(*np.percentile(
+            np.concatenate(self.gate_logits), [75, 25])))
+            if self.gate_logits else 1.0)
         if p.gate_stat == "zlogit" and p.gate_tau > 0 and raw \
                 and self.gate_ref_logit is not None and self.gate_logits:
             lg = _logit(np.array([r.confidence for r in raw]))
@@ -347,6 +379,15 @@ class UniversalPolicyPipeline:
             image=image if getattr(self.tracker, "needs_image", False)
             else None)
 
+        if use_state:
+            self.analyzer.observe_detector(
+                np.array([[r.x1, r.y1, r.x2, r.y2] for r in raw]).reshape(-1, 4),
+                np.array([r.confidence for r in raw]), norm_u,
+                gate_ref_prev, gate_iqr_prev)
+            self.analyzer.observe_tracks(
+                [t.track_id for t in tracks],
+                sum(d.confidence >= high for d in detections))
+
         # Frame t observations only affect frame t+1 onward.
         if p.density:
             self.density.observe(len(raw))
@@ -395,6 +436,8 @@ class UniversalPolicyPipeline:
             reliability=rel,
             trust=trust_used,
             **{f"cue_{k}": v for k, v in cues.items()},
+            **{f"s_{k}": v for k, v in state.items()},
+            **{f"d_{k}": v for k, v in decision.items()},
             leader_ref=(leader_ref if leader_ref is not None else np.nan),
             demoted=demoted,
             obs_survival=self.reliability.survival,

@@ -154,9 +154,7 @@ def run_one(args):
     lines, audit = [], []
     for i in range(1, det_cache.frames + 1):
         det_cache.frame = i
-        v = det_cache.visual[i - 1]
-        res = pipe.process(i, image, dict(edges=v[0], brightness=v[1],
-                                          blur=v[2]))
+        res = pipe.process(i, image, det_cache.visual_dict(i))
         for t in res["tracks"]:
             lines.append(f"{i},{t.track_id},{t.x1:.3f},{t.y1:.3f},"
                          f"{max(0.0, t.x2 - t.x1):.3f},"

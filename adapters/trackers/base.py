@@ -34,6 +34,11 @@ class TrackerAdapter(ABC):
     ) -> TrackList:
         raise NotImplementedError
 
+    def set_retention(self, frames: int) -> None:
+        """Generic retention command: how many frames a lost track is kept.
+        Adapters translate it to their own API; default: unsupported."""
+        return None
+
     @abstractmethod
     def reset(self):
         raise NotImplementedError
