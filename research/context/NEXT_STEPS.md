@@ -36,6 +36,12 @@ development caches (736 + 640/832), merges levels, then runs
 If it died, re-run the queues and then those commands. Record E36 (families)
 and E39 (constant audit) in EXPERIMENT_REGISTRY.md.
 
+The separate `tools/autonomous_v5tf_supervisor.py` waits for this existing
+waiter without restarting it. It requires the complete E36/E39 output sets and
+valid `family_choice.json` / `constant_audit.json`, refreshes context health,
+then launches one serialized non-interactive Codex continuation at a time.
+State: `research/context/AGENT_STATE.md`; logs: `outputs/autonomous_v5tf/`.
+
 ## AFTER THAT
 0. Live V5-TF: `universal_acmot.py` now computes frame motion via scene_state.image_stats when assoc_motion is on (was always empty → F3 inert live). Still TODO: a live==replay parity check for a V5-TF family on a few development frames, and per-component AC timers (scene analyzer / normaliser+Otsu / AC decision) in the pipeline audit for tools/t4_benchmark.py.
 1. Parameter audit update (PARAMETER_STATUS.md) from the E39 audit.

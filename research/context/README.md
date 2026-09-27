@@ -46,6 +46,8 @@ justifications or frozen state.
 | SESSION_HANDOFF.md | one-file compact handoff | manual |
 | KNOWLEDGE_GRAPH.md | typed entities + relations fed to Graphify | manual |
 | NEW_SESSION_PROMPT.md | copy-paste start prompt | manual |
+| AUTONOMOUS_AGENT_PROMPT.md | safety contract for serialized non-interactive continuation | manual |
+| AGENT_STATE.md | machine-readable autonomous stage, process and blocker state | supervisor + agent |
 
 Stable names (use exactly): Version: V1/V3/V4/V5/V5-TF · Detector: YOLOv8n,
 RT-DETR-L, Faster R-CNN ResNet50-FPN v2 · Tracker: ByteTrack, BoT-SORT ·
@@ -77,3 +79,13 @@ VisDrone2019-MOT-train confirmation-16, UAVDT test.
 9. `python3 tools/context_health_check.py` and 2–3 `graphify query` checks.
 10. Commit ONLY context/graph-config files with a descriptive message; never
     commit unrelated user edits. (`graphify-out/` is git-ignored: rebuildable.)
+
+## Autonomous continuation
+`tools/autonomous_v5tf_supervisor.py` is the single-writer, artifact-gated
+continuation loop. It does not restart cache queues or the current waiter. It
+validates complete E36/E39 artifacts, runs context health, then serially invokes
+one non-interactive Codex agent from `AUTONOMOUS_AGENT_PROMPT.md` plus
+`NEW_SESSION_PROMPT.md`. Runtime status and logs are under
+`outputs/autonomous_v5tf/`; canonical handoff state is `AGENT_STATE.md`.
+Start/status/safe-stop commands are `tools/start_autonomous_v5tf.sh`,
+`tools/status_autonomous_v5tf.sh`, and `tools/stop_autonomous_v5tf.sh`.
