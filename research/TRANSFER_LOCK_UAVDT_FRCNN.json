@@ -1,0 +1,38 @@
+{
+  "status": "LOCKED_BEFORE_EVALUATION",
+  "created": "2026-09-27",
+  "rule": "Transfer test of the FROZEN V4 policy. No policy, parameter, cue or threshold may change for this detector/dataset, before or after seeing results. Only the detector adapter (API translation) and the dataset protocol adapter are new.",
+  "code_commit": "fc003bf96621214dc09a0e55f720128093972927",
+  "code_tag": "universal-acmot-v4-freeze",
+  "file_sha256": {
+    "configs/universal_acmot_policy_v4.json": "a9b456e77ba7b8dddb0ec291967d0f9c41e48309d64683e9d0d87e0fdfa456bb",
+    "universal_policy_pipeline.py": "f7f4337d32169e4cb4bf103ad7851fd1b885177ae87716ec7c6b38157de3cf89",
+    "universal_acmot.py": "2dce00c695d2637fd665ab90768836804469702fc8476a34276eaa8ba2db927c",
+    "adapters/detectors/online_normalizer.py": "8825835354785b4a6a83cd396d622401e8f261d7bbe34db40f80ce68bb99f582",
+    "adapters/trackers/bytetrack.py": "4764c523456984e9119be5eb8a91eb9f7ffd51158a7ade87ba280010ef90b6d5",
+    "adapters/trackers/botsort.py": "18bdc4cec15bf8d505b2ab721fc5003c8d175660f0aca6be0a4e9db3ef79283a",
+    "adapters/detectors/fasterrcnn.py": "d1a6c5067dd0683ffca3addad098f62158e2734528765d0e283f1aa7c7991831",
+    "tools/heldout_run.py": "2c4941e730aab042a2163fb5183d38c82f7df637b4fd3ec687b2db3252dd0ede"
+  },
+  "evaluation": "custom class-agnostic internal protocol (NOT official VisDrone): HOTA TrackEval 12c8791; MOTA/IDF1/IDS/FP/FN/P/R motmetrics 1.4.0",
+  "bootstrap": "paired over the sequences, 10000 resamples, seed 42, pooled metrics recomputed per resample, 95% percentile CI",
+  "name": "Unseen dataset: UAVDT MOT test split (20 sequences, 16592 frames)",
+  "dataset_protocol": "UAVDT_EXTERNAL_PROTOCOL_FREEZE.json + UAVDT_ADAPTER_V1_FREEZE.json (frozen 2026-09-12): GT rows score!=0, frame>=1; predictions strictly inside ignore boxes removed; vehicle task (detector classes car/bus/truck).",
+  "detectors_run": [
+    "fasterrcnn"
+  ],
+  "tracker_systems": {
+    "bytetrack": [
+      "shared_static_736",
+      "V4_736"
+    ]
+  },
+  "bootstrap_pairs": [
+    [
+      "bytetrack",
+      "V4_736",
+      "shared_static_736"
+    ]
+  ],
+  "note": "736-only cache for compute reasons"
+}

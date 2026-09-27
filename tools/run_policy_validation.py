@@ -39,12 +39,21 @@ class CachedDetector:
     def __init__(self, npz_path, transform=None, cached_nms=0.45):
         self.CACHED_NMS = float(cached_nms)
         z = np.load(npz_path)
+        # Task class set (dataset protocol, e.g. UAVDT vehicles) declared
+        # in task.json next to the cache files; default = all cached.
+        task = Path(npz_path).parent / "task.json"
+        self.classes = (set(json.loads(task.read_text())["classes"])
+                        if task.exists() else None)
         self.visual = z["visual"]
         self.shape = tuple(int(v) for v in z["shape"])
         self.frames = int(z["frames"])
         self.by_res = {}
         for r in (640, 736, 832):
+            if f"det_{r}" not in z:     # subset caches (transfer tests)
+                continue
             a = z[f"det_{r}"].copy()
+            if self.classes is not None:
+                a = a[np.isin(a[:, 6].astype(int), list(self.classes))]
             if transform is not None:
                 sc = np.clip(a[:, 5], 1e-6, 1 - 1e-6)
                 a[:, 5] = self.TRANSFORMS[transform](sc)

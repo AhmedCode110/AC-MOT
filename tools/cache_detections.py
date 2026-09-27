@@ -32,6 +32,8 @@ def main():
     ap.add_argument("--sequences", nargs="*")
     ap.add_argument("--nms", type=float, default=0.45)
     ap.add_argument("--floor", type=float, default=0.01)
+    ap.add_argument("--resolutions", type=int, nargs="+",
+                    default=list(RESOLUTIONS))
     args = ap.parse_args()
 
     detector = create_detector(args.weights, family="auto")
@@ -51,7 +53,7 @@ def main():
             continue
         frames = sorted(seq.glob("*.jpg"))
         visual = np.zeros((len(frames), 3), dtype=np.float64)
-        rows = {r: [] for r in RESOLUTIONS}
+        rows = {r: [] for r in args.resolutions}
         shape = None
         t0 = time.perf_counter()
         for i, fp in enumerate(frames, start=1):
@@ -59,20 +61,20 @@ def main():
             shape = image.shape[:2]
             v = analyze_visual(image)
             visual[i - 1] = (v["edges"], v["brightness"], v["blur"])
-            for r in RESOLUTIONS:
+            for r in args.resolutions:
                 dets = detector.detect(image, confidence=args.floor,
                                        suppression=args.nms, resolution=r)
                 for d in dets:
                     rows[r].append((i, d.x1, d.y1, d.x2, d.y2,
                                     d.confidence, d.class_id))
         payload = {f"det_{r}": np.asarray(rows[r], dtype=np.float64)
-                   .reshape(-1, 7) for r in RESOLUTIONS}
+                   .reshape(-1, 7) for r in args.resolutions}
         np.savez_compressed(target, visual=visual,
                             shape=np.asarray(shape), frames=len(frames),
                             **payload)
         dt = time.perf_counter() - t0
         print(f"{seq.name}: {len(frames)} frames, {dt:.0f}s "
-              f"({1000 * dt / len(frames) / len(RESOLUTIONS):.0f} ms/det)")
+              f"({1000 * dt / len(frames) / len(args.resolutions):.0f} ms/det)")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,29 @@ import numpy as np
 from tools.eval_local import HOTA, build_data, load_gt, load_tracks
 
 
+def apply_ignore_regions(dataset, seq, tr):
+    """Dataset protocol rule (UAVDT adapter V1): drop a prediction when it
+    lies strictly inside an ignore box of the same frame. No-op when the
+    dataset has no ignore/ directory (VisDrone)."""
+    f = Path(dataset) / "ignore" / f"{seq}.txt"
+    if not f.exists() or not len(tr):
+        return tr
+    ig = np.loadtxt(f, delimiter=",", ndmin=2)     # frame,x,y,w,h
+    keep = np.ones(len(tr), bool)
+    for fr in np.unique(ig[:, 0]):
+        rows = np.where(tr[:, 0] == fr)[0]
+        if not len(rows):
+            continue
+        b = ig[ig[:, 0] == fr]
+        x1, y1 = tr[rows, 2], tr[rows, 3]
+        x2, y2 = x1 + tr[rows, 4], y1 + tr[rows, 5]
+        inside = ((x1[:, None] > b[None, :, 1]) & (y1[:, None] > b[None, :, 2])
+                  & (x2[:, None] < b[None, :, 1] + b[None, :, 3])
+                  & (y2[:, None] < b[None, :, 2] + b[None, :, 4])).any(1)
+        keep[rows[inside]] = False
+    return tr[keep]
+
+
 def sequence_stats(dataset, seq, tracks_file):
     import motmetrics as mm
 
@@ -25,6 +48,7 @@ def sequence_stats(dataset, seq, tracks_file):
     gt = load_gt(dataset / "annotations" / f"{seq}.txt")
     tr = load_tracks(tracks_file)
     n = len(list((dataset / "sequences" / seq).glob("*.jpg")))
+    tr = apply_ignore_regions(dataset, seq, tr)
 
     acc = mm.MOTAccumulator(auto_id=True)
     for t in range(1, n + 1):
