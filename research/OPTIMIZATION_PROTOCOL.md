@@ -281,3 +281,16 @@ before any freeze. Prior evidence (E05): MPS-cache replay reproduced the
 Colab/CUDA V1/V2b/V2c val metrics exactly (RT-DETR one row within ~1 FP).
 Official timing (detector, tracker, AC overhead, total, P95, FPS, GPU memory)
 is T4 only.
+
+### Amendment 5g — status of gate thresholds and pre-freeze use of transfer components
+* The Amendment-5f fidelity-gate thresholds are PROTOCOL CONSTANTS, not model
+  parameters. They are applied exactly as declared and are never relaxed or
+  re-interpreted after the gate result is observed.
+* Before the V5 freeze, Faster R-CNN and BoT-SORT may be used ONLY for
+  (a) latency/throughput measurement (tools/t4_benchmark.py computes no
+  tracking metrics) and (b) detection-level cache fidelity (tools/
+  fidelity_gate.py compare_det: counts, IoU, scores, classes). No tracking-
+  quality metric (MOTA/HOTA/IDF1/IDS/FP/FN/precision/recall) is computed for
+  them, and no design or tuning decision may use their timing or fidelity
+  output other than the declared gate PASS/FAIL. Their performance
+  evaluation is strictly post-freeze, under the transfer locks.
