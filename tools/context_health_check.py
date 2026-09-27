@@ -20,7 +20,8 @@ REQUIRED = ["README.md", "PROJECT_STATE.md", "ARCHITECTURE.md", "HARD_CONSTRAINT
             "FAILED_EXPERIMENTS.md", "DATASETS_AND_SPLITS.md", "FROZEN_VERSIONS.md",
             "PARAMETER_STATUS.md", "VALIDATION_PROTOCOL.md", "PROTECTED_EVALUATIONS.md",
             "ENVIRONMENT_AND_PATHS.md", "GIT_STATE.md", "NEXT_STEPS.md",
-            "SESSION_HANDOFF.md", "NEW_SESSION_PROMPT.md", "KNOWLEDGE_GRAPH.md"]
+            "SESSION_HANDOFF.md", "NEW_SESSION_PROMPT.md", "KNOWLEDGE_GRAPH.md",
+            "PROJECT_COMPLETION.md"]
 # Commits touching only these paths do not make the context stale.
 CONTEXT_PATHS = ("research/context/", "AGENTS.md", "CLAUDE.md", ".graphifyignore", ".gitignore",
                  "tools/update_project_context.py", "tools/context_health_check.py",
@@ -146,6 +147,27 @@ def check_versions() -> None:
         report("PASS", f"version labels consistent (current {cur.group(1)}, latest frozen {latest})")
 
 
+def check_final_target() -> None:
+    """FINAL TARGET = V5-TF everywhere; V4 never presented as fallback/final."""
+    ps, hc, kg = read("PROJECT_STATE.md"), read("HARD_CONSTRAINTS.md"), read("KNOWLEDGE_GRAPH.md")
+    ok = True
+    if "FINAL TARGET: V5-TF" not in ps:
+        report("FAIL", "PROJECT_STATE.md lacks 'FINAL TARGET: V5-TF'"); ok = False
+    if "## C0 — FINAL TARGET = V5-TF" not in hc:
+        report("FAIL", "HARD_CONSTRAINTS.md lacks C0 final-target constraint"); ok = False
+    if "| Project: Universal AC-MOT | FINAL_TARGET | Version: V5-TF |" not in kg:
+        report("FAIL", "KNOWLEDGE_GRAPH.md lacks Project FINAL_TARGET V5-TF"); ok = False
+    bad = re.compile(r"V4 (remains|is|becomes|stays) (the )?(final|fallback)", re.I)
+    allowed = re.compile(r"supersed|never|not |NOT |no longer", re.I)
+    for f in CTX.glob("*.md"):
+        for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            if bad.search(line) and not allowed.search(line):
+                report("FAIL", f"{f.name}:{n} presents V4 as final/fallback: {line.strip()[:90]}")
+                ok = False
+    if ok:
+        report("PASS", "final target = V5-TF consistently; V4 only baseline/ablation")
+
+
 def check_references() -> None:
     broken, local_missing = [], []
     for f in CTX.glob("*.md"):
@@ -243,6 +265,7 @@ def main() -> int:
     check_freshness()
     check_protected()
     check_versions()
+    check_final_target()
     check_references()
     check_results()
     check_kg()

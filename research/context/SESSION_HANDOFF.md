@@ -5,6 +5,8 @@ Repo: `/Users/ahmedgouda/Desktop/Universal-ACMOT`, branch
 Current HEAD / dirty state: see GIT_STATE.md (auto-generated) — verify with git.
 
 ## Direction
+FINAL TARGET = V5-TF (Amendment 7, HARD_CONSTRAINTS C0). V4 = historical
+baseline / ablation ONLY — never a fallback, never a rival final.
 Universal AC-MOT = adaptive-control layer around a FROZEN detector and FROZEN
 tracker (drone MOT). Current version under development: V5-TF — the FINAL AC
 layer must be TRAINING-FREE, online self-calibrating, causal, plug-and-play,
@@ -21,7 +23,9 @@ association) → Tracker → Tracks → causal feedback. Code: commit 71faf44
 
 ## Frozen state
 Latest frozen Universal version: V4 (tag universal-acmot-v4-freeze, fc003bf),
-held-out test-dev evaluated once (E31) — now an ABLATION/reference.
+held-out test-dev evaluated once (E31) — baseline/ablation only.
+V5-TF families: F3 / F5 (= F3 + scene-adaptive resolution R-res) selectable;
+F1/F2 ablations; F5R random-resolution control (Amendment 7).
 V1, V3 frozen & superseded; legacy AC-MOT v1.0.0-acmot-frozen.
 
 ## Protected (no quality metrics before V5-TF freeze)
@@ -40,8 +44,9 @@ img_motion_resp; rejected: edges, brightness, blur. V5-TF: no results yet.
 - waiter → `tools/v5tf_dev.py run` when train caches reach 56/56.
 
 ## Next exact step
-NEXT_STEPS.md → wait for E36 (V5-TF dev validation), then report + sensitivity
-of flagged constants, then T4 gate, freeze, confirmation-16 once.
+NEXT_STEPS.md + PROJECT_COMPLETION.md → caches (736 + 640/832) → E36 family
+validation → F3/F5 choice → E39 constant audit → T4 gate → freeze →
+confirmation-16 once (reported vs V4).
 
 ## Prohibitions
 No training of the AC layer; no `v5_train.py final`; no protected metrics;

@@ -28,8 +28,9 @@ NOT official VisDrone. HOTA = TrackEval 12c8791; others = motmetrics 1.4.0.
 | E33 | 62111e8 | S2: which cues predict headroom | single-cue LOSO + permutation null (`tools/v5_s2_cues.py`) | val-7 × 2 | candidates det_gap, det_count, trk_survival, trk_match, img_motion, img_motion_resp; edges/brightness/blur negative (`outputs/v5/s2_cue_utility.json`) | DEVELOPMENT (val, diagnostic) |
 | E34 | 62111e8 | S3 attempt 1: learned stump controller | cost FP+FN+IDSW, nested LOSO (`outputs/v5/s3/full/`) | val-7 × 2 | ½(HOTA+IDF1) vs V4: YOLO −2.42 [−4.86,−0.61], RT-DETR −2.64 [−8.30,+0.57] (Amendment 5b text) | FAILED |
 | E35 | 62111e8 | S3 attempt 2: identity-aligned cost | (FP+FN)+(IDFP+IDFN) (`outputs/v5/s3b/full/`) | val-7 × 2 | YOLO −2.26 [−4.77,−0.38]; RT-DETR −0.60 [−2.15,+1.10] (Amendment 5c text) | FAILED |
-| E36 | 71faf44 | V5-TF families F1/F2/F3 vs references at 736 | `tools/v5tf_dev.py run/report` | VisDrone2019-MOT-train development-40 × {YOLOv8n, RT-DETR-L}, ByteTrack | — | PENDING (waits for train caches) |
+| E36 | 71faf44 + Amendment 7 | V5-TF families F1, F2, F3, F5 (+R-res) and control F5R vs references (static, shared-static, V4) at budget 736; choice among F3/F5 | `tools/v5tf_dev.py run/report` | VisDrone2019-MOT-train development-40 × {YOLOv8n, RT-DETR-L}, ByteTrack | — | PENDING (waits for 736 + 640/832 caches) |
 | E37 | — | Discovery: S1/S2/S3 on development-40 (research upper bound D, headroom, cue stability) | `tools/v5_train.py s1/s2/s3` (NOT `final`) | development-40 | — | PLANNED, optional |
+| E39 | Amendment 7 | Constant audit on the chosen family (OTSU_BINS, Otsu window, RobustHistory window, warm-up; E28 criterion) | `tools/v5tf_dev.py sens` | development-40 × 2 detectors | — | PENDING (after E36) |
 | E38 | feff14f | Amendment 5f T4 fidelity gate | `tools/fidelity_gate.py`, `notebooks/Colab_T4_gate_and_benchmark.ipynb` | 4 predeclared dev sequences | — | PENDING (needs T4 session) |
 
 Numbers in E34/E35 are quoted from the committed protocol text

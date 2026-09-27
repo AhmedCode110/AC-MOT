@@ -57,11 +57,22 @@ def otsu3(values, bins=OTSU_BINS):
 class RobustHistory:
     """Causal rolling median/MAD of a scalar (window of past values)."""
 
-    def __init__(self, window=100):
+    def __init__(self, window=100, warmup=5):
         self.buf = deque(maxlen=int(window))
+        self.warmup = int(warmup)
+
+    def ready(self):
+        return len(self.buf) >= self.warmup
+
+    def rank(self, x):
+        """Causal ECDF mid-rank of x among the stored past values."""
+        if x is None or not np.isfinite(x) or not self.ready():
+            return None
+        a = np.asarray(self.buf)
+        return float(((a < x).sum() + 0.5 * (a == x).sum()) / len(a))
 
     def z(self, x):
-        if x is None or not np.isfinite(x) or len(self.buf) < 5:
+        if x is None or not np.isfinite(x) or not self.ready():
             return 0.0
         a = np.asarray(self.buf)
         med = np.median(a)
@@ -69,7 +80,7 @@ class RobustHistory:
         return float((x - med) / mad) if mad > 0 else 0.0
 
     def ratio(self, x):
-        if x is None or not np.isfinite(x) or len(self.buf) < 5:
+        if x is None or not np.isfinite(x) or not self.ready():
             return 1.0
         med = float(np.median(self.buf))
         return float(x / med) if med > 0 else 1.0

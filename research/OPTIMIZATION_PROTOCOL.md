@@ -357,3 +357,71 @@ beat V4, that is reported as the result ("training-free adaptation matches/
 does not match tuned V4"); no switch to a trained controller. Then val
 (secondary), Faster R-CNN, BoT-SORT, UAVDT, official T4 timing — no
 retuning after any of them.
+
+## Amendment 7 (2026-09-27) — V5-TF is THE final target; scene-state control; constant audit (declared before any V5-TF result)
+Owner direction: the final research target and contribution is V5-TF
+(training-free, online self-calibrating, scene/state adaptive, detector- and
+tracker-agnostic, plug-and-play, real-time, causal). V4 is historical
+evidence, an ablation and a comparison baseline ONLY — never a fallback final
+system. Weaknesses of V5-TF are fixed in V5-TF itself, scientifically.
+State at declaration: no V5-TF result exists (outputs/v5tf_dev absent; train
+caches YOLOv8n 0.45 56/56, RT-DETR-L 26/56, YOLOv8n native 0/56).
+
+1. Replaces the system-selection clauses of Amendments 5a/5d/6 ("adopted iff …
+   otherwise V4 remains final"): the confirmation-16 run (once, after freeze)
+   REPORTS V5-TF vs V4 (catastrophic cells, ½(HOTA+IDF1) per detector, paired
+   sequence bootstrap). It does not choose the final system. If V5-TF is worse,
+   that is reported as a limitation of V5-TF; any post-confirmation fix is a new
+   declared revision whose evidence needs new clean data (never confirmation-16
+   again).
+2. F4 is removed from the Amendment-6 families (a z-gate with τ = Otsu T2 in z
+   units is identical to F1; commit 71faf44). Simplicity order F1 < F2 < F3 < F5.
+3. Scene-state vector (all causal: state for frame t from frames < t, except the
+   image motion of frame t vs t−1, which is available before detection):
+   size s = median log(box area / image area) of primary-band candidates;
+   density = log(1 + #primary); reliability η = Otsu separability; motion
+   ratio r = motion / rolling median; association = track survival
+   |ids_t ∩ ids_{t−1}| / |ids_{t−1}|. Computed in the V5-TF path
+   (online_calibration.py), NOT by scene_state.py (so Z_REF and DECAY are not
+   part of V5-TF). Components without a declared rule are logged only.
+   Retention is not adapted (S1: retention headroom ≈ 0, E32).
+4. New declared rule R-res (control BEFORE the detector, compute budget B =
+   the deployment level, 736 in experiments; levels {640, 736, 832}, D):
+   ℓ = the level used at frame t−1; s̃ = median of s over the last 10 frames
+   processed AT LEVEL ℓ (the Otsu memory); p_t = causal ECDF rank of s̃ among
+   the stored history of s̃ observed AT LEVEL ℓ (RobustHistory window).
+   Conditioning on the level removes the self-induced bias of the action
+   (higher resolution detects smaller objects, lowering s; found by reasoning
+   and a metric-free crash test on one val cache, before any V5-TF result).
+   p_t < 1/3 → 832 (objects small relative to this stream's own history),
+   p_t > 2/3 → 640, else B; history of ℓ not warm → B. Tertiles = three equiprobable bands for
+   three levels (A).
+   The decision is taken at the start of each block of 10 frames (the Otsu
+   memory; same block length as the F5R control) and held within the block —
+   a per-frame version flickered (≈125 switches / 200 frames in the crash
+   test), which would confound tracking and make F5R an unfair control.
+   Budget guard (C, safety): at each block start, if the running mean pixel
+   cost (level²) so far ≥ B², a request for 832 is served at B. Warm-up (< warm-up
+   samples) → B.
+   Families added: F5 = F3 + R-res. Control (ablation, not selectable):
+   F5R = F3 + random level (uniform over the three levels, redrawn every 10
+   frames, fixed seed) with the same budget guard — tests whether the size
+   state beats random allocation at matched compute (E26 design).
+5. Final-family requirement: the frozen V5-TF must contain scene-state control,
+   so the selectable families are F3 and F5; F1/F2 are reported as ablations
+   (candidate handling without scene control). Choice between F3 and F5:
+   (1) fewest catastrophic cells, (2) worst-detector relative ½(HOTA+IDF1)
+   vs V4 on the same sequences, (3) simplicity. Mean pixel cost is reported per
+   detector; F5 must satisfy mean cost ≤ 1.01·B² to be selectable.
+6. Constant audit on the chosen family (development-40, both detectors,
+   ByteTrack): OTSU_BINS {32, 64, 128}; Otsu window {5, 10, 20}; RobustHistory
+   window {50, 100, 200}; warm-up {3, 5, 10}; one-at-a-time around the declared
+   defaults (64, 10, 100, 5). Criterion (E28 precedent): pooled |ΔHOTA| ≤ 0.4 per
+   detector and no additional catastrophic cell → value reclassified as
+   structural with insensitivity evidence (A). Otherwise the declared default is
+   KEPT and reported as a sensitive category-E limitation — never replaced by
+   the best-scoring value.
+7. Further rule revisions on development-40 are allowed only as new families
+   committed to this protocol before they are run; every attempt is reported;
+   no parameter search. Val, confirmation-16, Faster R-CNN, BoT-SORT, UAVDT and
+   test-dev remain as in Amendments 5d/5g/6.

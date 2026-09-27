@@ -1,5 +1,7 @@
 # research/context — canonical project memory
 
+FINAL TARGET = V5-TF. V4 = historical baseline / ablation only (HARD_CONSTRAINTS C0).
+
 The chat history is NOT the project memory. This directory, git and the
 machine-readable outputs are. Any new session reconstructs the state from
 here before doing work (prompt: NEW_SESSION_PROMPT.md).
@@ -40,6 +42,7 @@ justifications or frozen state.
 | ENVIRONMENT_AND_PATHS.md | paths, packages (no secrets) | manual |
 | GIT_STATE.md | branch, HEAD, tags, dirty files | AUTO (fully generated) |
 | NEXT_STEPS.md | goal, blockers, next exact action | manual |
+| PROJECT_COMPLETION.md | definition of done for the final system V5-TF | manual |
 | SESSION_HANDOFF.md | one-file compact handoff | manual |
 | KNOWLEDGE_GRAPH.md | typed entities + relations fed to Graphify | manual |
 | NEW_SESSION_PROMPT.md | copy-paste start prompt | manual |

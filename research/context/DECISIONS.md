@@ -68,6 +68,7 @@ only show the LEGACY cues/SCI fail. V4 kept as ablation/alternative; V5 scene-
 adaptive developed separately. Data status fixed: test-dev not clean for V5.
 Revisit: if V5-TF fails to beat V4 at matched compute, report that honestly
 (C11) — do not re-delete scene adaptation silently.
+Refined by D-018 (V4 is baseline/ablation only, never final).
 
 ### D-010 — S2 cue status (val, diagnostic)
 Date 2026-09-27 · Commit 57a7e72 · Amendment 5a · E33
@@ -88,7 +89,7 @@ overfitting by scarcity (7 sequences). Revisit: no further attempts on val folds
 Date 2026-09-27 · Commit b691c86 · Amendment 5d · research/TRAIN_SPLIT_V5.json
 Decision: development-40 / confirmation-16 (seed 20260927, length-stratified,
 metadata only). Val = secondary check only. "Final V5 = fitted on all 40"
-→ Superseded by D-015 (no fitting).
+→ Superseded by D-015 (no fitting). Adoption/"V4 remains final" clause superseded by D-018.
 
 ### D-013 — C3 Optuna controller specification
 Date 2026-09-27 · Commit bbe7271 · Amendment 5e
@@ -128,3 +129,38 @@ Revisit: no.
 Date 2026-09-27 · Commit: the commit adding research/context/ (see GIT_STATE.md)
 Decision: research/context/ + Graphify graph are the canonical session
 memory; chat history is last in the source-of-truth hierarchy. Revisit: no.
+
+### D-018 — FINAL TARGET = V5-TF; V4 is baseline/ablation only
+Date 2026-09-27 · Commit: the commit adding Amendment 7 (see git log -- research/OPTIMIZATION_PROTOCOL.md)
+Supersedes: the "otherwise V4 remains the final system" clauses of D-012 /
+Amendments 5a, 5d; refines D-009 and C11.
+Question: may V4 serve as the final system if V5-TF underperforms? Decision:
+no. V5-TF is the final research target and contribution; V4 is historical
+evidence, ablation and comparison baseline only. Confirmation-16 reports
+V5-TF vs V4; it does not select the final system. Weaknesses are fixed in
+V5-TF before freeze (declared families on development-40); post-confirmation
+fixes need a new revision and new clean data. Reason: owner direction;
+consistent with C1–C11 (honest reporting retained). Alternatives rejected:
+V4 fallback; choosing between V4 and V5-TF as rival finals. Revisit: only by
+owner.
+
+### D-019 — Scene-state control required in the frozen V5-TF; R-res declared
+Date 2026-09-27 · Amendment 7 §3–5
+Question: how does V5-TF satisfy C6 (AC before the detector, scene-adaptive)?
+Decision: add R-res — resolution chosen before detection from the tertile of
+the causal ECDF rank of the smoothed object-size state (median log area
+fraction of primary candidates), with a compute-budget guard; family F5 =
+F3 + R-res; control F5R (random allocation, same guard). Selectable finals are
+F3/F5 only; F1/F2 are ablations. Scene state computed in the V5-TF path, not by
+scene_state.py (Z_REF, DECAY out of V5-TF). Retention not adapted (E32).
+Evidence basis: E24–E26 rejected ABSOLUTE legacy cues, not online-normalised
+relative state; S1 resolution headroom per window ≈2.0/2.6 MOTA pts (E32).
+Revisit: if F5 ≤ F5R, report that the size state does not beat random
+allocation (C11); a new declared family may be tried on development-40.
+
+### D-020 — Constant audit rule for V5-TF
+Date 2026-09-27 · Amendment 7 §6
+Decision: one-at-a-time sensitivity of OTSU_BINS, Otsu window, RobustHistory
+window, warm-up on the chosen family; E28 criterion (|ΔHOTA| ≤ 0.4, no new
+catastrophic cell) → structural A; otherwise keep the declared default and
+report as category E. Never adopt the best-scoring value.

@@ -122,6 +122,12 @@ class PolicySpec:
     candidate_mode: str = ""
     # F3: association tolerance scaled by relative global motion.
     assoc_motion: bool = False
+    # Amendment 7 constants under audit (declared defaults) and R-res.
+    # res_policy "size_tertile" (F5) / "random3" (F5R control) choose the
+    # level before detection; fixed_resolution is then the budget level B.
+    otsu_bins: int = 64
+    tf_history: int = 100
+    tf_warmup: int = 5
     ecdf_stride: int = 10
     ecdf_window: int = 20
 
@@ -201,7 +207,19 @@ class UniversalPolicyPipeline:
         self.gate_logits = deque(maxlen=self.policy.gate_window)
         from online_calibration import RobustHistory
         self.otsu_window = deque(maxlen=self.policy.gate_window)
-        self.motion_hist = RobustHistory()
+        hist = lambda: RobustHistory(self.policy.tf_history,
+                                     self.policy.tf_warmup)
+        self.motion_hist = hist()
+        # Size state is kept per resolution level: it is compared only with
+        # past observations made under the same control action.
+        self.size_recent = {}
+        self.size_hist = {}
+        self.density_hist, self.eta_hist = hist(), hist()
+        self.size_rank = None
+        self.last_level = None
+        self.tf_primary = []
+        self.cost_sum, self.cost_n = 0.0, 0
+        self.rand_level = None
         self.tf_log = {}
         self.density = CandidateDensityController(**self.density_kwargs)
         self.reliability = TemporalReliability(self.policy.reliability_ema)
@@ -218,17 +236,19 @@ class UniversalPolicyPipeline:
         candidates and the tracker thresholds (band boundaries)."""
         from online_calibration import logits, otsu3
         if not raw:
+            self.tf_primary = []
             return [], 0.1, 0.5, 0.5, np.empty(0)
         L = logits([r.confidence for r in raw])
         ref = (np.concatenate(self.otsu_window)
                if mode == "otsu3_window" and self.otsu_window else L)
-        th = otsu3(ref)
+        th = otsu3(ref, bins=self.policy.otsu_bins)
         out = []
         if th is None:
             t1, t2, eta = -np.inf, -np.inf, 0.0
         else:
             t1, t2, eta = th
         n_prim = n_sec = 0
+        self.tf_primary = [r for r, li in zip(raw, L) if li >= t2]
         for li, d in zip(L, normalized):
             u = d.confidence
             if li >= t2:
@@ -240,6 +260,62 @@ class UniversalPolicyPipeline:
         self.tf_log.update(otsu_t1=t1, otsu_t2=t2, otsu_eta=eta,
                            n_primary=n_prim, n_secondary=n_sec)
         return out, 0.1, 0.5, 0.5, L
+
+    def _tf_level(self, frame_number, budget):
+        """R-res (Amendment 7): resolution chosen before detection at the
+        start of each gate_window block and held within it, from the size
+        state of frames < t (F5) or at random (F5R control); the budget guard
+        keeps the running mean pixel cost at or below budget**2."""
+        p = self.policy
+        if self.rand_level is None or (frame_number - 1) % p.gate_window == 0:
+            if p.res_policy == "size_tertile":
+                r = self.size_rank
+                level = (budget if r is None else
+                         832 if r < 1 / 3 else 640 if r > 2 / 3 else budget)
+            else:
+                block = (frame_number - 1) // p.gate_window + 1
+                h = (block * 2654435761) & 0xFFFFFFFF
+                level = (640, budget, 832)[(h >> 16) % 3]
+            if level > budget and self.cost_n and \
+                    self.cost_sum / self.cost_n >= budget * budget:
+                level = budget
+            self.rand_level = level          # held for the whole block
+        level = self.rand_level
+        self.cost_sum += level * level
+        self.cost_n += 1
+        self.last_level = level
+        self.tf_log.update(level=level, size_rank=(
+            self.size_rank if self.size_rank is not None else np.nan))
+        return level
+
+    def _tf_observe(self, shape):
+        """V5-TF scene-state vector from frame t (used from frame t+1 on).
+        Only the size state drives a rule (R-res); the rest is logged."""
+        from online_calibration import RobustHistory
+        h, w = shape
+        prim = self.tf_primary
+        lv = self.last_level
+        recent = self.size_recent.setdefault(
+            lv, deque(maxlen=self.policy.gate_window))
+        hist = self.size_hist.setdefault(
+            lv, RobustHistory(self.policy.tf_history, self.policy.tf_warmup))
+        if prim:
+            a = np.array([max((r.x2 - r.x1) * (r.y2 - r.y1), 1e-12)
+                          for r in prim]) / float(h * w)
+            recent.append(float(np.median(np.log(a))))
+        self.size_rank = None
+        if recent:
+            st = float(np.median(recent))
+            self.size_rank = hist.rank(st)
+            hist.push(st)
+            self.tf_log["state_size"] = st
+        d = float(np.log1p(len(prim)))
+        self.tf_log["state_density_z"] = self.density_hist.z(d)
+        self.density_hist.push(d)
+        eta = self.tf_log.get("otsu_eta")
+        self.tf_log["state_eta_z"] = self.eta_hist.z(eta)
+        self.eta_hist.push(eta)
+        self.tf_log["state_survival"] = self.reliability.survival
 
     def _cues(self, visual):
         """Causal scene cues: detector feedback from frames < t and image
@@ -319,7 +395,10 @@ class UniversalPolicyPipeline:
         if p.fixed_resolution:
             params = dict(params, size=int(p.fixed_resolution))
         cues = self._cues(visual) if p.scene_controller else {}
-        if p.res_policy:
+        if p.res_policy in ("size_tertile", "random3"):
+            params = dict(params, size=self._tf_level(
+                frame_number, int(p.fixed_resolution or 736)))
+        elif p.res_policy:
             if frame_number == 1 or frame_number % 10 == 1:
                 if p.res_policy == "random":
                     h = (frame_number * 2654435761) & 0xFFFFFFFF
@@ -448,6 +527,8 @@ class UniversalPolicyPipeline:
         if p.density:
             self.density.observe(len(raw))
         self.reliability.observe(t.track_id for t in tracks)
+        if p.candidate_mode:
+            self._tf_observe(image.shape[:2])
         trust_used = self.trust
         if p.trust_setpoint > 0:
             self.trust = float(np.clip(

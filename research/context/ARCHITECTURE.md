@@ -19,11 +19,11 @@ research/PARAMETER_AUDIT.md §1). Detector- and tracker-specific.
 | Version: V1 (e56c2f3) | FROZEN, SUPERSEDED | adapters + online histogram percentile normaliser + leader-relative ratio gate ρ + legacy SCI | not invariant to score temperature (E20) |
 | Version: V2b / V2c / V2d–V2f | SUPERSEDED (never frozen) | density budget + Top-K; additive/proportional density thresholds; reliability feedback | failed (E02, E03, E07, E11, E13) |
 | Version: V3 (c1e799d) | FROZEN, SUPERSEDED | order-only causal ECDF + z-logit leader gate (demote) τ 0.75; SCI still in path | exact Platt/temperature invariance (E23); SCI unjustified (E24–E26) |
-| Version: V4 (fc003bf) | FROZEN, ABLATION | V3 core, SCI removed, resolution = compute budget, global τ/s/offsets by nested LOSO | held-out test-dev once (E31) |
+| Version: V4 (fc003bf) | FROZEN, BASELINE/ABLATION ONLY (never final) | V3 core, SCI removed, resolution = compute budget, global τ/s/offsets by nested LOSO | held-out test-dev once (E31) |
 | Version: V5 (62111e8…e6d48b7) | SUPERSEDED as final method; research upper bound | scene-state vector + learned per-target controller (C1 stump, C2 tree, C3 Optuna linear score) | val attempts not adopted (Amend. 5b/5c); forbidden as deployed method (Amend. 6) |
-| Version: V5-TF (3684684, 71faf44) | CURRENT, EXPERIMENTAL | training-free online self-calibration | under validation |
+| Version: V5-TF (3684684, 71faf44, Amendment 7) | FINAL TARGET, CURRENT, EXPERIMENTAL | training-free online self-calibration + scene-state control | under validation |
 
-## C. V4 compute-budget architecture (FROZEN, ABLATION)
+## C. V4 compute-budget architecture (FROZEN, BASELINE/ABLATION ONLY — never the final system)
 Frame → ResolutionBudget (largest level meeting target FPS; fixed 640/736/832
 in experiments) → Detector Adapter (score floor 0.01, NMS request 0.45) →
 ECDF normaliser (frames < t) → z-logit gate: z = (logit s − EMA leader
@@ -33,7 +33,7 @@ logit)/IQR, demote if z < −τ, τ 0.75 → sensitivity s 0.4 → tracker thres
 code `universal_policy_pipeline.py`, entry `universal_acmot.py`.
 No scene cue in the decision path.
 
-## D. Target: V5-TF training-free generalized AC (CURRENT, EXPERIMENTAL)
+## D. FINAL TARGET: V5-TF training-free generalized AC (CURRENT, EXPERIMENTAL)
 ```
  Frame t ─┬─► Scene/State Analyzer (image motion; det/trk stats of frames < t)
           │        │
@@ -47,7 +47,8 @@ No scene cue in the decision path.
           │   Universal AC Controller (declared rule family F1/F2/F3; no fitted params)
           │        │
           │        ▼
-          │   Compute/Latency Constraint (resolution budget; 736 in experiments)
+          │   Compute/Latency Constraint (budget B; R-res: size-state tertile →
+          │        │                    640/B/832, budget guard)
           ▼        ▼
      Detector Adapter (detector-native suppression) ─► Detector (frozen)
                    │
@@ -65,17 +66,27 @@ Rule families (Amendment 6; code `universal_policy_pipeline.py`
 `candidate_mode`/`assoc_motion`, `online_calibration.py`, dev script
 `tools/v5tf_dev.py`): F1 Otsu-3 bands over the causal window; F2 within-frame
 Otsu; F3 = F1 + match_t = min(0.95, 1 − (1 − m0)/max(1, r_t)),
-r_t = motion / rolling-median motion; F4 dropped (identical to F1, 71faf44).
+r_t = motion / rolling-median motion; F4 dropped (identical to F1, 71faf44);
+F5 = F3 + R-res (Amendment 7): s̃ = 10-frame median of the size state
+(median log area fraction of primary candidates, frames < t), p = causal ECDF
+rank of s̃ in its own history; p < 1/3 → 832, p > 2/3 → 640, else budget
+level B; if running mean pixel cost ≥ B², 832 is served at B. F5R = same with
+random levels (10-frame blocks) — control. Selectable finals: F3, F5 (the
+frozen V5-TF must contain scene-state control); F1/F2 = ablations.
 Choice on development-40: fewest catastrophic cells → worst-detector relative
-½(HOTA+IDF1) vs V4 → simplicity (F1<F2<F3).
+½(HOTA+IDF1) vs V4 → simplicity (F3<F5).
 
-Implementation status (verified by reading code at 71faf44): the rules use
-only Otsu bands (F1/F2) and the motion ratio (F3). The full robust-z Scene
-State vector of Amendment 6 is only partly logged (`tf_otsu_eta`,
-`tf_motion_ratio`, `tf_n_primary`, plus `scene_state.py` EMA cues, which still
-reference Z_REF = 0.75 = V4 τ for logging). No rule currently consumes the
-density/size/association components → the "scene-state adaptive" claim for
-V5-TF rests on F3 only: NEEDS VERIFICATION/decision after dev validation.
+Implementation status (Amendment 7 commit): scene-state control = motion
+ratio → association tolerance (F3) and size state → resolution before the
+detector (R-res, F5; `_tf_level` / `_tf_observe` in
+`universal_policy_pipeline.py`). R-res decides at the start of each 10-frame
+block, compares the size state only with history observed at the same level
+(removes the action's self-induced bias), budget guard at block start. The
+V5-TF scene-state vector (size, density z, η z, survival) is logged as
+`tf_state_*`; density/η/survival drive no rule. V5-TF families run with
+`scene_state=False`, so `scene_state.py` (Z_REF, DECAY) is not in the V5-TF
+path. Metric-free crash test (one val cache, 200 frames): F5 pixel cost
+0.83–0.97 of 736², 7–13 level switches; F5R ≈0.98.
 
 ## Component table (V5-TF)
 | Component | Input | Output | Causal dependency | Online-derived | Structural | Adaptive | Learned/fitted params |

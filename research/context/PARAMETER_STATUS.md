@@ -8,15 +8,15 @@ Note on C: Amendment 6 uses C = "generic engineering safety bound"; the V4
 audit used C = "globally optimised". Below, C(safety) and C(opt) are kept apart.
 C(opt) values are NOT allowed in V5-TF.
 
-## ⚠ Category E / unverified items that touch V5-TF (must be resolved before freeze)
+## ⚠ Category E / unverified items that touch V5-TF (resolved only by the Amendment-7 §6 audit: insensitive → A; sensitive → default kept and reported as E)
 | Parameter | Component | Value | Problem | Required action |
 |---|---|---|---|---|
 | RobustHistory window | `online_calibration.py` | 100 samples | memory of the motion-ratio / scene-state history (NOT the Otsu window, which is 10 frames as in Amendment 6); Amendment 6 gives no length → no evidence yet | justify as structural memory + sensitivity sweep on development-40, or derive from stream |
 | RobustHistory warm-up | `online_calibration.py` | 5 samples | minimum sample count, no evidence | treat as structural warm-up (A) with rationale, or sweep |
 | Otsu window | `universal_policy_pipeline.py` (`gate_window`) | 10 frames | inherited from V4 gate (E28 covers V4 gate, not Otsu) | sensitivity on development-40 |
 | OTSU_BINS | `online_calibration.py` | 64 | code comment claims "sensitivity-checked"; no registry evidence found | NEEDS VERIFICATION |
-| Z_REF | `scene_state.py` | 0.75 (= V4 τ) | category E if any V5-TF rule consumes det_gap | currently logging only; must not enter a V5-TF rule |
-| DECAY | `scene_state.py` | 0.9 | EMA memory; E28 evidence is for V4 leader EMA | logging only in V5-TF; justify if used |
+| Z_REF | `scene_state.py` | 0.75 (= V4 τ) | outside V5-TF (Amendment 7 §3: V5-TF scene state is computed in online_calibration.py) | none while scene_state.py stays out of V5-TF decisions |
+| DECAY | `scene_state.py` | 0.9 | outside V5-TF (same) | none |
 
 ## V5-TF parameters
 | Parameter | Component | Value | Cat. | Origin | Evidence | Sensitivity | Status |
@@ -35,6 +35,12 @@ C(opt) values are NOT allowed in V5-TF.
 | Detector suppression | detector adapters | native: YOLOv8n 0.7, Faster R-CNN 0.5, RT-DETR-L none | D | API defaults | — | — | experimental |
 | Score floor / max det | detector adapters | 0.01 / 1000 | D | emission floor | same all adapters | — | kept |
 | Resolution | compute constraint | budget input; 736 in experiments | D (deployment input) | V4 | E24, E28 | monotone | kept |
+| R-res levels | compute constraint | {640, B, 832}, B = 736 | D | deployment/API levels (stride-32 multiples) | E24 accuracy monotone in level | — | declared (Amendment 7) |
+| R-res bands | compute constraint | ECDF-rank tertiles (1/3, 2/3) | A | three equiprobable bands for three levels | structural | — | declared |
+| R-res smoothing / decision block | compute constraint | 10-frame median per level; decision held per 10-frame block (= Otsu memory) | A/B | shares the Otsu window (audited in §6) | — | via Otsu-window audit | declared |
+| R-res state conditioning | compute constraint | size history kept per level | A | removes self-induced bias of the action | structural | — | declared |
+| Budget guard | compute constraint | mean pixel cost ≤ B² | C(safety) | compute budget | matched compute | — | declared |
+| F5R block length | control only | 10 frames, fixed seed | A | same memory as the rule (E26 design) | — | — | control, not deployed |
 | Motion cue | `tools/visual_cues.py` | phase-correlation shift / image diagonal | A | definition | — | — | experimental |
 
 ## V4 values — category E under Amendment 6 (V4 only, never V5-TF)

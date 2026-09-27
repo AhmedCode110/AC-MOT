@@ -13,9 +13,9 @@ Edit this file when the project state changes, then rebuild the graph.
 | Version: V1 | FROZEN SUPERSEDED | histogram normaliser ratio gate legacy SCI not temperature invariant | FROZEN_VERSIONS.md |
 | Version: V2 variants | SUPERSEDED | V2b V2c V2d V2e V2f density budgets reliability feedback all failed | FAILED_EXPERIMENTS.md |
 | Version: V3 | FROZEN SUPERSEDED | calibration-invariant ECDF z-logit gate with legacy SCI | FROZEN_VERSIONS.md |
-| Version: V4 | FROZEN ABLATION | latest frozen version compute-budget-only no scene cue VisDrone-tuned constants reference not final | FROZEN_VERSIONS.md |
+| Version: V4 | FROZEN BASELINE ONLY | latest frozen version; baseline and ablation only, never the final system or a fallback; compute-budget-only, VisDrone-tuned constants | FROZEN_VERSIONS.md |
 | Version: V5 learned controller | SUPERSEDED RESEARCH-ONLY | scene-state learned stump tree Optuna controller research upper bound not deployable | DECISIONS.md |
-| Version: V5-TF | CURRENT EXPERIMENTAL | training-free online self-calibrating generalized AC current version under development not frozen | ARCHITECTURE.md |
+| Version: V5-TF | FINAL TARGET EXPERIMENTAL | final target and contribution: training-free online self-calibrating scene-state adaptive detector-agnostic tracker-agnostic real-time causal; under development, not frozen | ARCHITECTURE.md |
 | Architecture: Original SCI architecture | SUPERSEDED | scene analysis SCI weighted sum resolution and sensitivity controller | ARCHITECTURE.md |
 | Architecture: V4 compute-budget architecture | ABLATION | V4 is not the final architecture: compute-budget-only ablation, scene adaptation deletion rejected (D-009), VisDrone-tuned category E constants; resolution budget ECDF z-gate | ARCHITECTURE.md |
 | Architecture: V5-TF target architecture | CURRENT | frame scene state analyzer online self-calibration AC controller before detector candidate handling tracker feedback | ARCHITECTURE.md |
@@ -32,6 +32,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Rule: F1 Otsu window bands | CANDIDATE | three-class Otsu on logits of causal window frames before t | ARCHITECTURE.md |
 | Rule: F2 Otsu frame bands | CANDIDATE | three-class Otsu within frame t candidates | ARCHITECTURE.md |
 | Rule: F3 motion-aware association | CANDIDATE | F1 plus association tolerance scaled by motion ratio to rolling median cap 0.95 | ARCHITECTURE.md |
+| Rule: F5 scene-adaptive resolution R-res | CANDIDATE | F3 plus resolution before detector from object-size state ECDF tertile 640 736 832 with compute budget guard | ARCHITECTURE.md |
+| Rule: F5R random resolution control | CONTROL | F3 plus random resolution levels same budget guard not selectable | ARCHITECTURE.md |
 | Rule: F4 online z-gate | DROPPED | identical to F1 by construction | DECISIONS.md |
 | Cue: det_gap | CANDIDATE | detector leader gap signal beyond null both detectors | DECISIONS.md |
 | Cue: det_count | CANDIDATE | detector candidate count density signal | DECISIONS.md |
@@ -80,7 +82,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E32 S1 headroom | DONE DEVELOPMENT | headroom for tau association resolution sensitivity retention none | EXPERIMENT_REGISTRY.md |
 | Experiment: E33 S2 cue utility | DONE DEVELOPMENT | candidate cues det_gap det_count trk_survival trk_match motion | EXPERIMENT_REGISTRY.md |
 | Experiment: E34-E35 S3 learned controller | FAILED | learned controllers lose to V4 on val overfitting by scarcity | FAILED_EXPERIMENTS.md |
-| Experiment: E36 V5-TF dev validation | PENDING NEXT | next experiment F1 F2 F3 on development-40 waits for train caches | NEXT_STEPS.md |
+| Experiment: E36 V5-TF dev validation | PENDING NEXT | next experiment F1 F2 F3 F5 F5R on development-40 waits for 736 and 640/832 train caches | NEXT_STEPS.md |
 | Experiment: E37 discovery S1-S3 on train | PLANNED OPTIONAL | research upper bound only never final fit | EXPERIMENT_REGISTRY.md |
 | Experiment: E38 T4 fidelity gate | PENDING | Mac MPS vs Colab T4 cache fidelity before freeze | EXPERIMENT_REGISTRY.md |
 | Result: V4 test-dev pooled metrics | HELD-OUT | outputs/heldout_v4/pooled_metrics.json | RESULTS_CANONICAL.md |
@@ -102,7 +104,11 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-014 fidelity gate constants | ACTIVE | T4 gate thresholds never relaxed | DECISIONS.md |
 | Decision: D-015 training-free final AC | ACTIVE | final AC layer must not be trained Optuna discovery-only | DECISIONS.md |
 | Decision: D-016 F4 dropped | ACTIVE | F4 identical to F1 | DECISIONS.md |
+| Decision: D-018 final target V5-TF | ACTIVE | final target is V5-TF; V4 baseline ablation only never fallback; confirmation reported not a gate | DECISIONS.md |
+| Decision: D-019 scene-state control R-res | ACTIVE | frozen V5-TF must contain scene-state control; selectable F3 F5 | DECISIONS.md |
+| Decision: D-020 constant audit rule | ACTIVE | sensitivity audit insensitive to structural else reported category E never tuned | DECISIONS.md |
 | Decision: D-017 repository is project memory | ACTIVE | context files over chat history | DECISIONS.md |
+| Constraint: C0 final target V5-TF | HARD | FINAL TARGET = V5-TF; V4 historical baseline ablation only; never revert to V4 | HARD_CONSTRAINTS.md |
 | Constraint: C1 training-free final AC layer | HARD | AC training NOT allowed no fitted controller no labels no GT at deployment | HARD_CONSTRAINTS.md |
 | Constraint: C3 causality | HARD | frame t uses only frames up to t no future no GT | HARD_CONSTRAINTS.md |
 | Constraint: C5 no category E constants | HARD | no worked-best-on-VisDrone numbers in V5-TF; unjustified parameters remain RobustHistory window warm-up Otsu window OTSU_BINS Z_REF | HARD_CONSTRAINTS.md |
@@ -114,6 +120,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Protocol: Amendment 4 | HISTORICAL | V4 whole-controller generalization audit | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 5d | PARTLY SUPERSEDED | 40/16 train split protocol | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 5f | ACTIVE | cross-hardware fidelity gate | VALIDATION_PROTOCOL.md |
+| Protocol: Amendment 7 | CURRENT | V5-TF final target, scene-adaptive resolution R-res, families F3 F5 F5R, constant audit | VALIDATION_PROTOCOL.md |
+| Experiment: E39 constant audit | PENDING | OTSU_BINS Otsu window RobustHistory window warm-up sensitivity on chosen family | EXPERIMENT_REGISTRY.md |
 | Protocol: Amendment 6 | CURRENT | V5-TF training-free protocol families comparison freeze | VALIDATION_PROTOCOL.md |
 | Tag: v1.0.0-acmot-frozen | FROZEN | legacy AC-MOT tag | FROZEN_VERSIONS.md |
 | Tag: universal-acmot-v1-freeze | FROZEN | V1 tag | FROZEN_VERSIONS.md |
@@ -144,6 +152,23 @@ Edit this file when the project state changes, then rebuild the graph.
 | Project: Universal AC-MOT | HAS_VERSION | Version: V5 learned controller |
 | Project: Universal AC-MOT | HAS_VERSION | Version: V5-TF |
 | Project: Universal AC-MOT | CURRENT_VERSION | Version: V5-TF |
+| Project: Universal AC-MOT | FINAL_TARGET | Version: V5-TF |
+| Project: Universal AC-MOT | BASELINE_ONLY | Version: V4 |
+| Component: Universal AC Controller | HAS_CANDIDATE_RULE | Rule: F5 scene-adaptive resolution R-res |
+| Rule: F5R random resolution control | CONTROLS_FOR | Rule: F5 scene-adaptive resolution R-res |
+| Rule: F5 scene-adaptive resolution R-res | BELONGS_TO | Component: Compute Latency Constraint |
+| Decision: D-018 final target V5-TF | SELECTS | Version: V5-TF |
+| Decision: D-018 final target V5-TF | DEMOTES_TO_ABLATION | Version: V4 |
+| Decision: D-018 final target V5-TF | RECORDED_IN | Protocol: Amendment 7 |
+| Decision: D-019 scene-state control R-res | SELECTS | Rule: F5 scene-adaptive resolution R-res |
+| Decision: D-019 scene-state control R-res | RECORDED_IN | Protocol: Amendment 7 |
+| Decision: D-020 constant audit rule | GOVERNS | Experiment: E39 constant audit |
+| Constraint: C0 final target V5-TF | APPLIES_TO | Version: V5-TF |
+| Constraint: C0 final target V5-TF | APPLIES_TO | Version: V4 |
+| Constraint: C0 final target V5-TF | DERIVED_FROM | Decision: D-018 final target V5-TF |
+| Protocol: Amendment 7 | GOVERNS | Version: V5-TF |
+| Protocol: Amendment 7 | GOVERNS | Experiment: E39 constant audit |
+| Experiment: E39 constant audit | EVALUATES | Version: V5-TF |
 | Project: Universal AC-MOT | LATEST_FROZEN_VERSION | Version: V4 |
 | Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E36 V5-TF dev validation |
 | Version: V1 | SUPERSEDES | Version: Legacy AC-MOT |
@@ -344,6 +369,9 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E33 S2 cue utility | IMPLEMENTED_IN | tools/v5_s2_cues.py |
 | Experiment: E34-E35 S3 learned controller | IMPLEMENTED_IN | tools/v5_s3_nested.py |
 | Experiment: E36 V5-TF dev validation | IMPLEMENTED_IN | tools/v5tf_dev.py |
+| Experiment: E39 constant audit | IMPLEMENTED_IN | tools/v5tf_dev.py |
+| Rule: F5 scene-adaptive resolution R-res | IMPLEMENTED_IN | universal_policy_pipeline.py |
+| Rule: F5R random resolution control | IMPLEMENTED_IN | universal_policy_pipeline.py |
 | Experiment: E38 T4 fidelity gate | IMPLEMENTED_IN | tools/fidelity_gate.py |
 | Experiment: E31 V4 test-dev held-out | IMPLEMENTED_IN | tools/heldout_run.py |
 | Constraint: C9 T4 official timing | IMPLEMENTED_IN | tools/t4_benchmark.py |

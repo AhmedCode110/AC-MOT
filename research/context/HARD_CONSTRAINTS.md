@@ -5,6 +5,16 @@ Source of authority: `research/OPTIMIZATION_PROTOCOL.md` Amendment 6 (commit
 protocol amendment committed BEFORE the result it would affect, plus a new
 superseding entry in `DECISIONS.md`. Chat instructions alone do not change it.
 
+## C0 — FINAL TARGET = V5-TF (Amendment 7)
+The final research target and contribution is Version: V5-TF — training-free,
+online self-calibrating, scene/state adaptive, detector-agnostic,
+tracker-agnostic, plug-and-play, real-time, causal.
+Version: V4 is historical evidence, an ablation and a comparison baseline
+ONLY. It is NEVER a fallback final system. Do not revert to V4, and do not
+present V4 and V5-TF as alternative final systems. Weaknesses of V5-TF are
+fixed in V5-TF itself (new declared families on development-40 before freeze).
+The confirmation-16 comparison against V4 is REPORTED, not a system-selection gate.
+
 ## C1 — Final AC layer is training-free (Version: V5-TF)
 The deployed AC layer must NOT require, at any point:
 training on VisDrone2019-MOT · fitting on the development-40 sequences ·
@@ -49,7 +59,8 @@ Scene State / SCI → Universal AC Controller → Compute/Latency Constraint →
 Detector Adapter → Detector → Universal Score/Candidate Handling → Tracker
 Adapter → Tracker → Tracks → Causal feedback. Do not reduce the contribution to
 a post-detector score filter. V4 compute-only is an ABLATION, not permission
-to silently delete scene adaptation.
+to silently delete scene adaptation. The frozen V5-TF must contain scene-state
+control (selectable families F3, F5 — Amendment 7).
 
 ## C7 — Research tools are discovery-only
 S1/S2/S3, C1/C2/C3, Optuna, decision stumps, cue selection and the 40/16 split
@@ -76,10 +87,13 @@ Online self-calibration = simple incremental statistics. No Optuna, model
 fitting, per-frame optimisation or batch reprocessing at runtime. AC overhead
 must be much smaller than detector latency (measured on T4).
 
-## C11 — Honest reporting
-If V5-TF does not reliably beat V4 compute-only at matched compute, report
+## C11 — Honest reporting (V5-TF stays the final system)
+Report every comparison truthfully. If V5-TF does not beat V4 compute-only at
+matched compute, report it as a limitation of V5-TF (and, for scene components,
 "scene-aware adaptation adds insufficient benefit under the tested
-training-free constraints". Never silently switch to a trained controller.
+training-free constraints") — V5-TF remains the final system; never switch to
+V4 or to a trained controller. Pre-freeze weaknesses are fixed in V5-TF;
+post-confirmation fixes are a new revision needing new clean data.
 Never claim "works with every detector/tracker": state exactly what was tested
 (Detector: YOLOv8n, RT-DETR-L, Faster R-CNN ResNet50-FPN v2; Tracker:
 ByteTrack, BoT-SORT).
