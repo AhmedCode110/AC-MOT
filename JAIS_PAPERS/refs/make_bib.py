@@ -50,6 +50,13 @@ OVERRIDES = {
 
 
 def esc(s):
+    import unicodedata
+    if s:
+        s = s.replace("s\u0306", "\\v{s}").replace("\u0161", "\\v{s}")
+        s = unicodedata.normalize("NFC", s)
+        s = "".join({"\u00e9": "\\'{e}", "\u00e8": "\\`{e}", "\u00fc": '\\"{u}', "\u00f6": '\\"{o}', "\u00e4": '\\"{a}',
+                     "\u00e1": "\\'{a}", "\u00ed": "\\'{i}", "\u00f3": "\\'{o}", "\u00fa": "\\'{u}", "\u00f1": "\\~{n}",
+                     "\u00e7": "\\c{c}"}.get(ch, ch) for ch in s)
     s = s.replace("\u00a0", " ").replace("&amp;", "\\&").replace("&", "\\&") if s else s
     s = s.replace("\\\\&", "\\&")
     return s

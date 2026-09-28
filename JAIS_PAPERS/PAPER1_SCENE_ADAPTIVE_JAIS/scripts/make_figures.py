@@ -84,7 +84,7 @@ def heur():  # core_v17.PresentationController, scene nudges omitted (scene labe
 
 fig, ax = plt.subplots(1, 3, figsize=(6.8, 2.1))
 for (c, n, z), col, lab in [(prof(Q), C["q"], "Q (Trial 24)"), (prof(B), C["b"], "B (Trial 22)"),
-                            (heur(), C["heur"], "Heuristic")]:
+                            (heur(), C["heur"], "Hand-designed")]:
     ax[0].plot(s, c, color=col, label=lab)
     ax[1].plot(s, n, color=col)
     ax[2].step(s, z, color=col, where="post")
@@ -122,7 +122,7 @@ test = {x["system"]: x for x in rows("FINAL_TEST_COMPARISON_3WORKER.csv")}
 m = json.load(open(EV / "MATCHED_STATIC_A0_TESTDEV.json"))
 b2 = json.load(open(EV / "V2_TRIAL22_TESTDEV_RESULT.json"))
 pts = [("Static default", float(test["Baseline_Default"]["FPS"]), 100 * float(test["Baseline_Default"]["HOTA"]), C["default"], "o"),
-       ("Heuristic", float(test["Old_ACMOT_Frozen"]["FPS"]), 100 * float(test["Old_ACMOT_Frozen"]["HOTA"]), C["heur"], "o"),
+       ("Hand-designed", float(test["Old_ACMOT_Frozen"]["FPS"]), 100 * float(test["Old_ACMOT_Frozen"]["HOTA"]), C["heur"], "o"),
        ("Q", float(test["New_ACMOT_Frozen"]["FPS"]), 100 * float(test["New_ACMOT_Frozen"]["HOTA"]), C["q"], "o"),
        ("B", b2["FPS"], 100 * b2["HOTA"], C["b"], "o"),
        ("Matched static*", m["A0_system"]["processing_fps"], 100 * m["observed_A0"]["HOTA"], C["static"], "D")]
@@ -152,7 +152,7 @@ ax[0].bar(range(len(o)), [100 * float(x["HOTA"]) for x in o], color=C["heur"])
 ax[0].set_xticks(range(len(o)), [lab[x["stage"]] for x in o], fontsize=7)
 ax[0].set_ylim(28, 34)
 ax[0].set_ylabel("Validation HOTA (%)")
-ax[0].set_title("(a) Heuristic controller", fontsize=8)
+ax[0].set_title("(a) Hand-designed controller", fontsize=8)
 for i, x in enumerate(o):
     ax[0].text(i, 100 * float(x["HOTA"]) + 0.08, f"{float(x['FPS']):.0f} FPS", ha="center", fontsize=5.5)
 n = rows("NEW_ACMOT_COMPONENT_ABLATION.csv")
@@ -195,7 +195,7 @@ a = np.array([d["New_ACMOT_Frozen"][s_] - d["Baseline_Default"][s_] for s_ in se
 b = np.array([d["New_ACMOT_Frozen"][s_] - d["Old_ACMOT_Frozen"][s_] for s_ in seqs])
 order = np.argsort(a)
 ax[0].scatter(range(len(seqs)), a[order], color=C["q"], s=12, label="Q $-$ static default")
-ax[0].scatter(range(len(seqs)), b[order], color=C["heur"], s=12, marker="s", label="Q $-$ heuristic")
+ax[0].scatter(range(len(seqs)), b[order], color=C["heur"], s=12, marker="s", label="Q $-$ hand-designed")
 ax[0].axhline(0, color="k", lw=0.6)
 ax[0].set_xlabel("VisDrone test-dev sequence (sorted)")
 ax[0].set_ylabel("$\\Delta$HOTA (points)")
@@ -214,3 +214,29 @@ fig.tight_layout()
 fig.savefig(OUT / "fig6_per_sequence.pdf")
 plt.close(fig)
 print("figures written to", OUT)
+
+# ---------------------------------------------------------------- Fig. 7 (scene examples; needs figures/scene_frames/)
+SF = OUT / "scene_frames"
+if (SF / "raw_cues.json").exists():
+    import matplotlib.image as mpimg
+    cues = json.load(open(SF / "raw_cues.json"))
+    summ = cfg["cue_calibration_summary"]
+    band = lambda v, s: ("below Q1" if v < s["q25"] else "Q1–median" if v < s["median"]
+                         else "median–Q3" if v < s["q75"] else "above Q3")
+    seqs = sorted(cues)
+    n = len(seqs); cols = 4; rows_ = int(np.ceil(n / cols))
+    fig, ax = plt.subplots(rows_, cols, figsize=(6.9, 1.55 * rows_ + 0.2))
+    for a in np.ravel(ax):
+        a.axis("off")
+    for a, sq in zip(np.ravel(ax), seqs):
+        c = cues[sq]
+        a.imshow(mpimg.imread(SF / f"{sq}_0000001.jpg"))
+        a.set_title(sq.replace("uav", "").replace("_v", ""), fontsize=6.5)
+        a.text(0.0, -0.04, f"gray {c['brightness']:.0f} ({band(c['brightness'], summ['brightness'])})\n"
+                           f"Laplacian var. {c['blur']:.0f} ({band(c['blur'], summ['blur'])})\n"
+                           f"gradient {c['edges']:.1f} ({band(c['edges'], summ['edge'])})",
+               transform=a.transAxes, va="top", fontsize=5.5)
+    fig.tight_layout(h_pad=2.6)
+    fig.savefig(OUT / "fig7_scene_examples.pdf")
+    plt.close(fig)
+    print("fig7 written")

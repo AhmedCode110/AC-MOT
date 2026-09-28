@@ -41,25 +41,25 @@ B = dict(weight_crowd=.16464526567145857, weight_tiny=.17462652795045444, weight
 # ---------------------------------------------------------------- Table 1: settings
 t = r"""\begin{table}[t]
 \centering
-\caption{Frozen configurations compared in this study. Confidence and NMS entries give the value at $S=0$ and at $S=1$ (linear in between); resolution is the short-side input size in pixels. All adaptive controllers analyze every $K=10$ frames with a moving mean over $W=7$ analyses.}
+\caption{Frozen configurations compared in this study. Confidence and NMS entries give the value at $S=0$ and at $S=1$ (linear in between); resolution is the long-side input size in pixels. All adaptive controllers analyze every $K=10$ frames with a moving mean over $W=7$ analyses.}
 \label{tab:settings}
 \small
-\begin{tabular}{lccccc}
+\begin{tabular}{p{3.3cm}p{3.0cm}p{3.0cm}p{3.8cm}p{1.2cm}}
 \hline
-Configuration & Confidence & NMS IoU & Resolution & Tracker profile & Selection \\
+Configuration & Confidence & NMS IoU & Resolution & Tracker \\
 \hline
-Static default & 0.25 & 0.45 & 640 & default & none (project reference) \\
-Heuristic controller & $0.245-0.05S$ (clipped 0.19--0.28) & $0.49-0.05S$ (clipped 0.40--0.52) & 640/736/832 & tuned & hand-designed \\
+Static default & 0.25 & 0.45 & 640 & default \\
+Hand-designed controller & $0.245-0.05S$, clipped to 0.19--0.28 & $0.49-0.05S$, clipped to 0.40--0.52 & 640/736/832 (rules in Sec.~\ref{sec:control}) & tuned \\
 """
 t += (f"Quality profile Q (trial 24) & {Q['conf_easy']:.2f}$\\to${Q['conf_hard']:.2f} & {Q['nms_easy']:.2f}$\\to${Q['nms_hard']:.2f} "
-      f"& 512/928/960 at $S\\ge{Q['threshold_mid']:.3f}/{Q['threshold_high']:.3f}$ & tuned & max MOTA s.t. IDS gate \\\\\n")
+      f"& 512/928/960 at $S\\ge{Q['threshold_mid']:.3f}/{Q['threshold_high']:.3f}$ & tuned \\\\\n")
 t += (f"Balanced profile B (trial 22) & {B['conf_easy']:.2f}$\\to${B['conf_hard']:.2f} & {B['nms_easy']:.2f}$\\to${B['nms_hard']:.2f} "
-      f"& 512/928/960 at $S\\ge{B['threshold_mid']:.3f}/{B['threshold_high']:.3f}$ & tuned & balanced Pareto score \\\\\n")
+      f"& 512/928/960 at $S\\ge{B['threshold_mid']:.3f}/{B['threshold_high']:.3f}$ & tuned \\\\\n")
 a = cfg["operating_ablation"]["cue_calibration_anchor"]
-t += (f"Matched static anchor & {a['confidence']:.2f} & {a['nms_iou']:.2f} & {a['resolution']} & tuned & post hoc attribution \\\\\n")
+t += (f"Matched static anchor & {a['confidence']:.2f} & {a['nms_iou']:.2f} & {a['resolution']} & tuned \\\\\n")
 t += r"""\hline
-\multicolumn{6}{l}{Tracker profiles (ByteTrack): default = high 0.25, low 0.10, new 0.25, buffer 30, match 0.80;}\\
-\multicolumn{6}{l}{tuned = high 0.18, low 0.04, new 0.20, buffer 45, match 0.86.}\\
+\multicolumn{5}{l}{Tracker profiles (ByteTrack): default = high 0.25, low 0.10, new 0.25, buffer 30, match 0.80;}\\
+\multicolumn{5}{l}{tuned = high 0.18, low 0.04, new 0.20, buffer 45, match 0.86.}\\
 \hline
 \end{tabular}
 \end{table}
@@ -120,7 +120,7 @@ System & HOTA & MOTA & IDF1 & IDS & FN & FP & FPS \\
 \multicolumn{8}{l}{\textit{VisDrone2019-MOT test-dev (17 sequences, 6,635 frames)}}\\
 """
 t += line("Static default", done["Baseline_Default"])
-t += line("Heuristic controller", done["Old_ACMOT_Frozen"])
+t += line("Hand-designed controller", done["Old_ACMOT_Frozen"])
 t += line("Quality profile Q", done["New_ACMOT_Frozen"])
 vr = v2r()
 if vr:
@@ -152,12 +152,13 @@ t = r"""\begin{table}[t]
 \caption{Paired sequence-level bootstrap (5,000 resamples, seed 42): observed difference and 95\% percentile interval. HOTA, MOTA and IDF1 in percentage points; IDS reduction in switches (positive = fewer switches for the first system).}
 \label{tab:boot}
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llllll}
 \hline
 Data & Comparison & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 & IDS reduction \\
 \hline
 """
-for comp, lab in (("New vs Baseline", "Q vs static default"), ("New vs Old", "Q vs heuristic")):
+for comp, lab in (("New vs Baseline", "Q vs static default"), ("New vs Old", "Q vs hand-designed")):
     g = lambda k: bs[(comp, k)]
     t += f"VisDrone & {lab} & " + " & ".join(
         ci(float(g(k)["observed_pp"]), float(g(k)["CI95_low_pp"]), float(g(k)["CI95_high_pp"]), 0 if k == "IDS_reduction" else 2)
@@ -175,7 +176,7 @@ FR = [("VisDrone", "B vs static default", (2.788, .747, 4.660), (4.063, .952, 6.
 for d, lab, h, mo, i1, ids in FR:
     t += f"{d} & {lab} & {ci(*h)} & {ci(*mo)} & {ci(*i1)} & {ci(*ids, digits=0)} \\\\\n"
 t += r"""\hline
-\end{tabular}
+\end{tabular}}
 \end{table}
 """
 write("tab4_bootstrap.tex", t)
@@ -192,11 +193,11 @@ t = r"""\begin{table}[t]
 \hline
 Stage & Components & HOTA & MOTA & IDF1 & IDS & FPS & Res. & Conf. & NMS \\
 \hline
-\multicolumn{10}{l}{\textit{Heuristic controller}}\\
+\multicolumn{10}{l}{\textit{Hand-designed controller}}\\
 """
 lab = {"OLD-A0": ("H0", "static default, default tracker"), "OLD-A1": ("H1", "+ tuned tracker"),
        "OLD-A2": ("H2", "+ adaptive conf./NMS (640 px)"), "OLD-A2R": ("H2R", "tuned tracker + adaptive resolution only"),
-       "OLD-A3": ("H3", "full heuristic controller")}
+       "OLD-A3": ("H3", "full hand-designed controller")}
 for k in ("OLD-A0", "OLD-A1", "OLD-A2", "OLD-A2R", "OLD-A3"):
     r = old[k]
     t += (f"{lab[k][0]} & {lab[k][1]} & {pct(r['HOTA'])} & {pct(r['MOTA'])} & {pct(r['IDF1'])} & {r['IDS']} & "
@@ -240,7 +241,7 @@ write("tab6_speed.tex", t)
 tem = rows("TEMPORAL_ABLATION_FULL.csv")
 t = r"""\begin{table}[t]
 \centering
-\caption{Temporal settings of the heuristic controller on VisDrone2019-MOT validation: HOTA (\%) / processing FPS for smoothing window $W$ (analyses) and analysis stride $K$ (frames). The selected setting is $W=7$, $K=10$.}
+\caption{Temporal settings of the hand-designed controller on VisDrone2019-MOT validation: HOTA (\%) / processing FPS for smoothing window $W$ (analyses) and analysis stride $K$ (frames). The selected setting is $W=7$, $K=10$.}
 \label{tab:temporal}
 \small
 \begin{tabular}{r""" + "c" * 5 + r"""}
