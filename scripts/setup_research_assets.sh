@@ -93,7 +93,7 @@ step_gmc() {
   log "SparseTrack GMC shim (OpenCV videostab, verbatim C++ via ctypes)"
   cp "$REPO/tools/v6/external/vendor/pbcvt.py" "$EXT/SparseTrack/tracker/pbcvt.py"
   if ! pkg-config --exists opencv5 opencv4 2>/dev/null; then
-    if command -v apt-get >/dev/null; then (sudo -n true 2>/dev/null && S=sudo || S=""; $S apt-get update -qq && $S apt-get install -y -qq libopencv-dev pkg-config g++); fi
+    if command -v apt-get >/dev/null; then (sudo -n true 2>/dev/null && S=sudo || S=""; ($S apt-get update -qq || log "WARN: apt-get update partly failed (unreachable PPA); continuing"); $S apt-get install -y -qq libopencv-dev pkg-config g++); fi
   fi
   PC=$(pkg-config --exists opencv5 && echo opencv5 || echo opencv4)
   # keep the .dylib file name: the unmodified pbcvt.py loads it by that name on every OS

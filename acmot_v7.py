@@ -123,6 +123,11 @@ class V7Spec:
     # Candidates entering the stream statistics: "full" (all emitted) |
     # "host" (only candidates the host can use: score >= host.low).
     domain: str = "full"
+    # Logits entering the pooled window: "post" (after this frame's
+    # duplicate handling; V6 identity) | "raw" (every emitted candidate:
+    # the statistics no longer depend on the regime-dependent duplicate
+    # rule, which removes the regime -> duplicates -> statistics loop).
+    pool: str = "post"
     # Regime: "rho" (clean iff confident share of the foreground >= 1/2) |
     # "noisy" (always V6-like) | "clean" (always host-anchored).
     regime: str = "rho"
@@ -354,7 +359,7 @@ class V7Layer:
         log["match"] = match
 
         # frame-t observations affect frames > t only
-        self.window.append(L_all)
+        self.window.append(L_in if s.pool == "raw" else L_all)
         if s.dup == "ctx" or s.dup_clean == "ctx":
             self.pair_hist.append(getattr(self, "_pair_ev", (0, 0)))
             self._pair_ev = (0, 0)

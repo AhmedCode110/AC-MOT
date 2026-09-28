@@ -7,6 +7,7 @@ with the V6 runner so every number is comparable to the V6 record.
   python tools/v7/dev.py report <system> [...]     # pooled, internal protocol
   python tools/v7/dev.py official <system> [...]   # official-compatible
   python tools/v7/dev.py seq <system> [...]
+  python tools/v7/dev.py track <system> [...]      # label-free: tracks + audit only
 
 A system is '<base>[@mod...]':
   base  a key of SYSTEMS (fixed V7Spec overrides) or 'V6:<name>' to read a
@@ -66,36 +67,26 @@ def out_dir(split):
     return ROOT / "outputs/v7" / split
 
 
-def run_one(job):
-    split, system, det, seq = job
-    dest = out_dir(split) / system / det / f"{seq}.pkl"
-    base, ov, tf, floor, botsort = parse(system)
-    stamp = dict(code_sha=_code_sha(), spec=dict(ov, name=base), transform=tf, floor=floor,
-                 botsort=botsort)
-    if dest.exists():
-        try:
-            old = pickle.load(open(dest, "rb")).get("v7_stamp")
-        except Exception:
-            old = None
-        if old == stamp:
-            return                      # identical code + spec: reuse
+def track_sequence(split, system, det, seq):
+    """Layer + host tracker on one cached sequence (no labels). Returns the
+    MOT-format track lines and the per-frame audit (layer log + host
+    output size)."""
     os.chdir(ROOT)
     import cv2
-    from acmot_v7 import HostContract, V7Layer, V7Spec, spec_from_dict
+    from acmot_v7 import HostContract, V7Layer, spec_from_dict
     from adapters.types import Detection
     from tools.run_policy_validation import CachedDetector
-    from tools.seqstats import sequence_stats
+    base, ov, tf, floor, botsort = parse(system)
     if botsort:
         from adapters.trackers.botsort import BoTSORTAdapter as Trk
     else:
         from adapters.trackers.bytetrack import ByteTrackAdapter as Trk
     sp = SPLITS[split]
-    frames = sorted((Path(sp["data"]) / "sequences" / seq).glob("*.jpg"))
     cd = CachedDetector(f"{sp['native']}/{det}/{seq}.npz", transform=tf)
-    if len(frames) != cd.frames:
-        raise SystemExit(f"{seq}: {len(frames)} *.jpg files in {sp['data']} but the cache has "
-                         f"{cd.frames} frames (the evaluator counts *.jpg files; see "
-                         "scripts/setup_research_assets.sh for placeholder frames)")
+    frames = sorted((Path(sp["data"]) / "sequences" / seq).glob("*.jpg"))
+    if botsort and len(frames) != cd.frames:
+        raise SystemExit(f"{seq}: BoT-SORT needs the real frames ({len(frames)} *.jpg in "
+                         f"{sp['data']}, cache has {cd.frames})")
     h = HOST_BYTETRACK
     tr = Trk(high=h["assoc"], low=h["low"], new=h["birth"], buffer=30, match=h["match"], fuse=True)
     layer = V7Layer(spec_from_dict(dict(ov, name=base)), HostContract(**h))
@@ -121,6 +112,30 @@ def run_one(job):
             lines.append(f"{i},{t.track_id},{t.x1:.3f},{t.y1:.3f},{t.x2 - t.x1:.3f},"
                          f"{t.y2 - t.y1:.3f},{t.confidence:.6f},{t.class_id},-1,-1\n")
         audit.append(dict(dec.log, tracks=len(tracks)))
+    return lines, audit, cd.frames
+
+
+def run_one(job):
+    split, system, det, seq = job
+    dest = out_dir(split) / system / det / f"{seq}.pkl"
+    base, ov, tf, floor, botsort = parse(system)
+    stamp = dict(code_sha=_code_sha(), spec=dict(ov, name=base), transform=tf, floor=floor,
+                 botsort=botsort)
+    if dest.exists():
+        try:
+            old = pickle.load(open(dest, "rb")).get("v7_stamp")
+        except Exception:
+            old = None
+        if old == stamp:
+            return                      # identical code + spec: reuse
+    sp = SPLITS[split]
+    frames = sorted((Path(sp["data"]) / "sequences" / seq).glob("*.jpg"))
+    lines, audit, n = track_sequence(split, system, det, seq)
+    if len(frames) != n:
+        raise SystemExit(f"{seq}: {len(frames)} *.jpg files in {sp['data']} but the cache has "
+                         f"{n} frames (the evaluator counts *.jpg files; see "
+                         "scripts/setup_research_assets.sh for placeholder frames)")
+    from tools.seqstats import sequence_stats
     f = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
     f.writelines(lines)
     f.close()
@@ -131,6 +146,28 @@ def run_one(job):
     st["v7_stamp"] = stamp
     dest.parent.mkdir(parents=True, exist_ok=True)
     pickle.dump(st, open(dest, "wb"))
+
+
+def track_one(job):
+    """Label-free run (no evaluation): outputs/v7/<split>/<system>/<det>/<seq>.trk.pkl"""
+    split, system, det, seq = job
+    dest = out_dir(split) / system / det / f"{seq}.trk.pkl"
+    base, ov, tf, floor, botsort = parse(system)
+    stamp = dict(code_sha=_code_sha(), spec=dict(ov, name=base), transform=tf, floor=floor,
+                 botsort=botsort)
+    if dest.exists() and pickle.load(open(dest, "rb")).get("v7_stamp") == stamp:
+        return
+    lines, audit, _ = track_sequence(split, system, det, seq)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    pickle.dump(dict(audit=audit, tracks_txt="".join(lines), v7_stamp=stamp), open(dest, "wb"))
+
+
+def track(split, systems, dets=DETS, workers=int(os.environ.get("V7_WORKERS", 6))):
+    guard(split)
+    seqs = split_sequences(split)
+    jobs = [(split, sy, d, s) for sy in systems for d in dets for s in seqs]
+    with ProcessPoolExecutor(workers) as ex:
+        list(ex.map(track_one, jobs, chunksize=1))
 
 
 def _path(split, system, det, seq, suffix=".pkl"):
@@ -236,4 +273,4 @@ if __name__ == "__main__":
     cmd, *args = sys.argv[1:]
     split = os.environ.get("V7_SPLIT", "val7")
     dets = os.environ.get("V7_DETS", ",".join(DETS)).split(",")
-    {"run": run, "report": report, "official": official_report, "seq": seq_table}[cmd](split, args, dets)
+    {"run": run, "track": track, "report": report, "official": official_report, "seq": seq_table}[cmd](split, args, dets)

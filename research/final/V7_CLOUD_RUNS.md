@@ -48,13 +48,52 @@ Uploaded from the Mac; checksums are in `research/final/ASSET_MANIFEST.json`.
 Setup: `scripts/setup_research_assets.sh`.
 
 ## Cloud runs
-None yet. A cloud session must provision the data listed in
-`CODEX_HANDOFF_V7.md` ("Data a cloud session needs"). Every cloud run
-must then be appended here with:
-- hardware (`nvidia-smi`, CPU, RAM);
-- command;
-- commit;
-- start condition;
-- result path;
-- metrics;
-- whether it is diagnostic or paper-eligible.
+
+### Cloud environment C1 (Claude Code cloud session, 2026-09-28)
+| Item | Value |
+|---|---|
+| Machine | Linux VM (x86_64), kernel 6.18.44 |
+| CPU | Intel Xeon @ 2.10 GHz, 4 vCPU |
+| Memory | 15 GB, no swap |
+| OS | Ubuntu 24.04.4 LTS |
+| NVIDIA GPU / CUDA | none (`nvidia-smi` absent; `torch.cuda.is_available()` = False) |
+| Python | 3.12.3 (both venvs) |
+| PyTorch | 2.14.0+cu130 (CPU use only), numpy 2.2.6, opencv-python 4.11.0 |
+| detectron2 | 0.6 @ a2f4a87, CPU build (FORCE_CUDA=0) |
+| GMC shim OpenCV | system libopencv-dev 4.6.0 (Mac record: Homebrew OpenCV 5.0.0) |
+| Start commit | 6c65a58 (branch `universal-adapters-v1-y0zkeh`) |
+
+#### Provisioning (`scripts/setup_research_assets.sh`)
+| Step | Result |
+|---|---|
+| caches | OK: all 5 release tars downloaded from `v7-dev-assets-1`, sha256 verified |
+| external | OK: MOT17 artefacts extracted (published detections, BoostTrack cache, reference tracks, val_half.json) |
+| repos | OK: SparseTrack @499844f, BoostTrack @fb5bfc3 (includes `results/gt/MOT17-val` = the val-half GT), TrackEval @12c8791 |
+| envs | OK (repo `.venv` and external venv, torch 2.14.0 from PyPI) |
+| gmc | OK after a fix: `apt-get update` failed on unreachable third-party PPAs (403) and aborted the script under `set -e`; the update is now allowed to fail partially. Shim built against OpenCV 4.6.0 |
+| paths | OK (`acmot_env.sh`; Mac-path symlinks created) |
+| mot17 | **BLOCKED**: `motchallenge.net` is denied by the environment's network policy (proxy 403) |
+| visdrone | **BLOCKED**: `drive.google.com` / `drive.usercontent.google.com` denied (proxy 403); `aiskyeye.com` 403 |
+| uavdt | **BLOCKED**: official distribution is Google Drive (denied) |
+| other | `download.pytorch.org`, `huggingface.co`, `dl.fbaipublicfiles.com`, `zenodo.org`, `kaggle.com` also denied; PyPI and GitHub reachable |
+
+Consequences until the owner allows `motchallenge.net`, `drive.google.com`
+and `drive.usercontent.google.com` in the environment's network settings:
+- no VisDrone/UAVDT metric can be computed (the annotations come only from
+  the official zips; the caches hold detections, not labels);
+- the SparseTrack and BoostTrack replays cannot run (both read the MOT17
+  frames: SparseTrack's GMC and the V7 motion cue use the images), so the
+  tier-(a) identity checks and E14 on MOT17 are DEFERRED;
+- label-free work (tracking outputs, layer audits, churn statistics, unit
+  tests, tools) continues on the cached detections.
+
+#### Runs in C1
+| Run | Command (repo root, `PYTHONPATH=.:$ACMOT_TRACKEVAL`) | Commit | Result path | Kind |
+|---|---|---|---|---|
+| unit tests | `.venv/bin/python -m pytest -q tests/test_v7_adaptive_layer.py tests/test_v7_bootstrap.py` | batch-1 commit | stdout: 54 passed | test |
+| label-free tracking (E12/E13), val-7 + dev-40 YOLOv8n/RT-DETR-L, val-7 Faster R-CNN | `V7_SPLIT=<val7|dev40> [V7_DETS=fasterrcnn] .venv/bin/python tools/v7/dev.py track NATIVE V6EMU V7c V7d "V7c@pool=raw" "V7d@pool=raw"` | batch-1 commit | `outputs/v7/<split>/<system>/<det>/<seq>.trk.pkl` | diagnostic, label-free |
+| churn diagnostics | `.venv/bin/python tools/v7/diag_churn.py <split> <det> <systems...>` | batch-1 commit | `research/final/V7_E12_CHURN.json` | diagnostic, label-free |
+
+Each run must be appended here with hardware, command, commit, start
+condition, result path, metrics and whether it is diagnostic or
+paper-eligible.
