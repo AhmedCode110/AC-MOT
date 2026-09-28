@@ -18,6 +18,12 @@ or sequence names. Frozen policy V7f (`V7_METHOD.md`), freeze commit 488df9a.
   track-continuation stage to trackers that have none. Rejected mechanisms are
   kept in the ledger (`V7_EXPERIMENT_LEDGER.md`, `V7_ABLATION.md`).
 
+## Main table
+Paper vs reproduction vs + frozen AC-MOT for SparseTrack, BoostTrack,
+ByteTrack, OC-SORT (development baselines) and PD-SORT, Hybrid-SORT
+(external): `V7_MAIN_RESULTS.md`. SparseTrack + V7f is the one open cell
+(needs the MOT17 frames).
+
 ## Development evidence (contaminated; `V7_STATISTICS.md`)
 - Two-stage hosts on clean streams (ByteTrack ×4, BoostTrack): unchanged.
 - Single-stage OC-SORT: +0.61 / +0.46 HOTA on MOT17 (CIs > 0); +7.9 on KITTI YOLOv8n.

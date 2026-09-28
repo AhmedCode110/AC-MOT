@@ -29,6 +29,18 @@ commit and push (no force).
 - Offline completion done: runtime benchmark (`V7_REALTIME.md`), external results JSON,
   V7_{METHOD,ABLATION,FAILURE_EVOLUTION,PAPER_CLAIMS,REPRODUCIBILITY,FINAL_SUMMARY}.md,
   lock-integrity tests (61 tests pass).
+- Main thesis table (paper vs reproduction vs + V7f for SparseTrack, BoostTrack,
+  ByteTrack, OC-SORT, PD-SORT, Hybrid-SORT; per-sequence; calibration shift; KITTI):
+  `research/final/V7_MAIN_RESULTS.md` / `.json`.
+- **Open cell: SparseTrack + V7f** (needs the MOT17 val-half frames: SparseTrack GMC
+  and the motion cue read images; not reachable from C1). On a machine with
+  `$ACMOT_EXT/data_mirror/MOT17/train` frames and the SparseTrack GMC shim:
+  ```
+  python tools/v7/external/sparsetrack_v7.py --system V7f --name ST7_V7f
+  python tools/v7/mot17_eval_v7.py $ACMOT_EXT/runs/sparsetrack ST7_BASELINE ST7_V7f
+  python tools/v7/mot17_eval_v7.py --boot $ACMOT_EXT/runs/sparsetrack ST7_BASELINE ST7_V7f
+  ```
+  then fill the SparseTrack row of `V7_MAIN_RESULTS.md` with the measured numbers.
 - Next (if more compute/network): further 2025/26 published systems when their
   artefacts become reachable (TOPICTrack stays reserved; it needs frames + ReID);
   VisDrone/UAVDT labelled checks and conf16 once Google Drive is reachable;
