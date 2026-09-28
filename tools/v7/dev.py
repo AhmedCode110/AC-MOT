@@ -33,7 +33,15 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.v6.dev import SPLITS as _V6_SPLITS, split_sequences  # noqa: E402  (read-only reuse)
+from tools.v6.dev import SPLITS as _V6_SPLITS, split_sequences as _v6_split_sequences  # noqa: E402  (read-only reuse)
+
+
+def split_sequences(split):
+    if split in _V6_SPLITS:
+        return _v6_split_sequences(split)
+    nat = ROOT / SPLITS[split]["native"]
+    return sorted(p.stem for p in (nat / "yolov8").glob("*.npz")
+                  if (nat / "visual_cues" / p.name).exists())
 
 # Dataset roots may be relocated (cloud / Codex) through environment variables;
 # defaults are the original Mac paths recorded in the V6 runner.
@@ -43,6 +51,12 @@ for _k, _env in (("val7", "ACMOT_VISDRONE_VAL"), ("dev40", "ACMOT_VISDRONE_TRAIN
                  ("uavdt", "ACMOT_UAVDT_VIEW")):
     if os.environ.get(_env):
         SPLITS[_k]["data"] = os.environ[_env]
+# KITTI tracking TRAINING split (cloud fallback development data, 21 sequences):
+# a frame view (sequences/<seq>/<frame>.jpg -> the official PNG frames) and
+# native caches built with the original recipe. Evaluation: tools/v7/kitti/kitti_eval.py.
+SPLITS["kitti"] = dict(data=os.environ.get("ACMOT_KITTI_VIEW",
+                                           str(Path.home() / "acmot_work/kitti/view")),
+                       native="outputs/det_cache_kitti_native", protected=False)
 V7_FREEZE_TAG = "universal-acmot-v7-freeze"
 
 

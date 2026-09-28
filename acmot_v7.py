@@ -161,6 +161,16 @@ class V7Spec:
     # yet, "track" removes every weaker overlapping candidate). Frame 1 has
     # no statistics, so it cannot know whether the stream is clean.
     cold_dup: str = "clean"
+    # "none" | "track": in clean/cold frames, hand a sub-low candidate that
+    # continues an uncovered track of frame t-1 (IoU >= dup_iou) to the
+    # host's low stage (its score is raised to just above host.low).
+    rescue: str = "none"
+    # "fg": foreground candidates (score >= t1) the host cannot use (score
+    # <= host.low, its lowest usable stage) are raised to just above
+    # host.low | "low": candidates <= host.low are raised to just above host.low |
+    # "assoc": candidates in (host.low, min(assoc, birth)) are raised to
+    # just above min(assoc, birth) (first-stage association).
+    rescue_band: str = "low"
     motion: bool = True
     # "always" | "noisy" (clean-regime and cold frames keep the host's own
     # IoU-match tolerance: the host is trusted there).
@@ -364,9 +374,50 @@ class V7Layer:
         else:
             out = scores[passed]
             assoc, birth = float(sigmoid(ta)), float(sigmoid(tb))
+        n_rescued = 0
+        if s.rescue == "track" and regime != "noisy" and len(self.prev_tracks) and len(passed):
+            # Track-consistent rescue: a candidate the host would ignore (score
+            # below its lowest stage) that continues an existing track of frame
+            # t-1 not covered by any usable candidate is handed to the host's
+            # low stage. Births are unaffected (the score stays below every
+            # birth/association threshold of the host).
+            if s.rescue_band == "fg":
+                # foreground candidates (>= t1 of frames < t) the host cannot see
+                # (below its lowest usable stage, host.low)
+                lo_fg = sigmoid(bands[0]) if bands is not None else np.inf
+                usable = passed[scores[passed] > h.low]
+                low_c = passed[(scores[passed] >= lo_fg) & (scores[passed] <= h.low)]
+            elif s.rescue_band == "assoc":
+                # candidates between the host's lowest stage and its association
+                # threshold (a single-stage host never uses them)
+                lim = min(h.assoc, h.birth)
+                usable = passed[scores[passed] >= lim]
+                low_c = passed[(scores[passed] > h.low) & (scores[passed] < lim)]
+            else:
+                usable = passed[scores[passed] > h.low]
+                low_c = passed[scores[passed] <= h.low]
+            if len(low_c):
+                cov = iou_matrix(boxes[usable], self.prev_tracks).max(0) >= s.dup_iou if len(usable) \
+                    else np.zeros(len(self.prev_tracks), bool)
+                P = iou_matrix(boxes[low_c], self.prev_tracks)
+                take = {}
+                for j in np.where(~cov)[0]:
+                    c = np.where(P[:, j] >= s.dup_iou)[0]
+                    if len(c):
+                        k = int(low_c[c[np.argmax(scores[low_c[c]])]])
+                        take[k] = True
+                if take:
+                    idx = np.array(sorted(take), int)
+                    pos = np.searchsorted(passed, idx)
+                    out = np.array(out, np.float64)
+                    out[pos] = (min(h.assoc, h.birth) + 1e-3 if s.rescue_band == "assoc"
+                                else h.low + 1e-3)
+                    n_rescued = len(idx)
+                    # candidates below the host's lowest stage that were not
+                    # rescued are irrelevant to the host either way
         log.update(n_in=int(len(scores)), n_dup=int(len(scores) - len(keep)),
                    n_pass=int(len(passed)), n_primary=int((Lp >= ta).sum()),
-                   assoc=assoc, birth=birth)
+                   assoc=assoc, birth=birth, n_rescued=n_rescued)
 
         match = h.match
         if s.motion:

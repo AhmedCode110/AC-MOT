@@ -49,9 +49,11 @@ HOSTS = {"ultra": dict(assoc=0.25, birth=0.25, low=0.1, match=0.8, filt=False),
          "official": dict(assoc=0.6, birth=0.7, low=0.1, match=0.8, filt=True),
          # OC-SORT (Cao et al., CVPR 2023; noahcao/OC_SORT @ 8462e7e), official MOT17
          # args: track_thresh 0.6 (single threshold: association = birth), iou_thresh
-         # 0.3 -> match 0.7, delta_t 3, inertia 0.2, asso iou, no BYTE stage (the
-         # 0.1 low bound is its hard-coded floor); writer drops w/h > 1.6 or area <= 10.
-         "ocsort": dict(assoc=0.6, birth=0.6, low=0.1, match=0.7, filt=True, min_area=10)}
+         # 0.3 -> match 0.7, delta_t 3, inertia 0.2, asso iou, no BYTE stage: the
+         # lowest score it can use is its det_thresh, so low = 0.6 (declared host
+         # property; runs before 2026-09-28 16:00 declared 0.1, which no V7 option
+         # read); writer drops w/h > 1.6 or area <= 10.
+         "ocsort": dict(assoc=0.6, birth=0.6, low=0.6, match=0.7, filt=True, min_area=10)}
 
 
 class OCSortHost:
