@@ -1,0 +1,40 @@
+{
+ "policy": "Universal AC-MOT V7",
+ "system": "V7f",
+ "spec": {
+  "name": "V7f",
+  "dup": "track",
+  "dup_iou": 0.5,
+  "dup_memory": 1,
+  "dup_scope": "all",
+  "dup_regime": "noisy",
+  "dup_clean": "xclass",
+  "domain": "full",
+  "pool": "post",
+  "regime": "rho",
+  "rho_ref": "fg",
+  "bg_check": true,
+  "rho_frames": 0,
+  "clean": "upper",
+  "noisy_primary": "t2",
+  "noisy_ext": "otsu",
+  "scores": "auto",
+  "cold": "host",
+  "cold_dup": "clean",
+  "rescue": "track",
+  "rescue_band": "fg",
+  "motion": true,
+  "motion_regime": "noisy",
+  "window": 10,
+  "hist": 100,
+  "warmup": 5
+ },
+ "host_contract_fields": [
+  "assoc",
+  "birth",
+  "low",
+  "match",
+  "cmc"
+ ],
+ "notes": "Training-free, online, causal. The layer reads only the candidate list, one image motion cue (optional) and the host's output tracks, plus the host's declared operating point. No detector, tracker, dataset or sequence names."
+}

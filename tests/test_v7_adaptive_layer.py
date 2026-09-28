@@ -366,3 +366,12 @@ def test_bg_check_counts_a_stream_without_background_mode_as_clean():
     fr2 = stream(18, noisy=True)
     assert [d.log["regime"] for d in replay(V7Layer(spec("V7e", bg_check=True), HOST), fr2)] == \
            [d.log["regime"] for d in replay(V7Layer(spec("V7e"), HOST), fr2)]
+
+
+# ------------------------------------------------------------- freeze
+def test_frozen_config_is_the_registered_v7f_policy():
+    import json
+    from dataclasses import asdict
+    cfg = json.loads((ROOT / "configs/universal_acmot_policy_v7.json").read_text())
+    assert cfg["system"] == "V7f"
+    assert cfg["spec"] == asdict(spec("V7f"))

@@ -435,6 +435,21 @@ V7f keeps motion_regime=noisy. Separate finding: on KITTI YOLOv8n the
 noisy-regime birth restriction costs the two-stage hosts MOTA (ByteTrack
 −1.7, BoT-SORT −2.4) while it strongly helps the single-stage host.
 
+### E20 — rejected: host-relative noisy band (noisy_primary=proj)
+Primary = clip(host, t1, t2) in noisy frames. KITTI YOLOv8n ByteTrack HOTA
++1.4 vs native but MOTA still −2.1; VisDrone RT-DETR label-free: 26.9 output
+boxes per frame (native 28.8, V7f 14.9) — the RT-DETR explosion that made the
+native host catastrophic (Mac: val-7 MOTA −6.2, 5 catastrophic sequences) is
+no longer controlled → REJECTED.
+
+### DECISION — freeze V7f (2026-09-28)
+V7f = V7d + rho_frames 0 + rescue fg + bg_check. Development matrix and CIs:
+`V7_STATISTICS.md`. Positive or neutral on 11/14 host×stream cells, significant
+gains on single-stage hosts and on the noisy detector (RT-DETR-L), full
+recovery under score recalibration; known regression: KITTI YOLOv8n with the
+two-stage hosts (MOTA −1.9 / −2.4). External systems predeclared in
+`V7_EXTERNAL_SELECTION.md` in the freeze commit.
+
 ## Open issues found by the adversarial audit (2026-09-28)
 - **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
 - **O2 — NATIVE vs the V6 record's "tracker default".** V7 `NATIVE` = native caches (YOLO NMS 0.7, RT-DETR no NMS, Faster R-CNN 0.5) + ultralytics ByteTrack 0.25/0.1/0.25, match 0.8, fuse on, no layer. The V6 paper's `static_default` used the NMS-0.45 caches: YOLO val-7 17.04/31.72/33.65 (IDS 359) vs 18.40/31.62/33.62 (IDS 320); Faster R-CNN MOTA −11.29 vs −9.56; RT-DETR identical. D8 and the catastrophic counts in E8 use V7 NATIVE.
