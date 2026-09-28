@@ -127,3 +127,16 @@ reads no image (CMC from its shipped GMC files, ReID features precomputed), so
 no image cue is passed. Reproduction reference: the paper's MOT17 / DanceTrack
 validation numbers, recorded in `V7_RECENT_EXTERNAL_SYSTEMS.md` from the CVF
 paper text before the first run.
+
+## Amendment 2 (2026-09-28, before any TrackTrack run): TrackTrack MOT17 split
+Amendment 1 named the TrackTrack MOT17 setting "val-half (02/04/05/09/10/11/13)".
+The official TrackTrack MOT17 validation protocol is different: sequences
+MOT17-04, -05, -09 in full (`3. Tracker/trackeval/seqmap/mot17/val.txt`,
+`mot17_val.json`, 2,412 frames), detector `mot17_half.pth.tar`, GT = the
+official `train/<seq>/gt/gt.txt`. The contract values are unchanged (these
+sequences use det_thr 0.60, init_thr 0.70, match_thr 0.70). Only three
+sequences exist, so the MOT17 bootstrap has three resampling units; it is
+reported but not used to call significance on its own. The released MOT17
+NMS-0.80 detections are absent from the official folder (only NMS 0.95 is
+released), so the official detector is re-run for both views and its NMS-0.95
+output is compared with the released file as the detector reproduction check.
