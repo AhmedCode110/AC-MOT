@@ -97,3 +97,5 @@ and `drive.usercontent.google.com` in the environment's network settings:
 Each run must be appended here with hardware, command, commit, start
 condition, result path, metrics and whether it is diagnostic or
 paper-eligible.
+| label-free stress, val-7 YOLOv8n/RT-DETR-L | `V7_SPLIT=val7 .venv/bin/python tools/v7/dev.py track "<base>@<mod>"` for base ∈ {NATIVE, V6EMU, V7c, V7d}, mod ∈ {t:temp2, t:temp05, t:pow3, t:scale05, floor=0.05, floor=0.1, floor=0.2}; `tools/v7/diag_stress.py` | batch-2 commit | `research/final/V7_STRESS_LABELFREE.json` | diagnostic, label-free |
+| label-free E12a | `dev.py track "V7c@cold=none" "V7d@cold=none"` (val-7 3 dets, dev-40 2 dets) | batch-2 commit | `research/final/V7_E12_CHURN.json` | diagnostic, label-free |

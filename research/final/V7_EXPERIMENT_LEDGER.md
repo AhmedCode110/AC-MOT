@@ -256,6 +256,47 @@ Findings (label-free, to be confirmed with per-frame IDS attribution):
 - V7d vs V7c: +1–2% ids everywhere (host tolerance kept in clean frames);
   no label-free separation.
 
+Label-free check of H1 (`@cold=none`: nothing admitted in cold frames):
+| Split / det | V6EMU ids / short | V7c ids / short | V7c@cold=none ids / short |
+|---|---|---|---|
+| val-7 YOLO | 481 / 72 | 542 / 97 | 518 / 82 |
+| val-7 RT-DETR | 454 / 53 | 648 / 166 | 481 / 57 |
+| val-7 Faster R-CNN | 742 / 124 | 895 / 203 | 793 / 139 |
+| dev-40 YOLO | 4447 / 551 | 4657 / 605 | 4574 / 579 |
+| dev-40 RT-DETR | 3816 / 280 | 5317 / 1011 | 4282 / 381 |
+Removing frame-1 admission removes most of the short-lived surplus
+(RT-DETR dev-40: 1011 → 381 vs V6 280). Consistent with H1; the quality
+trade-off (frame-1 recall on clean hosts, MOT17) is UNKNOWN until labels.
+
+### STRESS-LF — label-free calibration / floor stress (DIAGNOSTIC)
+Tool: `tools/v7/diag_stress.py` (val-7; `<base>@<mod>` vs `<base>` on the
+same candidates). regime = share of frames with the same regime; outR/outP
+= share of base/stressed output boxes reproduced (IoU ≥ 0.9); ids = ratio
+of track ids. Full table: `research/final/V7_STRESS_LABELFREE.json`.
+
+| det | mod | NATIVE outR/outP (ids) | V6EMU outR/outP (ids) | V7c regime, outR/outP (ids) |
+|---|---|---|---|---|
+| YOLO | temp2 | 0.90/0.53 (1.96) | 1.00/1.00 (1.00) | 1.00, 0.97/0.84 (1.30) |
+| YOLO | pow3 | 0.26/0.94 (0.24) | 0.94/0.74 (1.38) | 0.96, 0.73/0.72 (1.25) |
+| YOLO | floor 0.1 | 1.00/1.00 (1.00) | 0.45/0.94 (0.48) | 0.74, 0.52/0.93 (0.60) |
+| YOLO | floor 0.2 | 0.89/0.98 (1.04) | 0.32/0.94 (0.38) | 0.55, 0.38/0.87 (0.64) |
+| RT-DETR | temp2 | 0.89/0.53 (2.49) | 1.00/1.00 (1.00) | 1.00, 0.99/0.91 (1.70) |
+| RT-DETR | scale05 | 0.35/0.93 (0.20) | 0.95/0.58 (1.97) | 0.97, 0.87/0.59 (1.42) |
+| RT-DETR | floor 0.1 | 1.00/1.00 (1.00) | 0.68/0.96 (0.65) | 0.68, 0.72/0.87 (0.93) |
+| RT-DETR | floor 0.2 | 0.90/0.97 (1.04) | 0.49/0.95 (0.49) | 0.59, 0.54/0.76 (1.05) |
+
+Findings:
+- V6EMU is exactly invariant to logit temperature (Otsu + rank remap), as
+  the unit test predicts; V7c is not, because cold and clean frames use the
+  host's raw-scale thresholds (RT-DETR temp2: +70% ids, mostly frame 1 →
+  again H1).
+- The emission floor is V7's largest label-free instability: at floor 0.2
+  the regime agrees in only 55–59% of the frames and < 55% of the output
+  boxes survive. The full-stream pooled statistics (t1, t2, ρ) move with
+  the floor (D2/D6). NATIVE is floor-robust above its own low stage.
+- Quality under stress is UNKNOWN until labels; these numbers only say how
+  much the output moves.
+
 Predeclared labelled tests (run as soon as the annotations are available;
 decision by paired bootstrap, `tools/v7/bootstrap.py`, then the selection
 priority of the continue prompt):

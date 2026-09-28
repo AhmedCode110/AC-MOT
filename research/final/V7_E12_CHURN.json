@@ -1938,5 +1938,885 @@
   "regime_changes": 62,
   "assoc_jumps": 58,
   "band_move_mean": 0.028086901352516916
+ },
+ "val7/yolov8/V7c@cold=none": {
+  "system": "V7c@cold=none",
+  "det": "yolov8",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 518,
+   "drops": 925,
+   "returns": 474,
+   "short_births": 82,
+   "churn": 0.07300545253556091,
+   "tracks": 10.811314125087842,
+   "n_dup": 35.05130007027407
+  },
+  "clean": {
+   "frames": 1245,
+   "births": 111,
+   "drops": 238,
+   "returns": 159,
+   "short_births": 11,
+   "churn": 0.05972087666346593,
+   "tracks": 6.575903614457832,
+   "n_dup": 2.191967871485944
+  },
+  "noisy": {
+   "frames": 1594,
+   "births": 407,
+   "drops": 687,
+   "returns": 315,
+   "short_births": 71,
+   "churn": 0.08370202413437344,
+   "tracks": 14.166875784190715,
+   "n_dup": 60.834378920953576
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 8.142857142857142
+  },
+  "near_change": {
+   "frames": 86,
+   "births": 74,
+   "drops": 13,
+   "returns": 10,
+   "short_births": 1,
+   "churn": 0.7899249312499006,
+   "tracks": 6.627906976744186,
+   "n_dup": 16.96511627906977
+  },
+  "stable": {
+   "frames": 2760,
+   "births": 444,
+   "drops": 912,
+   "returns": 464,
+   "short_births": 81,
+   "churn": 0.05066665718431698,
+   "tracks": 10.941666666666666,
+   "n_dup": 35.61485507246377
+  },
+  "first30": {
+   "frames": 210,
+   "births": 118,
+   "drops": 44,
+   "returns": 19,
+   "short_births": 2,
+   "churn": 0.3475344234670796,
+   "tracks": 11.266666666666667,
+   "n_dup": 34.18571428571428
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 400,
+   "drops": 881,
+   "returns": 455,
+   "short_births": 80,
+   "churn": 0.05113478337940805,
+   "tracks": 10.775037936267072,
+   "n_dup": 35.12025796661609
+  },
+  "regime_changes": 20,
+  "assoc_jumps": 32,
+  "band_move_mean": 0.05867239562616928
+ },
+ "val7/yolov8/V7d@cold=none": {
+  "system": "V7d@cold=none",
+  "det": "yolov8",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 538,
+   "drops": 915,
+   "returns": 444,
+   "short_births": 87,
+   "churn": 0.07597717709631965,
+   "tracks": 10.749824314827828,
+   "n_dup": 35.05130007027407
+  },
+  "clean": {
+   "frames": 1245,
+   "births": 126,
+   "drops": 229,
+   "returns": 130,
+   "short_births": 16,
+   "churn": 0.06257102701754504,
+   "tracks": 6.4345381526104415,
+   "n_dup": 2.191967871485944
+  },
+  "noisy": {
+   "frames": 1594,
+   "births": 412,
+   "drops": 686,
+   "returns": 314,
+   "short_births": 71,
+   "churn": 0.08678175494308794,
+   "tracks": 14.16750313676286,
+   "n_dup": 60.834378920953576
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 8.142857142857142
+  },
+  "near_change": {
+   "frames": 86,
+   "births": 79,
+   "drops": 13,
+   "returns": 9,
+   "short_births": 2,
+   "churn": 0.8480644661336215,
+   "tracks": 6.5813953488372094,
+   "n_dup": 16.96511627906977
+  },
+  "stable": {
+   "frames": 2760,
+   "births": 459,
+   "drops": 902,
+   "returns": 435,
+   "short_births": 85,
+   "churn": 0.051919384756751556,
+   "tracks": 10.879710144927536,
+   "n_dup": 35.61485507246377
+  },
+  "first30": {
+   "frames": 210,
+   "births": 123,
+   "drops": 46,
+   "returns": 15,
+   "short_births": 5,
+   "churn": 0.3741819098661188,
+   "tracks": 10.995238095238095,
+   "n_dup": 34.18571428571428
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 415,
+   "drops": 869,
+   "returns": 429,
+   "short_births": 82,
+   "churn": 0.05222035088931745,
+   "tracks": 10.730273141122913,
+   "n_dup": 35.12025796661609
+  },
+  "regime_changes": 20,
+  "assoc_jumps": 32,
+  "band_move_mean": 0.05867239562616928
+ },
+ "val7/rtdetr/V7c@cold=none": {
+  "system": "V7c@cold=none",
+  "det": "rtdetr",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 481,
+   "drops": 761,
+   "returns": 361,
+   "short_births": 57,
+   "churn": 0.06632777577868161,
+   "tracks": 13.380182712579058,
+   "n_dup": 47.22066057624736
+  },
+  "clean": {
+   "frames": 201,
+   "births": 51,
+   "drops": 49,
+   "returns": 27,
+   "short_births": 3,
+   "churn": 0.1337641191765995,
+   "tracks": 26.00995024875622,
+   "n_dup": 0.0
+  },
+  "noisy": {
+   "frames": 2638,
+   "births": 430,
+   "drops": 712,
+   "returns": 334,
+   "short_births": 54,
+   "churn": 0.0613655276389808,
+   "tracks": 12.453373768006065,
+   "n_dup": 50.902198635329796
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 15.714285714285714
+  },
+  "near_change": {
+   "frames": 24,
+   "births": 105,
+   "drops": 4,
+   "returns": 0,
+   "short_births": 3,
+   "churn": 4.185216543513957,
+   "tracks": 11.875,
+   "n_dup": 42.625
+  },
+  "stable": {
+   "frames": 2822,
+   "births": 376,
+   "drops": 757,
+   "returns": 361,
+   "short_births": 54,
+   "churn": 0.031298246924802584,
+   "tracks": 13.392983699503898,
+   "n_dup": 47.259744861800144
+  },
+  "first30": {
+   "frames": 210,
+   "births": 157,
+   "drops": 73,
+   "returns": 33,
+   "short_births": 9,
+   "churn": 0.5125959895989544,
+   "tracks": 15.40952380952381,
+   "n_dup": 47.352380952380955
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 324,
+   "drops": 688,
+   "returns": 328,
+   "short_births": 48,
+   "churn": 0.030775300474335156,
+   "tracks": 13.218512898330804,
+   "n_dup": 47.210166919575116
+  },
+  "regime_changes": 8,
+  "assoc_jumps": 8,
+  "band_move_mean": 0.03957003460545905
+ },
+ "val7/rtdetr/V7d@cold=none": {
+  "system": "V7d@cold=none",
+  "det": "rtdetr",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 488,
+   "drops": 766,
+   "returns": 359,
+   "short_births": 58,
+   "churn": 0.06650333271417788,
+   "tracks": 13.360857343640197,
+   "n_dup": 47.22066057624736
+  },
+  "clean": {
+   "frames": 201,
+   "births": 58,
+   "drops": 54,
+   "returns": 25,
+   "short_births": 4,
+   "churn": 0.13624986563641214,
+   "tracks": 25.736318407960198,
+   "n_dup": 0.0
+  },
+  "noisy": {
+   "frames": 2638,
+   "births": 430,
+   "drops": 712,
+   "returns": 334,
+   "short_births": 54,
+   "churn": 0.0613655276389808,
+   "tracks": 12.453373768006065,
+   "n_dup": 50.902198635329796
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 15.714285714285714
+  },
+  "near_change": {
+   "frames": 24,
+   "births": 105,
+   "drops": 4,
+   "returns": 0,
+   "short_births": 3,
+   "churn": 4.185216543513957,
+   "tracks": 11.875,
+   "n_dup": 42.625
+  },
+  "stable": {
+   "frames": 2822,
+   "births": 383,
+   "drops": 762,
+   "returns": 359,
+   "short_births": 55,
+   "churn": 0.03147529690298201,
+   "tracks": 13.373493975903614,
+   "n_dup": 47.259744861800144
+  },
+  "first30": {
+   "frames": 210,
+   "births": 158,
+   "drops": 73,
+   "returns": 32,
+   "short_births": 9,
+   "churn": 0.5127864657894305,
+   "tracks": 15.404761904761905,
+   "n_dup": 47.352380952380955
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 330,
+   "drops": 693,
+   "returns": 327,
+   "short_births": 49,
+   "churn": 0.030949668850064418,
+   "tracks": 13.198027314112291,
+   "n_dup": 47.210166919575116
+  },
+  "regime_changes": 8,
+  "assoc_jumps": 8,
+  "band_move_mean": 0.03957003460545905
+ },
+ "val7/fasterrcnn/V7c@cold=none": {
+  "system": "V7c@cold=none",
+  "det": "fasterrcnn",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 793,
+   "drops": 1642,
+   "returns": 938,
+   "short_births": 139,
+   "churn": 0.09854017514396554,
+   "tracks": 15.488756148981025,
+   "n_dup": 29.461349262122276
+  },
+  "clean": {
+   "frames": 362,
+   "births": 98,
+   "drops": 270,
+   "returns": 216,
+   "short_births": 16,
+   "churn": 0.15641957754623706,
+   "tracks": 18.12154696132597,
+   "n_dup": 8.991712707182321
+  },
+  "noisy": {
+   "frames": 2477,
+   "births": 695,
+   "drops": 1372,
+   "returns": 722,
+   "short_births": 123,
+   "churn": 0.09035989155752448,
+   "tracks": 15.14775938635446,
+   "n_dup": 32.43641501816714
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 35.285714285714285
+  },
+  "near_change": {
+   "frames": 36,
+   "births": 102,
+   "drops": 19,
+   "returns": 4,
+   "short_births": 2,
+   "churn": 2.677689296439296,
+   "tracks": 9.555555555555555,
+   "n_dup": 27.416666666666668
+  },
+  "stable": {
+   "frames": 2810,
+   "births": 691,
+   "drops": 1623,
+   "returns": 934,
+   "short_births": 137,
+   "churn": 0.06549769529818907,
+   "tracks": 15.564768683274021,
+   "n_dup": 29.487544483985765
+  },
+  "first30": {
+   "frames": 210,
+   "births": 186,
+   "drops": 94,
+   "returns": 45,
+   "short_births": 10,
+   "churn": 0.5143068623310566,
+   "tracks": 16.52857142857143,
+   "n_dup": 34.57142857142857
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 607,
+   "drops": 1548,
+   "returns": 893,
+   "short_births": 129,
+   "churn": 0.06541763936654175,
+   "tracks": 15.405918057663126,
+   "n_dup": 29.054248861911987
+  },
+  "regime_changes": 12,
+  "assoc_jumps": 12,
+  "band_move_mean": 0.06118477645951887
+ },
+ "val7/fasterrcnn/V7d@cold=none": {
+  "system": "V7d@cold=none",
+  "det": "fasterrcnn",
+  "frames": 2846,
+  "all": {
+   "frames": 2846,
+   "births": 803,
+   "drops": 1646,
+   "returns": 932,
+   "short_births": 144,
+   "churn": 0.09904968909952046,
+   "tracks": 15.461349262122276,
+   "n_dup": 29.461349262122276
+  },
+  "clean": {
+   "frames": 362,
+   "births": 108,
+   "drops": 272,
+   "returns": 209,
+   "short_births": 21,
+   "churn": 0.15925456979402647,
+   "tracks": 17.908839779005525,
+   "n_dup": 8.991712707182321
+  },
+  "noisy": {
+   "frames": 2477,
+   "births": 695,
+   "drops": 1374,
+   "returns": 723,
+   "short_births": 123,
+   "churn": 0.09053098946782302,
+   "tracks": 15.147355672184094,
+   "n_dup": 32.43641501816714
+  },
+  "cold": {
+   "frames": 7,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 35.285714285714285
+  },
+  "near_change": {
+   "frames": 36,
+   "births": 102,
+   "drops": 21,
+   "returns": 4,
+   "short_births": 2,
+   "churn": 2.6860226297726295,
+   "tracks": 9.583333333333334,
+   "n_dup": 27.416666666666668
+  },
+  "stable": {
+   "frames": 2810,
+   "births": 701,
+   "drops": 1625,
+   "returns": 928,
+   "short_births": 142,
+   "churn": 0.06590697526883295,
+   "tracks": 15.536654804270462,
+   "n_dup": 29.487544483985765
+  },
+  "first30": {
+   "frames": 210,
+   "births": 188,
+   "drops": 94,
+   "returns": 43,
+   "short_births": 10,
+   "churn": 0.5146583362539591,
+   "tracks": 16.504761904761907,
+   "n_dup": 34.57142857142857
+  },
+  "after30": {
+   "frames": 2636,
+   "births": 615,
+   "drops": 1552,
+   "returns": 889,
+   "short_births": 134,
+   "churn": 0.06593974376475865,
+   "tracks": 15.378224582701062,
+   "n_dup": 29.054248861911987
+  },
+  "regime_changes": 12,
+  "assoc_jumps": 12,
+  "band_move_mean": 0.06118477645951887
+ },
+ "dev40/yolov8/V7c@cold=none": {
+  "system": "V7c@cold=none",
+  "det": "yolov8",
+  "frames": 17167,
+  "all": {
+   "frames": 17167,
+   "births": 4574,
+   "drops": 7183,
+   "returns": 3283,
+   "short_births": 579,
+   "churn": 0.08051721895993319,
+   "tracks": 15.443059358070718,
+   "n_dup": 53.64792916642395
+  },
+  "clean": {
+   "frames": 1810,
+   "births": 373,
+   "drops": 516,
+   "returns": 194,
+   "short_births": 64,
+   "churn": 0.07211451334782999,
+   "tracks": 11.21767955801105,
+   "n_dup": 5.564088397790055
+  },
+  "noisy": {
+   "frames": 15317,
+   "births": 4201,
+   "drops": 6667,
+   "returns": 3089,
+   "short_births": 515,
+   "churn": 0.08172043015770718,
+   "tracks": 15.982698961937716,
+   "n_dup": 59.43787948031599
+  },
+  "cold": {
+   "frames": 40,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 12.325
+  },
+  "near_change": {
+   "frames": 284,
+   "births": 541,
+   "drops": 57,
+   "returns": 29,
+   "short_births": 24,
+   "churn": 1.65699949088438,
+   "tracks": 9.616197183098592,
+   "n_dup": 34.806338028169016
+  },
+  "stable": {
+   "frames": 16883,
+   "births": 4033,
+   "drops": 7126,
+   "returns": 3254,
+   "short_births": 555,
+   "churn": 0.053998178195463445,
+   "tracks": 15.541076822839543,
+   "n_dup": 53.96487591067938
+  },
+  "first30": {
+   "frames": 1200,
+   "births": 890,
+   "drops": 429,
+   "returns": 134,
+   "short_births": 75,
+   "churn": 0.43840166525105323,
+   "tracks": 13.745,
+   "n_dup": 55.47416666666667
+  },
+  "after30": {
+   "frames": 15967,
+   "births": 3684,
+   "drops": 6754,
+   "returns": 3149,
+   "short_births": 504,
+   "churn": 0.05362041082131328,
+   "tracks": 15.570677021356548,
+   "n_dup": 53.51067827394
+  },
+  "regime_changes": 94,
+  "assoc_jumps": 100,
+  "band_move_mean": 0.037084067429412435
+ },
+ "dev40/yolov8/V7d@cold=none": {
+  "system": "V7d@cold=none",
+  "det": "yolov8",
+  "frames": 17167,
+  "all": {
+   "frames": 17167,
+   "births": 4613,
+   "drops": 7213,
+   "returns": 3273,
+   "short_births": 597,
+   "churn": 0.08129703931212338,
+   "tracks": 15.41271043280713,
+   "n_dup": 53.648103920312224
+  },
+  "clean": {
+   "frames": 1810,
+   "births": 410,
+   "drops": 550,
+   "returns": 179,
+   "short_births": 82,
+   "churn": 0.07945149021391,
+   "tracks": 10.97900552486188,
+   "n_dup": 5.564088397790055
+  },
+  "noisy": {
+   "frames": 15317,
+   "births": 4203,
+   "drops": 6663,
+   "returns": 3094,
+   "short_births": 515,
+   "churn": 0.08172743204178658,
+   "tracks": 15.976888424626232,
+   "n_dup": 59.43807534112424
+  },
+  "cold": {
+   "frames": 40,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 12.325
+  },
+  "near_change": {
+   "frames": 284,
+   "births": 543,
+   "drops": 57,
+   "returns": 27,
+   "short_births": 26,
+   "churn": 1.659012410495166,
+   "tracks": 9.464788732394366,
+   "n_dup": 34.809859154929576
+  },
+  "stable": {
+   "frames": 16883,
+   "births": 4070,
+   "drops": 7156,
+   "returns": 3246,
+   "short_births": 571,
+   "churn": 0.05475725577744447,
+   "tracks": 15.512764319137593,
+   "n_dup": 53.96499437303797
+  },
+  "first30": {
+   "frames": 1200,
+   "births": 892,
+   "drops": 436,
+   "returns": 137,
+   "short_births": 77,
+   "churn": 0.438893241715927,
+   "tracks": 13.733333333333333,
+   "n_dup": 55.47416666666667
+  },
+  "after30": {
+   "frames": 15967,
+   "births": 3721,
+   "drops": 6777,
+   "returns": 3136,
+   "short_births": 520,
+   "churn": 0.054421894144930774,
+   "tracks": 15.538924030813552,
+   "n_dup": 53.510866161458004
+  },
+  "regime_changes": 94,
+  "assoc_jumps": 100,
+  "band_move_mean": 0.03707453091356686
+ },
+ "dev40/rtdetr/V7c@cold=none": {
+  "system": "V7c@cold=none",
+  "det": "rtdetr",
+  "frames": 17167,
+  "all": {
+   "frames": 17167,
+   "births": 4282,
+   "drops": 5094,
+   "returns": 1511,
+   "short_births": 381,
+   "churn": 0.06668571353419557,
+   "tracks": 17.63785169220015,
+   "n_dup": 59.921477252868875
+  },
+  "clean": {
+   "frames": 1353,
+   "births": 770,
+   "drops": 716,
+   "returns": 304,
+   "short_births": 114,
+   "churn": 0.1399183431134402,
+   "tracks": 19.790835181079082,
+   "n_dup": 14.31559497413156
+  },
+  "noisy": {
+   "frames": 15774,
+   "births": 3512,
+   "drops": 4378,
+   "returns": 1207,
+   "short_births": 267,
+   "churn": 0.06057335653664578,
+   "tracks": 17.497907949790793,
+   "n_dup": 63.924749587929504
+  },
+  "cold": {
+   "frames": 40,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 23.85
+  },
+  "near_change": {
+   "frames": 254,
+   "births": 700,
+   "drops": 137,
+   "returns": 20,
+   "short_births": 39,
+   "churn": 2.1844455881689613,
+   "tracks": 14.334645669291339,
+   "n_dup": 46.87795275590551
+  },
+  "stable": {
+   "frames": 16913,
+   "births": 3582,
+   "drops": 4957,
+   "returns": 1491,
+   "short_births": 342,
+   "churn": 0.034881124865288174,
+   "tracks": 17.687459350795248,
+   "n_dup": 60.117365340270794
+  },
+  "first30": {
+   "frames": 1200,
+   "births": 917,
+   "drops": 281,
+   "returns": 70,
+   "short_births": 57,
+   "churn": 0.4872434013980747,
+   "tracks": 15.416666666666666,
+   "n_dup": 58.2525
+  },
+  "after30": {
+   "frames": 15967,
+   "births": 3365,
+   "drops": 4813,
+   "returns": 1441,
+   "short_births": 324,
+   "churn": 0.035078697473780014,
+   "tracks": 17.804784868791884,
+   "n_dup": 60.0469092503288
+  },
+  "regime_changes": 92,
+  "assoc_jumps": 92,
+  "band_move_mean": 0.028974730176368053
+ },
+ "dev40/rtdetr/V7d@cold=none": {
+  "system": "V7d@cold=none",
+  "det": "rtdetr",
+  "frames": 17167,
+  "all": {
+   "frames": 17167,
+   "births": 4372,
+   "drops": 5159,
+   "returns": 1486,
+   "short_births": 431,
+   "churn": 0.06811777194651068,
+   "tracks": 17.583037222578202,
+   "n_dup": 59.921768509349334
+  },
+  "clean": {
+   "frames": 1353,
+   "births": 861,
+   "drops": 792,
+   "returns": 279,
+   "short_births": 164,
+   "churn": 0.1583237542558216,
+   "tracks": 19.161862527716185,
+   "n_dup": 14.31559497413156
+  },
+  "noisy": {
+   "frames": 15774,
+   "births": 3511,
+   "drops": 4367,
+   "returns": 1207,
+   "short_births": 267,
+   "churn": 0.060553173037759735,
+   "tracks": 17.492202358311143,
+   "n_dup": 63.92506656523393
+  },
+  "cold": {
+   "frames": 40,
+   "births": 0,
+   "drops": 0,
+   "returns": 0,
+   "short_births": 0,
+   "churn": 0.0,
+   "tracks": 0.0,
+   "n_dup": 23.85
+  },
+  "near_change": {
+   "frames": 254,
+   "births": 700,
+   "drops": 132,
+   "returns": 19,
+   "short_births": 41,
+   "churn": 2.184442336462111,
+   "tracks": 14.251968503937007,
+   "n_dup": 46.89763779527559
+  },
+  "stable": {
+   "frames": 16913,
+   "births": 3672,
+   "drops": 5027,
+   "returns": 1467,
+   "short_births": 390,
+   "churn": 0.03633473881300612,
+   "tracks": 17.633063324070243,
+   "n_dup": 60.117365340270794
+  },
+  "first30": {
+   "frames": 1200,
+   "births": 918,
+   "drops": 286,
+   "returns": 69,
+   "short_births": 58,
+   "churn": 0.4874534130190593,
+   "tracks": 15.394166666666667,
+   "n_dup": 58.2525
+  },
+  "after30": {
+   "frames": 15967,
+   "births": 3454,
+   "drops": 4873,
+   "returns": 1417,
+   "short_births": 373,
+   "churn": 0.03660259882149919,
+   "tracks": 17.747541804972755,
+   "n_dup": 60.04722239619215
+  },
+  "regime_changes": 92,
+  "assoc_jumps": 92,
+  "band_move_mean": 0.02897896458379731
  }
 }
