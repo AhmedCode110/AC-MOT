@@ -307,3 +307,62 @@ def test_cached_stream_causality_and_determinism(det):
         part = replay(V7Layer(spec(name), HOST), fr[:30])
         for p, q in zip(x[:30], part):
             np.testing.assert_array_equal(p.keep, q.keep)
+
+
+# ------------------------------------------------------------- V7e mechanisms
+def test_cumulative_rho_history_is_unbounded():
+    L = V7Layer(spec("V7e"), HOST)
+    replay(L, stream(14, frames=150))
+    assert L.rho_hist.maxlen is None and len(L.rho_hist) == 149
+
+
+def _single_stage_host():
+    return HostContract(assoc=0.6, birth=0.6, low=0.6, match=0.7)
+
+
+def test_fg_rescue_hands_track_continuation_to_single_stage_host():
+    """A foreground candidate below a single-stage host's threshold that
+    continues an otherwise uncovered track of t-1 is raised just above it;
+    a candidate far from every track is not."""
+    L = V7Layer(V7Spec(regime="clean", clean="native", dup="none", rescue="track",
+                       rescue_band="fg", motion=False), _single_stage_host())
+    rng = np.random.default_rng(15)
+    for _ in range(5):                       # statistics with a background mode
+        b, s, _ = synth_frame(rng)
+        L.step(b, s)
+    trk = np.array([[100, 100, 140, 200]], float)
+    L.observe(trk, [1])
+    t1 = sigmoid(L._bands()[0])
+    cont, far = [101, 101, 141, 201], [500, 500, 540, 600]
+    sc = max(t1 + 0.01, 0.4)
+    d = L.step(np.array([cont, far], float), np.array([sc, sc]))
+    assert d.log["n_rescued"] == 1
+    assert d.scores[0] > 0.6 >= d.scores[1]
+
+
+def test_fg_rescue_is_a_no_op_for_two_stage_hosts_and_never_touches_births():
+    L = V7Layer(V7Spec(regime="clean", clean="native", dup="none", rescue="track",
+                       rescue_band="fg", motion=False), HOST)
+    rng = np.random.default_rng(16)
+    for _ in range(5):
+        b, s, _ = synth_frame(rng)
+        L.step(b, s)
+    L.observe(np.array([[100, 100, 140, 200]], float), [1])
+    d = L.step(np.array([[101, 101, 141, 201]], float), np.array([0.2]))
+    assert d.log["n_rescued"] == 0 and d.scores[0] == 0.2
+
+
+def test_bg_check_counts_a_stream_without_background_mode_as_clean():
+    """When the class below t1 is smaller than the foreground (no
+    background mode, e.g. a high emission floor) rho is clean evidence."""
+    H = logit(np.r_[np.full(4, 0.3), np.full(2, 0.803), np.full(2, 0.723), np.full(1, 0.95)])
+    for chk, expect_one in ((False, False), (True, True)):
+        L = V7Layer(V7Spec(bg_check=chk), HOST)
+        L.window.append(H)
+        t1, t2, rho = L._bands()
+        assert (H < t1).sum() < (H >= t1).sum()
+        assert (rho == 1.0) == expect_one and (expect_one or rho < 0.5)
+    # a stream WITH a background mode keeps its noisy decision
+    fr2 = stream(18, noisy=True)
+    assert [d.log["regime"] for d in replay(V7Layer(spec("V7e", bg_check=True), HOST), fr2)] == \
+           [d.log["regime"] for d in replay(V7Layer(spec("V7e"), HOST), fr2)]

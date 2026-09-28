@@ -139,7 +139,14 @@ class V7Spec:
     # The low tail below the host threshold (where emission floors act) no
     # longer enters rho.
     rho_ref: str = "fg"
-    # Frames of per-frame rho values whose median decides the regime.
+    # Interpretability check of the nested split: the bands are read as
+    # background | ambiguous | confident only when the class below t1 holds
+    # at least as many pooled candidates as the foreground; otherwise the
+    # frame's rho counts as clean evidence (1.0).
+    bg_check: bool = False
+    # Frames of per-frame rho values whose median decides the regime
+    # (0 = every non-cold frame of the stream so far: the regime is a property
+    # of the detector x scene stream, not of the last few seconds).
     rho_frames: int = 1
     # Clean regime: "proj" = clip(host, t1, t2) | "upper" = min(host, t2)
     # (the host is only prevented from rejecting the confident class) |
@@ -200,7 +207,7 @@ class V7Layer:
     def reset(self):
         s = self.spec
         self.window = deque(maxlen=int(s.window))     # pooled logits, frames < t
-        self.rho_hist = deque(maxlen=max(1, int(s.rho_frames)))
+        self.rho_hist = deque(maxlen=max(1, int(s.rho_frames)) if int(s.rho_frames) > 0 else None)
         self.motion_hist = RobustHistory(s.hist, s.warmup)
         self.prev_tracks = np.zeros((0, 4))
         self.prev_ids = np.zeros(0, int)
@@ -298,6 +305,15 @@ class V7Layer:
             lo = max(t1, float(logit(min(self.host.assoc, self.host.birth))))
         n_fg = int((H >= lo).sum())
         rho = float((H >= max(t2, lo)).sum() / n_fg) if n_fg else 1.0
+        if self.spec.bg_check and int((H < t1).sum()) < int((H >= t1).sum()):
+            # no background mode in the pooled stream (e.g. an emission floor
+            # above the background scores): the first split falls inside the
+            # objects, the bands are not background|ambiguous|confident and
+            # give no evidence against the host -> counted as clean evidence
+            rho = 1.0
+            self._no_bg = True
+        else:
+            self._no_bg = False
         return float(t1), float(t2), rho
 
     def _ecdf(self, scores):
@@ -375,18 +391,30 @@ class V7Layer:
             out = scores[passed]
             assoc, birth = float(sigmoid(ta)), float(sigmoid(tb))
         n_rescued = 0
-        if s.rescue == "track" and regime != "noisy" and len(self.prev_tracks) and len(passed):
+        if (s.rescue == "track" and (regime != "noisy" or s.rescue_band == "fg")
+                and len(self.prev_tracks) and len(passed)):
             # Track-consistent rescue: a candidate the host would ignore (score
             # below its lowest stage) that continues an existing track of frame
             # t-1 not covered by any usable candidate is handed to the host's
             # low stage. Births are unaffected (the score stays below every
             # birth/association threshold of the host).
             if s.rescue_band == "fg":
-                # foreground candidates (>= t1 of frames < t) the host cannot see
-                # (below its lowest usable stage, host.low)
+                # foreground candidates (raw score >= t1 of frames < t) that the
+                # host cannot see at the operating point passed this frame: a
+                # two-stage host sees everything above host.low; a single-stage
+                # host (host.low >= its association/birth threshold) sees only
+                # what reaches its passed association threshold.
+                single = h.low >= min(h.assoc, h.birth)
+                floor_pass = min(assoc, birth) if single else h.low
                 lo_fg = sigmoid(bands[0]) if bands is not None else np.inf
-                usable = passed[scores[passed] > h.low]
-                low_c = passed[(scores[passed] >= lo_fg) & (scores[passed] <= h.low)]
+                if single and s.bg_check and bands is not None and getattr(self, "_no_bg", False):
+                    # no background mode: every emitted candidate is object-like.
+                    # Only for a host WITHOUT a low stage: a two-stage host's own
+                    # designed low bound (host.low) is respected.
+                    lo_fg = 0.0
+                o = np.asarray(out, np.float64)
+                usable = passed[o > floor_pass]
+                low_c = passed[(scores[passed] >= lo_fg) & (o <= floor_pass)]
             elif s.rescue_band == "assoc":
                 # candidates between the host's lowest stage and its association
                 # threshold (a single-stage host never uses them)
@@ -411,6 +439,7 @@ class V7Layer:
                     pos = np.searchsorted(passed, idx)
                     out = np.array(out, np.float64)
                     out[pos] = (min(h.assoc, h.birth) + 1e-3 if s.rescue_band == "assoc"
+                                else floor_pass + 1e-3 if s.rescue_band == "fg"
                                 else h.low + 1e-3)
                     n_rescued = len(idx)
                     # candidates below the host's lowest stage that were not

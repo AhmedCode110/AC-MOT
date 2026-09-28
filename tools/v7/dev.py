@@ -91,6 +91,7 @@ def track_sequence(split, system, det, seq):
     from adapters.types import Detection
     from tools.run_policy_validation import CachedDetector
     base, ov, tf, floor, botsort = parse(system)
+    ocsort = "@trk:ocsort" in system
     if botsort:
         from adapters.trackers.botsort import BoTSORTAdapter as Trk
     else:
@@ -102,7 +103,11 @@ def track_sequence(split, system, det, seq):
         raise SystemExit(f"{seq}: BoT-SORT needs the real frames ({len(frames)} *.jpg in "
                          f"{sp['data']}, cache has {cd.frames})")
     h = HOST_BYTETRACK
-    tr = Trk(high=h["assoc"], low=h["low"], new=h["birth"], buffer=30, match=h["match"], fuse=True)
+    if ocsort:
+        h = HOST_OCSORT
+        tr = _ocsort_host(h)
+    else:
+        tr = Trk(high=h["assoc"], low=h["low"], new=h["birth"], buffer=30, match=h["match"], fuse=True)
     layer = V7Layer(spec_from_dict(dict(ov, name=base)), HostContract(**h))
     lines, audit = [], []
     for i in range(1, cd.frames + 1):
@@ -118,15 +123,50 @@ def track_sequence(split, system, det, seq):
                           confidence=float(v), class_id=raw[k].class_id)
                 for k, v in zip(dec.keep, dec.scores)]
         tr.set_association_tolerance(dec.match)
-        img = cv2.imread(str(frames[i - 1])) if botsort else np.empty(cd.shape + (0,), np.uint8)
-        tracks = tr.update(dets, cd.shape, association_threshold=dec.assoc,
-                           birth_threshold=dec.birth, image=img if botsort else None)
+        if ocsort:
+            tracks = tr.update([[x.x1, x.y1, x.x2, x.y2, x.confidence] for x in dets],
+                               cd.shape, min(dec.assoc, dec.birth))
+            _ocsort_classes(tracks, dets, tr)
+        else:
+            img = cv2.imread(str(frames[i - 1])) if botsort else np.empty(cd.shape + (0,), np.uint8)
+            tracks = tr.update(dets, cd.shape, association_threshold=dec.assoc,
+                               birth_threshold=dec.birth, image=img if botsort else None)
         layer.observe([[t.x1, t.y1, t.x2, t.y2] for t in tracks], [t.track_id for t in tracks])
         for t in tracks:
             lines.append(f"{i},{t.track_id},{t.x1:.3f},{t.y1:.3f},{t.x2 - t.x1:.3f},"
                          f"{t.y2 - t.y1:.3f},{t.confidence:.6f},{t.class_id},-1,-1\n")
         audit.append(dict(dec.log, tracks=len(tracks)))
     return lines, audit, cd.frames
+
+
+# OC-SORT (CVPR 2023, noahcao/OC_SORT @ 8462e7e) official arguments: single
+# threshold 0.6 (association = birth; no low stage -> low = 0.6), IoU 0.3.
+HOST_OCSORT = dict(assoc=0.6, birth=0.6, low=0.6, match=0.7)
+
+
+def _ocsort_host(h):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "mot17_host_v7", ROOT / "tools/v7/external/mot17_bytetrack_v7.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    t = m.OCSortHost(h)
+    t.cls = {}
+    return t
+
+
+def _ocsort_classes(tracks, dets, tr):
+    """OC-SORT outputs no class: a track takes the class of the passed
+    detection it reproduces (IoU >= 0.5), else keeps its last class."""
+    from acmot_v7 import iou_matrix
+    if not tracks:
+        return
+    M = iou_matrix([[t.x1, t.y1, t.x2, t.y2] for t in tracks],
+                   [[d.x1, d.y1, d.x2, d.y2] for d in dets]) if dets else None
+    for i, t in enumerate(tracks):
+        if M is not None and M.shape[1] and M[i].max() >= 0.5:
+            tr.cls[t.track_id] = dets[int(M[i].argmax())].class_id
+        t.class_id = tr.cls.get(t.track_id, -1)
 
 
 def run_one(job):

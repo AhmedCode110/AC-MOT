@@ -309,6 +309,90 @@ priority of the continue prompt):
   within 2 frames of a regime change, clean vs noisy frames.
 - E13 `V7c@pool=raw`, `V7d@pool=raw` (tracks already produced).
 
+## Labelled fallback evidence (cloud C1) — E15–E19
+All numbers below are EXACT evaluations of the stated configuration (see
+`V7_FALLBACK_VALIDATION.md`), cloud CPU, TrackEval @12c8791. Development
+data only (MOT17 val-half and KITTI training are contaminated for V7).
+MOT17 cells: two emission floors of the same published YOLOX-X detector
+(st = SparseTrack's published stream, floor 0.01; bt = BoostTrack's
+published stream, floor 0.1). Hosts: ByteTrack official MOT17 setting
+("official"), ultralytics ByteTrack default ("ultra"), OC-SORT official
+("OC"), BoostTrack (pixel-free, exact). No image motion cue on MOT17 (frames
+unreachable): the V7 motion rule is inactive there.
+
+### E15 — identity and floor stress on MOT17 hosts (NATIVE, V6EMU, V7c/V7d)
+- NATIVE = BASELINE exactly on every host and floor (tier-a identity);
+  BoostTrack BASELINE pixel-free = the Mac reference tracks byte for byte.
+- V6EMU collapses at floor 0.1 (ByteTrack 56.4 vs 67.7 HOTA; OC 45.7 vs
+  66.4) — labelled confirmation of D2/D6.
+- V7c = V7d here (no motion cue). Floor 0.01: parity (±0.02 HOTA). Floor
+  0.1: −0.14 (ByteTrack official), −0.75 (OC-SORT), −0.12 (BoostTrack).
+- Cause (per sequence): false noisy calls — mid-stream in MOT17-10 (a 54-frame
+  confidence dip under camera motion) and at the start of MOT17-02/11/13.
+- `cold=none` (E12a labelled): −0.3 to −0.5 HOTA on every MOT17 host →
+  REJECTED (frame-1 admission is not the fix on clean streams).
+- `pool=raw` (E13 labelled): within ±0.1 HOTA everywhere → not adopted
+  (no evidence of benefit; KITTI YOLO +0.17 HOTA but −IDF1).
+- `cold_dup=noisy`: within ±0.06 HOTA → not adopted.
+
+### E16 — regime from the whole stream (rho_frames = 0, "cumulative")
+Hypothesis: the regime is a property of the detector × scene stream; a
+100-frame median reacts to transient confidence dips (MOT17-10) and flips.
+Result: removes the mid-stream flips — ByteTrack floor 0.1 back to ≥ baseline
+(67.702 vs 67.698), OC floor 0.1 −0.37 (from −0.75), BoostTrack −0.03 (from
+−0.12). Remaining losses: start-of-sequence false noisy calls. ADOPTED.
+`rho_ref=host` gave no further gain once cumulative → not adopted.
+
+### E17 — track-consistent rescue (host-relative low stage)
+- `rescue_band=low` (sub-host.low continuations to ByteTrack's low stage):
+  FP +700–1000, −0.4/−0.5 HOTA → REJECTED.
+- `scores=ecdf` in clean frames: ByteTrack −0.2/−1.6 HOTA → REJECTED.
+- `rescue_band=assoc` (band (host.low, assoc) of OC with a misdeclared
+  low=0.1): OC +0.25 HOTA / +1.1 MOTA; ByteTrack −0.04 → redesigned.
+- **`rescue_band=fg`** (ADOPTED in V7e): a FOREGROUND candidate (≥ t1)
+  continuing an uncovered track of t−1 that the host cannot see at the
+  operating point passed this frame is handed to the host's lowest stage.
+  Host contract made honest: OC-SORT has no low stage → low = det_thresh =
+  0.6 (documented property: use_byte=False). Two-stage hosts: no-op by
+  construction. In noisy frames it hands the extension band to a
+  single-stage host (the V6 bands' intended semantics "may continue, may not
+  start").
+
+### E18 — interpretability of the nested split (bg_check, V7f)
+Diagnosis (MOT17-11 start, floor 0.1): ~10 candidates per frame, all objects;
+no background mode → first Otsu split falls inside the objects (t1 ≈ 0.6),
+second at 0.93 → ρ 0.13–0.17 → false noisy regime.
+Rule: the bands are read as background | ambiguous | confident only when the
+class below t1 holds at least as many pooled candidates as the foreground;
+otherwise the frame's ρ counts as clean evidence. For a host without a low
+stage every emitted candidate of such a stream may continue an uncovered
+track. Parameter-free.
+
+| Cell | BASELINE HOTA/MOTA/IDF1 (IDS) | V7f HOTA/MOTA/IDF1 (IDS) | ΔHOTA 95% CI (10k paired, seed 42) |
+|---|---|---|---|
+| ByteTrack official, floor 0.01 | 67.698/77.604/79.471 (214) | 67.684/77.662/79.440 (218) | −0.014 [−0.058, +0.009] |
+| ByteTrack official, floor 0.1 | 67.698/77.604/79.471 (214) | identical | 0 |
+| ByteTrack ultralytics, floor 0.01 | 66.000/74.756/76.417 (424) | identical | 0 |
+| ByteTrack ultralytics, floor 0.1 | 66.000/74.756/76.417 (424) | identical | 0 |
+| OC-SORT, floor 0.01 | 66.428/74.672/78.052 (211) | **67.041/75.940/78.708 (203)** | **+0.613 [+0.363, +1.241]**; MOTA +1.27 [+0.17, +3.01] |
+| OC-SORT, floor 0.1 | 66.443/74.669/78.046 (213) | **66.907/75.931/78.333 (199)** | **+0.464 [+0.266, +1.086]**; MOTA +1.26 [+0.37, +3.34]; IDF1 +0.29 [+0.00, +0.84] |
+| BoostTrack online / GBI | 68.492 / 71.725 | identical (declared two-stage: its own boosting is its low stage) | 0 |
+
+KITTI tracking training (21 seq, ultralytics hosts, native YOLOv8n cache,
+official KITTI HOTA car/ped averaged):
+| Host | NATIVE | V6EMU | V7d | V7e | V7f |
+|---|---|---|---|---|---|
+| ByteTrack (0.25/0.25/0.1) | 45.31/46.54/60.92 (561) | 44.82/43.77/62.01 (241) | 45.17/44.75/61.99 (315) | 45.40/44.64/62.40 (285) | 45.37/44.67/62.40 (290) |
+| OC-SORT (0.6, IoU 0.3) | 36.27/33.99/50.46 (91) | 40.20/38.43/55.74 (149) | 41.14/40.18/56.41 (166) | 44.15/43.33/60.00 (169) | **44.18/43.39/60.05 (170)** |
+(HOTA_avg/MOTA_avg/IDF1_avg (IDS)). KITTI ByteTrack: V7 trades MOTA (−1.9,
+FN +1500 car) for IDF1 (+1.5) and IDS (−48%); HOTA neutral. OC-SORT whose
+fixed 0.6 threshold is miscalibrated for YOLOv8n: +7.9 HOTA.
+
+### E19 — BoT-SORT on KITTI (E11 host)
+The ultralytics BoT-SORT Kalman update raised a Cholesky error on sequence
+0020 with V7-filtered inputs (host numerical failure; NATIVE runs). E11 will
+be reported on the 20 other sequences for every system (diagnostic subset).
+
 ## Open issues found by the adversarial audit (2026-09-28)
 - **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
 - **O2 — NATIVE vs the V6 record's "tracker default".** V7 `NATIVE` = native caches (YOLO NMS 0.7, RT-DETR no NMS, Faster R-CNN 0.5) + ultralytics ByteTrack 0.25/0.1/0.25, match 0.8, fuse on, no layer. The V6 paper's `static_default` used the NMS-0.45 caches: YOLO val-7 17.04/31.72/33.65 (IDS 359) vs 18.40/31.62/33.62 (IDS 320); Faster R-CNN MOTA −11.29 vs −9.56; RT-DETR identical. D8 and the catastrophic counts in E8 use V7 NATIVE.
