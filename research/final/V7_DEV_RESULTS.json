@@ -1,0 +1,1629 @@
+{
+ "visdrone_val7_yolo_rtdetr": {
+  "NATIVE": {
+   "yolov8": {
+    "MOTA": 17.044,
+    "HOTA": 31.719,
+    "IDF1": 33.654,
+    "IDS": 359,
+    "FP": 9740,
+    "FN": 45768,
+    "Precision": 68.899,
+    "Recall": 32.039,
+    "clean_frac": 0.998,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": -6.244,
+    "HOTA": 36.761,
+    "IDF1": 40.672,
+    "IDS": 839,
+    "FP": 42646,
+    "FN": 28065,
+    "Precision": 47.946,
+    "Recall": 58.327,
+    "clean_frac": 0.998,
+    "catastrophic": [
+     "uav0000117_02622_v",
+     "uav0000182_00000_v",
+     "uav0000268_05773_v",
+     "uav0000305_00000_v",
+     "uav0000339_00001_v"
+    ]
+   }
+  },
+  "V6EMU": {
+   "yolov8": {
+    "MOTA": 18.56,
+    "HOTA": 34.262,
+    "IDF1": 38.597,
+    "IDS": 159,
+    "FP": 8427,
+    "FN": 46260,
+    "Precision": 71.446,
+    "Recall": 31.309,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 25.012,
+    "HOTA": 41.649,
+    "IDF1": 48.113,
+    "IDS": 150,
+    "FP": 9474,
+    "FN": 40877,
+    "Precision": 73.641,
+    "Recall": 39.302,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@cold=host": {
+   "yolov8": {
+    "MOTA": 18.803,
+    "HOTA": 34.565,
+    "IDF1": 39.014,
+    "IDS": 174,
+    "FP": 8633,
+    "FN": 45875,
+    "Precision": 71.322,
+    "Recall": 31.881,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.254,
+    "HOTA": 41.751,
+    "IDF1": 47.946,
+    "IDS": 172,
+    "FP": 10569,
+    "FN": 40270,
+    "Precision": 71.924,
+    "Recall": 40.203,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@dup=track": {
+   "yolov8": {
+    "MOTA": 18.5,
+    "HOTA": 34.304,
+    "IDF1": 38.73,
+    "IDS": 159,
+    "FP": 8480,
+    "FN": 46247,
+    "Precision": 71.33,
+    "Recall": 31.328,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.758,
+    "HOTA": 41.604,
+    "IDF1": 48.034,
+    "IDS": 150,
+    "FP": 9644,
+    "FN": 40878,
+    "Precision": 73.293,
+    "Recall": 39.301,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@regime=rho": {
+   "yolov8": {
+    "MOTA": 18.23,
+    "HOTA": 34.634,
+    "IDF1": 39.21,
+    "IDS": 175,
+    "FP": 9823,
+    "FN": 45070,
+    "Precision": 69.397,
+    "Recall": 33.076,
+    "clean_frac": 0.409,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.149,
+    "HOTA": 41.592,
+    "IDF1": 48.479,
+    "IDS": 175,
+    "FP": 11641,
+    "FN": 39266,
+    "Precision": 70.692,
+    "Recall": 41.694,
+    "clean_frac": 0.101,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@regime=rho@dup_regime=noisy": {
+   "yolov8": {
+    "MOTA": 16.6,
+    "HOTA": 33.673,
+    "IDF1": 37.844,
+    "IDS": 244,
+    "FP": 10751,
+    "FN": 45171,
+    "Precision": 67.347,
+    "Recall": 32.926,
+    "clean_frac": 0.372,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.559,
+    "HOTA": 41.574,
+    "IDF1": 48.447,
+    "IDS": 192,
+    "FP": 12217,
+    "FN": 39070,
+    "Precision": 69.829,
+    "Recall": 41.985,
+    "clean_frac": 0.087,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@regime=rho@scores=raw": {
+   "yolov8": {
+    "MOTA": 19.151,
+    "HOTA": 32.913,
+    "IDF1": 35.724,
+    "IDS": 174,
+    "FP": 7256,
+    "FN": 47018,
+    "Precision": 73.694,
+    "Recall": 30.183,
+    "clean_frac": 0.409,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.756,
+    "HOTA": 41.198,
+    "IDF1": 47.284,
+    "IDS": 159,
+    "FP": 10738,
+    "FN": 39776,
+    "Precision": 71.969,
+    "Recall": 40.937,
+    "clean_frac": 0.101,
+    "catastrophic": []
+   }
+  },
+  "V6EMU@scores=raw": {
+   "yolov8": {
+    "MOTA": 19.041,
+    "HOTA": 32.947,
+    "IDF1": 35.996,
+    "IDS": 151,
+    "FP": 6782,
+    "FN": 47589,
+    "Precision": 74.444,
+    "Recall": 29.336,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 25.548,
+    "HOTA": 41.199,
+    "IDF1": 47.054,
+    "IDS": 138,
+    "FP": 9033,
+    "FN": 40969,
+    "Precision": 74.49,
+    "Recall": 39.165,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   }
+  },
+  "V7a": {
+   "yolov8": {
+    "MOTA": 19.376,
+    "HOTA": 33.461,
+    "IDF1": 36.59,
+    "IDS": 183,
+    "FP": 7500,
+    "FN": 46613,
+    "Precision": 73.434,
+    "Recall": 30.785,
+    "clean_frac": 0.407,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.031,
+    "HOTA": 41.464,
+    "IDF1": 47.5,
+    "IDS": 187,
+    "FP": 11843,
+    "FN": 39131,
+    "Precision": 70.435,
+    "Recall": 41.895,
+    "clean_frac": 0.099,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup=ctx": {
+   "yolov8": {
+    "MOTA": 19.234,
+    "HOTA": 33.677,
+    "IDF1": 36.894,
+    "IDS": 181,
+    "FP": 7654,
+    "FN": 46557,
+    "Precision": 73.089,
+    "Recall": 30.868,
+    "clean_frac": 0.405,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.833,
+    "HOTA": 41.561,
+    "IDF1": 47.648,
+    "IDS": 181,
+    "FP": 12065,
+    "FN": 39049,
+    "Precision": 70.107,
+    "Recall": 42.016,
+    "clean_frac": 0.099,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup=ctx@dup_memory=10": {
+   "yolov8": {
+    "MOTA": 19.216,
+    "HOTA": 33.508,
+    "IDF1": 36.762,
+    "IDS": 174,
+    "FP": 7684,
+    "FN": 46546,
+    "Precision": 73.023,
+    "Recall": 30.884,
+    "clean_frac": 0.404,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.819,
+    "HOTA": 41.563,
+    "IDF1": 47.647,
+    "IDS": 181,
+    "FP": 12075,
+    "FN": 39048,
+    "Precision": 70.091,
+    "Recall": 42.018,
+    "clean_frac": 0.099,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup=ctx@dup_scope=primary": {
+   "yolov8": {
+    "MOTA": 19.093,
+    "HOTA": 33.829,
+    "IDF1": 37.364,
+    "IDS": 195,
+    "FP": 8260,
+    "FN": 46032,
+    "Precision": 72.069,
+    "Recall": 31.647,
+    "clean_frac": 0.332,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 21.951,
+    "HOTA": 41.501,
+    "IDF1": 47.824,
+    "IDS": 237,
+    "FP": 15628,
+    "FN": 36697,
+    "Precision": 66.229,
+    "Recall": 45.509,
+    "clean_frac": 0.076,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup=none": {
+   "yolov8": {
+    "MOTA": 17.698,
+    "HOTA": 33.779,
+    "IDF1": 36.964,
+    "IDS": 262,
+    "FP": 9333,
+    "FN": 45831,
+    "Precision": 69.744,
+    "Recall": 31.946,
+    "clean_frac": 0.339,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 17.857,
+    "HOTA": 40.373,
+    "IDF1": 46.307,
+    "IDS": 294,
+    "FP": 18561,
+    "FN": 36464,
+    "Precision": 62.459,
+    "Recall": 45.855,
+    "clean_frac": 0.075,
+    "catastrophic": [
+     "uav0000182_00000_v",
+     "uav0000305_00000_v"
+    ]
+   }
+  },
+  "V7a@dup_memory=10": {
+   "yolov8": {
+    "MOTA": 19.324,
+    "HOTA": 33.43,
+    "IDF1": 36.611,
+    "IDS": 176,
+    "FP": 7557,
+    "FN": 46598,
+    "Precision": 73.301,
+    "Recall": 30.807,
+    "clean_frac": 0.406,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.03,
+    "HOTA": 41.464,
+    "IDF1": 47.501,
+    "IDS": 187,
+    "FP": 11845,
+    "FN": 39130,
+    "Precision": 70.432,
+    "Recall": 41.896,
+    "clean_frac": 0.099,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup_memory=30": {
+   "yolov8": {
+    "MOTA": 19.203,
+    "HOTA": 33.378,
+    "IDF1": 36.557,
+    "IDS": 177,
+    "FP": 7644,
+    "FN": 46592,
+    "Precision": 73.082,
+    "Recall": 30.816,
+    "clean_frac": 0.404,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.002,
+    "HOTA": 41.459,
+    "IDF1": 47.492,
+    "IDS": 187,
+    "FP": 11864,
+    "FN": 39130,
+    "Precision": 70.398,
+    "Recall": 41.896,
+    "clean_frac": 0.099,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup_regime=noisy": {
+   "yolov8": {
+    "MOTA": 18.53,
+    "HOTA": 33.56,
+    "IDF1": 36.604,
+    "IDS": 211,
+    "FP": 8095,
+    "FN": 46560,
+    "Precision": 71.97,
+    "Recall": 30.863,
+    "clean_frac": 0.368,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.745,
+    "HOTA": 41.348,
+    "IDF1": 47.322,
+    "IDS": 204,
+    "FP": 12135,
+    "FN": 39015,
+    "Precision": 70.011,
+    "Recall": 42.067,
+    "clean_frac": 0.087,
+    "catastrophic": []
+   }
+  },
+  "V7a@dup_scope=primary": {
+   "yolov8": {
+    "MOTA": 19.093,
+    "HOTA": 33.68,
+    "IDF1": 37.182,
+    "IDS": 193,
+    "FP": 8245,
+    "FN": 46049,
+    "Precision": 72.09,
+    "Recall": 31.622,
+    "clean_frac": 0.332,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 21.942,
+    "HOTA": 41.497,
+    "IDF1": 47.817,
+    "IDS": 237,
+    "FP": 15620,
+    "FN": 36711,
+    "Precision": 66.23,
+    "Recall": 45.488,
+    "clean_frac": 0.076,
+    "catastrophic": []
+   }
+  },
+  "V7b": {
+   "yolov8": {
+    "MOTA": 17.89,
+    "HOTA": 34.057,
+    "IDF1": 37.96,
+    "IDS": 231,
+    "FP": 9722,
+    "FN": 45344,
+    "Precision": 69.353,
+    "Recall": 32.669,
+    "clean_frac": 0.429,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.469,
+    "HOTA": 41.563,
+    "IDF1": 47.958,
+    "IDS": 195,
+    "FP": 11970,
+    "FN": 39375,
+    "Precision": 70.03,
+    "Recall": 41.532,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7b@dup_regime=always": {
+   "yolov8": {
+    "MOTA": 18.768,
+    "HOTA": 34.118,
+    "IDF1": 38.248,
+    "IDS": 200,
+    "FP": 9110,
+    "FN": 45396,
+    "Precision": 70.669,
+    "Recall": 32.592,
+    "clean_frac": 0.451,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.272,
+    "HOTA": 41.739,
+    "IDF1": 48.304,
+    "IDS": 185,
+    "FP": 11480,
+    "FN": 39334,
+    "Precision": 70.93,
+    "Recall": 41.593,
+    "clean_frac": 0.067,
+    "catastrophic": []
+   }
+  },
+  "V7c": {
+   "yolov8": {
+    "MOTA": 18.414,
+    "HOTA": 34.503,
+    "IDF1": 38.578,
+    "IDS": 222,
+    "FP": 9357,
+    "FN": 45365,
+    "Precision": 70.141,
+    "Recall": 32.638,
+    "clean_frac": 0.437,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.543,
+    "HOTA": 41.569,
+    "IDF1": 47.967,
+    "IDS": 186,
+    "FP": 11923,
+    "FN": 39381,
+    "Precision": 70.108,
+    "Recall": 41.523,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7c@clean=proj": {
+   "yolov8": {
+    "MOTA": 18.414,
+    "HOTA": 34.503,
+    "IDF1": 38.578,
+    "IDS": 222,
+    "FP": 9357,
+    "FN": 45365,
+    "Precision": 70.141,
+    "Recall": 32.638,
+    "clean_frac": 0.437,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.527,
+    "HOTA": 41.572,
+    "IDF1": 47.959,
+    "IDS": 184,
+    "FP": 11932,
+    "FN": 39385,
+    "Precision": 70.089,
+    "Recall": 41.518,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7c@cold=none": {
+   "yolov8": {
+    "MOTA": 18.132,
+    "HOTA": 34.233,
+    "IDF1": 38.184,
+    "IDS": 206,
+    "FP": 9176,
+    "FN": 45752,
+    "Precision": 70.178,
+    "Recall": 32.063,
+    "clean_frac": 0.437,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 24.363,
+    "HOTA": 41.457,
+    "IDF1": 47.93,
+    "IDS": 161,
+    "FP": 10756,
+    "FN": 40021,
+    "Precision": 71.754,
+    "Recall": 40.573,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7c@dup_clean=none": {
+   "yolov8": {
+    "MOTA": 17.89,
+    "HOTA": 34.057,
+    "IDF1": 37.96,
+    "IDS": 231,
+    "FP": 9722,
+    "FN": 45344,
+    "Precision": 69.353,
+    "Recall": 32.669,
+    "clean_frac": 0.429,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.485,
+    "HOTA": 41.561,
+    "IDF1": 47.966,
+    "IDS": 197,
+    "FP": 11961,
+    "FN": 39371,
+    "Precision": 70.049,
+    "Recall": 41.538,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7c@scores=ecdf": {
+   "yolov8": {
+    "MOTA": 16.704,
+    "HOTA": 34.216,
+    "IDF1": 38.776,
+    "IDS": 239,
+    "FP": 11169,
+    "FN": 44688,
+    "Precision": 66.981,
+    "Recall": 33.643,
+    "clean_frac": 0.437,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.077,
+    "HOTA": 41.837,
+    "IDF1": 48.523,
+    "IDS": 193,
+    "FP": 12538,
+    "FN": 39073,
+    "Precision": 69.277,
+    "Recall": 41.981,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V7d": {
+   "yolov8": {
+    "MOTA": 18.43,
+    "HOTA": 33.861,
+    "IDF1": 37.764,
+    "IDS": 226,
+    "FP": 9259,
+    "FN": 45448,
+    "Precision": 70.282,
+    "Recall": 32.515,
+    "clean_frac": 0.437,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 23.445,
+    "HOTA": 41.523,
+    "IDF1": 47.907,
+    "IDS": 188,
+    "FP": 11934,
+    "FN": 39434,
+    "Precision": 70.049,
+    "Recall": 41.445,
+    "clean_frac": 0.071,
+    "catastrophic": []
+   }
+  },
+  "V6:X5": {
+   "yolov8": {
+    "MOTA": 18.56,
+    "HOTA": 34.262,
+    "IDF1": 38.597,
+    "IDS": 159,
+    "FP": 8427,
+    "FN": 46260,
+    "Precision": 71.446,
+    "Recall": 31.309,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 25.012,
+    "HOTA": 41.649,
+    "IDF1": 48.113,
+    "IDS": 150,
+    "FP": 9474,
+    "FN": 40877,
+    "Precision": 73.641,
+    "Recall": 39.302,
+    "clean_frac": NaN,
+    "catastrophic": []
+   }
+  },
+  "V6:V4": {
+   "yolov8": {
+    "MOTA": 17.495,
+    "HOTA": 33.247,
+    "IDF1": 36.568,
+    "IDS": 159,
+    "FP": 7639,
+    "FN": 47765,
+    "Precision": 71.935,
+    "Recall": 29.074,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 21.529,
+    "HOTA": 38.987,
+    "IDF1": 42.409,
+    "IDS": 81,
+    "FP": 7084,
+    "FN": 45681,
+    "Precision": 75.358,
+    "Recall": 32.169,
+    "clean_frac": NaN,
+    "catastrophic": []
+   }
+  },
+  "V6:shared_static": {
+   "yolov8": {
+    "MOTA": 18.592,
+    "HOTA": 30.729,
+    "IDF1": 31.297,
+    "IDS": 119,
+    "FP": 4206,
+    "FN": 50499,
+    "Precision": 80.021,
+    "Recall": 25.014,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 22.958,
+    "HOTA": 40.593,
+    "IDF1": 46.101,
+    "IDS": 312,
+    "FP": 14698,
+    "FN": 36874,
+    "Precision": 67.46,
+    "Recall": 45.246,
+    "clean_frac": NaN,
+    "catastrophic": []
+   }
+  },
+  "V6:static_default": {
+   "yolov8": {
+    "MOTA": 18.401,
+    "HOTA": 31.619,
+    "IDF1": 33.623,
+    "IDS": 320,
+    "FP": 8414,
+    "FN": 46219,
+    "Precision": 71.517,
+    "Recall": 31.37,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": -6.244,
+    "HOTA": 36.761,
+    "IDF1": 40.672,
+    "IDS": 839,
+    "FP": 42646,
+    "FN": 28065,
+    "Precision": 47.946,
+    "Recall": 58.327,
+    "clean_frac": NaN,
+    "catastrophic": [
+     "uav0000117_02622_v",
+     "uav0000182_00000_v",
+     "uav0000268_05773_v",
+     "uav0000305_00000_v",
+     "uav0000339_00001_v"
+    ]
+   }
+  }
+ },
+ "visdrone_val7_fasterrcnn": {
+  "NATIVE": {
+   "fasterrcnn": {
+    "MOTA": -11.288,
+    "HOTA": 34.486,
+    "IDF1": 38.118,
+    "IDS": 1016,
+    "FP": 43245,
+    "FN": 30686,
+    "Precision": 45.879,
+    "Recall": 54.435,
+    "clean_frac": 0.998,
+    "catastrophic": [
+     "uav0000117_02622_v",
+     "uav0000137_00458_v",
+     "uav0000182_00000_v",
+     "uav0000268_05773_v",
+     "uav0000305_00000_v",
+     "uav0000339_00001_v"
+    ]
+   }
+  },
+  "V6EMU": {
+   "fasterrcnn": {
+    "MOTA": 20.181,
+    "HOTA": 36.951,
+    "IDF1": 44.022,
+    "IDS": 305,
+    "FP": 13766,
+    "FN": 39683,
+    "Precision": 66.771,
+    "Recall": 41.075,
+    "clean_frac": 0.0,
+    "catastrophic": []
+   }
+  },
+  "V7c": {
+   "fasterrcnn": {
+    "MOTA": 18.56,
+    "HOTA": 37.419,
+    "IDF1": 44.242,
+    "IDS": 342,
+    "FP": 16365,
+    "FN": 38139,
+    "Precision": 64.089,
+    "Recall": 43.368,
+    "clean_frac": 0.127,
+    "catastrophic": []
+   }
+  },
+  "V6:V4": {
+   "fasterrcnn": {
+    "MOTA": 18.138,
+    "HOTA": 34.781,
+    "IDF1": 40.155,
+    "IDS": 242,
+    "FP": 11796,
+    "FN": 43092,
+    "Precision": 67.278,
+    "Recall": 36.013,
+    "clean_frac": NaN,
+    "catastrophic": []
+   }
+  },
+  "V6:shared_static": {
+   "fasterrcnn": {
+    "MOTA": 3.305,
+    "HOTA": 36.957,
+    "IDF1": 42.561,
+    "IDS": 670,
+    "FP": 32611,
+    "FN": 31838,
+    "Precision": 52.126,
+    "Recall": 52.724,
+    "clean_frac": NaN,
+    "catastrophic": [
+     "uav0000137_00458_v",
+     "uav0000182_00000_v",
+     "uav0000305_00000_v"
+    ]
+   }
+  },
+  "V6:static_default": {
+   "fasterrcnn": {
+    "MOTA": -9.558,
+    "HOTA": 34.969,
+    "IDF1": 38.736,
+    "IDS": 941,
+    "FP": 42011,
+    "FN": 30830,
+    "Precision": 46.501,
+    "Recall": 54.221,
+    "clean_frac": NaN,
+    "catastrophic": [
+     "uav0000117_02622_v",
+     "uav0000137_00458_v",
+     "uav0000182_00000_v",
+     "uav0000268_05773_v",
+     "uav0000305_00000_v",
+     "uav0000339_00001_v"
+    ]
+   }
+  }
+ },
+ "visdrone_dev40": {
+  "NATIVE": {
+   "yolov8": {
+    "MOTA": 24.458,
+    "HOTA": 34.035,
+    "IDF1": 39.567,
+    "IDS": 2655,
+    "FP": 60610,
+    "FN": 366583,
+    "Precision": 76.959,
+    "Recall": 35.577,
+    "clean_frac": 0.998,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 12.464,
+    "HOTA": 41.244,
+    "IDF1": 47.781,
+    "IDS": 4837,
+    "FP": 285920,
+    "FN": 207341,
+    "Precision": 55.849,
+    "Recall": 63.562,
+    "clean_frac": 0.998,
+    "catastrophic": [
+     "uav0000013_00000_v",
+     "uav0000013_01392_v",
+     "uav0000071_03240_v",
+     "uav0000076_00720_v",
+     "uav0000218_00001_v",
+     "uav0000239_03720_v",
+     "uav0000263_03289_v",
+     "uav0000264_02760_v",
+     "uav0000289_00001_v",
+     "uav0000300_00000_v",
+     "uav0000308_01380_v",
+     "uav0000309_00000_v",
+     "uav0000315_00000_v",
+     "uav0000316_01288_v",
+     "uav0000329_04715_v",
+     "uav0000360_00001_v",
+     "uav0000363_00001_v"
+    ]
+   }
+  },
+  "V7c": {
+   "yolov8": {
+    "MOTA": 25.578,
+    "HOTA": 36.029,
+    "IDF1": 43.57,
+    "IDS": 1394,
+    "FP": 60319,
+    "FN": 361763,
+    "Precision": 77.457,
+    "Recall": 36.424,
+    "clean_frac": 0.105,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 29.407,
+    "HOTA": 40.763,
+    "IDF1": 48.638,
+    "IDS": 1319,
+    "FP": 75966,
+    "FN": 324406,
+    "Precision": 76.304,
+    "Recall": 42.989,
+    "clean_frac": 0.078,
+    "catastrophic": [
+     "uav0000263_03289_v",
+     "uav0000264_02760_v"
+    ]
+   }
+  },
+  "V7d": {
+   "yolov8": {
+    "MOTA": 25.551,
+    "HOTA": 35.968,
+    "IDF1": 43.467,
+    "IDS": 1419,
+    "FP": 60123,
+    "FN": 362088,
+    "Precision": 77.487,
+    "Recall": 36.367,
+    "clean_frac": 0.105,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 29.543,
+    "HOTA": 40.787,
+    "IDF1": 48.643,
+    "IDS": 1328,
+    "FP": 75041,
+    "FN": 324544,
+    "Precision": 76.514,
+    "Recall": 42.965,
+    "clean_frac": 0.078,
+    "catastrophic": [
+     "uav0000263_03289_v",
+     "uav0000264_02760_v"
+    ]
+   }
+  },
+  "V6:X5": {
+   "yolov8": {
+    "MOTA": 25.534,
+    "HOTA": 35.816,
+    "IDF1": 43.499,
+    "IDS": 1272,
+    "FP": 57592,
+    "FN": 364865,
+    "Precision": 77.997,
+    "Recall": 35.879,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 29.555,
+    "HOTA": 39.891,
+    "IDF1": 47.692,
+    "IDS": 999,
+    "FP": 58696,
+    "FN": 341150,
+    "Precision": 79.518,
+    "Recall": 40.046,
+    "clean_frac": NaN,
+    "catastrophic": [
+     "uav0000263_03289_v",
+     "uav0000264_02760_v"
+    ]
+   }
+  },
+  "V6:V4": {
+   "yolov8": {
+    "MOTA": 25.132,
+    "HOTA": 35.189,
+    "IDF1": 42.193,
+    "IDS": 1188,
+    "FP": 49574,
+    "FN": 375254,
+    "Precision": 79.628,
+    "Recall": 34.053,
+    "clean_frac": NaN,
+    "catastrophic": []
+   },
+   "rtdetr": {
+    "MOTA": 26.308,
+    "HOTA": 38.41,
+    "IDF1": 44.408,
+    "IDS": 753,
+    "FP": 48120,
+    "FN": 370453,
+    "Precision": 80.494,
+    "Recall": 34.897,
+    "clean_frac": NaN,
+    "catastrophic": [
+     "uav0000013_01392_v",
+     "uav0000263_03289_v",
+     "uav0000264_02760_v"
+    ]
+   }
+  }
+ },
+ "mot17_sparsetrack": {
+  "ST7_BASELINE": {
+   "HOTA": 68.876,
+   "DetA": 66.539,
+   "AssA": 71.791,
+   "MOTA": 77.849,
+   "IDF1": 81.974,
+   "IDS": 124,
+   "FP": 2231,
+   "FN": 9582,
+   "Precision": 95.206,
+   "Recall": 82.219,
+   "Frag": 545
+  },
+  "ST7_NATIVE": {
+   "HOTA": 68.876,
+   "DetA": 66.539,
+   "AssA": 71.791,
+   "MOTA": 77.849,
+   "IDF1": 81.974,
+   "IDS": 124,
+   "FP": 2231,
+   "FN": 9582,
+   "Precision": 95.206,
+   "Recall": 82.219,
+   "Frag": 545
+  },
+  "ST7_V7a": {
+   "HOTA": 67.717,
+   "DetA": 65.648,
+   "AssA": 70.339,
+   "MOTA": 76.962,
+   "IDF1": 80.274,
+   "IDS": 135,
+   "FP": 1768,
+   "FN": 10512,
+   "Precision": 96.084,
+   "Recall": 80.494,
+   "Frag": 517
+  },
+  "ST7_V7a_clean": {
+   "HOTA": 67.776,
+   "DetA": 65.636,
+   "AssA": 70.47,
+   "MOTA": 76.927,
+   "IDF1": 80.371,
+   "IDS": 133,
+   "FP": 1822,
+   "FN": 10479,
+   "Precision": 95.972,
+   "Recall": 80.555,
+   "Frag": 514
+  },
+  "ST7_V7a_dupnone": {
+   "HOTA": 68.792,
+   "DetA": 66.776,
+   "AssA": 71.377,
+   "MOTA": 78.141,
+   "IDF1": 81.738,
+   "IDS": 136,
+   "FP": 2156,
+   "FN": 9488,
+   "Precision": 95.369,
+   "Recall": 82.394,
+   "Frag": 555
+  },
+  "ST7_V7a_mem10": {
+   "HOTA": 67.935,
+   "DetA": 65.701,
+   "AssA": 70.735,
+   "MOTA": 77.04,
+   "IDF1": 80.543,
+   "IDS": 131,
+   "FP": 1921,
+   "FN": 10321,
+   "Precision": 95.777,
+   "Recall": 80.848,
+   "Frag": 523
+  },
+  "ST7_V7a_mem30": {
+   "HOTA": 67.967,
+   "DetA": 65.814,
+   "AssA": 70.684,
+   "MOTA": 77.157,
+   "IDF1": 80.637,
+   "IDS": 128,
+   "FP": 1930,
+   "FN": 10252,
+   "Precision": 95.765,
+   "Recall": 80.976,
+   "Frag": 526
+  },
+  "ST7_V7a_nomotion": {
+   "HOTA": 67.839,
+   "DetA": 65.645,
+   "AssA": 70.59,
+   "MOTA": 76.933,
+   "IDF1": 80.623,
+   "IDS": 135,
+   "FP": 1771,
+   "FN": 10525,
+   "Precision": 96.076,
+   "Recall": 80.469,
+   "Frag": 513
+  },
+  "ST7_V7b": {
+   "HOTA": 68.812,
+   "DetA": 66.688,
+   "AssA": 71.508,
+   "MOTA": 77.988,
+   "IDF1": 81.771,
+   "IDS": 134,
+   "FP": 2245,
+   "FN": 9483,
+   "Precision": 95.188,
+   "Recall": 82.403,
+   "Frag": 555
+  },
+  "ST7_V7c": {
+   "HOTA": 68.812,
+   "DetA": 66.689,
+   "AssA": 71.508,
+   "MOTA": 77.99,
+   "IDF1": 81.772,
+   "IDS": 134,
+   "FP": 2245,
+   "FN": 9482,
+   "Precision": 95.188,
+   "Recall": 82.405,
+   "Frag": 555
+  },
+  "ST7_V7d": {
+   "HOTA": 68.931,
+   "DetA": 66.588,
+   "AssA": 71.853,
+   "MOTA": 77.927,
+   "IDF1": 82.13,
+   "IDS": 131,
+   "FP": 2249,
+   "FN": 9515,
+   "Precision": 95.176,
+   "Recall": 82.344,
+   "Frag": 551
+  },
+  "ST7_ctx1": {
+   "HOTA": 67.862,
+   "DetA": 65.535,
+   "AssA": 70.754,
+   "MOTA": 76.79,
+   "IDF1": 80.406,
+   "IDS": 127,
+   "FP": 1885,
+   "FN": 10496,
+   "Precision": 95.837,
+   "Recall": 80.523,
+   "Frag": 514
+  },
+  "ST7_ctx10": {
+   "HOTA": 68.045,
+   "DetA": 65.714,
+   "AssA": 70.944,
+   "MOTA": 77.064,
+   "IDF1": 80.811,
+   "IDS": 127,
+   "FP": 1924,
+   "FN": 10309,
+   "Precision": 95.772,
+   "Recall": 80.87,
+   "Frag": 522
+  },
+  "ST7_ctxprim": {
+   "HOTA": 67.939,
+   "DetA": 65.599,
+   "AssA": 70.846,
+   "MOTA": 76.914,
+   "IDF1": 80.759,
+   "IDS": 130,
+   "FP": 1882,
+   "FN": 10429,
+   "Precision": 95.849,
+   "Recall": 80.648,
+   "Frag": 515
+  },
+  "ST7_dupnoisy": {
+   "HOTA": 68.773,
+   "DetA": 66.739,
+   "AssA": 71.377,
+   "MOTA": 78.081,
+   "IDF1": 81.711,
+   "IDS": 136,
+   "FP": 2187,
+   "FN": 9489,
+   "Precision": 95.306,
+   "Recall": 82.392,
+   "Frag": 555
+  },
+  "ST7_scopeprim": {
+   "HOTA": 67.791,
+   "DetA": 65.699,
+   "AssA": 70.434,
+   "MOTA": 77.072,
+   "IDF1": 80.532,
+   "IDS": 134,
+   "FP": 1763,
+   "FN": 10459,
+   "Precision": 96.099,
+   "Recall": 80.592,
+   "Frag": 514
+  },
+  "ST_A_official": {
+   "HOTA": 68.876,
+   "DetA": 66.539,
+   "AssA": 71.791,
+   "MOTA": 77.849,
+   "IDF1": 81.974,
+   "IDS": 124,
+   "FP": 2231,
+   "FN": 9582,
+   "Precision": 95.206,
+   "Recall": 82.219,
+   "Frag": 545
+  },
+  "ST_DIAG_assoc_motion_0": {
+   "HOTA": 64.863,
+   "DetA": 61.408,
+   "AssA": 68.918,
+   "MOTA": 71.728,
+   "IDF1": 77.777,
+   "IDS": 106,
+   "FP": 594,
+   "FN": 14536,
+   "Precision": 98.513,
+   "Recall": 73.027,
+   "Frag": 563
+  },
+  "ST_DIAG_dedup_iou_0": {
+   "HOTA": 67.305,
+   "DetA": 64.444,
+   "AssA": 70.729,
+   "MOTA": 75.27,
+   "IDF1": 80.226,
+   "IDS": 106,
+   "FP": 1039,
+   "FN": 12182,
+   "Precision": 97.569,
+   "Recall": 77.395,
+   "Frag": 509
+  },
+  "ST_plus_V6TF": {
+   "HOTA": 64.721,
+   "DetA": 61.395,
+   "AssA": 68.636,
+   "MOTA": 71.709,
+   "IDF1": 77.488,
+   "IDS": 108,
+   "FP": 601,
+   "FN": 14537,
+   "Precision": 98.496,
+   "Recall": 73.025,
+   "Frag": 564
+  },
+  "ST_replay_baseline": {
+   "HOTA": 68.876,
+   "DetA": 66.539,
+   "AssA": 71.791,
+   "MOTA": 77.849,
+   "IDF1": 81.974,
+   "IDS": 124,
+   "FP": 2231,
+   "FN": 9582,
+   "Precision": 95.206,
+   "Recall": 82.219,
+   "Frag": 545
+  }
+ },
+ "mot17_boosttrack": {
+  "BT7_BASELINE": {
+   "HOTA": 68.492,
+   "DetA": 64.814,
+   "AssA": 72.806,
+   "MOTA": 75.502,
+   "IDF1": 81.413,
+   "IDS": 113,
+   "FP": 1637,
+   "FN": 11452,
+   "Precision": 96.286,
+   "Recall": 78.749,
+   "Frag": 531
+  },
+  "BT7_BASELINE_post": {
+   "HOTA": 71.474,
+   "DetA": 68.811,
+   "AssA": 74.756,
+   "MOTA": 80.996,
+   "IDF1": 84.128,
+   "IDS": 98,
+   "FP": 2684,
+   "FN": 7459,
+   "Precision": 94.535,
+   "Recall": 86.159,
+   "Frag": 177
+  },
+  "BT7_BASELINE_post_gbi": {
+   "HOTA": 71.725,
+   "DetA": 69.02,
+   "AssA": 75.071,
+   "MOTA": 81.032,
+   "IDF1": 84.163,
+   "IDS": 97,
+   "FP": 2674,
+   "FN": 7451,
+   "Precision": 94.555,
+   "Recall": 86.174,
+   "Frag": 164
+  },
+  "BT7_NATIVE": {
+   "HOTA": 68.492,
+   "DetA": 64.814,
+   "AssA": 72.806,
+   "MOTA": 75.502,
+   "IDF1": 81.413,
+   "IDS": 113,
+   "FP": 1637,
+   "FN": 11452,
+   "Precision": 96.286,
+   "Recall": 78.749,
+   "Frag": 531
+  },
+  "BT7_NATIVE_post": {
+   "HOTA": 71.474,
+   "DetA": 68.811,
+   "AssA": 74.756,
+   "MOTA": 80.996,
+   "IDF1": 84.128,
+   "IDS": 98,
+   "FP": 2684,
+   "FN": 7459,
+   "Precision": 94.535,
+   "Recall": 86.159,
+   "Frag": 177
+  },
+  "BT7_NATIVE_post_gbi": {
+   "HOTA": 71.725,
+   "DetA": 69.02,
+   "AssA": 75.071,
+   "MOTA": 81.032,
+   "IDF1": 84.163,
+   "IDS": 97,
+   "FP": 2674,
+   "FN": 7451,
+   "Precision": 94.555,
+   "Recall": 86.174,
+   "Frag": 164
+  },
+  "BT7_V7b": {
+   "HOTA": 67.282,
+   "DetA": 64.186,
+   "AssA": 70.941,
+   "MOTA": 74.823,
+   "IDF1": 79.855,
+   "IDS": 115,
+   "FP": 996,
+   "FN": 12457,
+   "Precision": 97.653,
+   "Recall": 76.884,
+   "Frag": 524
+  },
+  "BT7_V7b_post": {
+   "HOTA": 70.243,
+   "DetA": 68.279,
+   "AssA": 72.765,
+   "MOTA": 80.2,
+   "IDF1": 82.653,
+   "IDS": 102,
+   "FP": 2326,
+   "FN": 8242,
+   "Precision": 95.152,
+   "Recall": 84.706,
+   "Frag": 177
+  },
+  "BT7_V7b_post_gbi": {
+   "HOTA": 70.453,
+   "DetA": 68.44,
+   "AssA": 73.049,
+   "MOTA": 80.239,
+   "IDF1": 82.718,
+   "IDS": 103,
+   "FP": 2314,
+   "FN": 8232,
+   "Precision": 95.176,
+   "Recall": 84.724,
+   "Frag": 164
+  },
+  "BT7_V7c": {
+   "HOTA": 68.164,
+   "DetA": 64.707,
+   "AssA": 72.235,
+   "MOTA": 75.315,
+   "IDF1": 81.074,
+   "IDS": 125,
+   "FP": 1600,
+   "FN": 11578,
+   "Precision": 96.356,
+   "Recall": 78.515,
+   "Frag": 537
+  },
+  "BT7_V7c_nomotion": {
+   "HOTA": 68.373,
+   "DetA": 64.587,
+   "AssA": 72.809,
+   "MOTA": 75.175,
+   "IDF1": 81.195,
+   "IDS": 120,
+   "FP": 1625,
+   "FN": 11633,
+   "Precision": 96.297,
+   "Recall": 78.413,
+   "Frag": 529
+  },
+  "BT7_V7c_nomotion_post": {
+   "HOTA": 71.428,
+   "DetA": 68.537,
+   "AssA": 74.952,
+   "MOTA": 80.674,
+   "IDF1": 83.943,
+   "IDS": 97,
+   "FP": 2610,
+   "FN": 7708,
+   "Precision": 94.651,
+   "Recall": 85.697,
+   "Frag": 172
+  },
+  "BT7_V7c_nomotion_post_gbi": {
+   "HOTA": 71.653,
+   "DetA": 68.718,
+   "AssA": 75.245,
+   "MOTA": 80.688,
+   "IDF1": 83.977,
+   "IDS": 97,
+   "FP": 2605,
+   "FN": 7705,
+   "Precision": 94.661,
+   "Recall": 85.702,
+   "Frag": 158
+  },
+  "BT7_V7c_post": {
+   "HOTA": 70.831,
+   "DetA": 68.34,
+   "AssA": 73.925,
+   "MOTA": 80.109,
+   "IDF1": 83.448,
+   "IDS": 107,
+   "FP": 2913,
+   "FN": 7699,
+   "Precision": 94.068,
+   "Recall": 85.713,
+   "Frag": 187
+  },
+  "BT7_V7c_post_gbi": {
+   "HOTA": 71.057,
+   "DetA": 68.513,
+   "AssA": 74.23,
+   "MOTA": 80.115,
+   "IDF1": 83.483,
+   "IDS": 103,
+   "FP": 2913,
+   "FN": 7700,
+   "Precision": 94.068,
+   "Recall": 85.712,
+   "Frag": 171
+  },
+  "BT7_V7d": {
+   "HOTA": 68.373,
+   "DetA": 64.587,
+   "AssA": 72.809,
+   "MOTA": 75.175,
+   "IDF1": 81.195,
+   "IDS": 120,
+   "FP": 1625,
+   "FN": 11633,
+   "Precision": 96.297,
+   "Recall": 78.413,
+   "Frag": 529
+  },
+  "BT7_V7d_post": {
+   "HOTA": 71.428,
+   "DetA": 68.537,
+   "AssA": 74.952,
+   "MOTA": 80.674,
+   "IDF1": 83.943,
+   "IDS": 97,
+   "FP": 2610,
+   "FN": 7708,
+   "Precision": 94.651,
+   "Recall": 85.697,
+   "Frag": 172
+  },
+  "BT7_V7d_post_gbi": {
+   "HOTA": 71.653,
+   "DetA": 68.718,
+   "AssA": 75.245,
+   "MOTA": 80.688,
+   "IDF1": 83.977,
+   "IDS": 97,
+   "FP": 2605,
+   "FN": 7705,
+   "Precision": 94.661,
+   "Recall": 85.702,
+   "Frag": 158
+  },
+  "BT_plus_V6TF": {
+   "HOTA": 62.606,
+   "DetA": 57.507,
+   "AssA": 68.504,
+   "MOTA": 66.636,
+   "IDF1": 75.191,
+   "IDS": 75,
+   "FP": 286,
+   "FN": 17619,
+   "Precision": 99.218,
+   "Recall": 67.306,
+   "Frag": 406
+  },
+  "BT_plus_V6TF_post": {
+   "HOTA": 66.182,
+   "DetA": 61.971,
+   "AssA": 71.077,
+   "MOTA": 72.243,
+   "IDF1": 78.495,
+   "IDS": 72,
+   "FP": 687,
+   "FN": 14199,
+   "Precision": 98.299,
+   "Recall": 73.652,
+   "Frag": 122
+  },
+  "BT_plus_V6TF_post_gbi": {
+   "HOTA": 66.35,
+   "DetA": 62.105,
+   "AssA": 71.296,
+   "MOTA": 72.297,
+   "IDF1": 78.512,
+   "IDS": 70,
+   "FP": 676,
+   "FN": 14183,
+   "Precision": 98.326,
+   "Recall": 73.682,
+   "Frag": 110
+  },
+  "BT_replay_baseline": {
+   "HOTA": 68.492,
+   "DetA": 64.814,
+   "AssA": 72.806,
+   "MOTA": 75.502,
+   "IDF1": 81.413,
+   "IDS": 113,
+   "FP": 1637,
+   "FN": 11452,
+   "Precision": 96.286,
+   "Recall": 78.749,
+   "Frag": 531
+  },
+  "BT_replay_baseline_post": {
+   "HOTA": 71.474,
+   "DetA": 68.811,
+   "AssA": 74.756,
+   "MOTA": 80.996,
+   "IDF1": 84.128,
+   "IDS": 98,
+   "FP": 2684,
+   "FN": 7459,
+   "Precision": 94.535,
+   "Recall": 86.159,
+   "Frag": 177
+  },
+  "BT_replay_baseline_post_gbi": {
+   "HOTA": 71.725,
+   "DetA": 69.02,
+   "AssA": 75.071,
+   "MOTA": 81.032,
+   "IDF1": 84.163,
+   "IDS": 97,
+   "FP": 2674,
+   "FN": 7451,
+   "Precision": 94.555,
+   "Recall": 86.174,
+   "Frag": 164
+  }
+ }
+}
