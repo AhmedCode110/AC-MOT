@@ -37,6 +37,11 @@ from tools.v6.dev import SPLITS as _V6_SPLITS, split_sequences as _v6_split_sequ
 
 
 def split_sequences(split):
+    ex = set(filter(None, os.environ.get("V7_EXCLUDE", "").split(",")))   # declared host-failure subsets only
+    return [s for s in _split_sequences(split) if s not in ex]
+
+
+def _split_sequences(split):
     if split in _V6_SPLITS:
         return _v6_split_sequences(split)
     nat = ROOT / SPLITS[split]["native"]

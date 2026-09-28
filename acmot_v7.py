@@ -361,8 +361,13 @@ class V7Layer:
                 tdisc = -np.inf                      # host's own low stage
             else:
                 regime = "noisy"
-                ta = t2 if s.noisy_primary == "t2" else t1
-                tb = ta
+                if s.noisy_primary == "proj":
+                    # host-relative: the host's own operating point projected
+                    # onto the stream's ambiguous band [t1, t2]
+                    ta, tb = float(np.clip(A, t1, t2)), float(np.clip(B, t1, t2))
+                else:
+                    ta = t2 if s.noisy_primary == "t2" else t1
+                    tb = ta
                 tdisc = t1 if s.noisy_ext == "otsu" else -np.inf
 
         L_in = logit(scores)
@@ -387,6 +392,8 @@ class V7Layer:
             u = self._ecdf(scores[passed])
             out = np.where(Lp >= ta, 0.5 + 0.5 * u, 0.1 + 0.4 * u)
             assoc, birth = 0.5, 0.5
+            if tb > ta:          # birth above association (host-relative bands)
+                birth = float(0.5 + 0.5 * self._ecdf(np.array([sigmoid(tb)]))[0])
         else:
             out = scores[passed]
             assoc, birth = float(sigmoid(ta)), float(sigmoid(tb))

@@ -37,6 +37,15 @@ import trackeval  # noqa: E402
 
 KITTI = Path(os.environ.get("ACMOT_KITTI", Path.home() / "acmot_work/kitti"))
 GT = KITTI / "gt"
+EXCLUDE = sorted(filter(None, os.environ.get("V7_EXCLUDE", "").split(",")))
+if EXCLUDE:          # declared subset (host failure), own seqmap next to the full one
+    _sub = KITTI / ("gt_ex_" + "_".join(EXCLUDE))
+    _sub.mkdir(exist_ok=True)
+    if not (_sub / "label_02").exists():
+        (_sub / "label_02").symlink_to(GT / "label_02")
+    open(_sub / "evaluate_tracking.seqmap.training", "w").writelines(
+        l for l in open(GT / "evaluate_tracking.seqmap.training") if l.split()[0] not in EXCLUDE)
+    GT = _sub
 TYPES = {0: "Pedestrian", 2: "Car"}
 CLASSES = ["car", "pedestrian"]
 
@@ -47,7 +56,7 @@ def seqs():
 
 def write_tracker(det, system):
     """Convert the runner output to KITTI files; returns the trackers root."""
-    root = ROOT / "outputs/v7/kitti_trackeval" / det
+    root = ROOT / "outputs/v7/kitti_trackeval" / (det + ("_ex_" + "_".join(EXCLUDE) if EXCLUDE else ""))
     d = root / system.replace("@", "__") / "data"
     d.mkdir(parents=True, exist_ok=True)
     for s in seqs():
@@ -68,7 +77,7 @@ def write_tracker(det, system):
 def evaluate(det, system):
     """Per-sequence, per-class TrackEval results (cached)."""
     tname = system.replace("@", "__")
-    cache = ROOT / "outputs/v7/kitti_trackeval" / det / tname / "per_seq.pkl"
+    cache = ROOT / "outputs/v7/kitti_trackeval" / (det + ("_ex_" + "_".join(EXCLUDE) if EXCLUDE else "")) / tname / "per_seq.pkl"
     stamp = [pickle.load(open(ROOT / "outputs/v7/kitti" / system / det / f"{s}.trk.pkl", "rb"))["v7_stamp"]
              for s in seqs()]
     if cache.exists():

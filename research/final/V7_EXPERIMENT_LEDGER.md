@@ -417,10 +417,23 @@ recalibrated detector (scale05 / pow3: from 0 or ~60 back to ~66 HOTA) and is
 identical to the host where nothing is wrong; worst cell −0.14 HOTA
 (ultralytics host, scale05). Development evidence only.
 
-### E19 — BoT-SORT on KITTI (E11 host)
+### E19 — E11 on KITTI: motion rule vs camera-motion compensation (YOLOv8n)
 The ultralytics BoT-SORT Kalman update raised a Cholesky error on sequence
-0020 with V7-filtered inputs (host numerical failure; NATIVE runs). E11 will
-be reported on the 20 other sequences for every system (diagnostic subset).
+0020 with V7-filtered inputs (host numerical failure; NATIVE runs). E11 is
+reported on the 20 other sequences for EVERY system (`V7_EXCLUDE=0020`).
+
+| Host (CMC?) | NATIVE | V7f (motion in noisy frames) | V7f motion always | V7f motion off |
+|---|---|---|---|---|
+| ByteTrack (no CMC) | 45.22/45.78/60.63 (531) | 45.03/44.12/62.17 (275) | 45.05/43.97/62.22 (268) | 44.95/44.17/61.94 (293) |
+| BoT-SORT (CMC) | 49.21/49.89/64.41 (422) | 48.20/47.46/64.76 (195) | 48.17/47.44/64.83 (189) | 48.32/47.47/64.90 (195) |
+| OC-SORT (no CMC, 21 seq) | 36.27/33.99/50.46 (91) | 44.18/43.39/60.05 (170) | 44.29/43.46/60.14 (174) | 44.08/43.21/60.01 (168) |
+
+Reading: the motion rule's sign follows the E10 hypothesis (helps a host
+without CMC by +0.08–0.11 HOTA, costs a CMC host 0.12) but every effect is
+≤ 0.12 HOTA, i.e. within noise → no `cmc` capability flag is introduced;
+V7f keeps motion_regime=noisy. Separate finding: on KITTI YOLOv8n the
+noisy-regime birth restriction costs the two-stage hosts MOTA (ByteTrack
+−1.7, BoT-SORT −2.4) while it strongly helps the single-stage host.
 
 ## Open issues found by the adversarial audit (2026-09-28)
 - **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
