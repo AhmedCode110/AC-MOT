@@ -12,6 +12,8 @@ Protocol: `V7_RECENT_EXTERNAL_PROTOCOL.md` (preregistered). Machine-readable:
 | C-TWiX | official README, "HOTA on the validation sets" | MOT17 val-half (CenterTrack) | 77.8 | – | – | detections: YOLOX from ByteTrack |
 | C-TWiX | same | DanceTrack val | 60.4 | – | – | detections: YOLOX from ByteTrack |
 | C-TWiX | same | KITTIMOT val car / ped | 89.3 / 71.4 | – | – | detections: Permatrack |
+| TrackTrack | CVPR 2025 paper, Tables 4–7 (full method, TPA + TAI, D_del) | MOT17 val-half | 69.1 | – | – | AssA 72.7; post-processed output (GBI), as `run.py` evaluates `_post` |
+| TrackTrack | same | DanceTrack val | 63.3 | – | – | AssA 49.7; post-processed output (AFLink) |
 
 ## Systems
 Filled per system as runs complete: citation, venue, year, repository and
