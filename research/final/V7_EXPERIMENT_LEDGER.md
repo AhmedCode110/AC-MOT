@@ -388,6 +388,35 @@ official KITTI HOTA car/ped averaged):
 FN +1500 car) for IDF1 (+1.5) and IDS (−48%); HOTA neutral. OC-SORT whose
 fixed 0.6 threshold is miscalibrated for YOLOv8n: +7.9 HOTA.
 
+### STRESS-L — labelled calibration / floor stress on MOT17 (floor-0.01 stream)
+`<system>@t:<transform>` / `@floor=f` applied to the published detections
+before the layer; NATIVE = the host on the same stressed stream.
+HOTA / MOTA / IDF1:
+
+| Host | Stress | NATIVE | V7f |
+|---|---|---|---|
+| ByteTrack official | temp2 | 65.84 / 72.77 / 77.21 | **66.95 / 77.59 / 78.61** |
+| ByteTrack official | temp05 | 67.30 / 77.78 / 78.59 | 67.29 / 77.78 / 78.58 |
+| ByteTrack official | pow3 | 60.92 / 60.26 / 71.56 | **65.81 / 75.96 / 76.57** |
+| ByteTrack official | scale05 | 0 / 0 / 0 (nothing reaches 0.6) | **66.17 / 75.32 / 77.20** |
+| ByteTrack official | floor 0.05 / 0.2 | 67.70 / 67.41 | 67.70 / 67.41 (identical) |
+| ByteTrack ultralytics | temp2 | 63.97 / 68.09 / 73.48 | identical |
+| ByteTrack ultralytics | temp05 | 66.53 / 76.72 / 77.08 | 66.53 / 76.72 / 77.08 |
+| ByteTrack ultralytics | pow3 | 66.31 / 76.19 / 77.18 | 66.31 / 76.17 / 77.14 |
+| ByteTrack ultralytics | scale05 | 66.61 / 75.83 / 77.47 | 66.48 / 75.84 / 77.30 |
+| ByteTrack ultralytics | floor 0.05 / 0.2 | 66.00 / 66.08 | identical |
+| OC-SORT | temp2 | 65.99 / 73.30 / 77.66 | **67.22 / 75.35 / 79.31** |
+| OC-SORT | temp05 | 66.61 / 75.14 / 77.88 | **67.06 / 76.10 / 78.41** |
+| OC-SORT | pow3 | 58.34 / 58.38 / 69.00 | **66.60 / 75.53 / 78.32** |
+| OC-SORT | scale05 | 0 / 0 / 0 | **66.72 / 75.36 / 78.02** |
+| OC-SORT | floor 0.05 | 66.43 / 74.67 / 78.05 | **67.26 / 76.06 / 79.06** |
+| OC-SORT | floor 0.2 | 66.43 / 74.67 / 78.05 | **66.67 / 75.78 / 77.94** |
+
+Reading: V7f restores hosts whose fixed operating point no longer matches a
+recalibrated detector (scale05 / pow3: from 0 or ~60 back to ~66 HOTA) and is
+identical to the host where nothing is wrong; worst cell −0.14 HOTA
+(ultralytics host, scale05). Development evidence only.
+
 ### E19 — BoT-SORT on KITTI (E11 host)
 The ultralytics BoT-SORT Kalman update raised a Cholesky error on sequence
 0020 with V7-filtered inputs (host numerical failure; NATIVE runs). E11 will
