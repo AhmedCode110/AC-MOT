@@ -8,11 +8,9 @@ commit and push (no force).
 - **V7 IS FROZEN**: system V7f, freeze commit **488df9a** on
   `universal-adapters-v1-y0zkeh` (draft PR #1). Config
   `configs/universal_acmot_policy_v7.json`, lock `research/V7_POLICY_LOCK.json`.
-  The annotated tag `universal-acmot-v7-freeze` exists locally but the cloud git
-  proxy refuses tag pushes (HTTP 403). Owner action:
-  `git tag -a universal-acmot-v7-freeze 488df9a -m "Universal AC-MOT V7 frozen policy (V7f)" && git push origin universal-acmot-v7-freeze`.
-  Until the tag exists on the remote, `tools/v7/dev.py` still refuses conf16 in
-  a fresh clone.
+  The annotated tag `universal-acmot-v7-freeze` → 488df9a is on GitHub (published
+  by workflow `.github/workflows/v7_freeze_tag.yml`, run 36477643708, after checking
+  the policy lock at that commit: 10/10 files match). Immutable.
 - Evidence: development matrix + CIs `research/final/V7_STATISTICS.md`;
   experiments E12–E20 + STRESS-L in the ledger; availability matrix
   `V7_FALLBACK_VALIDATION.md`; runs `V7_CLOUD_RUNS.md`.
@@ -47,7 +45,7 @@ commit and push (no force).
 - Branch: **`universal-adapters-v1`**. The authoritative commit is the branch
   HEAD; `git log -1` shows the latest state commit. First V7 commit: `d56bba0`.
 - Tags: `universal-acmot-v6-freeze` → `2cff95f` (V6-TF, immutable).
-  `universal-acmot-v7-freeze` does NOT exist yet (V7 is not frozen).
+  `universal-acmot-v7-freeze` → `488df9a` (V7f, frozen).
 - Expected working tree after `git clone` + `scripts/setup_research_assets.sh`:
   - clean git tree;
   - untracked, git-ignored `outputs/det_cache_*_native/` and `outputs/v7/`;

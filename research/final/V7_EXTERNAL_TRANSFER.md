@@ -1,8 +1,7 @@
 # V7 EXTERNAL TRANSFER — frozen Universal AC-MOT (V7f) added to published systems
 
 Frozen policy: `configs/universal_acmot_policy_v7.json` (V7f) from the freeze
-commit 488df9a (tag `universal-acmot-v7-freeze` created locally; the cloud git
-proxy refuses tag pushes, see handoff). Systems and protocol predeclared in the
+commit 488df9a (tag `universal-acmot-v7-freeze`). Systems and protocol predeclared in the
 freeze commit (`V7_EXTERNAL_SELECTION.md`). No AC-MOT parameter was changed
 after the freeze; both predeclared outcomes are reported.
 

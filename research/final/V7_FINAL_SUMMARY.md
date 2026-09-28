@@ -49,4 +49,5 @@ tests (61), bootstrap, lock, runtime.
 Not yet achieved (needs network access to motchallenge.net / Google Drive):
 a second (and third) 2025/26 published system with an improvement; a second
 dataset / test-set external result; VisDrone/UAVDT labelled checks and the
-reserved VisDrone confirmation-16; the freeze tag on GitHub (owner push).
+reserved VisDrone confirmation-16.
+Freeze tag `universal-acmot-v7-freeze` → 488df9a is published on GitHub.

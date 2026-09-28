@@ -3,8 +3,7 @@
 Frozen policy: `configs/universal_acmot_policy_v7.json` (V7f), lock
 `research/V7_POLICY_LOCK.json` (sha256 of the layer, config, registry and
 runners; checked by `tests/test_v7_adaptive_layer.py::test_v7_policy_lock_integrity`),
-freeze commit 488df9a (tag `universal-acmot-v7-freeze`; push pending by the
-owner — the cloud git proxy refuses tags).
+freeze commit 488df9a (tag `universal-acmot-v7-freeze`, published on GitHub).
 
 ## Environment
 - `bash scripts/setup_research_assets.sh envs caches external repos gmc paths`
