@@ -1,0 +1,1 @@
+{"kind": "kitti", "gt_folder": "/home/runner/acmot_work/kitti_val", "seqmap": "evaluate_tracking.seqmap.training"}

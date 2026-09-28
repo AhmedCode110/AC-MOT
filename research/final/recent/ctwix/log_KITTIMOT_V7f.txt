@@ -1,0 +1,10 @@
+done 0002
+done 0006
+done 0007
+done 0008
+done 0010
+done 0013
+done 0014
+done 0016
+done 0018
+wrote /home/runner/acmot_work/acmot_external/runs/ctwix/KITTIMOT-val/CT_V7f/data

@@ -1,0 +1,2 @@
+Error importing BURST due to missing underlying dependency: No module named 'tabulate'
+Tracker file not found: /home/runner/acmot_work/acmot_external/runs/ctwix/DanceTrack-val/CT_BASELINE/data/dancetrack0004.txt

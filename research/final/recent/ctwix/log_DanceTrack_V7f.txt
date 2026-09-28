@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/runner/work/AC-MOT/AC-MOT/tools/v7/recent/ctwix_v7.py", line 178, in <module>
+    main()
+  File "/home/runner/work/AC-MOT/AC-MOT/tools/v7/recent/ctwix_v7.py", line 146, in main
+    scene.load_scene(scene_name)
+  File "/home/runner/acmot_work/acmot_external/TWiX/src/datasets/DanceTrack.py", line 41, in load_scene
+    self.height, self.width, _ = cv2.imread(self.get_path_image(1)).shape
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'shape'
