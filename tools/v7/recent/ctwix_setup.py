@@ -1,7 +1,7 @@
 """
 Prepare the C-TWiX data layout (Guepardow/TWiX @ 3cff9cc) without images.
-C-TWiX is coordinate-only: it reads frame images never, but lists frame
-numbers from the image folders. The folders are created with empty files
+C-TWiX is coordinate-only: it reads no frame content, but lists frame
+numbers from the image folders (and DanceTrack reads the size of frame 1). The folders are created with empty files
 named exactly as the official frames (frame counts from the official
 seqinfo.ini / KITTI seqmap), and the evaluation GT is built with the
 authors' own tools/create_halves_mot17.py from the official gt.txt files.
@@ -73,6 +73,14 @@ def dancetrack(src):
         (out / "img1").mkdir(parents=True, exist_ok=True)
         for f in range(1, n + 1):
             (out / f"img1/{f:08d}.jpg").touch()
+        # DanceTrack.load_scene reads frame 1 only for its height and width: a black image of the
+        # official size (seqinfo.ini imWidth / imHeight) is written there
+        import cv2
+        import numpy as np
+        c = configparser.ConfigParser()
+        c.read(d / "seqinfo.ini")
+        h, w = int(c["Sequence"]["imHeight"]), int(c["Sequence"]["imWidth"])
+        cv2.imwrite(str(out / "img1/00000001.jpg"), np.zeros((h, w, 3), np.uint8))
         shutil.copy(d / "seqinfo.ini", out / "seqinfo.ini")
         if (d / "gt/gt.txt").exists():
             (out / "gt").mkdir(exist_ok=True)

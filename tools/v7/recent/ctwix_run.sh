@@ -15,7 +15,7 @@ python3 -m venv "$EXT/venv"; P="$EXT/venv/bin/pip"; PY="$EXT/venv/bin/python"
 "$P" install -q --upgrade pip wheel
 "$P" install -q torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu || "$P" install -q torch==2.14.0
 "$P" install -q numpy==2.2.6 pandas scipy==1.18.1 loguru einops==0.8.0 pyyaml tqdm prettytable seaborn==0.13.2 \
-  matplotlib opencv-python-headless pycocotools requests
+  matplotlib opencv-python-headless pycocotools requests tabulate
 export ACMOT_TRACKEVAL="$WORK/TrackEval"
 git clone -q https://github.com/JonathonLuiten/TrackEval.git "$ACMOT_TRACKEVAL" && git -C "$ACMOT_TRACKEVAL" checkout -q 12c8791
 git clone -q https://github.com/Guepardow/TWiX.git "$EXT/TWiX" && git -C "$EXT/TWiX" checkout -q 3cff9cc
