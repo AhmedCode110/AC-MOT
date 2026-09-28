@@ -375,3 +375,22 @@ def test_frozen_config_is_the_registered_v7f_policy():
     cfg = json.loads((ROOT / "configs/universal_acmot_policy_v7.json").read_text())
     assert cfg["system"] == "V7f"
     assert cfg["spec"] == asdict(spec("V7f"))
+
+
+def test_v7_policy_lock_integrity():
+    """Every file named in the V7 lock still has its frozen sha256."""
+    import hashlib
+    import json
+    lock = json.loads((ROOT / "research/V7_POLICY_LOCK.json").read_text())
+    bad = [p for p, h in lock["file_sha256"].items()
+           if hashlib.sha256((ROOT / p).read_bytes()).hexdigest() != h]
+    assert not bad, bad
+
+
+def test_v6_policy_lock_untouched():
+    import hashlib
+    import json
+    lock = json.loads((ROOT / "research/V6TF_POLICY_LOCK.json").read_text())
+    bad = [p for p, h in lock["file_sha256"].items()
+           if hashlib.sha256((ROOT / p).read_bytes()).hexdigest() != h]
+    assert not bad, bad

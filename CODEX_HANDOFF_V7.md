@@ -26,6 +26,9 @@ commit and push (no force).
     (README 67.1/75.8/78.0) → + V7f identical (Δ = 0; two-stage host, clean stream).
 - BLOCKED here (recorded once): motchallenge.net, Google Drive, arXiv, Hugging
   Face, Zenodo, several author hosts. Reachable: GitHub, PyPI, official KITTI S3.
+- Offline completion done: runtime benchmark (`V7_REALTIME.md`), external results JSON,
+  V7_{METHOD,ABLATION,FAILURE_EVOLUTION,PAPER_CLAIMS,REPRODUCIBILITY,FINAL_SUMMARY}.md,
+  lock-integrity tests (61 tests pass).
 - Next (if more compute/network): further 2025/26 published systems when their
   artefacts become reachable (TOPICTrack stays reserved; it needs frames + ReID);
   VisDrone/UAVDT labelled checks and conf16 once Google Drive is reachable;
