@@ -1,3 +1,5 @@
+> **V7 development cycle (2026-09-28): `CODEX_HANDOFF_V7.md` is authoritative for current work; this file is V6-era.**
+
 # NEXT STEPS (operational; keep short; move finished items to DECISIONS/EXPERIMENT_REGISTRY)
 
 ## CURRENT GOAL

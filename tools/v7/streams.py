@@ -28,10 +28,10 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-EXT = Path("/Users/ahmedgouda/Desktop/acmot_external")
+EXT = Path(__import__("os").environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external"))
 MOT_GT = EXT / "BoostTrack/results/gt/MOT17-val"
 MOT_DATA = EXT / "data_mirror/MOT17"
-VD_VAL = Path("/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val")
+VD_VAL = Path(__import__("os").environ.get("ACMOT_VISDRONE_VAL", "/Users/ahmedgouda/Desktop/CUE_SELECTION/VisDrone2019-MOT-val"))
 MOT_SEQS = ["MOT17-02-FRCNN", "MOT17-04-FRCNN", "MOT17-05-FRCNN", "MOT17-09-FRCNN",
             "MOT17-10-FRCNN", "MOT17-11-FRCNN", "MOT17-13-FRCNN"]
 

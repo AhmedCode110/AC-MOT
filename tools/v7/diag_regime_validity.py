@@ -31,8 +31,8 @@ for split, dets, v6 in (("val7", ["yolov8", "rtdetr"], "X5"), ("val7", ["fasterr
             rows.append((split, det, s, m6["HOTA"] - mn["HOTA"], m6["MOTA"] - mn["MOTA"], m6["IDF1"] - mn["IDF1"],
                          m7["HOTA"] - mn["HOTA"], m7["HOTA"] - m6["HOTA"], rb, cl, mn["MOTA"]))
 # MOT17: SparseTrack per-sequence V6 vs baseline (external results file)
-ext = json.load(open("/Users/ahmedgouda/Desktop/acmot_external/reports/external_results.json"))
-pf = json.load(open("/Users/ahmedgouda/Desktop/acmot_external/runs/sparsetrack/MOT17-val/ST7_V7c/per_frame.json"))
+ext = json.load(open(str(Path(__import__("os").environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external")) / "reports/external_results.json")))
+pf = json.load(open(str(Path(__import__("os").environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external")) / "runs/sparsetrack/MOT17-val/ST7_V7c/per_frame.json")))
 for s, b in ext["ST_A_official"]["per_seq"].items():
     v = ext["ST_plus_V6TF"]["per_seq"][s]
     q = [x for x in pf if x["seq"] == s]

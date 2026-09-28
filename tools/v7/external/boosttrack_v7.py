@@ -31,8 +31,9 @@ for _n, _v in (("float", float), ("int", int), ("bool", bool), ("object", object
         setattr(_np, _n, _v)
 import numpy as np
 
-ACMOT = Path("/Users/ahmedgouda/Desktop/Universal-ACMOT")
-EXT = Path("/Users/ahmedgouda/Desktop/acmot_external")
+import os
+ACMOT = Path(os.environ.get("ACMOT_ROOT", Path(__file__).resolve().parents[3]))
+EXT = Path(os.environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external"))
 BT = EXT / "BoostTrack"
 DATA = EXT / "data_mirror/MOT17"
 TRANSFORMS = {
@@ -59,6 +60,7 @@ def main():
     a = ap.parse_args()
     sys.path.insert(0, str(ACMOT))
     v6drv = _load("bt_v6_driver", ACMOT / "tools/v6/external/boosttrack_v6.py")
+    v6drv.BT, v6drv.DATA = BT, DATA          # relocatable paths (read at call time)
     systems = _load("v7_systems", ACMOT / "tools/v7/systems.py")
     from acmot_v7 import HostContract, V7Layer, spec_from_dict
     GS = v6drv.setup_boosttrack()              # chdir(BT), official settings

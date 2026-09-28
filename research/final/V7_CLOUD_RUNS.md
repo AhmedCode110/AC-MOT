@@ -31,9 +31,21 @@ paper-eligible external evidence, and no timing from them is reported.
 | BoostTrack (MOT17 val-half) | `…/venv/bin/python tools/v7/external/boosttrack_v7.py --system <S> --name <N>` | `…/acmot_external/runs/boosttrack/MOT17-val/<N>{,_post,_post_gbi}/` | → mot17_boosttrack |
 | Offline diagnostics D1–D8 | `.venv/bin/python tools/v7/{streams,diag_pairs,diag_bands,diag_dup_rules,diag_regime,diag_support,screen,diag_regime_validity}.py` | stdout (summarised in the ledger); streams cached in `outputs/v7/diag/` | ledger D-series |
 
-The commit for all of the above is the first V7 development commit that
-contains this file. The runs used the working tree of that commit plus the
-V6 freeze.
+Provenance: these runs used an UNCOMMITTED, evolving working tree (options
+were added to `acmot_v7.py` between E1 and E10). The first V7 commit,
+`d56bba0`, came after them, and results were not stamped with a code hash.
+From the next commit on, `tools/v7/dev.py` stamps every result with
+sha256(acmot_v7.py) + the resolved spec. The first cloud task is to re-run
+NATIVE, V6EMU, V7c and V7d from committed code (handoff §6, E14).
+
+## Assets published for cloud continuation (2026-09-28)
+GitHub release `v7-dev-assets-1` (public, derived artefacts only):
+- the four `acmot_detcache_*_native.tar` files;
+- `acmot_external_mot17_artifacts.tar`;
+- `SHA256SUMS`.
+
+Uploaded from the Mac; checksums are in `research/final/ASSET_MANIFEST.json`.
+Setup: `scripts/setup_research_assets.sh`.
 
 ## Cloud runs
 None yet. A cloud session must provision the data listed in

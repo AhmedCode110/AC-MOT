@@ -1,0 +1,131 @@
+{
+  "sha256": "8957b4da276121408b5769c23eb3de84dd30667c88d539e437ba6b6afc28648a",
+  "adapter": {
+    "adapter_version": "UAVDT_ADAPTER_V1",
+    "status": "FROZEN_BEFORE_EXTERNAL_TEST",
+    "dataset": "UAVDT",
+    "purpose": "External generalization with no dataset-specific tuning",
+    "detector_class_mapping": {
+      "source": "COCO pretrained YOLOv8n",
+      "classes": [
+        2,
+        5,
+        7
+      ],
+      "names": [
+        "car",
+        "bus",
+        "truck"
+      ],
+      "frozen_before_test": true
+    },
+    "ground_truth": {
+      "source_file": "<sequence>_gt.txt",
+      "columns": [
+        "frame",
+        "target_id",
+        "x",
+        "y",
+        "width",
+        "height",
+        "score",
+        "in_view",
+        "occlusion"
+      ],
+      "score_filter": "remove GT rows where column 7 (score) == 0",
+      "negative_frame_filter": "remove GT rows where frame < 1",
+      "class_filter": "none in official MOT evaluator",
+      "id_handling": "normalize remaining GT IDs"
+    },
+    "prediction_format": {
+      "columns": [
+        "frame",
+        "id",
+        "x",
+        "y",
+        "width",
+        "height",
+        "score",
+        "unused1",
+        "unused2"
+      ],
+      "negative_frame_filter": "remove result rows where frame < 1",
+      "max_frame_filter": "remove result rows beyond GT max frame",
+      "duplicate_rule": "no duplicate frame-ID pairs"
+    },
+    "ignore_region_rule": {
+      "source_file": "<sequence>_gt_ignore.txt",
+      "sequences": [
+        "M0203",
+        "M0205",
+        "M0208",
+        "M0403",
+        "M0601",
+        "M0602",
+        "M0606",
+        "M0701",
+        "M0802",
+        "M1001",
+        "M1004",
+        "M1007",
+        "M1009",
+        "M1101",
+        "M1301",
+        "M1302",
+        "M1303",
+        "M1401"
+      ],
+      "rule": "For each ignore region, remove a prediction when prediction frame equals ignore frame AND prediction left > ignore left AND prediction top > ignore top AND prediction right < ignore right AND prediction bottom < ignore bottom.",
+      "interpretation": "prediction box must be fully inside ignore box",
+      "strict_boundaries": true
+    },
+    "evaluation": {
+      "trackeval_commit": "12c8791b303e0a0b50f753af204249e622d0281a",
+      "metrics": [
+        "MOTA",
+        "HOTA",
+        "IDF1",
+        "IDS",
+        "FN",
+        "FP"
+      ],
+      "matching_iou": 0.5
+    },
+    "external_test": {
+      "test_sequences": [
+        "M0203",
+        "M0205",
+        "M0208",
+        "M0209",
+        "M0403",
+        "M0601",
+        "M0602",
+        "M0606",
+        "M0701",
+        "M0801",
+        "M0802",
+        "M1001",
+        "M1004",
+        "M1007",
+        "M1009",
+        "M1101",
+        "M1301",
+        "M1302",
+        "M1303",
+        "M1401"
+      ],
+      "count": 20,
+      "tuning": false,
+      "optuna": false,
+      "recalibration": false,
+      "candidate_selection": false,
+      "parameter_changes": false
+    },
+    "self_test": {
+      "sequence": "M0101",
+      "split": "TRAIN",
+      "expected_frames": 407,
+      "test_data_used": false
+    }
+  }
+}

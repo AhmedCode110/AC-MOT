@@ -36,7 +36,7 @@ detector (floor 0.1); vd_* are the VisDrone val-7 native caches at 736.
 | D1 (`diag_pairs.py`) | What does V6's IoU-0.5 duplicate rule remove? | MOT17, overlapping pairs (IoU > 0.5) with lower score ≥ 0.1: 2166 are two distinct people, 1775 are duplicates. At lower score ≥ 0.5 it is 1662 distinct vs 552 duplicates. VisDrone: 95–100% duplicates (RT-DETR 22926 dup / 432 distinct; Faster R-CNN 11349 / 32; YOLO 5945 / 325). VisDrone pairs above IoU 0.7 are almost all cross-class (YOLO same-class share 0.00–0.09). | "IoU > 0.5 = duplicate" is scene-dependent: false in side-view crowds, true in aerial views. |
 | D2 (`diag_bands.py`) | Where do V6 bands sit vs the host operating point? | MOT17 (floor 0.01): t2 ≈ raw 0.78 → primary band holds 67.4% of GT vs 78.5% for the native 0.6. Floor 0.1 moves t1 0.33 → 0.64 and t2 0.78 → 0.87 (primary only 48.4% of GT). | V6 over-restricts clean streams; its thresholds depend strongly on the emission floor. |
 | D3 (`diag_dup_rules.py`) | Can track context separate duplicates from occluded people? | Track rule (remove unless a different track of frame t−1 claims the candidate), MOT17 ≥ 0.5: removes 233 TP / 242 FP vs V6 1635 TP / 528 FP. VisDrone: same removals as V6. | Track context is crowd-safe offline (accepted as a mechanism, see E-series for tracking). |
-| D4 (`diag_regime.py`) | Label-free regime statistic | ρ = confident share of the foreground (nested Otsu on pooled logits): MOT17 median 0.76 (floor 0.01) / 0.62 (floor 0.1); VisDrone YOLO 0.45, RT-DETR 0.29, Faster R-CNN 0.39 | ρ ≥ ½ (the confident class is the majority) separates the regimes on these streams. |
+| D4 (`diag_regime.py`) | Label-free regime statistic | ρ = confident share of the foreground (nested Otsu on pooled logits after V6's IoU dedup): MOT17 median 0.76 (floor 0.01) / 0.62 (floor 0.1); VisDrone YOLO 0.45, RT-DETR 0.29, Faster R-CNN 0.39 | ρ ≥ ½ separates the stream MEDIANS; per sequence it is right for 81/108 (D8). NB: V7c/V7d pool logits after their own (regime-dependent) duplicate handling, not V6's dedup — see open issue O3. |
 | D5 (`diag_support.py`) | Do label-free proxies track the ambiguous band's precision? | Both ρ and the track support of the ambiguous band follow its precision: MOT17 prec_amb 0.47–0.98, VisDrone 0.06–0.62 | ρ is used (needs no tracker state). |
 | D5b | Is frame-to-frame temporal support a precision proxy? | NO: false positives persist like true objects (FP any-support 0.72–0.96 vs TP 0.79–0.99 in every score bin) | REJECTED |
 | D6 (`screen.py`) | Detection-level screen (dMOTA of the primary set) of threshold rules across floors {0.01, 0.05, 0.1} and transforms {temp2, temp05, pow3, scale05} | V6 t2: Platt-invariant but floor-sensitive (YOLO 17.8 → 11.1 at floor 0.1) and poor on MOT17 (71.1 vs native 77.5). Otsu on the host-usable domain (≥ host low): floor-robust (YOLO 18.5 at all floors) but catastrophic under temp2 (RT-DETR −41.5). ρ-switch (rho_full): never catastrophic; MOT17 77.3 at floor 0.01. | No single score rule is robust to both floor and temperature. The regime switch is the least fragile, so V7 keeps full-stream statistics. |
@@ -111,17 +111,19 @@ claimed by tracks.
     like its operating point.
   - Cost: VisDrone YOLO MOTA 18.5 (IDS 211).
 
-### E6 — ladder from exact V6 to V7 on VisDrone val-7 (YOLO / RT-DETR MOTA/HOTA/IDF1)
-| Step | YOLO | RT-DETR |
+### E6 — one-factor-at-a-time ablations from V6EMU on VisDrone val-7 (YOLO / RT-DETR MOTA/HOTA/IDF1)
+Each row changes ONE factor relative to V6EMU (not cumulative).
+| System | YOLO | RT-DETR |
 |---|---|---|
 | V6EMU | 18.6/34.3/38.6 | 25.0/41.6/48.1 |
-| + raw scores | 19.0/32.9/36.0 | 25.5/41.2/47.1 |
-| + host at frame 1 | 18.8/34.6/39.0 | 24.3/41.8/47.9 |
-| + track duplicates | 18.5/34.3/38.7 | 24.8/41.6/48.0 |
-| + ρ regime | 18.2/34.6/39.2 | 24.1/41.6/48.5 |
+| V6EMU@scores=raw | 19.0/32.9/36.0 | 25.5/41.2/47.1 |
+| V6EMU@cold=host | 18.8/34.6/39.0 | 24.3/41.8/47.9 |
+| V6EMU@dup=track | 18.5/34.3/38.7 | 24.8/41.6/48.0 |
+| V6EMU@regime=rho | 18.2/34.6/39.2 | 24.1/41.6/48.5 |
+| (combined endpoint V7a) | 19.4/33.5/36.6 | 24.0/41.5/47.5 |
 
 Findings:
-- V6's ECDF score remap is worth +1.4 HOTA / +2.6 IDF1 on YOLO: ByteTrack's
+- V6's ECDF score remap is worth +1.3 HOTA / +2.6 IDF1 on YOLO (34.262 − 32.947; 38.597 − 35.996): ByteTrack's
   score-fused association benefits.
 - Raw scores are required for exact pass-through on hosts that use scores
   internally (SparseTrack stage-1 fuse, BoostTrack boosting).
@@ -170,12 +172,11 @@ Catastrophic cells:
 | development-40 | 2 | 17 | 2 |
 
 Ablations:
-- `@clean=proj` equals V7c on VisDrone.
-- `@dup_clean=none` equals V7b (so cross-class removal is worth YOLO
+- `@clean=proj` equals V7c on YOLO (identical) and is within ±0.02 MOTA / ±2 IDS on RT-DETR.
+- `@dup_clean=none` equals V7b on YOLO and is within ±0.02 MOTA / ±2 IDS on RT-DETR (so cross-class removal is worth YOLO
   +0.5 MOTA / +0.6 IDF1).
 
-Verdict: best balanced candidate so far. Open issue: ID switches are 10–32%
-above V6 on VisDrone.
+Verdict: best balanced candidate so far (no significance tests yet). Open issue: ID switches are ~10–40% above V6 on VisDrone (val-7 YOLO 222 vs 159 = +40%, development-40 RT-DETR +32%, val-7 RT-DETR +24%, Faster R-CNN +12%, development-40 YOLO +10%). Faster R-CNN HOTA vs V6: +0.47 (37.419 vs 36.951).
 
 ### E9 — ID-switch diagnostics on V7c (val-7)
 | Variant | YOLO MOTA/HOTA/IDF1 (IDS) | RT-DETR MOTA/HOTA/IDF1 (IDS) | Reading |
@@ -189,7 +190,7 @@ Neither variant is adopted yet (conflicts with pass-through).
 
 | Host | HOTA | MOTA | IDF1 | IDS |
 |---|---|---|---|---|
-| SparseTrack | **68.93 (+0.05)** | 77.93 (+0.08) | **82.13 (+0.16)** | 131 |
+| SparseTrack | 68.93 (+0.05, untested) | 77.93 (+0.08) | 82.13 (+0.16) | 131 |
 | BoostTrack online | 68.37 (−0.12) | 75.17 (−0.33) | 81.19 (−0.22) | |
 | BoostTrack post (GBI) | 71.65 (−0.07) | 80.69 | 83.98 | |
 
@@ -201,18 +202,20 @@ VisDrone:
 - RT-DETR 23.4/41.5/47.9;
 - development-40 ≈ V7c.
 
-Reading: the motion-conditioned tolerance helps hosts WITHOUT camera-motion
-compensation (ultralytics ByteTrack on drone video) and slightly hurts hosts
-that already compensate (SparseTrack GMC, BoostTrack ECC). Trade-off → OPEN.
+Reading (HYPOTHESIS, not established): the motion-conditioned tolerance may help hosts WITHOUT camera-motion
+compensation (ultralytics ByteTrack on drone video) and slightly hurt hosts
+that already compensate (SparseTrack GMC, BoostTrack ECC). This is CONFOUNDED (host and dataset change together; the val-7 YOLO effect is −0.64 HOTA, development-40 ≈ 0, MOT17 gaps 0.12–0.21 HOTA) and untested by bootstrap. V7c vs V7d differences are within noise until tested. OPEN.
+
+## Open issues found by the adversarial audit (2026-09-28)
+- **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
+- **O2 — NATIVE vs the V6 record's "tracker default".** V7 `NATIVE` = native caches (YOLO NMS 0.7, RT-DETR no NMS, Faster R-CNN 0.5) + ultralytics ByteTrack 0.25/0.1/0.25, match 0.8, fuse on, no layer. The V6 paper's `static_default` used the NMS-0.45 caches: YOLO val-7 17.04/31.72/33.65 (IDS 359) vs 18.40/31.62/33.62 (IDS 320); Faster R-CNN MOTA −11.29 vs −9.56; RT-DETR identical. D8 and the catastrophic counts in E8 use V7 NATIVE.
+- **O3 — regime/duplicate feedback loop.** The pooled window holds logits AFTER duplicate handling, and for V7c/V7d the duplicate rule depends on the regime (xclass in clean/cold frames, track in noisy frames): regime → duplicates → pooled stream → t1/t2/ρ → regime. Measurable: YOLO val-7 clean share 0.409 (V6EMU@regime=rho) vs 0.372 (+dup_regime=noisy). Planned E13: pool the logits of ALL emitted candidates (regime-independent) and compare.
+- **O4 — definitions.** "Cold" = any frame whose last-10-frame window gives no valid bands (frame 1, or <3 pooled logits); in cold frames the host thresholds apply, but V7c/V7d still apply dup_clean=xclass and V7c the motion rule. ρ̄ is the median of ρ over the last 100 NON-cold frames.
+- **O5 — causality statement.** assoc/birth/discard thresholds and the regime depend only on frames < t; the IoU-match tolerance depends on the frame-t motion cue (a permitted frame-t image statistic) normalised by the history of frames < t; duplicate handling uses frame-t candidate geometry with track context from frames < t. Tests must check exactly this.
 
 ## Current best candidates and open items (before any freeze)
-- **Candidates:** V7c (VisDrone-favoured) and V7d (MOT17-host-favoured).
-  Their only difference is the motion gating.
-- **Next experiment (E11):** condition the motion rule on a generic host
-  capability declared in HostContract (the host compensates camera motion
-  itself: yes/no). Compare with the data-driven alternative (motion rule
-  only in noisy frames = V7d) on val-7, development-40, SparseTrack and
-  BoostTrack.
+- **Candidates:** V7c and V7d (only difference: motion gating; differences so far within noise, untested).
+- **Next experiment (E11, predeclared, unconfounded):** on the SAME VisDrone streams (val-7 + development-40, YOLO + RT-DETR), run ByteTrack (no camera-motion compensation) and BoT-SORT (has CMC) with V7c vs V7d; decide by paired bootstrap whether the motion rule helps only without CMC. Only if that holds, add `HostContract.cmc` (already present, default False, unused) set from a DOCUMENTED host property (the tracker's published design: ByteTrack none; BoT-SORT/SparseTrack GMC; BoostTrack ECC), never from results. Risk to record: a capability flag whose values coincide with the development hosts could act as a disguised tracker branch; it is acceptable only if it is a documented property and the unconfounded test supports it.
 - Then:
   - ID switches on VisDrone (frame-1 admission, clean-frame raw scores);
   - Stage-D checks (UAVDT, test-dev, Faster R-CNN test-dev/UAVDT, BoT-SORT);

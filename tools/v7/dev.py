@@ -32,7 +32,31 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.v6.dev import SPLITS, split_sequences  # noqa: E402  (read-only reuse)
+from tools.v6.dev import SPLITS as _V6_SPLITS, split_sequences  # noqa: E402  (read-only reuse)
+
+# Dataset roots may be relocated (cloud / Codex) through environment variables;
+# defaults are the original Mac paths recorded in the V6 runner.
+SPLITS = {k: dict(v) for k, v in _V6_SPLITS.items()}
+for _k, _env in (("val7", "ACMOT_VISDRONE_VAL"), ("dev40", "ACMOT_VISDRONE_TRAIN"),
+                 ("conf16", "ACMOT_VISDRONE_TRAIN"), ("testdev", "ACMOT_VISDRONE_TESTDEV"),
+                 ("uavdt", "ACMOT_UAVDT_VIEW")):
+    if os.environ.get(_env):
+        SPLITS[_k]["data"] = os.environ[_env]
+V7_FREEZE_TAG = "universal-acmot-v7-freeze"
+
+
+def _code_sha():
+    import hashlib
+    return hashlib.sha256((ROOT / "acmot_v7.py").read_bytes()).hexdigest()
+
+
+def guard(split):
+    """confirmation-16 is reserved for ONE post-freeze V7 check."""
+    if split == "conf16":
+        import subprocess
+        tags = subprocess.run(["git", "tag"], cwd=ROOT, capture_output=True, text=True).stdout.split()
+        if V7_FREEZE_TAG not in tags:
+            raise SystemExit("PROTECTED: conf16 is reserved until " + V7_FREEZE_TAG)
 
 DETS = ["yolov8", "rtdetr"]
 from tools.v7.systems import HOST_BYTETRACK, SYSTEMS, parse  # noqa: E402,F401
@@ -45,15 +69,22 @@ def out_dir(split):
 def run_one(job):
     split, system, det, seq = job
     dest = out_dir(split) / system / det / f"{seq}.pkl"
+    base, ov, tf, floor, botsort = parse(system)
+    stamp = dict(code_sha=_code_sha(), spec=dict(ov, name=base), transform=tf, floor=floor,
+                 botsort=botsort)
     if dest.exists():
-        return
+        try:
+            old = pickle.load(open(dest, "rb")).get("v7_stamp")
+        except Exception:
+            old = None
+        if old == stamp:
+            return                      # identical code + spec: reuse
     os.chdir(ROOT)
     import cv2
     from acmot_v7 import HostContract, V7Layer, V7Spec, spec_from_dict
     from adapters.types import Detection
     from tools.run_policy_validation import CachedDetector
     from tools.seqstats import sequence_stats
-    base, ov, tf, floor, botsort = parse(system)
     if botsort:
         from adapters.trackers.botsort import BoTSORTAdapter as Trk
     else:
@@ -61,6 +92,10 @@ def run_one(job):
     sp = SPLITS[split]
     frames = sorted((Path(sp["data"]) / "sequences" / seq).glob("*.jpg"))
     cd = CachedDetector(f"{sp['native']}/{det}/{seq}.npz", transform=tf)
+    if len(frames) != cd.frames:
+        raise SystemExit(f"{seq}: {len(frames)} *.jpg files in {sp['data']} but the cache has "
+                         f"{cd.frames} frames (the evaluator counts *.jpg files; see "
+                         "scripts/setup_research_assets.sh for placeholder frames)")
     h = HOST_BYTETRACK
     tr = Trk(high=h["assoc"], low=h["low"], new=h["birth"], buffer=30, match=h["match"], fuse=True)
     layer = V7Layer(spec_from_dict(dict(ov, name=base)), HostContract(**h))
@@ -93,6 +128,7 @@ def run_one(job):
     os.unlink(f.name)
     st["audit"] = audit
     st["tracks_txt"] = "".join(lines)
+    st["v7_stamp"] = stamp
     dest.parent.mkdir(parents=True, exist_ok=True)
     pickle.dump(st, open(dest, "wb"))
 
@@ -107,7 +143,8 @@ def load(split, system, det, seq):
     return pickle.load(open(_path(split, system, det, seq), "rb"))
 
 
-def run(split, systems, dets=DETS, workers=6):
+def run(split, systems, dets=DETS, workers=int(os.environ.get("V7_WORKERS", 6))):
+    guard(split)
     seqs = split_sequences(split)
     jobs = [(split, sy, d, s) for sy in systems if not sy.startswith("V6:")
             for d in dets for s in seqs]
@@ -167,7 +204,8 @@ def official_summary(split, system, dets=DETS):
     return res
 
 
-def official_report(split, systems, dets=DETS, workers=6):
+def official_report(split, systems, dets=DETS, workers=int(os.environ.get("V7_WORKERS", 6))):
+    guard(split)
     seqs = split_sequences(split)
     jobs = [(split, sy, d, s) for sy in systems for d in dets for s in seqs]
     with ProcessPoolExecutor(workers) as ex:

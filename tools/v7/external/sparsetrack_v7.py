@@ -31,8 +31,9 @@ for _n, _v in (("float", float), ("int", int), ("bool", bool), ("object", object
 import numpy as np
 import torch
 
-ACMOT = Path("/Users/ahmedgouda/Desktop/Universal-ACMOT")
-EXT = Path("/Users/ahmedgouda/Desktop/acmot_external")
+import os
+ACMOT = Path(os.environ.get("ACMOT_ROOT", Path(__file__).resolve().parents[3]))
+EXT = Path(os.environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external"))
 ST = EXT / "SparseTrack"
 sys.path.insert(0, str(ACMOT))
 sys.path.insert(0, str(ST))
@@ -62,6 +63,7 @@ def main():
     ap.add_argument("--root", default=str(EXT / "runs/sparsetrack"))
     a = ap.parse_args()
     v6drv = _load("st_v6_driver", ACMOT / "tools/v6/external/sparsetrack_v6.py")
+    sys.path.insert(0, str(ST))              # relocatable SparseTrack root first
     systems = _load("v7_systems", ACMOT / "tools/v7/systems.py")
     from acmot_v7 import HostContract, V7Layer, spec_from_dict
     from tracker.sparse_tracker import SparseTracker

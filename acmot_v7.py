@@ -1,33 +1,35 @@
 """
 Universal AC-MOT V7 -- a self-limiting, crowd-safe adaptive control layer
-(development version; the frozen configuration is selected in
-research/final/V7_EXPERIMENT_LEDGER.md).
+(DEVELOPMENT version: every mechanism is an option of V7Spec; the selected
+policy will be frozen as configs/universal_acmot_policy_v7.json, which is then
+the single source of truth -- V7Spec defaults are NOT the selected policy).
 
 The layer sits between a frozen detector and a frozen tracker. It sees only
 the detector's candidate list (boxes, scores, classes), one image cue
-(global motion) and the tracker's output tracks, plus the host tracker's
-own operating point declared through a generic contract (HostContract).
-It contains no detector, tracker, dataset or sequence names.
+(global motion of frame t vs t-1) and the tracker's output tracks, plus the
+host tracker's own operating point declared through a generic contract
+(HostContract). It contains no detector, tracker, dataset or sequence names.
 
-Per frame t (causal):
-  1. duplicate handling on frame t's own candidates, with track context
-     from the host's output of frame t-1 (crowd-safe: an overlapping
-     candidate that corresponds to a different existing track is kept);
-  2. stream statistics from the pooled logits of frames t-W..t-1 only:
+Per frame t:
+  1. stream statistics from the pooled logits of frames t-W..t-1 only:
      nested exact Otsu -> t1 (background|foreground), t2 (ambiguous|
-     confident) and the confident share of the foreground rho;
-  3. self-limiting operating point:
-       - regime "clean" (the confident class dominates the foreground):
-         the host's own thresholds are kept unless they lie outside the
-         stream's ambiguous band [t1, t2] (projection = the smallest change
-         consistent with the stream);
-       - regime "noisy" (the ambiguous class dominates): the ambiguous band
-         becomes extension-only (V6 behaviour);
-  4. candidates are passed with their RAW scores (the host's internal use of
-     scores is untouched); the layer only removes candidates and moves the
-     host's generic thresholds;
-  5. motion-conditioned IoU-match tolerance (V6), native when calm;
-  6. state updates with frame-t observations (used from frame t+1 on).
+     confident) and rho = confident share of the foreground; regime =
+     clean iff median rho over recent non-cold frames >= 1/2 (option
+     "rho"), cold when no valid bands exist;
+  2. operating point: clean/cold -> the host's own thresholds (option
+     "upper": only lowered to t2 when the host would reject the confident
+     class; "proj": clipped to [t1, t2]); noisy -> V6 bands (primary >= t2,
+     extension [t1, t2), discard < t1);
+  3. duplicate handling on frame t's candidates with track context from
+     the host output of frame t-1 (options: none | iou | track | ctx |
+     xclass; dup_regime selects a different rule for clean/cold frames);
+  4. scores: raw (host internals untouched) or ECDF band remap (V6), or
+     "auto" = remap only in noisy frames;
+  5. motion-conditioned IoU-match tolerance (frame-t motion normalised by
+     the history of frames < t);
+  6. state updates with frame-t data affect frame t+1 on only.
+Causality: assoc/birth/discard thresholds and the regime use frames < t
+only; the match tolerance uses the permitted frame-t image cue.
 """
 from __future__ import annotations
 
@@ -86,6 +88,10 @@ class HostContract:
     birth: float          # track-initialisation threshold
     low: float            # lowest score the host uses (low stage / emission)
     match: float          # IoU-match tolerance (1 - minimum IoU)
+    # Declared capability (documented host property, not a result): the host
+    # compensates global camera motion itself (GMC/ECC). Planned experiment
+    # E11; unused by every current system.
+    cmc: bool = False
 
 
 @dataclass(frozen=True)
@@ -270,8 +276,10 @@ class V7Layer:
 
     # ------------------------------------------------------------------ step
     def step(self, boxes, scores, motion=None, classes=None) -> V7Decision:
-        """Decision for frame t from its candidates and frame-t motion; every
-        threshold comes from state built on frames < t."""
+        """Decision for frame t. assoc/birth/discard thresholds and the regime
+        come from state built on frames < t; duplicate handling uses frame-t
+        geometry with track context of frame t-1; the match tolerance uses
+        the frame-t motion cue normalised by the history of frames < t."""
         s, h = self.spec, self.host
         self.frame += 1
         boxes = np.asarray(boxes, np.float64).reshape(-1, 4)

@@ -1,0 +1,212 @@
+{
+ "schema": "ASSET_MANIFEST v1 (Universal AC-MOT V7)",
+ "updated": "2026-09-28",
+ "setup": "bash scripts/setup_research_assets.sh  (then: source $ACMOT_WORK/acmot_env.sh)",
+ "release": "https://github.com/AhmedCode110/AC-MOT/releases/tag/v7-dev-assets-1 (public, derived artefacts only; no dataset images or raw annotations)",
+ "assets": [
+  {
+   "name": "detcache_val_native",
+   "purpose": "VisDrone val-7 (V7 development sandbox): YOLOv8n, RT-DETR-L, Faster R-CNN detections at 736 + per-frame motion cues",
+   "source": "https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/acmot_detcache_val_native.tar",
+   "path": "<repo>/outputs/det_cache_val_native/",
+   "size_bytes": 68943360,
+   "sha256": "69a76315459c14fb358b564816e02371dc7ee21649cfe6791464936a2b69516e",
+   "regenerable": "yes, but NOT byte-identical (built on Mac MPS; a CUDA/CPU rebuild is a new baseline and V6/V7 numbers must be re-established on it)",
+   "command": "bash scripts/setup_research_assets.sh caches",
+   "rebuild_command": "per detector: python tools/cache_detections.py --weights <W> --dataset <VisDrone split> --output-dir outputs/det_cache_<split>_native/<det> --resolutions 736 [--nms 0.7 for yolov8n.pt | --nms 0.5 for Faster R-CNN | (RT-DETR ignores NMS)]; motion cues: python tools/visual_cues.py <dataset> outputs/det_cache_<split>_native (original recipe: tools/mac_cache_queue_v5tf.sh)"
+  },
+  {
+   "name": "detcache_train_native",
+   "purpose": "VisDrone train: development-40 (V7 development) and confirmation-16 (RESERVED: one post-freeze V7 check) for YOLOv8n + RT-DETR-L + motion cues",
+   "source": "https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/acmot_detcache_train_native.tar",
+   "path": "<repo>/outputs/det_cache_train_native/",
+   "size_bytes": 188494848,
+   "sha256": "a921618bc637bb43e8c9487836f0be9456cfb07172430e9b82a953e7f3cbf215",
+   "regenerable": "yes, but NOT byte-identical (built on Mac MPS; a CUDA/CPU rebuild is a new baseline and V6/V7 numbers must be re-established on it)",
+   "command": "bash scripts/setup_research_assets.sh caches",
+   "rebuild_command": "per detector: python tools/cache_detections.py --weights <W> --dataset <VisDrone split> --output-dir outputs/det_cache_<split>_native/<det> --resolutions 736 [--nms 0.7 for yolov8n.pt | --nms 0.5 for Faster R-CNN | (RT-DETR ignores NMS)]; motion cues: python tools/visual_cues.py <dataset> outputs/det_cache_<split>_native (original recipe: tools/mac_cache_queue_v5tf.sh)"
+  },
+  {
+   "name": "detcache_testdev_native",
+   "purpose": "VisDrone test-dev: Stage-D transfer check (YOLOv8n, RT-DETR-L, Faster R-CNN) + motion cues",
+   "source": "https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/acmot_detcache_testdev_native.tar",
+   "path": "<repo>/outputs/det_cache_testdev_native/",
+   "size_bytes": 175838208,
+   "sha256": "812a4d850353bbb7019dccf535a9575d4fc245f805f755a9cae33623e07caf17",
+   "regenerable": "yes, but NOT byte-identical (built on Mac MPS; a CUDA/CPU rebuild is a new baseline and V6/V7 numbers must be re-established on it)",
+   "command": "bash scripts/setup_research_assets.sh caches",
+   "rebuild_command": "per detector: python tools/cache_detections.py --weights <W> --dataset <VisDrone split> --output-dir outputs/det_cache_<split>_native/<det> --resolutions 736 [--nms 0.7 for yolov8n.pt | --nms 0.5 for Faster R-CNN | (RT-DETR ignores NMS)]; motion cues: python tools/visual_cues.py <dataset> outputs/det_cache_<split>_native (original recipe: tools/mac_cache_queue_v5tf.sh)"
+  },
+  {
+   "name": "detcache_uavdt_native",
+   "purpose": "UAVDT test (20 sequences): Stage-D dataset transfer (YOLOv8n, RT-DETR-L, Faster R-CNN) + motion cues + task.json (vehicle classes)",
+   "source": "https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/acmot_detcache_uavdt_native.tar",
+   "path": "<repo>/outputs/det_cache_uavdt_native/",
+   "size_bytes": 286894080,
+   "sha256": "03721788852bc920c9a150d9f45c4b3fb449d54ea4fd64d905785aceb4353e22",
+   "regenerable": "yes, but NOT byte-identical (built on Mac MPS; a CUDA/CPU rebuild is a new baseline and V6/V7 numbers must be re-established on it)",
+   "command": "bash scripts/setup_research_assets.sh caches",
+   "rebuild_command": "per detector: python tools/cache_detections.py --weights <W> --dataset <VisDrone split> --output-dir outputs/det_cache_<split>_native/<det> --resolutions 736 [--nms 0.7 for yolov8n.pt | --nms 0.5 for Faster R-CNN | (RT-DETR ignores NMS)]; motion cues: python tools/visual_cues.py <dataset> outputs/det_cache_<split>_native (original recipe: tools/mac_cache_queue_v5tf.sh)"
+  },
+  {
+   "name": "external_mot17_artifacts",
+   "purpose": "MOT17 val-half development hosts: SparseTrack published YOLOX-X detections (official run), BoostTrack detection+ECC cache, reference track files of the official/replay baselines (identity checks), MOT17 mirror manifest (per-file sha256), COCO-format half-split annotations, V6 external results",
+   "source": "https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/acmot_external_mot17_artifacts.tar",
+   "path": "$ACMOT_EXT/ (runs/, BoostTrack/cache/, reports/, data_mirror/)",
+   "size_bytes": 52758528,
+   "sha256": "10f080dbf7bd88b49cc91d11c1961d14c5a8cb2cf732d8c305c66380c2014d3a",
+   "regenerable": "detections: only by re-running the official detectors (new baseline); annotations: yes (BoostTrack data/tools/convert_mot17_to_coco.py; val_half.json sha256 ae7ac86d61df6cdba59e3b7a78ef7a3a8b7b56978d3a8322971ef6d8dfa5c126)",
+   "command": "bash scripts/setup_research_assets.sh external"
+  },
+  {
+   "name": "MOT17 (val-half images, 7 FRCNN sequences, 2652 frames)",
+   "purpose": "images for SparseTrack GMC, BoostTrack, V7 motion cue",
+   "source": "https://motchallenge.net/data/MOT17.zip (official, ~5.5 GB; CC BY-NC-SA 3.0)",
+   "path": "$ACMOT_EXT/data_mirror/MOT17/train/MOT17-XX-FRCNN/img1/",
+   "size_bytes": null,
+   "sha256": "per file in data_mirror/MOT17_mirror_manifest.json (456 MB subset)",
+   "regenerable": "download",
+   "command": "bash scripts/setup_research_assets.sh mot17"
+  },
+  {
+   "name": "MOT17 val-half GT (TrackEval layout)",
+   "purpose": "evaluation",
+   "source": "BoostTrack repository results/gt/MOT17-val (+ seqmaps)",
+   "path": "$ACMOT_EXT/BoostTrack/results/gt",
+   "size_bytes": null,
+   "sha256": "verified identical to the half split: tools/v6/external/vendor/mot17_split_verification.json",
+   "regenerable": "clone",
+   "command": "bash scripts/setup_research_assets.sh repos"
+  },
+  {
+   "name": "VisDrone2019-MOT val / train / test-dev",
+   "purpose": "ground truth (internal + official-compatible protocols) and frame counts (the evaluator counts *.jpg); real images only for BoT-SORT and cue rebuilds",
+   "source": "official VisDrone-Dataset README (Task 4): Google Drive ids val 1rqnKe9IgU_crMaxRoel9_nuUsMEBBVQu (1.48 GB), train 1-qX2d-P1Xr64ke6nTdlm33om1VxCUTSh (7.53 GB), test-dev 14z8Acxopj1d86-qhsF1NwS4Bv3KYa4Wu (2.14 GB); BaiduYun mirrors in the README",
+   "path": "$ACMOT_WORK/VisDrone2019-MOT-{val,train,test-dev} (env ACMOT_VISDRONE_VAL/TRAIN/TESTDEV)",
+   "size_bytes": null,
+   "sha256": null,
+   "regenerable": "download",
+   "command": "bash scripts/setup_research_assets.sh visdrone"
+  },
+  {
+   "name": "UAVDT (UAV-benchmark-M images + UAV-benchmark-MOTD_v1.0 GT)",
+   "purpose": "Stage-D dataset transfer",
+   "source": "official UAVDT site (sites.google.com/view/grli-uavdt), manual download",
+   "path": "view: <repo>/outputs/uavdt_view (tools/build_uavdt_view.py; protocol research/uavdt_protocol/UAVDT_EXTERNAL_PROTOCOL_FREEZE.json, UAVDT_ADAPTER_V1_FREEZE.json)",
+   "size_bytes": null,
+   "sha256": null,
+   "regenerable": "download + tools/build_uavdt_view.py (edit ROOT)",
+   "command": "bash scripts/setup_research_assets.sh uavdt  (prints the manual steps)"
+  },
+  {
+   "name": "SparseTrack @499844f",
+   "purpose": "development host (tracker code; detector only for re-detection)",
+   "source": "https://github.com/hustvl/SparseTrack",
+   "path": "$ACMOT_EXT/SparseTrack",
+   "size_bytes": null,
+   "sha256": "git 499844f",
+   "regenerable": "clone",
+   "command": "bash scripts/setup_research_assets.sh repos gmc"
+  },
+  {
+   "name": "SparseTrack GMC shim",
+   "purpose": "SparseTrack calls pbcvt.GMC every frame (OpenCV videostab)",
+   "source": "tools/v6/external/vendor/gmc_shim.cpp + pbcvt.py (in git)",
+   "path": "$ACMOT_EXT/SparseTrack/tracker/{pbcvt.py,libgmc_shim.dylib}",
+   "size_bytes": null,
+   "sha256": null,
+   "regenerable": "build (g++ + OpenCV with videostab; Mac used Homebrew OpenCV 5.0.0 \u2014 a different OpenCV may change warps: re-establish the baseline if the identity check fails)",
+   "command": "bash scripts/setup_research_assets.sh gmc"
+  },
+  {
+   "name": "BoostTrack @fb5bfc3",
+   "purpose": "development host",
+   "source": "https://github.com/vukasin-stanojevic/BoostTrack",
+   "path": "$ACMOT_EXT/BoostTrack (cache/ from the release)",
+   "size_bytes": null,
+   "sha256": "git fb5bfc3",
+   "regenerable": "clone",
+   "command": "bash scripts/setup_research_assets.sh repos"
+  },
+  {
+   "name": "TrackEval @12c8791",
+   "purpose": "HOTA/CLEAR/Identity for every protocol",
+   "source": "https://github.com/JonathonLuiten/TrackEval",
+   "path": "$ACMOT_TRACKEVAL (Mac: /Users/ahmedgouda/Desktop/CUE_SELECTION/cue_ablation_tools/TrackEval)",
+   "size_bytes": null,
+   "sha256": "git 12c8791",
+   "regenerable": "clone",
+   "command": "bash scripts/setup_research_assets.sh repos"
+  },
+  {
+   "name": "detectron2 @a2f4a8771ab77e8411c26b27f24f9489a28a2453",
+   "purpose": "SparseTrack Instances/Boxes structures",
+   "source": "https://github.com/facebookresearch/detectron2",
+   "path": "external venv",
+   "size_bytes": null,
+   "sha256": "git a2f4a87",
+   "regenerable": "pip install from source (FORCE_CUDA=0 on CPU)",
+   "command": "bash scripts/setup_research_assets.sh envs"
+  },
+  {
+   "name": "Python environments",
+   "purpose": "repo .venv (VisDrone runner, V6 tooling, tests) and external venv (SparseTrack/BoostTrack hosts, MOT17 evaluator)",
+   "source": "research/final/env/repo_venv.txt, research/final/env/external_venv.txt (pip freeze, macOS arm64, Python 3.12.14, torch 2.14.0)",
+   "path": "<repo>/.venv, $ACMOT_EXT/venv",
+   "size_bytes": null,
+   "sha256": null,
+   "regenerable": "pip",
+   "command": "bash scripts/setup_research_assets.sh envs"
+  },
+  {
+   "name": "yolov8n.pt",
+   "purpose": "YOLOv8n detector (cache rebuild / final live benchmark)",
+   "source": "Ultralytics assets release (auto-download by ultralytics)",
+   "path": "any; Mac: /Users/ahmedgouda/Desktop/CUE_SELECTION/yolov8n.pt",
+   "size_bytes": 6300000,
+   "sha256": "f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36",
+   "regenerable": "download (verify sha256)",
+   "command": "python -c \"from ultralytics import YOLO; YOLO('yolov8n.pt')\""
+  },
+  {
+   "name": "rtdetr-l.pt",
+   "purpose": "RT-DETR-L detector (cache rebuild / benchmark)",
+   "source": "Ultralytics assets release",
+   "path": "any",
+   "size_bytes": null,
+   "sha256": "6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f",
+   "regenerable": "download (verify sha256)",
+   "command": "python -c \"from ultralytics import RTDETR; RTDETR('rtdetr-l.pt')\""
+  },
+  {
+   "name": "fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth",
+   "purpose": "Faster R-CNN R50-FPN v2 (cache rebuild)",
+   "source": "https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth",
+   "path": "<repo>/weights/",
+   "size_bytes": 175000000,
+   "sha256": "dd69338a24b8d7381807e247652bdc356325bcbaf1cd3e092e00e0a1a58706bf",
+   "regenerable": "download",
+   "command": "curl -L -o weights/fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth"
+  },
+  {
+   "name": "bytetrack_ablation.pth.tar (YOLOX-X, MOT17 half + CrowdHuman)",
+   "purpose": "detector of SparseTrack/BoostTrack/TOPICTrack (re-detection, live benchmark)",
+   "source": "ByteTrack README model zoo: Google Drive id 1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob (baidu code eeo8)",
+   "path": "$ACMOT_EXT/BoostTrack/external/weights/ and SparseTrack pretrain dir",
+   "size_bytes": 792000000,
+   "sha256": "26cb8d2808664e5068a4c812d53becbc948b47fd6eacf2b45db049ab40c48b1a",
+   "regenerable": "download",
+   "command": "gdown 1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob -O bytetrack_ablation.pth.tar"
+  },
+  {
+   "name": "TOPICTrack weights (RESERVED for post-freeze external validation)",
+   "purpose": "topictrack_ablation.pth.tar (sha256 identical to bytetrack_ablation) + mot17_sbs_S50.pth (FastReID SBS-S50)",
+   "source": "TOPICTrack README: Google Drive folder 16GETvgDgDBUHVT-rwTzIhCbX8bSA8bxN (baidu code topi); code https://github.com/holmescao/TOPICTrack @ e7b260f",
+   "path": "$ACMOT_EXT/TOPICTrack/external/weights/",
+   "size_bytes": null,
+   "sha256": "topictrack_ablation 26cb8d2808664e5068a4c812d53becbc948b47fd6eacf2b45db049ab40c48b1a; mot17_sbs_S50 eb2e83afe774c85f20b735a7fabc423659c022387187eba449419c18dd6b4fa9",
+   "regenerable": "download",
+   "command": "only after the V7 freeze: git clone https://github.com/holmescao/TOPICTrack && gdown --folder 16GETvgDgDBUHVT-rwTzIhCbX8bSA8bxN"
+  }
+ ]
+}

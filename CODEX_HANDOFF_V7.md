@@ -1,225 +1,314 @@
-# CODEX / CLOUD HANDOFF — Universal AC-MOT V7 cycle (2026-09-28)
+# CODEX / CLOUD HANDOFF — Universal AC-MOT V7 (living document; GitHub is authoritative)
 
-## 1. Why this handoff exists
-The V7 development cycle started in a Claude desktop session running on the
-owner's LOCAL Mac, not in Claude Cloud:
-- MacBook Neo, Apple A18 Pro (6 cores), 8 GB;
-- no NVIDIA GPU, no CUDA.
+Last updated: 2026-09-28. Update this file, `research/final/V7_EXPERIMENT_LEDGER.md`
+and `research/final/V7_DEV_RESULTS.json` after EVERY experiment batch, then
+commit and push (no force).
 
-The owner then instructed that development runs must NOT use the local
-Mac/MPS and must run in Claude Cloud. Every run was stopped at that point.
-This file lets a cloud session (or Codex) continue without repeating
-completed work.
+## 0. Branch, commit, working tree
+- Repository: https://github.com/AhmedCode110/AC-MOT (public).
+- Branch: **`universal-adapters-v1`**. The authoritative commit is the branch
+  HEAD; `git log -1` shows the latest state commit. First V7 commit: `d56bba0`.
+- Tags: `universal-acmot-v6-freeze` → `2cff95f` (V6-TF, immutable).
+  `universal-acmot-v7-freeze` does NOT exist yet (V7 is not frozen).
+- Expected working tree after `git clone` + `scripts/setup_research_assets.sh`:
+  - clean git tree;
+  - untracked, git-ignored `outputs/det_cache_*_native/` and `outputs/v7/`;
+  - `$ACMOT_WORK` (default `~/acmot_work`) holding `acmot_external/`, the
+    datasets, TrackEval and `acmot_env.sh`.
+- Clone with tags: do NOT use `--depth 1` or `--no-tags`. `tools/v6/dev.py`
+  checks `git tag`.
 
-## 2. Authoritative state
-- **Repository:** github.com/AhmedCode110/AC-MOT, branch
-  `universal-adapters-v1`. The V7 commit is recorded by `git log`
-  ("V7 development …"). If the push did not happen, the local Mac holds
-  the only copy: see §9.
-- **V6-TF:** FROZEN at `2cff95f` (tag `universal-acmot-v6-freeze`). Never
-  edit the files in `research/V6TF_POLICY_LOCK.json`. That includes
-  `tools/eval_local.py`, `tools/seqstats.py` and `tools/v6/eval_official.py`,
-  which V7 reuses read-only.
-- **V7:** NOT frozen. New files only:
-  - `acmot_v7.py` (layer: `V7Spec`, `HostContract`, `V7Layer.step/observe`);
-  - `tools/v7/systems.py` (named systems + `@k=v` parser);
-  - `tools/v7/dev.py` (VisDrone/UAVDT runner: internal + official-compatible reports);
-  - `tools/v7/external/{sparsetrack_v7,boosttrack_v7}.py` (MOT17 development hosts);
-  - `tools/v7/collect.py` (writes `research/final/V7_DEV_RESULTS.json`);
-  - diagnostics `tools/v7/{streams,diag_*,screen,censored_mixture}.py`.
-- **Records:**
-  - `research/final/V7_EXPERIMENT_LEDGER.md` — every experiment, including
-    rejected ones;
-  - `research/final/V7_CLOUD_RUNS.md` — execution record;
-  - `research/final/V7_DEV_RESULTS.json` — all metrics.
-
-## 3. V7 architecture (development version)
-Per frame t, with host contract (assoc, birth, low, match) declared by the
-tracker adapter:
-1. **Stream statistics from frames < t only.** Nested exact Otsu on the pooled
-   logits of frames t−10..t−1 gives t1 (background|foreground) and
-   t2 (ambiguous|confident).
-2. **Regime.** ρ = confident share of the foreground; the median of ρ over
-   the last 100 frames decides it: clean iff ρ̄ ≥ ½. Frame 1 is "cold": the
-   host acts natively.
-3. **Clean regime (self-limiting).**
-   - The host's own thresholds are kept. They are only lowered to t2 when the
-     host would reject the stream's confident class (`clean=upper`).
-   - Raw scores are passed through.
-   - Only cross-class duplicates are removed (`dup_clean=xclass`: a candidate
-     overlapping, IoU > ½, a stronger candidate with a different class label).
-   - The host keeps its low stage.
-4. **Noisy regime.**
+## 1. Current V7 architecture (development; `acmot_v7.py`)
+The tracker adapter declares its own operating point in a
+`HostContract(assoc, birth, low, match, cmc=False)`. Per frame t:
+1. **Statistics (frames < t).** Nested exact Otsu on the pooled logits of
+   frames t−10..t−1 gives t1 (background|foreground) and t2
+   (ambiguous|confident). ρ is the confident share of the foreground; the
+   regime is clean iff the median ρ over the last 100 non-cold frames is
+   ≥ ½; "cold" means no valid bands.
+2. **Clean / cold regime (self-limiting).**
+   - The host's own thresholds are kept; they are only lowered to t2 when the
+     host would reject the confident class (`clean=upper`).
+   - Raw scores are passed; the host keeps its low stage.
+   - Only cross-class duplicates are removed (`dup_clean=xclass`).
+3. **Noisy regime.**
    - V6 bands: primary ≥ t2; extension [t1, t2); discard < t1.
    - ECDF score remap (`scores=auto`).
-   - Track-context duplicates (`dup=track`): an overlapping weaker candidate
-     is removed unless a DIFFERENT track of frame t−1 claims it (IoU ≥ ½).
-5. **Motion-conditioned IoU-match tolerance** (V6): V7c applies it always;
-   V7d only in noisy frames.
-6. **State updates** with frame-t data affect frame t+1 on only.
+   - Track-context duplicates (`dup=track`): a weaker overlapping candidate
+     (IoU > ½) is removed unless a different track of frame t−1 claims it.
+4. **Motion rule (V6).** IoU-match tolerance min(0.95, 1 − (1 − m0)/max(1, r)).
+   - V7c applies it in every frame;
+   - V7d applies it only in noisy frames.
+5. **State updates.** Frame-t data enter the state after the decision
+   (frames > t only).
 
-Pass-through identity holds: with the regime forced clean and every rule off
-(`NATIVE`), outputs are byte-identical to the official SparseTrack and
-BoostTrack replays.
+**Causality statement:**
+- the assoc/birth/discard thresholds and the regime use frames < t only;
+- the match tolerance uses the permitted frame-t motion cue;
+- duplicate handling uses frame-t geometry plus tracks of t−1.
 
-## 4. Best candidates and status (details: ledger E1–E10)
-| System | SparseTrack (baseline 68.88/77.85/81.97) | BoostTrack online (68.49/75.50/81.41) | VisDrone val-7 YOLO / RT-DETR | development-40 YOLO / RT-DETR | Faster R-CNN val-7 |
+**Pass-through property:** with `NATIVE` (regime forced clean, all rules
+off), outputs are byte-identical to the official SparseTrack and BoostTrack
+replays.
+
+## 2. Current best candidates
+**V7c** and **V7d**, defined in `tools/v7/systems.py`. The only difference is
+the motion gating. The differences between them are within noise:
+UNTESTED, and no bootstrap has been run yet.
+
+## 3. Results so far
+Source: `research/final/V7_DEV_RESULTS.json`. All runs were made on the
+owner's Mac, CPU, on cached detections, before commit `d56bba0` — see §5 O1.
+
+MOT17 metrics are HOTA/MOTA/IDF1; VisDrone metrics are MOTA/HOTA/IDF1.
+
+| System | SparseTrack | BoostTrack online | BoostTrack post (GBI) |
+|---|---|---|---|
+| baseline | 68.88/77.85/81.97 | 68.49/75.50/81.41 | 71.72/81.03/84.16 |
+| V6-TF | 64.72/71.71/77.49 | 62.61/66.64/75.19 | 66.35/72.30/78.51 |
+| V7c | 68.81/77.99/81.77 | 68.16/75.31/81.07 | 71.06/80.11/83.48 |
+| V7d | 68.93/77.93/82.13 | 68.37/75.17/81.19 | 71.65/80.69/83.98 |
+
+| System | val-7 YOLOv8n | val-7 RT-DETR-L | val-7 Faster R-CNN | development-40 YOLOv8n | development-40 RT-DETR-L |
 |---|---|---|---|---|---|
-| V6-TF (frozen) | 64.72/71.71/77.49 | 62.61/66.64/75.19 | 18.6/34.3/38.6 · 25.0/41.6/48.1 | 25.5/35.8/43.5 · 29.6/39.9/47.7 | 20.2/37.0/44.0 |
-| V7c | 68.81/77.99/81.77 | 68.16/75.31/81.07 | 18.4/34.5/38.6 · 23.5/41.6/48.0 | 25.6/36.0/43.6 · 29.4/40.8/48.6 | 18.6/37.4/44.2 |
-| V7d | **68.93/77.93/82.13** | 68.37/75.17/81.19 | 18.4/33.9/37.8 · 23.4/41.5/47.9 | 25.6/36.0/43.5 · 29.5/40.8/48.6 | not run |
-
-Tables give HOTA/MOTA/IDF1 for MOT17 and MOTA/HOTA/IDF1 for VisDrone.
-
-Catastrophic cells (V7c):
-- val-7: 0 (host native 5);
-- development-40: 2 (native 17, V6 2);
-- Faster R-CNN val-7: 0 (native 6).
-
-**Rejected so far:**
-- temporal-support precision proxy (D5b);
-- censored Gaussian mixture (D7);
-- host-domain Otsu alone (D6: catastrophic under temperature 2);
-- scene-evidence duplicate rule `ctx` (E4);
-- duplicate handling restricted to primaries (E5);
-- track memory as a fix (E3: superseded).
+| host NATIVE | 17.0/31.7/33.7 | −6.2/36.8/40.7 (5 cat) | −11.3/34.5/38.1 (6 cat) | 24.5/34.0/39.6 | 12.5/41.2/47.8 (17 cat) |
+| V6-TF | 18.6/34.3/38.6 | 25.0/41.6/48.1 | 20.2/37.0/44.0 | 25.5/35.8/43.5 | 29.6/39.9/47.7 (2 cat) |
+| V7c | 18.4/34.5/38.6 | 23.5/41.6/48.0 | 18.6/37.4/44.2 | 25.6/36.0/43.6 | 29.4/40.8/48.6 (2 cat) |
+| V7d | 18.4/33.9/37.8 | 23.4/41.5/47.9 | — | 25.6/36.0/43.5 | 29.5/40.8/48.6 |
 
 **Status by system:**
-- **SparseTrack:** severe V6 collapse removed (V7d ≈ +0.05 HOTA, n.s. not
-  yet tested).
-- **BoostTrack:** −0.12 HOTA online / −0.07 post-processed with V7d; no
-  catastrophic negative transfer.
-- **Faster R-CNN:** V7c keeps V6's gain (HOTA +0.4 vs V6), MOTA −1.6 vs V6.
-- **RT-DETR:** development-40 HOTA +0.9 vs V6; val-7 MOTA −1.5 vs V6.
-- **VisDrone:** ≈ V6; ID switches +10–32% vs V6 (open).
-- **UAVDT:** NOT yet run for V7.
+- **SparseTrack** (development host): V6's collapse (−4.15 HOTA) is removed;
+  V7 ≈ baseline, untested.
+- **BoostTrack** (development host): −0.12 (V7d) / −0.33 (V7c) HOTA online;
+  no catastrophic transfer.
+- **YOLOv8n:** ≈ V6 on val-7 and development-40; ID switches +10–40% vs V6.
+- **RT-DETR-L:**
+  - development-40 HOTA +0.9 and IDF1 +0.9 vs V6;
+  - val-7 MOTA −1.5 vs V6;
+  - some development-40 sequences where host-native is better than any
+    intervention (D8).
+- **Faster R-CNN:** V7c HOTA +0.47 vs V6, MOTA −1.6; 0 catastrophic cells.
+- **VisDrone overall:** healthy; catastrophic cells controlled (0 on val-7,
+  2 on development-40 vs host 17).
+- **UAVDT:** NOT yet run for V7. Caches are in the release; images and GT
+  need the official download.
 
-## 5. Exact next experiments (in order)
-1. **E11 — motion rule conditioning.** Add a generic `HostContract` field
-   `cmc: bool` (does the host compensate camera motion itself?):
-   - ByteTrack: False;
-   - BoT-SORT, SparseTrack (GMC), BoostTrack (ECC): True.
+## 4. Accepted / rejected
+**Accepted:**
+- track-context duplicates;
+- duplicate handling only in noisy frames, plus cross-class in clean frames;
+- ρ regime with host-anchored clean regime;
+- clean=upper (fixes BoostTrack's floor-0.1 raise);
+- scores=auto;
+- the V6EMU and NATIVE identity checks.
 
-   Motion loosening applies only to hosts without compensation. Compare with
-   V7c and V7d on val-7, development-40, SparseTrack and BoostTrack. This is
-   a declared capability, like the native thresholds; not a tracker-name
-   branch.
-2. **E12 — VisDrone ID switches.** Frame-1 admission (`cold`) vs pass-through
-   principle; check where the extra IDS arise per sequence (clean vs noisy
-   frames).
-3. **Stage D (development transfer)**, with `V7_SPLIT` set per split:
-   - UAVDT: `V7_SPLIT=uavdt` for YOLO + RT-DETR, and `V7_DETS=fasterrcnn`;
-   - test-dev: `V7_SPLIT=testdev`, same detectors;
-   - BoT-SORT: `"<S>@trk:botsort"` on val-7 and development-40.
+**Rejected** (kept in the ledger):
+- temporal-support precision proxy (D5b);
+- censored Gaussian mixture (D7);
+- host-domain Otsu alone: catastrophic under temperature 2 (D6);
+- scene-evidence duplicate rule `ctx` (E4);
+- duplicate handling limited to primaries (E5);
+- track memory as the fix (E3, superseded).
 
-   Keep confirmation-16 UNTOUCHED (post-freeze internal check).
-4. **Stress tests:**
-   - floors `@floor=0.05`, `@floor=0.1`, `@floor=0.2`;
-   - transforms `@t:temp2`, `@t:temp05`, `@t:pow3`, `@t:scale05` on val-7;
-   - the same via `--system "V7x@t:temp2"` on SparseTrack and BoostTrack
-     (both drivers support `t:` and `floor=`).
-5. **Tests** — `tests/test_v7_adaptive_layer.py`:
-   - causality: perturb frames ≥ k, and outputs < k and the frame-k
-     thresholds are unchanged;
-   - state reset;
+## 5. Unresolved problems (ledger "Open issues")
+- **O1 — provenance.** Re-run NATIVE, V6EMU, V7c and V7d from committed code
+  before relying on any number. The runner now stamps each result with the
+  code hash and spec.
+- **O2 — definition.** `NATIVE` ≠ the V6 paper's `static_default` (0.45
+  caches). Keep them distinct.
+- **O3 — feedback loop.** Regime ↔ duplicates: the pooled stream is
+  post-duplicate. Planned **E13**: pool all emitted candidates.
+- **O4 — cold frames.** Definition documented.
+- **O5 — causality tests** must follow the statement in §1.
+- **O6 — ID switches** on VisDrone are +10–40% vs V6. Frame-1 host admission
+  is part of it (E9).
+- **O7 — RT-DETR sequences** (development-40) where native beats any
+  intervention (the noisy-regime t2 is too strict there).
+- **O8 — motion rule vs camera-motion compensation.** Confounded so far;
+  E11 is the predeclared unconfounded test.
+
+## 6. Exact next experiments (in order)
+1. **Set up and run the identity checks (§8).**
+2. **E14 — provenance re-run** from committed code (cheap, cached detections):
+   ```
+   python tools/v7/dev.py run NATIVE V6EMU V7c V7d                      # val-7
+   V7_DETS=fasterrcnn python tools/v7/dev.py run NATIVE V6EMU V7c V7d
+   V7_SPLIT=dev40 python tools/v7/dev.py run NATIVE V6EMU V7c V7d
+   ```
+   Then the external venv:
+   ```
+   python tools/v7/external/sparsetrack_v7.py --system V7c --name ST7_V7c_r
+   python tools/v7/external/sparsetrack_v7.py --system V7d --name ST7_V7d_r
+   python tools/v7/external/boosttrack_v7.py  --system V7c --name BT7_V7c_r
+   python tools/v7/external/boosttrack_v7.py  --system V7d --name BT7_V7d_r
+   ```
+3. **E11 — motion rule vs camera-motion compensation** (predeclared).
+   ```
+   python tools/v7/dev.py run V7c V7d "V7c@trk:botsort" "V7d@trk:botsort"   # val-7 and V7_SPLIT=dev40
+   ```
+   BoT-SORT needs real VisDrone images. Decide by paired bootstrap (item 7).
+   Use `HostContract.cmc` only if the unconfounded test supports it, and set
+   it from documented tracker designs.
+4. **E13 — regime computed on all emitted candidates.** Add
+   `V7Spec.pool="raw"`, test it, and keep `"post"` as the default for
+   V6EMU identity.
+5. **E12 — ID switches.**
+   - Split the extra IDS by clean vs noisy frames and by sequence.
+   - Test cold-frame handling.
+6. **Stage D:**
+   ```
+   V7_SPLIT=testdev python tools/v7/dev.py run NATIVE V6EMU <best>            # (+ V7_DETS=fasterrcnn)
+   V7_SPLIT=uavdt python tools/v7/dev.py run NATIVE V6EMU <best>              # needs UAVDT (manual download)
+   ```
+   Then BoT-SORT on val-7 and development-40.
+7. **Stress tests.**
+   - Floors: `"<best>@floor=0.05"`, `"<best>@floor=0.1"`, `"<best>@floor=0.2"`.
+   - Transforms: `"<best>@t:temp2"`, `"<best>@t:temp05"`, `"<best>@t:pow3"`,
+     `"<best>@t:scale05"`.
+   - Run on val-7; for SparseTrack and BoostTrack use `--system "<best>@t:temp2"`.
+8. **Tests** — `tests/test_v7_adaptive_layer.py`:
+   - causality per §1;
+   - reset;
    - pass-through identity;
-   - no detector/tracker/dataset names in `acmot_v7.py`;
-   - affine-logit invariance of the noisy-regime bands;
-   - floor tests;
-   - crowd/duplicate unit cases: two tracked people overlapping must both be
-     kept; a near-coincident duplicate must be removed.
-6. **Paired bootstrap** (10,000 resamples, seed 42): every host,
-   V7 vs baseline and V7 vs V6, using `tools/v6/external/mot17_eval.py --boot`
-   and the V6 `tools/v6/confirm_report.py` logic.
-7. **Freeze V7:**
-   - config `configs/universal_acmot_policy_v7.json`;
-   - lock hashes `research/V7_POLICY_LOCK.json`;
-   - tag `universal-acmot-v7-freeze`.
-8. **Predeclare the external set BEFORE running frozen V7:**
-   - TOPICTrack (IEEE TIP 2025; untouched; same YOLOX checkpoint;
-     weights `topictrack_ablation`, `mot17_sbs_S50` already downloaded
-     locally);
-   - plus 1–3 more 2025/2026 Q1/Q2 systems with official code and weights,
-     verified with sources (see `research/final/EXTERNAL_PAPER_SELECTION.md`
-     for the V6 candidate matrix).
-9. **Final real-time benchmark** on ONE fixed device, AFTER freeze only:
-   - Baseline vs Baseline + frozen V7;
-   - batch 1, sequential, full pipeline;
-   - report hardware, precision, resolution, mean/P95 latency, FPS and
-     V7 overhead in ms and %.
+   - no names;
+   - noisy-band affine invariance;
+   - floors;
+   - crowd/duplicate cases.
+9. **Bootstrap.** Write `tools/v7/bootstrap.py`: 10,000 paired sequence
+   resamples, `default_rng(42)`, internal and official protocols, supporting
+   `V6:<name>`. MOT17 uses `tools/v7/mot17_eval_v7.py --boot`.
+10. **Freeze:**
+    - `configs/universal_acmot_policy_v7.json` (single source of truth);
+    - `research/V7_POLICY_LOCK.json` (sha256 of `acmot_v7.py`, the config
+      and the runners);
+    - tag `universal-acmot-v7-freeze`.
+11. **Predeclare the external set** in `research/final/V7_EXTERNAL_SELECTION.md`
+    BEFORE any run: TOPICTrack + 1–3 verified 2025/2026 Q1/Q2 systems. Then:
+    faithful baseline → the same system + exact frozen V7 → confirmation-16
+    once.
+12. **Final benchmark.**
+    - Baseline vs Baseline + frozen V7, on ONE fixed device, only after the
+      freeze.
+    - Batch 1, sequential, live detector.
+    - Report detector, controller and tracker latency; end-to-end mean and
+      P95; FPS; V7 overhead in ms and %; precision; resolution; hardware.
+    - Use the owner's Mac/MPS ONLY if the owner explicitly asks at that stage.
+    - A GPU-bound step that cannot run is recorded as DEFERRED with its exact
+      command, and the cycle continues.
 
-## 6. Commands (repo root, `PYTHONPATH=.`)
-**VisDrone runner**
+## 7. Commands (after `source $ACMOT_WORK/acmot_env.sh`; repo root)
+**Repo `.venv`** (VisDrone runner, V6 tooling, tests)
 ```
-python tools/v7/dev.py run V7c V7d "V7c@t:temp2" …    # V7_SPLIT=val7|dev40|testdev|uavdt, V7_DETS=yolov8,rtdetr|fasterrcnn
-python tools/v7/dev.py report NATIVE V6:X5 V7c …      # V6 runs are read from outputs/v6 as V6:<name>
-python tools/v7/dev.py official V7c …                 # official-compatible VisDrone port
-python tools/v7/dev.py seq V6:X5 V7c
+.venv/bin/python tools/v7/dev.py run|report|official|seq <systems...>
 ```
-
-**SparseTrack (external venv)**
+Environment: `V7_SPLIT=val7|dev40|testdev|uavdt` (conf16 is refused until the
+V7 freeze), `V7_DETS`, `V7_WORKERS`.
 ```
-python tools/v7/external/sparsetrack_v7.py --system V7d --name ST7_V7d    # --system BASELINE for the replay
+.venv/bin/python tools/v7/collect.py        # merges into research/final/V7_DEV_RESULTS.json
 ```
 
-**BoostTrack (external venv)**
+**External venv** (`$ACMOT_EXT/venv/bin/python`)
 ```
-python tools/v7/external/boosttrack_v7.py  --system V7d --name BT7_V7d
-```
-
-**MOT17 evaluation and bootstrap**
-```
-python tools/v6/external/mot17_eval.py <runs_root> ST7_BASELINE ST7_V7d
-python tools/v6/external/mot17_eval.py --boot <runs_root> ST7_BASELINE ST7_V7d
+tools/v7/external/sparsetrack_v7.py --system <S|BASELINE> --name <N>   # -> $ACMOT_EXT/runs/sparsetrack/MOT17-val/<N>/
+tools/v7/external/boosttrack_v7.py  --system <S|BASELINE> --name <N>   # -> $ACMOT_EXT/runs/boosttrack/MOT17-val/<N>{,_post,_post_gbi}/
+tools/v7/mot17_eval_v7.py $ACMOT_EXT/runs/sparsetrack <names...>       # TrackEval table
+tools/v7/mot17_eval_v7.py --boot $ACMOT_EXT/runs/sparsetrack <A> <B>   # paired bootstrap
 ```
 
-**Collect all development results**
-```
-python tools/v7/collect.py
-```
+**Rule for new code.** Every code change gets a NEW system name or run name.
+The VisDrone runner stamps results; `mot17_eval` caches
+`trackeval_per_seq.pkl` per run folder, so never reuse a run name.
 
-## 7. Data a cloud session needs (NOT in git)
-Sizes are measured on the Mac.
+## 8. Identity checks (first thing in a new environment)
+**Tier (a), mandatory, same platform:**
+- `NATIVE` byte-identical to `BASELINE`: run
+  `cmp $ACMOT_EXT/runs/sparsetrack/MOT17-val/ST7_NATIVE/data/*.txt …/ST7_BASELINE/data/*.txt`
+  and the same for BoostTrack, including `_post_gbi`.
+- `V6EMU` must equal V6 as re-run on the same caches.
 
-| Item | Local path | Size | Public source / how to rebuild |
-|---|---|---|---|
-| VisDrone native detection caches | `outputs/det_cache_{val,train,testdev,uavdt}_native/` (+ `visual_cues/`) | 13 + 74 + 78 + 119 MB | Copy from the owner, or rebuild with `tools/cache_detections.py --weights W --dataset D --output-dir O --nms none --resolutions 736` (YOLOv8n `yolov8n.pt`, RT-DETR-L `rtdetr-l.pt`, Faster R-CNN torchvision v2, sha256 in `research/final/REPRODUCIBILITY.md`) |
-| UAVDT view | `outputs/uavdt_view` | 10 MB (+ images) | `tools/build_uavdt_view.py` |
-| VisDrone2019-MOT val / train / test-dev (annotations + images; the runner counts `*.jpg` per sequence, BoT-SORT reads images) | Google Drive `AC-MOT-shared/AC-MOT-data/…` (symlinked) | several GB | public VisDrone2019-MOT release |
-| MOT17 val-half | `/Users/ahmedgouda/Desktop/acmot_external/data_mirror/MOT17` (byte-identical mirror, sha256 manifest) | 456 MB (val-half images + `annotations/*.json`) | MOT17 from motchallenge.net; split verified by `tools/v6/external/verify_mot17_split.py` (hashes in `vendor/mot17_split_verification.json`) |
-| SparseTrack published detections | `…/acmot_external/runs/sparsetrack_A_official/published_detections.pkl` | 1.9 MB | or rerun the official detector (YOLOX-X, `bytetrack_ablation.pth.tar`, sha256 26cb8d28…) |
-| BoostTrack detections + ECC cache | `…/acmot_external/BoostTrack/cache/` | 2.5 MB | BoostTrack's own cache |
-| SparseTrack @499844f, BoostTrack @fb5bfc3 | `…/acmot_external/{SparseTrack,BoostTrack}` | — | clone at the pinned commits + `tools/v6/external/vendor/*_compat.diff`; SparseTrack GMC shim `vendor/gmc_shim.cpp` + `pbcvt.py` (OpenCV videostab) |
-| MOT17 val-half GT | `…/acmot_external/BoostTrack/results/gt/MOT17-val` | small | shipped in the BoostTrack repo |
-| TrackEval @12c8791 | `/Users/ahmedgouda/Desktop/CUE_SELECTION/cue_ablation_tools/TrackEval` | small | github.com/JonathonLuiten/TrackEval |
+**Tier (b), cross-platform:** compare with the Mac values.
 
-**Hard-coded Mac paths.** The locked V6 files (`tools/eval_local.py` TRACKEVAL)
-and the V6/V7 tools use absolute Mac paths. The locked files must not be
-edited. In the cloud, recreate the same absolute paths with symlinks:
-```
-mkdir -p /Users/ahmedgouda/Desktop && ln -s <cloud>/… …
-```
-Paths used:
-- `/Users/ahmedgouda/Desktop/{Universal-ACMOT,acmot_external,CUE_SELECTION}`;
-- the Google-Drive VisDrone paths in `tools/v6/dev.py` SPLITS.
+| Check | Value |
+|---|---|
+| V6EMU val-7 YOLO | 18.560 / 34.262 / 38.597, IDS 159 |
+| V6EMU val-7 RT-DETR | 25.012 / 41.649 / 48.113, IDS 150 |
+| V6EMU val-7 Faster R-CNN | 20.181 / 36.951 / 44.022 |
+| SparseTrack BASELINE | 68.876 / 77.849 / 81.974, IDS 124, FP 2231, FN 9582 |
+| BoostTrack BASELINE (online) | 68.492 / 75.502 / 81.413 |
+| BoostTrack BASELINE (post_gbi) | 71.725 / 81.032 / 84.163 |
 
-## 8. Scientific constraints (unchanged)
-- Training-free, online, causal: frame-t control uses frames < t plus
-  frame-t image cues.
-- No labels, and no detector, tracker, dataset or sequence names or branches.
-- SparseTrack and BoostTrack are DEVELOPMENT hosts for V7, never external
+The reference Mac track files are in the release tar at
+`runs/sparsetrack/MOT17-val/{ST_A_official,ST_replay_baseline}/data` and
+`runs/boosttrack/MOT17-val/BT_replay_baseline*/data`.
+
+If only tier (b) fails (for example a different OpenCV for GMC, or x86
+numerics), record a new cloud baseline in `research/final/V7_CLOUD_RUNS.md`
+and compare within one platform only.
+
+## 9. Required assets
+Full list with sources, sizes, sha256 and commands:
+`research/final/ASSET_MANIFEST.json`. Setup:
+`bash scripts/setup_research_assets.sh`.
+
+**Datasets:**
+- MOT17 (motchallenge.net, val-half subset verified per file);
+- VisDrone2019-MOT val/train/test-dev (official Google Drive ids);
+- UAVDT (official site, manual).
+
+**Caches:** GitHub release `v7-dev-assets-1`:
+- `acmot_detcache_{val,train,testdev,uavdt}_native.tar`;
+- `acmot_external_mot17_artifacts.tar`.
+
+These are derived outputs only. A rebuilt cache is a new baseline.
+
+**Checkpoints** (only for re-detection, the final benchmark, and post-freeze
+external runs):
+- yolov8n.pt (f59b3d83…);
+- rtdetr-l.pt (6de60b10…);
+- fasterrcnn_resnet50_fpn_v2 (dd69338a…);
+- bytetrack_ablation.pth.tar (26cb8d28…, ByteTrack Drive id
+  1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob);
+- TOPICTrack weights (reserved).
+
+**Environments** (Python 3.12):
+- `research/final/env/repo_venv.txt` (repo `.venv`);
+- `research/final/env/external_venv.txt` (external venv): detectron2
+  @a2f4a87 from source, `cython_bbox==0.1.5 --no-build-isolation`,
+  numpy 2.2.6, omegaconf, lap, motmetrics 1.4.0, scikit-learn (GBI),
+  filterpy, loguru.
+- SparseTrack needs the GMC shim: `vendor/gmc_shim.cpp`, built against
+  OpenCV with videostab, keeping the file name `libgmc_shim.dylib`.
+- The repo's `AGENTS.md` graphify and writer-lock steps do not apply to a
+  fresh cloud clone. `research/context/*` is V6-era; this file is
+  authoritative for V7.
+
+## 10. Result paths
+- VisDrone/UAVDT: `outputs/v7/<split>/<system>/<det>/<seq>.pkl` (+ `.official.pkl`).
+- MOT17: `$ACMOT_EXT/runs/{sparsetrack,boosttrack}/MOT17-val/<run>/`.
+- Summary: `research/final/V7_DEV_RESULTS.json`.
+- Execution record: `research/final/V7_CLOUD_RUNS.md` (hardware + commit
+  per run).
+
+## 11. Scientific constraints
+- Training-free, online, causal (§1); no labels at runtime.
+- No detector, tracker, dataset or sequence names or branches. A declared
+  host capability must be a documented host property.
+- V6-TF (2cff95f) is immutable; never edit files listed in
+  `research/V6TF_POLICY_LOCK.json`.
+- SparseTrack and BoostTrack are DEVELOPMENT hosts for V7: never external
   evidence.
-- TOPICTrack must stay untouched until V7 is frozen and the external list is
-  predeclared.
-- confirmation-16 is reserved for a single post-freeze V7 check.
-- No policy change after the freeze based on external results.
+- After the freeze: no policy change based on external results; report ALL
+  predeclared external outcomes.
 - Keep negative results.
-- Report timing only with the exact hardware; the final speed comparison is
-  Baseline vs Baseline + frozen V7 on one fixed device, after the freeze.
+- No state-of-the-art or universal-improvement claims unless the evidence
+  supports them.
+- Timing only with exact hardware; the final speed comparison is on one
+  fixed device after the freeze.
 
-## 9. If the branch was not pushed
-The V7 development commit exists only on the owner's Mac
-(`/Users/ahmedgouda/Desktop/Universal-ACMOT`). Run from that folder:
-```
-git push origin universal-adapters-v1 && git push origin universal-acmot-v6-freeze
-```
+## 12. Reserved (untouched) systems for post-freeze validation
+- **TOPICTrack** (IEEE TIP 2025, github.com/holmescao/TOPICTrack @ e7b260f):
+  never run during V7 development.
+- **VisDrone confirmation-16:** one post-freeze V7 check; the runner refuses
+  it before the tag.
+- 1–3 further 2025/2026 Q1/Q2 systems to be verified and predeclared before
+  the freeze. Candidate matrix from V6: `research/final/EXTERNAL_PAPER_SELECTION.md`.

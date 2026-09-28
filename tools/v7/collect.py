@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-EXT = Path("/Users/ahmedgouda/Desktop/acmot_external/runs")
+EXT = Path(__import__("os").environ.get("ACMOT_EXT", "/Users/ahmedgouda/Desktop/acmot_external")) / "runs"
 
 
 def visdrone(split, dets):
@@ -39,10 +39,13 @@ def visdrone(split, dets):
 
 
 def mot17(host):
-    sys.path.insert(0, str(ROOT / "tools/v6/external"))
-    import mot17_eval as me
+    sys.path.insert(0, str(ROOT / "tools/v7"))
+    from mot17_eval_v7 import load_mot17_eval
+    me = load_mot17_eval()
     root = EXT / host
     out = {}
+    if not (root / "MOT17-val").exists():
+        return out
     for p in sorted((root / "MOT17-val").iterdir()):
         if not (p / "data").exists():
             continue
@@ -64,6 +67,10 @@ if __name__ == "__main__":
            "mot17_sparsetrack": mot17("sparsetrack"),
            "mot17_boosttrack": mot17("boosttrack")}
     dest = ROOT / "research/final/V7_DEV_RESULTS.json"
+    old = json.load(open(dest)) if dest.exists() else {}
+    for k, v in res.items():                 # merge: never erase earlier entries
+        old.setdefault(k, {}).update(v)
+    res = old
     json.dump(res, open(dest, "w"), indent=1)
     for k, v in res.items():
         print(k, len(v))
