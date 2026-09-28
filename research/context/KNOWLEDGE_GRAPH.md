@@ -13,10 +13,10 @@ Edit this file when the project state changes, then rebuild the graph.
 | Version: V1 | FROZEN SUPERSEDED | histogram normaliser ratio gate legacy SCI not temperature invariant | FROZEN_VERSIONS.md |
 | Version: V2 variants | SUPERSEDED | V2b V2c V2d V2e V2f density budgets reliability feedback all failed | FAILED_EXPERIMENTS.md |
 | Version: V3 | FROZEN SUPERSEDED | calibration-invariant ECDF z-logit gate with legacy SCI | FROZEN_VERSIONS.md |
-| Version: V4 | FROZEN BASELINE ONLY | latest frozen version; baseline and ablation only, never the final system or a fallback; compute-budget-only, VisDrone-tuned constants | FROZEN_VERSIONS.md |
+| Version: V4 | FROZEN BASELINE ONLY | previous frozen version (before V6-TF); baseline and ablation only, never the final system or a fallback; compute-budget-only, VisDrone-tuned constants | FROZEN_VERSIONS.md |
 | Version: V5 learned controller | SUPERSEDED RESEARCH-ONLY | scene-state learned stump tree Optuna controller research upper bound not deployable | DECISIONS.md |
 | Version: V5-TF | SUPERSEDED DEVELOPMENT | training-free Otsu-band line F1-F5 and E41; E41 locked then rejected by audit (FX-18); never frozen; succeeded by V6-TF | ARCHITECTURE.md |
-| Version: V6-TF | FINAL TARGET | final target and contribution: training-free online self-calibrating causal detector-agnostic tracker-agnostic; dedup IoU 0.5, nested exact-Otsu bands on logits of frames t-10..t-1, motion-conditioned association; tag universal-acmot-v6-freeze | ARCHITECTURE.md |
+| Version: V6-TF | FINAL TARGET FROZEN | latest frozen version (tag universal-acmot-v6-freeze, 2cff95f); final target and contribution: training-free online self-calibrating causal detector-agnostic tracker-agnostic; dedup IoU 0.5, nested exact-Otsu bands on logits of frames t-10..t-1, motion-conditioned association; tag universal-acmot-v6-freeze | ARCHITECTURE.md |
 | Architecture: Original SCI architecture | SUPERSEDED | scene analysis SCI weighted sum resolution and sensitivity controller | ARCHITECTURE.md |
 | Architecture: V4 compute-budget architecture | ABLATION | V4 is not the final architecture: compute-budget-only ablation, scene adaptation deletion rejected (D-009), VisDrone-tuned category E constants; resolution budget ECDF z-gate | ARCHITECTURE.md |
 | Architecture: V5-TF target architecture | CURRENT | frame scene state analyzer online self-calibration AC controller before detector candidate handling tracker feedback | ARCHITECTURE.md |

@@ -1,15 +1,15 @@
 # PROJECT STATE — read this first
 
 <!-- AUTO:BEGIN (tools/update_project_context.py — do not edit by hand) -->
-LAST VERIFIED COMMIT: baa7958d3870e1387561ca902d085f3f1414e6b3
-CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 17, behind 0)
-LAST CONTEXT UPDATE: 2026-09-27 20:26 UTC
-LATEST FROZEN TAG (git): universal-acmot-v4-freeze → fc003bf
-WORKING TREE: 9 uncommitted path(s) — see GIT_STATE.md
+LAST VERIFIED COMMIT: 2cff95f8a565fdff17f5b1fb06c23cf78e0ffed0
+CURRENT BRANCH: universal-adapters-v1 (upstream origin/universal-adapters-v1, ahead 18, behind 0)
+LAST CONTEXT UPDATE: 2026-09-28 00:19 UTC
+LATEST FROZEN TAG (git): universal-acmot-v6-freeze → 2cff95f
+WORKING TREE: 2 uncommitted path(s) — see GIT_STATE.md
 <!-- AUTO:END -->
 
 FINAL TARGET: V6-TF — the final research target and contribution (Amendment 9; successor of V5-TF after the E41 audit). V4 = historical baseline / ablation ONLY, never a fallback.
-CURRENT RESEARCH VERSION: V6-TF (training-free online self-calibrating Universal AC-MOT, nested-Otsu candidate bands) — FREEZE IN PREPARATION (see FROZEN_VERSIONS.md / git tag universal-acmot-v6-freeze)
+CURRENT RESEARCH VERSION: V6-TF (training-free online self-calibrating Universal AC-MOT, nested-Otsu candidate bands) — FROZEN (tag universal-acmot-v6-freeze → 2cff95f)
 CURRENT PHASE: V6-TF freeze → one-way post-freeze evaluations (confirmation-16, Faster R-CNN, BoT-SORT, UAVDT, val official-compatible, test-dev post-hoc) → external published-system transfer → paper package (research/final/)
 
 ## What is the project?
