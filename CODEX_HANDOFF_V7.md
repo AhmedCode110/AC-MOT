@@ -5,43 +5,31 @@ and `research/final/V7_DEV_RESULTS.json` after EVERY experiment batch, then
 commit and push (no force).
 
 ## CLOUD STATUS (read first; updated 2026-09-28, environment C1)
-- Working branch: **`universal-adapters-v1-y0zkeh`** (draft PR #1 into
-  `universal-adapters-v1`). Hardware + every run: `research/final/V7_CLOUD_RUNS.md`.
-  Availability matrix (exact vs diagnostic, dev vs reserved):
-  `research/final/V7_FALLBACK_VALIDATION.md`.
-- BLOCKED (recorded once, not retried): motchallenge.net, Google Drive
-  (VisDrone/UAVDT GT, MOT17 frames), arxiv.org, huggingface, zenodo,
-  mehdimiah.com (C-TWiX artefacts). Reachable: GitHub, PyPI, official KITTI S3.
-- **Labelled development evidence built in C1 (exact configurations):**
-  - MOT17 val-half, published YOLOX-X detections at two emission floors
-    (0.01 SparseTrack stream / 0.1 BoostTrack stream): ByteTrack official,
-    ByteTrack ultralytics default, OC-SORT official
-    (`tools/v7/external/mot17_bytetrack_v7.py`); BoostTrack pixel-free
-    (`boosttrack_v7.py --pixel-free`, BASELINE byte-identical to the Mac
-    reference tracks).
-  - KITTI tracking training (21 seq): native YOLOv8n + RT-DETR-L caches built
-    with the original recipe (`outputs/det_cache_kitti_native`, frames from
-    the official zip by HTTP range), hosts ultralytics ByteTrack / OC-SORT
-    (`V7_SPLIT=kitti`, `@trk:ocsort`), official KITTI HOTA via
-    `tools/v7/kitti/kitti_eval.py`.
-- **Current best candidate: V7f** (`tools/v7/systems.py`) = V7d + regime from
-  the whole stream (rho_frames=0) + foreground track-consistent rescue
-  (rescue_band=fg) + split interpretability check (bg_check). Ledger E15–E18.
-  - two-stage hosts (ByteTrack ×4 cells, BoostTrack): = baseline (≤0.014 HOTA);
-  - OC-SORT (no low stage): +0.61 [+0.36,+1.24] / +0.46 [+0.27,+1.09] HOTA,
-    +1.27 / +1.26 MOTA (10k paired bootstrap, seed 42);
-  - KITTI YOLOv8n: OC-SORT +7.9 HOTA; ByteTrack HOTA ≈, IDF1 +1.5, MOTA −1.9.
-- Pending before any freeze: KITTI RT-DETR cells, labelled stress (MOT17
-  transforms/floors, running), E11 on KITTI (BoT-SORT; seq 0020 host crash),
-  full bootstrap table, collect into V7_DEV_RESULTS.json, then freeze.
-- Post-freeze external candidates found so far (NOT run with V7):
-  PD-SORT (IEEE Trans. Consumer Electronics 2025, github Wangyc2000/PD_SORT
-  @af21db6): OC-SORT-based single-stage tracker; the repo ships the exact
-  tracker-input detections (`res_mot/MOT17-val/.../*_detections.txt`, same
-  YOLOX-X outputs as our caches), CMC files and its own MOT17-val outputs →
-  pixel-free faithful reproduction possible. TOPICTrack stays reserved.
-  C-TWiX (Pattern Recognition 2025) excluded: weights/detections only on a
-  blocked host.
+- **V7 IS FROZEN**: system V7f, freeze commit **488df9a** on
+  `universal-adapters-v1-y0zkeh` (draft PR #1). Config
+  `configs/universal_acmot_policy_v7.json`, lock `research/V7_POLICY_LOCK.json`.
+  The annotated tag `universal-acmot-v7-freeze` exists locally but the cloud git
+  proxy refuses tag pushes (HTTP 403). Owner action:
+  `git tag -a universal-acmot-v7-freeze 488df9a -m "Universal AC-MOT V7 frozen policy (V7f)" && git push origin universal-acmot-v7-freeze`.
+  Until the tag exists on the remote, `tools/v7/dev.py` still refuses conf16 in
+  a fresh clone.
+- Evidence: development matrix + CIs `research/final/V7_STATISTICS.md`;
+  experiments E12–E20 + STRESS-L in the ledger; availability matrix
+  `V7_FALLBACK_VALIDATION.md`; runs `V7_CLOUD_RUNS.md`.
+- **Post-freeze external results** (`V7_EXTERNAL_TRANSFER.md`, predeclared in
+  `V7_EXTERNAL_SELECTION.md` in the freeze commit):
+  - PD-SORT (IEEE TCE 2025): faithful pixel-free reproduction (metric-identical to
+    the authors' released MOT17-val run) 68.011/75.185/81.032 → + frozen V7f
+    68.624/76.313/81.850; ΔHOTA +0.61 [+0.27, +1.65], ΔMOTA +1.13 [+0.27, +3.03],
+    ΔIDF1 +0.82 [+0.43, +1.94] (10k paired bootstrap, seed 42); HOTA up on 7/7 sequences.
+  - Hybrid-SORT (AAAI 2024): reproduction of the accessible setup 66.70/75.52/77.56
+    (README 67.1/75.8/78.0) → + V7f identical (Δ = 0; two-stage host, clean stream).
+- BLOCKED here (recorded once): motchallenge.net, Google Drive, arXiv, Hugging
+  Face, Zenodo, several author hosts. Reachable: GitHub, PyPI, official KITTI S3.
+- Next (if more compute/network): further 2025/26 published systems when their
+  artefacts become reachable (TOPICTrack stays reserved; it needs frames + ReID);
+  VisDrone/UAVDT labelled checks and conf16 once Google Drive is reachable;
+  the final timing benchmark on one fixed device.
 
 ## 0. Branch, commit, working tree
 - Repository: https://github.com/AhmedCode110/AC-MOT (public).
