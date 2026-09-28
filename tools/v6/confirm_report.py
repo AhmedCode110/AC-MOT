@@ -19,7 +19,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.v6.dev import DETS, load, out_dir, split_sequences  # noqa: E402
 
-PAIRS = [("V6TF", "V4"), ("V6TF", "shared_static")]
+PAIRS = [("V6TF", "V4"), ("V6TF", "shared_static"),
+         ("V6TF@trk:botsort", "V4@trk:botsort"),
+         ("V6TF@trk:botsort", "static_default@trk:botsort")]
 METRICS = ("HOTA", "IDF1", "MOTA")
 
 
@@ -65,9 +67,14 @@ def main():
     from tools.v6.eval_official import combine_official
     seqs = split_sequences(split)
     pooled, rows = [], []
+    protos = os.environ.get("V6_PROTOCOLS", "internal,official").split(",")
+    dets = os.environ.get("V6_DETS", ",".join(DETS)).split(",")
+    tag = os.environ.get("V6_TAG", "")
     for proto, comb in (("internal", combine), ("official", combine_official)):
+        if proto not in protos:
+            continue
         for sy in systems:
-            for d in DETS:
+            for d in dets:
                 st = _stats(split, sy, d, proto)
                 m = comb(st)
                 per = [comb([x]) for x in st]
@@ -80,17 +87,17 @@ def main():
                                      **{k: (round(v, 3) if isinstance(v, float) else v)
                                         for k, v in p.items()}))
     od = out_dir(split)
-    json.dump(pooled, open(od / "pooled_metrics.json", "w"), indent=1)
-    with open(od / "per_sequence.csv", "w", newline="") as f:
+    json.dump(pooled, open(od / f"pooled_metrics{tag}.json", "w"), indent=1)
+    with open(od / f"per_sequence{tag}.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) + ["GT"],
                            extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
     jobs = [(split, a, b, d, proto, n) for a, b in PAIRS if a in systems and b in systems
-            for d in DETS for proto in ("internal", "official")]
+            for d in dets for proto in protos]
     with ProcessPoolExecutor(6) as ex:
         boots = [r for res in ex.map(_boot, jobs) for r in res]
-    json.dump(boots, open(od / "bootstrap.json", "w"), indent=1)
+    json.dump(boots, open(od / f"bootstrap{tag}.json", "w"), indent=1)
     for p in pooled:
         print(f"{p['protocol']:<9}{p['system']:<15}{p['detector']:<7} cat {p['n_catastrophic']:2d} "
               f"MOTA {p['MOTA']:6.2f} HOTA {p['HOTA']:6.2f} IDF1 {p['IDF1']:6.2f} "
