@@ -110,7 +110,7 @@ def v2r():
 
 t = r"""\begin{table}[t]
 \centering
-\caption{Held-out results (percent for HOTA, MOTA, IDF1; counts for IDS, FN, FP; processing frames per second on one NVIDIA Tesla T4). Best value per column and dataset in bold is not marked because the profiles target different trade-offs.}
+\caption{Held-out results (percent for HOTA, MOTA, IDF1; counts for IDS, FN, FP; processing frames per second on one NVIDIA Tesla T4, each system measured in its own session). No entry is marked as best because the profiles target different trade-offs.}
 \label{tab:main}
 \small
 \begin{tabular}{lrrrrrrr}
