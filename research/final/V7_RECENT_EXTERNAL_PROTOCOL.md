@@ -107,3 +107,23 @@ GitHub Actions (ubuntu-24.04, 4 vCPU, no GPU), because the Claude container
 cannot reach motchallenge.net, Google Drive or the authors' hosts. Every
 workflow records the repository commit, asset sha256, library versions and
 CPU, and commits its results to `research/final/recent/<system>/`.
+
+## Amendment 1 (2026-09-28, before any TrackTrack run): TrackTrack contract and adapter
+Source: kamkyu94/TrackTrack @ ee7f1c5, `3. Tracker/utils/etc.py::set_parameters`,
+`trackers/tracker.py::update`, `1. YOLOX/detect.py` (conf 0.1).
+
+| Setting | assoc | birth | low | match | Mapping |
+|---|---|---|---|---|---|
+| MOT17 val-half (sequences 02/04/05/09/10/11/13: det_thr 0.60, init_thr 0.70, match_thr 0.70) | 0.6 | 0.7 | 0.1 | 0.7 (mixed IoU/ReID cost; not mapped) | `det_thr ← decision.assoc`, `init_thr ← decision.birth` |
+| DanceTrack val (det_thr 0.60, init_thr 0.60, match_thr 0.80) | 0.6 | 0.6 | 0.1 | 0.8 (not mapped) | same |
+
+TrackTrack takes two views of the same detector output per frame (NMS 0.80 =
+the candidates, NMS 0.95 = the source of its "deleted detections"). The layer
+runs on the NMS-0.80 candidates. In the NMS-0.95 view, a row that matches a
+candidate (the tracker's own IoU ≥ 0.97 rule) takes that candidate's fate:
+removed if the layer removed it, rescored if the layer rescored it; rows the
+tracker would treat as deleted detections are left as they are. The tracker
+reads no image (CMC from its shipped GMC files, ReID features precomputed), so
+no image cue is passed. Reproduction reference: the paper's MOT17 / DanceTrack
+validation numbers, recorded in `V7_RECENT_EXTERNAL_SYSTEMS.md` from the CVF
+paper text before the first run.
