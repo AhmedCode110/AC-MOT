@@ -1,0 +1,2 @@
+repo_commit 2d1a504f2209d0633ec13b22f4cc0038cca23d6f
+runner AMD EPYC 9V74 80-Core Processor x 4; detector and ReID on CPU fp32
