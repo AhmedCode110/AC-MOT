@@ -4,6 +4,32 @@ Last updated: 2026-09-28. Update this file, `research/final/V7_EXPERIMENT_LEDGER
 and `research/final/V7_DEV_RESULTS.json` after EVERY experiment batch, then
 commit and push (no force).
 
+## CLOUD STATUS (read first; 2026-09-28, environment C1)
+- Working branch of the cloud session: **`universal-adapters-v1-y0zkeh`**
+  (draft PR #1 into `universal-adapters-v1`). Hardware and every run:
+  `research/final/V7_CLOUD_RUNS.md`.
+- Provisioned: both venvs, release caches (sha256 OK), SparseTrack,
+  BoostTrack (with the MOT17 val-half GT), TrackEval, GMC shim (OpenCV 4.6).
+- **BLOCKED by the environment network policy:** `motchallenge.net`
+  (MOT17 frames), `drive.google.com` + `drive.usercontent.google.com`
+  (VisDrone annotations/frames, UAVDT). Until the owner allows them, no
+  labelled metric can be produced and the MOT17 replays cannot run. Tier-(a)
+  identity checks, E14, E11, E12a/E12c, E13 metrics, Stage D, stress metrics,
+  bootstrap numbers and the freeze are all waiting on this.
+- Done label-free in C1: E13 option `pool`, `dev.py track`,
+  `tools/v7/diag_churn.py` (E12-LF: frame-1 admission is the leading
+  candidate for the ID-switch surplus, see the ledger),
+  `tools/v7/diag_stress.py`, `tools/v7/bootstrap.py`,
+  `tests/test_v7_adaptive_layer.py` (52 tests) + `tests/test_v7_bootstrap.py`.
+- First commands once the hosts are allowed:
+  ```
+  export ACMOT_WORK=~/acmot_work
+  bash scripts/setup_research_assets.sh mot17 visdrone   # the zips hold the real frames (BoT-SORT, E11)
+  source $ACMOT_WORK/acmot_env.sh
+  ```
+  then §8 identity checks and §6 in order (E12a/E13 systems are listed in
+  the ledger "Cloud continuation").
+
 ## 0. Branch, commit, working tree
 - Repository: https://github.com/AhmedCode110/AC-MOT (public).
 - Branch: **`universal-adapters-v1`**. The authoritative commit is the branch
@@ -152,9 +178,11 @@ MOT17 metrics are HOTA/MOTA/IDF1; VisDrone metrics are MOTA/HOTA/IDF1.
 4. **E13 — regime computed on all emitted candidates.** Add
    `V7Spec.pool="raw"`, test it, and keep `"post"` as the default for
    V6EMU identity.
-5. **E12 — ID switches.**
-   - Split the extra IDS by clean vs noisy frames and by sequence.
-   - Test cold-frame handling.
+5. **E12 — ID switches.** Label-free part done (ledger E12-LF). Labelled:
+   - `python tools/v7/diag_churn.py <split> <det> V6EMU V7c V7d ...`
+     (per-frame IDS attribution: cold/first-30, clean/noisy, near regime
+     changes);
+   - E12a `V7c@cold=none`, `V7d@cold=none` (all VisDrone cells + MOT17 hosts).
 6. **Stage D:**
    ```
    V7_SPLIT=testdev python tools/v7/dev.py run NATIVE V6EMU <best>            # (+ V7_DETS=fasterrcnn)

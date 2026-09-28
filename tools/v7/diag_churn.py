@@ -131,10 +131,12 @@ def summarise(split, det, system, seqs, dataset=None):
         rows += F
     reg = np.array([r["regime"] for r in rows])
     unstable = near([r["regime_change"] or r["assoc_jump"] for r in rows])
+    early = np.array([r["frame"] <= 30 for r in rows])
     out = dict(system=system, det=det, frames=len(rows))
     for key, m in (("all", np.ones(len(rows), bool)), ("clean", reg == "clean"),
                    ("noisy", reg == "noisy"), ("cold", reg == "cold"),
-                   ("near_change", unstable), ("stable", ~unstable)):
+                   ("near_change", unstable), ("stable", ~unstable),
+                   ("first30", early), ("after30", ~early)):
         sub = [r for r, k in zip(rows, m) if k]
         if not sub:
             continue

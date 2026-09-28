@@ -206,6 +206,68 @@ Reading (HYPOTHESIS, not established): the motion-conditioned tolerance may help
 compensation (ultralytics ByteTrack on drone video) and slightly hurt hosts
 that already compensate (SparseTrack GMC, BoostTrack ECC). This is CONFOUNDED (host and dataset change together; the val-7 YOLO effect is −0.64 HOTA, development-40 ≈ 0, MOT17 gaps 0.12–0.21 HOTA) and untested by bootstrap. V7c vs V7d differences are within noise until tested. OPEN.
 
+## Cloud continuation (environment C1, see V7_CLOUD_RUNS.md)
+Labelled evaluation is BLOCKED in C1: the network policy denies the official
+MOT17 (motchallenge.net) and VisDrone/UAVDT (Google Drive) downloads. The
+entries below are label-free (no metric, no accept/reject), except where
+stated. Code: batch-1 commit on `universal-adapters-v1-y0zkeh`.
+
+### E12-LF — ID churn, label-free part (DIAGNOSTIC)
+Question: where do V7c/V7d create more track identities than V6EMU?
+Tool: `tools/v7/diag_churn.py` on `dev.py track` outputs (ByteTrack host,
+native caches). "ids" = distinct track ids = births; "short" = ids living
+< 5 frames; cold = frames without valid bands (here only frame 1 of each
+sequence); regchg = regime changes (the first cold→regime change of every
+sequence included); ajump = |Δassoc| > 0.05. Full table:
+`research/final/V7_E12_CHURN.json`.
+
+| Split / det | System | ids | short | births in cold frames | births clean | births noisy | regchg | ajump |
+|---|---|---|---|---|---|---|---|---|
+| val-7 YOLO | V6EMU | 481 | 72 | 0 | 0 | 481 | 7 | 0 |
+| val-7 YOLO | V7c | 542 | 97 | 102 | 80 | 360 | 20 | 30 |
+| val-7 YOLO | V7c@pool=raw | 641 | 110 | 102 | 71 | 468 | 14 | 22 |
+| val-7 RT-DETR | V6EMU | 454 | 53 | 0 | 0 | 454 | 7 | 0 |
+| val-7 RT-DETR | V7c | 648 | 166 | 294 | 26 | 328 | 8 | 7 |
+| val-7 Faster R-CNN | V6EMU | 742 | 124 | 0 | 0 | 742 | 7 | 0 |
+| val-7 Faster R-CNN | V7c | 895 | 203 | 245 | 68 | 582 | 12 | 11 |
+| dev-40 YOLO | V6EMU | 4447 | 551 | 0 | 0 | 4447 | 40 | 0 |
+| dev-40 YOLO | V7c | 4657 | 605 | 596 | 339 | 3722 | 94 | 94 |
+| dev-40 RT-DETR | V6EMU | 3816 | 280 | 0 | 0 | 3816 | 40 | 0 |
+| dev-40 RT-DETR | V7c | 5317 | 1011 | 1861 | 598 | 2858 | 90 | 84 |
+| dev-40 RT-DETR | V7c@pool=raw | 5626 | 922 | 1861 | 317 | 3448 | 62 | 58 |
+
+Findings (label-free, to be confirmed with per-frame IDS attribution):
+- **H1, cold-frame admission.** Frame 1 (host-native thresholds, no
+  statistics yet) births 42–47 tracks per RT-DETR sequence and ~15 per YOLO
+  sequence. On dev-40 RT-DETR these 1861 cold births exceed the whole
+  surplus of V7c over V6EMU (+1501 ids), and short-lived ids triple
+  (1011 vs 280). Frame-1 false tracks are the leading candidate for the
+  extra ID switches (a false track that overlaps a later true object can
+  take its match, then lose it).
+- **H2, regime/threshold oscillation.** V7c changes regime ~2.3 times per
+  dev-40 sequence (V6EMU: only the cold→noisy start) with a matching number
+  of association-threshold jumps. Births near a change are few on val-7
+  (YOLO 16 of 542), so oscillation is a secondary candidate.
+- **E13 (pool=raw) label-free effect.** Pooling every emitted candidate
+  removes 25–35% of the regime changes (the feedback loop O3 is real), but
+  the host outputs more boxes (dev-40 RT-DETR 21.1 vs 18.7 per frame) and
+  more ids in noisy frames: the raw pool contains the duplicates, which
+  moves t1/t2 down. Quality effect UNKNOWN until labels are available.
+- V7d vs V7c: +1–2% ids everywhere (host tolerance kept in clean frames);
+  no label-free separation.
+
+Predeclared labelled tests (run as soon as the annotations are available;
+decision by paired bootstrap, `tools/v7/bootstrap.py`, then the selection
+priority of the continue prompt):
+- E12a `V7c@cold=none`, `V7d@cold=none` vs V7c/V7d on val-7 (YOLO,
+  RT-DETR, Faster R-CNN) and dev-40, plus SparseTrack/BoostTrack (cold
+  frames cost the first frame of each MOT17 sequence there). Label-free
+  tracks already produced in C1.
+- E12c per-frame ID-switch attribution (`diag_churn.py`, labelled mode):
+  share of the V7c−V6EMU IDS surplus in frames ≤ 30 after a cold frame,
+  within 2 frames of a regime change, clean vs noisy frames.
+- E13 `V7c@pool=raw`, `V7d@pool=raw` (tracks already produced).
+
 ## Open issues found by the adversarial audit (2026-09-28)
 - **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
 - **O2 — NATIVE vs the V6 record's "tracker default".** V7 `NATIVE` = native caches (YOLO NMS 0.7, RT-DETR no NMS, Faster R-CNN 0.5) + ultralytics ByteTrack 0.25/0.1/0.25, match 0.8, fuse on, no layer. The V6 paper's `static_default` used the NMS-0.45 caches: YOLO val-7 17.04/31.72/33.65 (IDS 359) vs 18.40/31.62/33.62 (IDS 320); Faster R-CNN MOTA −11.29 vs −9.56; RT-DETR identical. D8 and the catastrophic counts in E8 use V7 NATIVE.
