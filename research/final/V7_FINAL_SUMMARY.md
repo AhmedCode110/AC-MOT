@@ -21,8 +21,8 @@ or sequence names. Frozen policy V7f (`V7_METHOD.md`), freeze commit 488df9a.
 ## Main table
 Paper vs reproduction vs + frozen AC-MOT for SparseTrack, BoostTrack,
 ByteTrack, OC-SORT (development baselines) and PD-SORT, Hybrid-SORT
-(external): `V7_MAIN_RESULTS.md`. SparseTrack + V7f is the one open cell
-(needs the MOT17 frames).
+(external): `V7_MAIN_RESULTS.md`. SparseTrack + V7f (run on GitHub Actions with
+verified MOT17 frames): 68.876 → 68.931 HOTA, +0.055 [−0.011, +0.254].
 
 ## Development evidence (contaminated; `V7_STATISTICS.md`)
 - Two-stage hosts on clean streams (ByteTrack ×4, BoostTrack): unchanged.

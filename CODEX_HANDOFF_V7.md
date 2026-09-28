@@ -32,15 +32,11 @@ commit and push (no force).
 - Main thesis table (paper vs reproduction vs + V7f for SparseTrack, BoostTrack,
   ByteTrack, OC-SORT, PD-SORT, Hybrid-SORT; per-sequence; calibration shift; KITTI):
   `research/final/V7_MAIN_RESULTS.md` / `.json`.
-- **Open cell: SparseTrack + V7f** (needs the MOT17 val-half frames: SparseTrack GMC
-  and the motion cue read images; not reachable from C1). On a machine with
-  `$ACMOT_EXT/data_mirror/MOT17/train` frames and the SparseTrack GMC shim:
-  ```
-  python tools/v7/external/sparsetrack_v7.py --system V7f --name ST7_V7f
-  python tools/v7/mot17_eval_v7.py $ACMOT_EXT/runs/sparsetrack ST7_BASELINE ST7_V7f
-  python tools/v7/mot17_eval_v7.py --boot $ACMOT_EXT/runs/sparsetrack ST7_BASELINE ST7_V7f
-  ```
-  then fill the SparseTrack row of `V7_MAIN_RESULTS.md` with the measured numbers.
+- SparseTrack + V7f DONE on GitHub Actions (`.github/workflows/sparsetrack_v7f.yml`,
+  run 36475110213; MOT17 frames 2669/2669 sha256-verified; lock 10/10):
+  68.876/77.849/81.974 → 68.931/77.927/82.130, ΔHOTA +0.055 [−0.011, +0.254].
+  Record `research/final/sparsetrack_v7f/`. The same runner pattern (motchallenge.net
+  reachable from Actions) can serve other frame-dependent runs.
 - Next (if more compute/network): further 2025/26 published systems when their
   artefacts become reachable (TOPICTrack stays reserved; it needs frames + ReID);
   VisDrone/UAVDT labelled checks and conf16 once Google Drive is reachable;

@@ -106,3 +106,8 @@ and `drive.usercontent.google.com` in the environment's network settings:
 Each run must be appended here with hardware, command, commit, start
 condition, result path, metrics and whether it is diagnostic or
 paper-eligible.
+
+#### Post-freeze, GitHub Actions
+| Run | Command | Commit | Result path | Kind |
+|---|---|---|---|---|
+| SparseTrack BASELINE + V7f, MOT17 val-half (frames from motchallenge.net, 2669/2669 verified) | workflow `sparsetrack_v7f.yml` → `tools/v7/ci/sparsetrack_v7f.sh` (ubuntu-24.04, AMD EPYC 7763 × 4, OpenCV 4.6.0) | 79749c5 | `research/final/sparsetrack_v7f/` | development host, labelled |

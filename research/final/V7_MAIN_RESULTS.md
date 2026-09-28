@@ -21,7 +21,7 @@ Two roles:
 
 | Tracker (venue) | Role | Paper | Our reproduction | + AC-MOT (V7f) | ΔHOTA [95% CI] | ΔMOTA | ΔIDF1 |
 |---|---|---|---|---|---|---|---|
-| SparseTrack (IEEE TCSVT 2025) | dev | 69.2 / 76.8 / 81.4 | 68.876 / 77.849 / 81.974 | V7f not yet run (see note 1); last measured variant V7d: 68.931 / 77.927 / 82.130 | V7d: +0.055 | V7d: +0.078 | V7d: +0.156 |
+| SparseTrack (IEEE TCSVT 2025) | dev | 69.2 / 76.8 / 81.4 | 68.876 / 77.849 / 81.974 | 68.931 / 77.927 / 82.130 | +0.055 [−0.011, +0.254] | +0.078 [−0.027, +0.304] | +0.156 [−0.015, +0.696] |
 | BoostTrack (MVA 2024), online | dev | 68.371 / 75.561 / 81.354 | 68.492 / 75.502 / 81.413 | 68.492 / 75.502 / 81.413 | 0 (identical output) | 0 | 0 |
 | BoostTrack (MVA 2024), + GBI | dev | 71.326 / 80.549 / 83.839 | 71.725 / 81.032 / 84.163 | 71.725 / 81.032 / 84.163 | 0 (identical output) | 0 | 0 |
 | ByteTrack (ECCV 2022), floor 0.01 | dev | – / 76.6 / 79.3 | 67.698 / 77.604 / 79.471 | 67.684 / 77.662 / 79.440 | −0.014 [−0.058, +0.009] | +0.058 | −0.031 |
@@ -40,14 +40,18 @@ inference); OC-SORT val-half; Hybrid-SORT README. Reproduction details:
 (PD-SORT, Hybrid-SORT).
 
 Note 1. SparseTrack reads the MOT17 frames (GMC and the AC-MOT motion cue).
-The frames are not reachable from the cloud environment, so SparseTrack +
-V7f has not been run. The last measured AC-MOT variant on SparseTrack is V7d
-(V7f = V7d + whole-stream regime + single-stage rescue + interpretability
-check). On the same detection stream and the same host contract (assoc 0.6,
-birth 0.7, low 0.1), ByteTrack gives identical output under V7d and V7f.
-That makes it likely, but not measured, that SparseTrack + V7f equals V7d.
-Only a measured V7f run may be reported in the thesis table. The command is
-in `CODEX_HANDOFF_V7.md` (SparseTrack V7f).
+Its runs were executed on a GitHub Actions runner (ubuntu-24.04, AMD EPYC
+7763 × 4, OpenCV 4.6.0 for the GMC shim; workflow
+`.github/workflows/sparsetrack_v7f.yml`, script `tools/v7/ci/sparsetrack_v7f.sh`)
+at repo commit 79749c5. The runner downloaded MOT17 from motchallenge.net and
+verified every file against `MOT17_mirror_manifest.json` (2669/2669 sha256
+identical to the owner's Drive copy). Before running, it checked the V7
+policy lock (10/10 files match). The runner's baseline is the same
+reproduction as the earlier one: same tracks, identities and frames in all 7
+sequences; box coordinates differ by at most 0.1 px (last written decimal,
+GMC under OpenCV 4.6 vs 5.0); metrics identical. SparseTrack + V7f gives
+exactly the V7d numbers. Record: `sparsetrack_v7f/` (results.json,
+summary.txt, environment.txt, pip_freeze.txt, tracks.tar.gz).
 
 ## Table 2 — per-sequence ΔHOTA (V7f − reproduction), MOT17 val-half
 
@@ -55,6 +59,7 @@ in `CODEX_HANDOFF_V7.md` (SparseTrack V7f).
 |---|---|---|---|---|---|---|---|---|
 | OC-SORT, floor 0.01 | +0.25 | +0.54 | +0.45 | +2.90 | +1.27 | +0.34 | +0.03 | 7/7 |
 | OC-SORT, floor 0.1 | +0.42 | +0.21 | +0.37 | +1.40 | +1.14 | +0.71 | +1.48 | 7/7 |
+| SparseTrack | +0.09 | 0.00 | 0.00 | 0.00 | +0.52 | 0.00 | −0.07 | 2/7 (5 unchanged) |
 | ByteTrack, floor 0.01 | 0.00 | 0.00 | −0.01 | 0.00 | +0.04 | 0.00 | −0.21 | – |
 | ByteTrack, floor 0.1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | identical |
 | BoostTrack online / + GBI | 0 | 0 | 0 | 0 | 0 | 0 | 0 | identical |
@@ -89,8 +94,8 @@ BoT-SORT excludes sequence 0020 (numerical failure of the unmodified tracker).
 
 ## Reading of the results
 1. **Where the tracker's own operating point already fits a clean detector**
-   (BoostTrack, ByteTrack, and SparseTrack under V7d on YOLOX-X MOT17),
-   AC-MOT leaves the output unchanged or within ±0.06 HOTA. The frozen V6
+   (SparseTrack, BoostTrack, ByteTrack on YOLOX-X MOT17), AC-MOT leaves the
+   output unchanged or within ±0.06 HOTA (CIs include 0). The frozen V6
    cost these same trackers 4–6 HOTA (SparseTrack −4.15, BoostTrack −5.89),
    so the absence of harm is itself the V6 → V7 result. These trackers are
    not reported as improved on clean MOT17 because they were not improved
