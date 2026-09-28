@@ -24,6 +24,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f research/final/aerial_v7f || true
+          git add -f JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS/figures/scene_frames || true
           git diff --cached --quiet && exit 0
           git commit -m "Frozen V7f on VisDrone val-7 / confirmation-16 / test-dev (run ${GITHUB_RUN_ID})"
           for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

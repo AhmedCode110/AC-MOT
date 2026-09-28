@@ -27,9 +27,10 @@ bash "$REPO/scripts/setup_research_assets.sh" caches
 log "VisDrone annotations (official zips) + placeholder frames"
 fetch_split() {  # id name
   local id=$1 name=$2 z="$WORK/$2.zip"
-  "$REPO/.venv/bin/gdown" -q "$id" -O "$z"
+  for t in 1 2 3 4 5 6; do "$REPO/.venv/bin/gdown" -q "$id" -O "$z" && break; log "gdown $name attempt $t failed; retry in 15 min"; sleep 900; done
+  test -s "$z"
   sha256sum "$z" | tee -a "$OUT/visdrone_zip_sha256.txt"
-  "$PY" - "$z" "$WORK/$name" <<'PY'
+  "$PY" - "$z" "$WORK/$name" "$REPO/JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS/figures/scene_frames" <<'PY'
 import sys, zipfile
 from pathlib import Path
 z = zipfile.ZipFile(sys.argv[1]); out = Path(sys.argv[2]); n = a = 0
@@ -42,6 +43,24 @@ for i in z.infolist():
         k = p.index("sequences"); dst = out.joinpath(*p[k:]); dst.parent.mkdir(parents=True, exist_ok=True)
         dst.touch(); n += 1
 print(sys.argv[1], "annotations", a, "frame names", n)
+if out.name == "VisDrone2019-MOT-val":
+    # Paper 1 scene examples: frame 1 of every validation sequence, downscaled,
+    # with the raw image cues of the legacy controller (robust_visual).
+    import cv2, json, numpy as np
+    dst = Path(sys.argv[3]); dst.mkdir(parents=True, exist_ok=True); cues = {}
+    for i in z.infolist():
+        if i.filename.endswith("/0000001.jpg") and "sequences" in i.filename:
+            img = cv2.imdecode(np.frombuffer(z.read(i), np.uint8), cv2.IMREAD_COLOR)
+            seq = Path(i.filename).parent.name
+            small = cv2.resize(img, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
+            gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+            gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3); gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+            cues[seq] = dict(width=img.shape[1], height=img.shape[0], brightness=float(gray.mean()),
+                             blur=float(cv2.Laplacian(gray, cv2.CV_64F).var()), edges=float(np.mean(np.sqrt(gx * gx + gy * gy))))
+            h = int(round(img.shape[0] * 640 / img.shape[1]))
+            cv2.imwrite(str(dst / f"{seq}_0000001.jpg"), cv2.resize(img, (640, h), interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 85])
+    (dst / "raw_cues.json").write_text(json.dumps(cues, indent=1))
+    print("scene examples", sorted(cues))
 PY
   rm -f "$z"
 }
