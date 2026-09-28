@@ -1,0 +1,134 @@
+{
+ "status": "LOCKED_BEFORE_EVALUATION",
+ "created": "2026-09-28",
+ "rule": "Transfer tests of the FROZEN V6-TF policy (tag universal-acmot-v6-freeze). No policy, parameter, cue or threshold may change for any detector, tracker or dataset, before or after seeing results. Only integration adapters (detector API, tracker API, dataset protocol view) are allowed. Each evaluation runs once.",
+ "code_tag": "universal-acmot-v6-freeze",
+ "code_commit": "2cff95f8a565fdff17f5b1fb06c23cf78e0ffed0",
+ "policy_file_sha256": {
+  "configs/universal_acmot_policy_v6tf.json": "ed630bc9abacdf00038476a4273b452ec14d806914f11952e6d886b025e17a89",
+  "universal_policy_pipeline.py": "a96676c645ba1c0db4e36eb44ab6e691bc5fd1bacecb34ac5df37ac51c9ecde6",
+  "online_calibration.py": "cc03302526ea589ce4f7fc183ae2de267323321a24d860af65183ded6ce17dcb",
+  "adapters/detectors/online_normalizer.py": "8825835354785b4a6a83cd396d622401e8f261d7bbe34db40f80ce68bb99f582",
+  "adapters/detectors/base.py": "18c8e113697440eb042e9fdab2fbc27631fba1b02fe86c24f3eb39722b2190cb",
+  "adapters/detectors/yolov8.py": "10a58301fb4f630e0ae4c177eb269183468b9fd6d8cd89edcc85bad6eb138ed9",
+  "adapters/detectors/rtdetr.py": "ae5575469e6d77d631c45b0ddcb4d8ea498f59e180220ec27b50c64be2a45d2b",
+  "adapters/detectors/fasterrcnn.py": "2defe8cbdc61ff6337183c893f01dae6f81f09432b919f872e0958c5de115b22",
+  "adapters/detectors/factory.py": "29f4f092e8993ff6355819ced95f58ba9249af9c07496afa3e671ee7aac0cd9d",
+  "adapters/detectors/generic_controls.py": "b776bb0fac0e17aacf1110adbf33f32818b12d700cbbbb5f423ec5ad3dc796a2",
+  "adapters/detectors/candidate_density.py": "6b587613fea65d2b6505e4abd7844346982f7648c17ead6f1e7d8bf82451eefe",
+  "adapters/types.py": "64a9b9daefea687c916a12ed108cd1439933111bc5ed244ba51a5e6d1110887a",
+  "adapters/trackers/base.py": "4a643045743c841f8eef63376510e2293965a7a3ddcf9aa3921204a2a60c7506",
+  "adapters/trackers/bytetrack.py": "87eb7a1b73371abc7754462f5e5c8f6a184bb9cadc2329b8a1fa8d9371914881",
+  "adapters/trackers/botsort.py": "18bdc4cec15bf8d505b2ab721fc5003c8d175660f0aca6be0a4e9db3ef79283a",
+  "universal_acmot.py": "22a5e1e1f7c21c8ba5e89c32c48bb869c234c2575d70f3935910f14b9aca0b9f",
+  "scene_state.py": "65afd22874f1abe38844a423ae0a3659b223af35e8ee17e7deb1483df05cdac7",
+  "core.py": "70fbf89c4795c03c57fed03a81f3a0a6194dffc823af06d3977a908a8e3495a3",
+  "run_universal_acmot.py": "1acf8067b287058871000b538f35ace8aa38c17c6f0a34af57004f718caccc93",
+  "tools/run_policy_validation.py": "e8cd722b3a026a1b4fe8e7912988d3c1e8b7b84d8c299cae9665f2a2f2db9684",
+  "tools/eval_local.py": "e0889480949d1efdd964575dcf83e13501d311d5fa9d61234c36b732655e24aa",
+  "tools/seqstats.py": "886e6e0afd7040c931c405106f2be64d0157452ba3166a7c93054c37f3d3c121",
+  "tools/v6/eval_official.py": "6230e4d0a7d0037ac629152670f53510b01f8c93c551c0b47a6bfe12dff16d7b",
+  "tests/test_v6_adaptive_layer.py": "cecc9900261815f351a53aeedff13fe59e34e92588d97f4ddcaa9a1b3b385908"
+ },
+ "evaluations": {
+  "confirmation16": {
+   "dataset": "VisDrone2019-MOT-train confirmation-16",
+   "detectors": [
+    "yolov8",
+    "rtdetr"
+   ],
+   "tracker": "bytetrack",
+   "systems": [
+    "V6TF",
+    "V4",
+    "shared_static",
+    "static_default",
+    "E41"
+   ]
+  },
+  "botsort": {
+   "dataset": "VisDrone2019-MOT-train confirmation-16 (+ test-dev post-hoc)",
+   "detectors": [
+    "yolov8",
+    "rtdetr"
+   ],
+   "tracker": "botsort (ultralytics, GMC sparseOptFlow, no ReID)",
+   "systems": [
+    "V6TF@trk:botsort",
+    "V4@trk:botsort",
+    "static_default@trk:botsort",
+    "shared_static@trk:botsort"
+   ]
+  },
+  "fasterrcnn": {
+   "dataset": "VisDrone2019-MOT-val (scenes developed on, detector unseen) + VisDrone2019-MOT-test-dev (post-hoc) + UAVDT",
+   "detectors": [
+    "fasterrcnn"
+   ],
+   "tracker": "bytetrack",
+   "systems": [
+    "V6TF",
+    "V4",
+    "shared_static",
+    "static_default"
+   ],
+   "note": "V4 replays NMS-0.45 caches built after the freeze (caching only); V6-TF and static systems as for the other detectors"
+  },
+  "uavdt": {
+   "dataset": "UAVDT test view (outputs/uavdt_view, vehicles car/bus/truck, ignore regions)",
+   "detectors": [
+    "yolov8",
+    "rtdetr",
+    "fasterrcnn"
+   ],
+   "tracker": "bytetrack",
+   "systems": [
+    "V6TF",
+    "V4",
+    "shared_static",
+    "static_default"
+   ]
+  },
+  "testdev_posthoc": {
+   "dataset": "VisDrone2019-MOT-test-dev (post-hoc; V4 held-out already E31)",
+   "detectors": [
+    "yolov8",
+    "rtdetr"
+   ],
+   "tracker": "bytetrack",
+   "systems": [
+    "V6TF",
+    "V4",
+    "shared_static",
+    "static_default"
+   ]
+  }
+ },
+ "bootstrap": {
+  "resamples": 10000,
+  "seed": 42,
+  "unit": "sequence",
+  "pairs": [
+   [
+    "V6TF",
+    "V4"
+   ],
+   [
+    "V6TF",
+    "shared_static"
+   ],
+   [
+    "V6TF@trk:botsort",
+    "V4@trk:botsort"
+   ],
+   [
+    "V6TF@trk:botsort",
+    "static_default@trk:botsort"
+   ]
+  ]
+ },
+ "protocols": [
+  "internal (tools/eval_local.py / seqstats; UAVDT ignore regions)",
+  "official-compatible VisDrone (tools/v6/eval_official.py) for VisDrone splits"
+ ]
+}

@@ -22,6 +22,7 @@ import tempfile
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
+import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +38,15 @@ SPLITS = {
                         "gmail.com/My Drive/AC-MOT-shared/AC-MOT-data/VisDrone2019-MOT-train",
                    native="outputs/det_cache_train_native", v4="outputs/det_cache_train",
                    protected=True),
+    "testdev": dict(data="/Users/ahmedgouda/Library/CloudStorage/GoogleDrive-a7medgouda1@"
+                         "gmail.com/.shortcut-targets-by-id/1IvH3DmlX4Ce5k2cZWDvu0ixfbvxZ-67m/"
+                         "visdrone goda1/VisDrone_Zips/VisDrone2019-MOT-test-dev/"
+                         "VisDrone2019-MOT-test-dev",
+                    native="outputs/det_cache_testdev_native", v4="outputs/det_cache_testdev",
+                    protected=True),
+    "uavdt": dict(data=str(ROOT / "outputs/uavdt_view"),
+                  native="outputs/det_cache_uavdt_native", v4="outputs/det_cache_uavdt",
+                  protected=True),
 }
 DETS = ["yolov8", "rtdetr"]
 FREEZE_TAG = "universal-acmot-v6-freeze"
@@ -46,7 +56,9 @@ def split_sequences(split):
     if split in ("dev40", "conf16"):
         s = json.load(open(ROOT / "research/TRAIN_SPLIT_V5.json"))
         return s["development" if split == "dev40" else "confirmation"]
-    return sorted(p.stem for p in (ROOT / SPLITS[split]["native"] / "yolov8").glob("*.npz"))
+    return sorted(p.stem for p in (ROOT / SPLITS[split]["native"] / "yolov8").glob("*.npz")
+                  if (ROOT / SPLITS[split]["native"] / "visual_cues" / p.name).exists()
+                  or split == "val7")
 
 
 def frozen():
@@ -101,8 +113,9 @@ def resolve(system):
         None if base in STATIC else dict(v4_overrides()) if base == "V4" else None)
     transform = None
     for m in mods:
-        if m.startswith("t:"):
-            transform = m[2:]
+        if m.startswith("t:") or m.startswith("trk:"):
+            if m.startswith("t:"):
+                transform = m[2:]
         else:
             from dataclasses import fields
             from universal_policy_pipeline import PolicySpec
@@ -134,6 +147,10 @@ def run_one(job):
     os.chdir(ROOT)
     sys.path.insert(0, str(ROOT))
     from adapters.trackers.bytetrack import ByteTrackAdapter
+    botsort = "@trk:botsort" in system
+    if botsort:
+        from adapters.trackers.botsort import BoTSORTAdapter as ByteTrackAdapter  # noqa: F811
+    frames = sorted((Path(SPLITS[split]["data"]) / "sequences" / seq).glob("*.jpg"))
     from run_universal_acmot import build_config
     from tools.run_policy_validation import CachedDetector, make_tracker
     from tools.seqstats import sequence_stats
@@ -156,14 +173,17 @@ def run_one(job):
                               buffer=30, match=0.8)
         for i in range(1, cd.frames + 1):
             cd.frame = i
-            emit(i, tr.update(cd.detect(None, 0.01, 0.45, 736), cd.shape))
+            im = cv2.imread(str(frames[i - 1])) if botsort else None
+            emit(i, tr.update(cd.detect(None, 0.01, 0.45, 736), cd.shape, image=im))
     else:
         pol = replace(POLICIES["V1"], **ov)
         cfg = build_config()
-        pipe = UniversalPolicyPipeline(cfg, cd, make_tracker(cfg, pol), pol)
+        pipe = UniversalPolicyPipeline(cfg, cd, make_tracker(cfg, pol, cls=ByteTrackAdapter), pol)
         img = np.empty(cd.shape + (0,), np.uint8)
         for i in range(1, cd.frames + 1):
             cd.frame = i
+            if botsort:
+                img = cv2.imread(str(frames[i - 1]))
             r = pipe.process(i, img, cd.visual_dict(i))
             emit(i, r["tracks"])
             a = r["audit"]
@@ -187,8 +207,28 @@ def load(split, system, det, seq):
     return pickle.load(open(out_dir(split) / system / det / f"{seq}.pkl", "rb"))
 
 
+def verify_lock():
+    """Post-freeze runs: every locked file must be byte-identical."""
+    import hashlib
+    lock = json.load(open(ROOT / "research/V6TF_POLICY_LOCK.json"))
+    for rel, h in lock["file_sha256"].items():
+        got = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+        if got != h:
+            raise SystemExit(f"LOCK VIOLATION: {rel} changed since the freeze")
+
+
 def run(split, systems, dets=DETS, workers=6):
     guard(split, dets)
+    if SPLITS[split]["protected"] or any(d not in DETS for d in dets):
+        verify_lock()
+        man = out_dir(split) / "RUN_MANIFEST.jsonl"
+        man.parent.mkdir(parents=True, exist_ok=True)
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True).stdout.strip()
+        import datetime
+        with open(man, "a") as f:
+            f.write(json.dumps(dict(utc=datetime.datetime.utcnow().isoformat(),
+                                    head=head, systems=systems, dets=dets)) + "\n")
     seqs = split_sequences(split)
     jobs = [(split, sy, d, s) for sy in systems for d in dets for s in seqs]
     with ProcessPoolExecutor(workers) as ex:
