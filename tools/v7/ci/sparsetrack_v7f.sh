@@ -32,7 +32,15 @@ export PYTHONPATH="$REPO:$ACMOT_TRACKEVAL"
 PY="$EXT/venv/bin/python"
 
 log "frozen-policy lock check"
-"$PY" -m pytest -q "$REPO/tests/test_v7_adaptive_layer.py" -k "lock" | tail -2 | tee "$OUT/lock_check.txt"
+"$PY" - "$REPO" <<'PYEOF' | tee "$OUT/lock_check.txt"
+import hashlib, json, sys
+from pathlib import Path
+root = Path(sys.argv[1]); lock = json.load(open(root / "research/V7_POLICY_LOCK.json"))
+bad = [f for f, h in lock["file_sha256"].items()
+       if hashlib.sha256((root / f).read_bytes()).hexdigest() != h]
+print(f"V7 policy lock: {len(lock['file_sha256']) - len(bad)}/{len(lock['file_sha256'])} files match", bad or "")
+sys.exit(1 if bad else 0)
+PYEOF
 
 log "runs"
 "$PY" "$REPO/tools/v7/external/sparsetrack_v7.py" --system BASELINE --name ST7_BASELINE_ci
