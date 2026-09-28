@@ -4,31 +4,44 @@ Last updated: 2026-09-28. Update this file, `research/final/V7_EXPERIMENT_LEDGER
 and `research/final/V7_DEV_RESULTS.json` after EVERY experiment batch, then
 commit and push (no force).
 
-## CLOUD STATUS (read first; 2026-09-28, environment C1)
-- Working branch of the cloud session: **`universal-adapters-v1-y0zkeh`**
-  (draft PR #1 into `universal-adapters-v1`). Hardware and every run:
-  `research/final/V7_CLOUD_RUNS.md`.
-- Provisioned: both venvs, release caches (sha256 OK), SparseTrack,
-  BoostTrack (with the MOT17 val-half GT), TrackEval, GMC shim (OpenCV 4.6).
-- **BLOCKED by the environment network policy:** `motchallenge.net`
-  (MOT17 frames), `drive.google.com` + `drive.usercontent.google.com`
-  (VisDrone annotations/frames, UAVDT). Until the owner allows them, no
-  labelled metric can be produced and the MOT17 replays cannot run. Tier-(a)
-  identity checks, E14, E11, E12a/E12c, E13 metrics, Stage D, stress metrics,
-  bootstrap numbers and the freeze are all waiting on this.
-- Done label-free in C1: E13 option `pool`, `dev.py track`,
-  `tools/v7/diag_churn.py` (E12-LF: frame-1 admission is the leading
-  candidate for the ID-switch surplus, see the ledger),
-  `tools/v7/diag_stress.py`, `tools/v7/bootstrap.py`,
-  `tests/test_v7_adaptive_layer.py` (52 tests) + `tests/test_v7_bootstrap.py`.
-- First commands once the hosts are allowed:
-  ```
-  export ACMOT_WORK=~/acmot_work
-  bash scripts/setup_research_assets.sh mot17 visdrone   # the zips hold the real frames (BoT-SORT, E11)
-  source $ACMOT_WORK/acmot_env.sh
-  ```
-  then §8 identity checks and §6 in order (E12a/E13 systems are listed in
-  the ledger "Cloud continuation").
+## CLOUD STATUS (read first; updated 2026-09-28, environment C1)
+- Working branch: **`universal-adapters-v1-y0zkeh`** (draft PR #1 into
+  `universal-adapters-v1`). Hardware + every run: `research/final/V7_CLOUD_RUNS.md`.
+  Availability matrix (exact vs diagnostic, dev vs reserved):
+  `research/final/V7_FALLBACK_VALIDATION.md`.
+- BLOCKED (recorded once, not retried): motchallenge.net, Google Drive
+  (VisDrone/UAVDT GT, MOT17 frames), arxiv.org, huggingface, zenodo,
+  mehdimiah.com (C-TWiX artefacts). Reachable: GitHub, PyPI, official KITTI S3.
+- **Labelled development evidence built in C1 (exact configurations):**
+  - MOT17 val-half, published YOLOX-X detections at two emission floors
+    (0.01 SparseTrack stream / 0.1 BoostTrack stream): ByteTrack official,
+    ByteTrack ultralytics default, OC-SORT official
+    (`tools/v7/external/mot17_bytetrack_v7.py`); BoostTrack pixel-free
+    (`boosttrack_v7.py --pixel-free`, BASELINE byte-identical to the Mac
+    reference tracks).
+  - KITTI tracking training (21 seq): native YOLOv8n + RT-DETR-L caches built
+    with the original recipe (`outputs/det_cache_kitti_native`, frames from
+    the official zip by HTTP range), hosts ultralytics ByteTrack / OC-SORT
+    (`V7_SPLIT=kitti`, `@trk:ocsort`), official KITTI HOTA via
+    `tools/v7/kitti/kitti_eval.py`.
+- **Current best candidate: V7f** (`tools/v7/systems.py`) = V7d + regime from
+  the whole stream (rho_frames=0) + foreground track-consistent rescue
+  (rescue_band=fg) + split interpretability check (bg_check). Ledger E15–E18.
+  - two-stage hosts (ByteTrack ×4 cells, BoostTrack): = baseline (≤0.014 HOTA);
+  - OC-SORT (no low stage): +0.61 [+0.36,+1.24] / +0.46 [+0.27,+1.09] HOTA,
+    +1.27 / +1.26 MOTA (10k paired bootstrap, seed 42);
+  - KITTI YOLOv8n: OC-SORT +7.9 HOTA; ByteTrack HOTA ≈, IDF1 +1.5, MOTA −1.9.
+- Pending before any freeze: KITTI RT-DETR cells, labelled stress (MOT17
+  transforms/floors, running), E11 on KITTI (BoT-SORT; seq 0020 host crash),
+  full bootstrap table, collect into V7_DEV_RESULTS.json, then freeze.
+- Post-freeze external candidates found so far (NOT run with V7):
+  PD-SORT (IEEE Trans. Consumer Electronics 2025, github Wangyc2000/PD_SORT
+  @af21db6): OC-SORT-based single-stage tracker; the repo ships the exact
+  tracker-input detections (`res_mot/MOT17-val/.../*_detections.txt`, same
+  YOLOX-X outputs as our caches), CMC files and its own MOT17-val outputs →
+  pixel-free faithful reproduction possible. TOPICTrack stays reserved.
+  C-TWiX (Pattern Recognition 2025) excluded: weights/detections only on a
+  blocked host.
 
 ## 0. Branch, commit, working tree
 - Repository: https://github.com/AhmedCode110/AC-MOT (public).
