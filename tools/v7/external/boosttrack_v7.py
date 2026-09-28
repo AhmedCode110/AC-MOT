@@ -57,6 +57,11 @@ def main():
     ap.add_argument("--system", required=True, help="V7 system or 'BASELINE'")
     ap.add_argument("--name", required=True)
     ap.add_argument("--root", default=str(EXT / "runs/boosttrack"))
+    ap.add_argument("--pixel-free", action="store_true",
+                    help="MOT17 frames unavailable: the host reads only the frame SHAPE (ECC comes "
+                         "from its complete cache, embeddings are off), taken from val_half.json; "
+                         "the V7 image motion cue is then unavailable (motion=None -> the "
+                         "motion rule is inactive). Verified by byte identity of BASELINE.")
     a = ap.parse_args()
     sys.path.insert(0, str(ACMOT))
     v6drv = _load("bt_v6_driver", ACMOT / "tools/v6/external/boosttrack_v6.py")
@@ -89,7 +94,10 @@ def main():
                 host = HostContract(assoc=float(tracker.det_thresh), birth=float(tracker.det_thresh),
                                     low=0.1, match=1.0 - float(tracker.iou_threshold))
                 layer = V7Layer(spec, host)
-        np_img = cv2.imread(str(DATA / "train" / im["file_name"]))
+        if a.pixel_free:
+            np_img = np.broadcast_to(np.zeros((1, 1, 1), np.uint8), (im["height"], im["width"], 3))
+        else:
+            np_img = cv2.imread(str(DATA / "train" / im["file_name"]))
         pred = dets_cache[tag]
         pred = pred.cpu().numpy() if hasattr(pred, "cpu") else np.asarray(pred)
         pred = np.asarray(pred, np.float32).reshape(-1, pred.shape[-1] if np.ndim(pred) == 2 else 5).copy()
@@ -104,7 +112,7 @@ def main():
         if baseline:
             d_in = pred
         else:
-            m = layer.image_motion(np_img)
+            m = None if a.pixel_free else layer.image_motion(np_img)
             t_l0 = time.perf_counter()
             dec = layer.step(pred[:, :4] / scale, pred[:, 4], m, classes=np.zeros(len(pred), int))
             t_layer = time.perf_counter() - t_l0

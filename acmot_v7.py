@@ -131,6 +131,14 @@ class V7Spec:
     # Regime: "rho" (clean iff confident share of the foreground >= 1/2) |
     # "noisy" (always V6-like) | "clean" (always host-anchored).
     regime: str = "rho"
+    # Reference set of rho: "fg" (confident share of the whole foreground
+    # >= t1) | "host" (confident share of the foreground the HOST would
+    # admit, >= max(t1, min(host.assoc, host.birth))): intervention is needed
+    # only when the host's own operating point lets a mostly-ambiguous
+    # foreground in; a host whose threshold already sits above t2 is clean.
+    # The low tail below the host threshold (where emission floors act) no
+    # longer enters rho.
+    rho_ref: str = "fg"
     # Frames of per-frame rho values whose median decides the regime.
     rho_frames: int = 1
     # Clean regime: "proj" = clip(host, t1, t2) | "upper" = min(host, t2)
@@ -148,6 +156,11 @@ class V7Spec:
     # Frame 1 (no history): "host" (native pass-through) | "none" (V6: no
     # candidate admitted).
     cold: str = "host"
+    # Duplicate rule in cold frames when dup_regime == "noisy": "clean" (the
+    # dup_clean rule, V7c/V7d) | "noisy" (the dup rule; with no track context
+    # yet, "track" removes every weaker overlapping candidate). Frame 1 has
+    # no statistics, so it cannot know whether the stream is clean.
+    cold_dup: str = "clean"
     motion: bool = True
     # "always" | "noisy" (clean-regime and cold frames keep the host's own
     # IoU-match tolerance: the host is trusted there).
@@ -269,8 +282,12 @@ class V7Layer:
         if th is None:
             return None
         t1, t2, _ = th
-        n_fg = int((H >= t1).sum())
-        rho = float((H >= t2).sum() / n_fg) if n_fg else 0.0
+        lo = t1
+        if self.spec.rho_ref == "host":
+            # the part of the foreground the host itself would admit
+            lo = max(t1, float(logit(min(self.host.assoc, self.host.birth))))
+        n_fg = int((H >= lo).sum())
+        rho = float((H >= max(t2, lo)).sum() / n_fg) if n_fg else 1.0
         return float(t1), float(t2), rho
 
     def _ecdf(self, scores):
@@ -324,7 +341,9 @@ class V7Layer:
 
         L_in = logit(scores)
         cls = None if classes is None else np.asarray(classes).reshape(-1)
-        if s.dup_regime == "noisy" and regime != "noisy":
+        if s.dup_regime == "noisy" and regime == "cold" and s.cold_dup == "noisy":
+            keep = self._duplicates(boxes, scores, cls)
+        elif s.dup_regime == "noisy" and regime != "noisy":
             keep = self._duplicates(boxes, scores, cls, rule=s.dup_clean)
         elif s.dup_scope == "primary":
             prim = np.where(L_in >= min(ta, tb))[0]
