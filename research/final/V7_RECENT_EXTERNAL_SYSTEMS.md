@@ -20,3 +20,6 @@ Filled per system as runs complete: citation, venue, year, repository and
 commit, checkpoint / detection hashes, ReID source, dataset, split, evaluator,
 configuration, reference metrics, reproduced metrics, classification, then
 baseline vs + V7f with CIs and per-sequence wins / ties / losses.
+
+### TOPICTrack — MOT17 val-half (run 36483670872)
+Reproduced (interpolated, as the README evaluates): HOTA 67.538, MOTA 79.070, IDF1 78.634, IDS 166, FP 1,841, FN 9,272 vs reference 69.6 / 79.8 / 81.2 → **FAILED** (ΔHOTA −2.06 > 1.0). Not in the main table; details and the exploratory V7f arm in `V7_RECENT_EXTERNAL_FAILURES.md`.
