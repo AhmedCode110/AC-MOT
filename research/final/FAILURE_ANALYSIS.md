@@ -24,6 +24,8 @@ The internal protocol is used unless stated otherwise.
 | F-H Calibrated-detector ceiling | when a detector's raw scores are already close to calibrated (RT-DETR-L), one fixed raw threshold is a strong operating point | test-dev RT-DETR: shared static HOTA +2.4 over V6-TF (significant) | NOT fixed: the price of calibration invariance; V6-TF wins where calibration differs (YOLOv8n, Faster R-CNN) |
 | F-I Non-affine recalibration | the nested Otsu is equivariant to affine logit maps (Platt) only | val-7 stress s³ / 0.5·s: 2–4 cat | NOT fixed (limitation) |
 | F-J Adapter emission contract | raising the adapter's emission floor removes the background mass the split relies on | val-7 floor 0.05/0.1: YOLO HOTA −4.9 / −8.9 | documented interface requirement |
+| F-K Crowd overlap removed by duplicate suppression | the IoU-0.5 rule assumes two boxes above IoU 0.5 cannot be two distinct objects. That holds in top-down aerial views and fails in side-view pedestrian crowds, where occluding people overlap heavily and the published detector keeps them on purpose (NMS 0.7) | SparseTrack (MOT17): 3,527 true detections removed; the diagnostic without dedup recovers 2.6 of the 4.15 HOTA lost | NOT fixed (frozen). The FINAL_METHOD justification is corrected to a scope condition |
+| F-L Over-pruning on in-domain high-precision detectors | the nested Otsu assumes a clutter-dominated stream. A MOT17-trained YOLOX-X emits about 35 candidates per frame at about 95% precision, so the second split cuts through the true-object mode (primary threshold raw ≈ 0.78 vs published 0.6; ≈ 0.87 on BoostTrack's 0.1-floored stream) | SparseTrack: 5,787 true detections demoted from the first stage, FN +52%. BoostTrack (single stage, no low band): FN +54% | NOT fixed (frozen); defines the method's scope |
 
 ## 2. Representative cases
 1. **RT-DETR uav0000266_04830 (confirmation-16, 116 frames, 393 GT boxes).**
@@ -45,7 +47,18 @@ The internal protocol is used unless stated otherwise.
    shared static +2.6 / +19.4. Detector precision is ≈35–43%, so the
    conservative fixed threshold wins by outputting little (F-G).
 
+6. **External, SparseTrack MOT17-04 (crowded).** HOTA 79.1 → 73.4, FP
+   780 → 102, FN 1754 → 4310 (F-K + F-L).
+   MOT17-11 is the only sequence with a MOTA gain (+2.1): FP 445 → 75 with a
+   smaller FN increase.
+
 ## 3. Limitations (to be stated in the paper)
+- **Scope (external evidence):** the frozen layer degrades strong in-domain
+  published pedestrian trackers (SparseTrack, BoostTrack) on MOT17. Its
+  benefit is confined to regimes where the detector's operating point is
+  miscalibrated for the data (generic or unseen detectors, domain shift);
+  there it matches or beats a VisDrone-tuned controller and fixed
+  thresholds.
 - Aerial evaluation uses COCO-pretrained detectors, not VisDrone-trained
   ones. Absolute numbers are far below VisDrone-trained trackers and must not
   be compared with them.

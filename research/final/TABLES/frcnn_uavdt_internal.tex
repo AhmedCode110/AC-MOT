@@ -1,0 +1,11 @@
+% Faster R-CNN on UAVDT (post-freeze) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+fasterrcnn & V4 (frozen, VisDrone-tuned) & 8 & 18.2 & 35.1 & 44.1 & 342 & 65072 & 213389 & 66.2 & 37.4 \\
+fasterrcnn & Shared static (raw 0.5) & 7 & 14.1 & 37.2 & 46.9 & 698 & 109364 & 182606 & 59.1 & 46.4 \\
+fasterrcnn & Tracker default (raw 0.25) & 13 & -5.1 & 34.6 & 41.8 & 1774 & 181930 & 174702 & 47.7 & 48.8 \\
+fasterrcnn & V6-TF (ours, frozen) & 8 & 18.7 & 34.9 & 44.3 & 381 & 65161 & 211682 & 66.5 & 37.9 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,125 @@
+diff --git a/models/yolo_head.py b/models/yolo_head.py
+index 788361b..4e02b7d 100644
+--- a/models/yolo_head.py
++++ b/models/yolo_head.py
+@@ -166,7 +166,7 @@ class YOLOXHead(nn.Module):
+             if self.training:
+                 output = torch.cat([reg_output, obj_output, cls_output], 1)
+                 output, grid = self.get_output_and_grid(
+-                    output, k, stride_this_level, xin[0].type()
++                    output, k, stride_this_level, xin[0]  # MAC-COMPAT: reference tensor instead of legacy dtype string
+                 )
+                 x_shifts.append(grid[:, :, 0])
+                 y_shifts.append(grid[:, :, 1])
+@@ -211,7 +211,7 @@ class YOLOXHead(nn.Module):
+                 [x.flatten(start_dim=2) for x in outputs], dim=2
+             ).permute(0, 2, 1)
+             if self.decode_in_inference:
+-                return self.decode_outputs(outputs, dtype=xin[0].type())
++                return self.decode_outputs(outputs, dtype=xin[0])  # MAC-COMPAT: reference tensor instead of legacy dtype string
+             else:
+                 return outputs
+ 
+@@ -223,7 +223,7 @@ class YOLOXHead(nn.Module):
+         hsize, wsize = output.shape[-2:]
+         if grid.shape[2:4] != output.shape[2:4]:
+             yv, xv = torch.meshgrid([torch.arange(hsize), torch.arange(wsize)])
+-            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).type(dtype)
++            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+             self.grids[k] = grid
+ 
+         output = output.view(batch_size, self.n_anchors, n_ch, hsize, wsize)
+@@ -245,8 +245,8 @@ class YOLOXHead(nn.Module):
+             shape = grid.shape[:2]
+             strides.append(torch.full((*shape, 1), stride))
+ 
+-        grids = torch.cat(grids, dim=1).type(dtype)
+-        strides = torch.cat(strides, dim=1).type(dtype)
++        grids = torch.cat(grids, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
++        strides = torch.cat(strides, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+ 
+         outputs[..., :2] = (outputs[..., :2] + grids) * strides
+         outputs[..., 2:4] = torch.exp(outputs[..., 2:4]) * strides
+diff --git a/register_data.py b/register_data.py
+index 73d009c..04fdc3c 100644
+--- a/register_data.py
++++ b/register_data.py
+@@ -168,9 +168,9 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
+     return dataset_dicts
+ 
+ 
+-VAL_JSON="/data/zelinliu/MOT20/annotations/val_half.json"
++VAL_JSON="/Users/ahmedgouda/Desktop/acmot_external/data_mirror/MOT17/annotations/val_half.json"  # PATH-ONLY: byte-identical mirror of the Drive MOT17 (manifest data_mirror/MOT17_mirror_manifest.json)
+ # VAL_JSON = '/data/zelinliu/MOT17/annotations/test.json'
+-VAL_PATH="/data/zelinliu/MOT20/train"
++VAL_PATH="/Users/ahmedgouda/Desktop/acmot_external/data_mirror/MOT17/train"  # PATH-ONLY
+ DatasetCatalog.register("my_val", lambda: load_coco_json(VAL_JSON, VAL_PATH, "my_val", ["id"]))
+ MetadataCatalog.get("my_val").set(thing_classes=[ "pedestrian"], # pedestrian
+                                                 json_file=VAL_JSON,
+diff --git a/tracker/eval/evaluators.py b/tracker/eval/evaluators.py
+index b39de76..219de74 100644
+--- a/tracker/eval/evaluators.py
++++ b/tracker/eval/evaluators.py
+@@ -76,7 +76,8 @@ class MOTEvaluator:
+             summary (sr): summary info of evaluation.
+         """
+         # TODO half to amp_test
+-        tensor_type = torch.cuda.HalfTensor if half else torch.cuda.FloatTensor
++        _dev = next(model.parameters()).device  # MAC-COMPAT: device-agnostic (was torch.cuda.*Tensor)
++        tensor_type = torch.float16 if half else torch.float32
+         model = model.eval()
+         if half:
+             model = model.half()
+@@ -120,23 +121,26 @@ class MOTEvaluator:
+                         det_path = os.path.join(batch_data[0]["file_name"][:-10].replace('img1', 'det'), 'det.txt')
+                         video_dets = np.loadtxt(det_path, dtype=np.float32, delimiter=',')
+                 
+-                # if do ablation please invalidate the specific thresh settings from 124 - 138
+-                if 'MOT17-05-' in video_name  or 'MOT17-06-' in video_name:
+-                    self.args.track.track_buffer = 14
+-                elif 'MOT17-13-' in video_name:
+-                    self.args.track.track_buffer = 25
+-                else:
+-                    self.args.track.track_buffer = ori_track_buffer
+-                
+-                if 'MOT17-06-' in video_name:
+-                    self.args.track.track_thresh = 0.65
+-                elif 'MOT17-12-' in video_name:
+-                    self.args.track.track_thresh = 0.7
+-                elif video_name in ['MOT20-06', 'MOT20-08']:
+-                    self.args.track.track_thresh = 0.27
+-                else:
+-                    self.args.track.track_thresh = ori_thresh
+-                    
++                # AUTHOR INSTRUCTION (mot17_ab_track_cfg.py): ablation -> per-sequence overrides invalidated
++                # [ABLATION-DISABLED] # if do ablation please invalidate the specific thresh settings from 124 - 138
++                # [ABLATION-DISABLED] if 'MOT17-05-' in video_name  or 'MOT17-06-' in video_name:
++                # [ABLATION-DISABLED] self.args.track.track_buffer = 14
++                # [ABLATION-DISABLED] elif 'MOT17-13-' in video_name:
++                # [ABLATION-DISABLED] self.args.track.track_buffer = 25
++                # [ABLATION-DISABLED] else:
++                # [ABLATION-DISABLED] self.args.track.track_buffer = ori_track_buffer
++                # [ABLATION-DISABLED] 
++                # [ABLATION-DISABLED] if 'MOT17-06-' in video_name:
++                # [ABLATION-DISABLED] self.args.track.track_thresh = 0.65
++                # [ABLATION-DISABLED] elif 'MOT17-12-' in video_name:
++                # [ABLATION-DISABLED] self.args.track.track_thresh = 0.7
++                # [ABLATION-DISABLED] elif video_name in ['MOT20-06', 'MOT20-08']:
++                # [ABLATION-DISABLED] self.args.track.track_thresh = 0.27
++                # [ABLATION-DISABLED] else:
++                # [ABLATION-DISABLED] self.args.track.track_thresh = ori_thresh
++                # [ABLATION-DISABLED] 
++                self.args.track.track_buffer = ori_track_buffer  # ablation: official values
++                self.args.track.track_thresh = ori_thresh
+                 if video_name not in video_names:
+                     video_names[video_id] = video_name
+                 if frame_id == 1:
+@@ -171,7 +175,7 @@ class MOTEvaluator:
+                 # run model
+                 timer.tic()
+                 if not self.args.track.is_public:
+-                    batch_data[0]["image"] = batch_data[0]["image"].type(tensor_type)  
++                    batch_data[0]["image"] = batch_data[0]["image"].to(device=_dev, dtype=tensor_type)  # MAC-COMPAT  
+                     outputs = model(batch_data)  
+                 else:
+                     frame_mask = video_dets[:, 0] == frame_id

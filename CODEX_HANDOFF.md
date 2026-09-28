@@ -47,32 +47,37 @@ See FINAL_SUMMARY.md.
 - Faster R-CNN val-7: official HOTA +2.52 and IDF1 +4.08 vs V4; MOTA +16.9
   vs shared static.
 
-## In progress / unresolved
-1. `tools/v6/after_frcnn_caches.sh` (background). It waits for
-   `tools/v6/cache_queue_frcnn045.sh` (Faster R-CNN NMS-0.45 caches for
-   test-dev and UAVDT), then runs the locked Faster R-CNN test-dev/UAVDT
-   evaluations and bootstraps. Log: `outputs/v6/after_frcnn.log` (ends with
-   AFTER_DONE). If the process died, rerun the script; `dev.py` skips
-   finished PKLs.
-2. External published-system transfer (C8). The survey is in
-   research/final/EXTERNAL_PAPER_TRANSFER.md. It is BLOCKED on owner
-   permission for downloads (MOT17 about 5.5 GB, published weights, GitHub
-   repositories).
-3. T4 fidelity gate and official timing: deferred by the owner (Amendment 9 §5).
+## Status (updated 2026-09-28, end of the external stage)
+All post-freeze work is DONE:
+- confirmation-16 (E48)
+- test-dev post-hoc (E49)
+- UAVDT (E50)
+- BoT-SORT (E51)
+- Faster R-CNN on val-7, test-dev and UAVDT (E52)
+- External published systems:
+  - BoostTrack (E53, MVA 2024): faithful execution; frozen V6-TF worse;
+  - SparseTrack (E54, IEEE TCSVT 2025, headline): faithful execution;
+    frozen V6-TF significantly worse (HOTA −4.15 [−5.54, −1.66]).
 
-## Exact next commands (repo root)
-```
-PYTHONPATH=. .venv/bin/python tools/v6/make_tables.py
-PYTHONPATH=. .venv/bin/python tools/v6/compose_final_results.py
-PYTHONPATH=. .venv/bin/python research/final/FIGURES/make_figures.py
-python3 tools/update_project_context.py
-$(cat graphify-out/.graphify_python) tools/build_context_graph.py
-python3 tools/context_health_check.py
-```
-Then update E52 in research/context/EXPERIMENT_REGISTRY.md and C3 in
-PROJECT_COMPLETION.md with the Faster R-CNN test-dev/UAVDT numbers
-(`outputs/v6/{testdev,uavdt}/bootstrap_frcnn.json`, `pooled_metrics_frcnn.json`),
-and commit.
+  Both are diagnosed (FAILURE_ANALYSIS F-K, F-L) and kept as negative
+  results.
+
+External assets:
+- Location: `/Users/ahmedgouda/Desktop/acmot_external/`
+  - `SparseTrack/`, `BoostTrack/`, `TOPICTrack/`;
+  - venv (Python 3.12, torch 2.14 MPS, detectron2 0.6);
+  - `data_mirror/MOT17` (byte-identical val-half mirror of the owner's
+    Drive copy);
+  - `runs/`, `reports/`.
+- Patches, shim and reports are copied into `tools/v6/external/vendor/`.
+
+Remaining (owner's pre-paper step):
+- Amendment-5f T4 fidelity gate and official GPU timing.
+- Optional TOPICTrack external run (IEEE TIP 2025; weights ready; same
+  detector checkpoint).
+
+## Exact commands
+See research/final/EXTERNAL_PAPER_TRANSFER.md §20 and REPRODUCIBILITY.md.
 
 ## Important files
 - `tools/v6/dev.py`: runner with the guard, lock verification and manifest.

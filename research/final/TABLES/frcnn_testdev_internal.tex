@@ -1,0 +1,11 @@
+% Faster R-CNN (unseen detector) on test-dev (post-hoc) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+fasterrcnn & V4 (frozen, VisDrone-tuned) & 1 & 26.0 & 36.1 & 44.5 & 977 & 31243 & 126922 & 73.8 & 41.0 \\
+fasterrcnn & Shared static (raw 0.5) & 5 & 13.3 & 37.2 & 44.7 & 2141 & 89961 & 94209 & 57.3 & 56.2 \\
+fasterrcnn & Tracker default (raw 0.25) & 8 & -1.5 & 35.1 & 41.1 & 3047 & 125283 & 89896 & 50.0 & 58.2 \\
+fasterrcnn & V6-TF (ours, frozen) & 1 & 26.2 & 36.1 & 44.9 & 1028 & 32514 & 125151 & 73.4 & 41.8 \\
+\bottomrule
+\end{tabular}

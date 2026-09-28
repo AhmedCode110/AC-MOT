@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 F = ROOT / "research/final/FINAL_RESULTS.md"
 MARK = "# Generated tables"
-ORDER = ["conf16_confirmation_internal", "conf16_confirmation_official", "conf16_botsort_internal",
+ORDER = ["external_transfer_mot17val", "conf16_confirmation_internal", "conf16_confirmation_official", "conf16_botsort_internal",
          "conf16_botsort_official", "frcnn_val7_internal", "frcnn_val7_official",
          "frcnn_testdev_internal", "frcnn_testdev_official", "frcnn_uavdt_internal",
          "uavdt_transfer_internal", "testdev_posthoc_internal", "testdev_posthoc_official",

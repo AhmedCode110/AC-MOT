@@ -36,6 +36,12 @@ tolerant association is, from statistics of the stream itself.
    frame's own list. The rationale is that under the IoU-0.5 correspondence
    rule two boxes with IoU > 0.5 cannot both be matched to distinct objects,
    so the weaker one is redundant.
+
+   *Scope correction (post-freeze, 2026-09-28; the method is unchanged):*
+   this holds only when distinct objects rarely overlap above IoU 0.5, as in
+   top-down aerial views. In side-view pedestrian crowds (MOT17), occluding
+   people overlap heavily, and the rule removes real objects (external
+   SparseTrack analysis, FAILURE_ANALYSIS F-K).
 4. **Logits.** `ℓ_i = log(s_i / (1 − s_i))`, with s clipped to [1e−9, 1−1e−9].
 5. **Band thresholds from frames < t only.** Let
    `H_t = ∪_{k=t−W}^{t−1} {ℓ}_k` be the pooled post-suppression logits of the

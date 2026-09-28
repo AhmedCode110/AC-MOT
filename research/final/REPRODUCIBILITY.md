@@ -74,3 +74,22 @@ to the pre-paper step (Amendment 9 §5).
    with the sanity check that GT as the tracker output scores 100/100/100.
    It is class-aware; COCO detectors have no "van", so van GT is always FN.
    UAVDT uses its own ignore-region rule (`tools/seqstats.apply_ignore_regions`).
+
+## External published systems (MOT17 val-half)
+Everything needed to rerun is in `tools/v6/external/`:
+- drivers: `sparsetrack_v6.py`, `boosttrack_v6.py`;
+- evaluator and statistics: `mot17_eval.py`;
+- split verification: `verify_mot17_split.py`;
+- tables and figure: `make_external_tables.py`;
+- compatibility patches (`vendor/*.diff`), the verbatim GMC shim
+  (`vendor/gmc_shim.cpp`, `vendor/pbcvt.py`), the logged official runner
+  and the result JSONs.
+
+Commands: EXTERNAL_PAPER_TRANSFER.md §20.
+
+External environment:
+- Python 3.12.14 venv with torch 2.14.0 (MPS), detectron2 0.6
+  @a2f4a8771ab77e8411c26b27f24f9489a28a2453, numpy 2.2.6, opencv-python 4.11;
+- Homebrew OpenCV 5.0.0 (GMC only);
+- ultralytics 8.3.200, motmetrics 1.4.0, TrackEval 12c8791.
+

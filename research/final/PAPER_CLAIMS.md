@@ -43,7 +43,17 @@ Evidence levels:
 8. **A large, consistent gain over a single shared raw threshold for
    YOLOv8n:** HOTA +3.5 to +4.4 and IDF1 +6.3 to +8.1 on confirmation-16,
    test-dev and UAVDT, all significant.
-9. **Negative results reported:**
+9. **Transfer to an unseen detector across datasets without retuning
+   (Faster R-CNN).** Faster R-CNN on test-dev (post-hoc), vs V4
+   (official-compatible): HOTA +1.46 [0.53, 2.55], IDF1 +1.85, MOTA +1.66
+   (significant). Against shared static, MOTA is +12.8 (significant). On
+   UAVDT it ties V4.
+10. **Integrates into independently published trackers as a plug-in.**
+    SparseTrack (TCSVT 2025) and BoostTrack (MVA 2024) run through
+    integration-only adapters with the lock verified. It adds about 4.7 ms
+    per frame, no detector compute, and **significantly reduces false
+    positives** (−73% / −83%) and BoostTrack's ID switches (−38).
+11. **Negative results reported:**
    - E41 rejected (15 catastrophic cells);
    - scene-adaptive resolution F5 did not beat random allocation;
    - learned controllers did not generalise;
@@ -61,10 +71,11 @@ Evidence levels:
 
    It is NOT significant under the internal protocol (positive point
    estimates). On test-dev (post-hoc) MOTA is +3.98 with CI [0.01, 8.69].
-3. **Tracker-agnostic.** Shown for two trackers of the same family
-   (ByteTrack and BoT-SORT, both two-stage IoU association from Ultralytics).
-   Trackers with a different association design have not been tested yet;
-   the external published-system transfer is pending.
+3. **Tracker-agnostic.** Integration is shown for four trackers:
+   ByteTrack, BoT-SORT, SparseTrack's pseudo-depth DCM and BoostTrack's
+   confidence-boosted single stage. The accuracy *benefit* holds for
+   ByteTrack/BoT-SORT in the calibration-shift regime; for the two
+   published pedestrian trackers it is negative.
 4. **Dataset transfer (UAVDT).** V6-TF ≈ V4 (RT-DETR n.s.; YOLOv8n small
    deficit). UAVDT is dominated by detector domain shift (12 catastrophic
    cells for both); shared static has fewer (6) because it outputs almost
@@ -81,8 +92,10 @@ Evidence levels:
 1. State of the art on VisDrone or UAVDT. The detectors are COCO-pretrained
    and the protocols are internal or official-compatible ports, not the
    leaderboard.
-2. "Works with every detector/tracker." Tested: YOLOv8n, RT-DETR-L, Faster
-   R-CNN R50-FPN v2; ByteTrack, BoT-SORT.
+2. "Works with every detector/tracker." Tested:
+   - detectors: YOLOv8n, RT-DETR-L, Faster R-CNN R50-FPN v2, and YOLOX-X
+     (MOT17) in the external hosts;
+   - trackers: ByteTrack, BoT-SORT, SparseTrack, BoostTrack.
 3. Uniform superiority over a fixed threshold. With RT-DETR-L, shared static
    0.5 is as good or better on HOTA/IDF1 (test-dev −2.4 HOTA, significant).
 4. Invariance to arbitrary monotone score recalibration. Only affine-in-logit
@@ -90,7 +103,14 @@ Evidence levels:
 5. Independence from the detector adapter's emission contract. The layer
    needs the low-score candidate stream (floor 0.01).
 6. That pre-detector scene-adaptive resolution helps (F5 failed).
-7. Any published-system transfer result. It is not run yet
-   (EXTERNAL_PAPER_TRANSFER.md).
+7. **That the frozen layer improves a published SOTA-class tracker.** It
+   significantly **degrades** SparseTrack (IEEE TCSVT 2025) on MOT17
+   val-half: HOTA −4.15 [−5.54, −1.66], MOTA −6.14, IDF1 −4.49. It also
+   degrades BoostTrack (MVA 2024): HOTA −5.89, MOTA −8.87, IDF1 −6.22. The
+   supported external statement is only the plug-in / FP-reduction one
+   (A.10).
 8. Hardware-independent numbers. The T4 fidelity gate is deferred; all
    quality numbers come from Mac-MPS caches.
+9. That V6-TF's duplicate suppression is universally valid. The
+   IoU-0.5 rule removes genuinely overlapping pedestrians in side-view
+   crowds (F-K).

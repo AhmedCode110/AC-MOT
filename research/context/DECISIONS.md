@@ -293,3 +293,43 @@ authored by this session. They are preserved, not deleted:
 The freeze commit is built from a clean tree. The owner may restore them with
 `git stash pop`.
 
+### D-029 — External published-system transfer: SparseTrack headline, BoostTrack supporting; result negative
+Date 2026-09-28 · Evidence E53, E54 · research/final/EXTERNAL_PAPER_*.md
+
+Selection (owner-confirmed):
+- **Headline: SparseTrack** (IEEE TCSVT 2025, Q1). Official code @499844f;
+  ByteTrack ablation checkpoint (sha256 26cb8d28…).
+- **Supporting: BoostTrack** (MVA 2024, Q2).
+
+Other candidates were rejected for missing weights or code, CUDA-only
+components, or conference venues (candidate matrix).
+
+Execution:
+- Faithful execution with compatibility-only patches, on the owner's MOT17
+  val-half (verified frame-for-frame).
+- SparseTrack: 68.88/77.85/81.97 (HOTA/MOTA/IDF1) vs paper 69.2/76.8/81.4.
+- BoostTrack: within ±0.12 of the authors' re-reported numbers.
+- The replay drivers reproduce the official outputs byte-for-byte.
+
+Result with the exact frozen V6-TF (lock verified, no retuning):
+- **SparseTrack:** significant degradation. HOTA −4.15 [−5.54, −1.66],
+  MOTA −6.14, IDF1 −4.49. FP −73%, FN +52%.
+- **BoostTrack:** HOTA −5.89, MOTA −8.87, IDF1 −6.22, IDS −38.
+
+Diagnosis:
+- IoU-0.5 duplicate suppression removes overlapping pedestrians in
+  side-view crowds (about 62% of the SparseTrack HOTA loss).
+- The nested-Otsu primary boundary (raw ≈ 0.78 / 0.87) sits above the
+  published operating point (0.6) of an in-domain ≈95%-precision detector.
+
+Decision:
+- Keep the negative result.
+- Do not retune; V6-TF stays frozen.
+- Correct the scope of the duplicate-suppression justification in
+  FINAL_METHOD.
+- The paper claim is restricted to the calibration/domain-shift regime
+  (PAPER_CLAIMS C.7 / C.9).
+- TOPICTrack (TIP 2025) is not run: it uses the same detector checkpoint and
+  the same 0.1-floored stream as BoostTrack; its environment and weights are
+  ready.
+

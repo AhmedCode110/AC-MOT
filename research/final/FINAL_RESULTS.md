@@ -44,7 +44,11 @@ V6-TF, which uses no dataset-selected constants:
    - Faster R-CNN val-7: 0 vs 0 for V4 and 3 for shared static;
    - confirmation-16, RT-DETR uav0000266_04830: V4 collapses to MOTA −252,
      V6-TF +3.6;
-5. **does not dominate a fixed raw threshold on RT-DETR-L.** RT-DETR's
+5. **does not transfer to strong in-domain published pedestrian trackers.**
+   SparseTrack (TCSVT 2025) and BoostTrack (MVA 2024) both get
+   significantly worse on MOT17 val-half: HOTA −4.15 / −5.89, even though
+   FP falls by 73–83%. See the external section below.
+6. **does not dominate a fixed raw threshold on RT-DETR-L.** RT-DETR's
    scores are close to calibrated, so shared static 0.5 is as good or better
    on HOTA/IDF1 (test-dev −2.4 HOTA for V6-TF, significant). On UAVDT,
    shared static also has fewer catastrophic cells (6 vs 12).
@@ -80,9 +84,33 @@ val-7 (scenes seen during development, detector unseen). Bootstrap
   **+4.08 [1.20, 7.09]**, MOTA +2.10 [−0.37, 4.65].
 - **V6-TF − shared static:** MOTA **+16.88 [12.28, 21.57]** (internal),
   HOTA ±0.
-- test-dev and UAVDT with Faster R-CNN: see the tables below if present
-  (they ran after the NMS-0.45 reference caches finished;
-  `outputs/v6/after_frcnn.log`).
+- **test-dev (post-hoc):**
+  - V6-TF − V4: official-compatible HOTA **+1.46 [0.53, 2.55]**, IDF1
+    **+1.85 [0.48, 3.56]**, MOTA **+1.66 [0.05, 3.47]**; internal n.s.;
+  - V6-TF − shared static: MOTA **+12.84 [4.18, 22.47]** (internal);
+  - catastrophic cells (official-compatible): V6-TF 1, V4 2, shared static
+    3, default 6.
+- **UAVDT:**
+  - V6-TF − V4: n.s. on all three metrics;
+  - V6-TF − shared static: HOTA **−2.26 [−4.28, −0.04]**, MOTA +4.53
+    [−1.24, 13.76];
+  - catastrophic cells: V6-TF 8, V4 8, shared static 7, default 13.
+
+## External published systems (MOT17 val-half; see EXTERNAL_PAPER_TRANSFER.md)
+- **SparseTrack (IEEE TCSVT 2025)**, official code and checkpoint:
+  - our execution: HOTA 68.88 / MOTA 77.85 / IDF1 81.97 (paper 69.2 / 76.8 /
+    81.4);
+  - + frozen V6-TF on identical detections: 64.72 / 71.71 / 77.49.
+  - Δ: HOTA **−4.15 [−5.54, −1.66]**, MOTA **−6.14**, IDF1 **−4.49**, FP
+    −1630, FN +4955 (all significant); IDS −16 (n.s.).
+- **BoostTrack (MVA 2024):**
+  - our execution: 68.49 / 75.50 / 81.41 (authors 68.37 / 75.56 / 81.35);
+  - + frozen V6-TF: 62.61 / 66.64 / 75.19.
+  - Δ: HOTA **−5.89**, MOTA **−8.87**, IDF1 **−6.22**, IDS **−38** (all
+    significant).
+- These are negative external transfers. The cause is diagnosed as IoU-0.5
+  duplicate suppression in side-view crowds plus over-conservative bands on
+  in-domain high-precision detectors. Details: FAILURE_ANALYSIS.md F-K / F-L.
 
 ## Dataset transfer: UAVDT (20 sequences, internal protocol with UAVDT ignore regions)
 - **V6-TF − V4:**
@@ -116,6 +144,30 @@ deferred (Amendment 9 §5).
 
 ---
 # Generated tables (tools/v6/make_tables.py; CSV and LaTeX in TABLES/)
+
+## External transfer — MOT17 val-half, TrackEval MOTChallenge protocol (paper rows as published; Precision/Recall from TrackEval CLEAR)
+
+| System | MOTA ↑ | HOTA ↑ | IDF1 ↑ | IDS ↓ | FP ↓ | FN ↓ | Prec ↑ | Rec ↑ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| SparseTrack (IEEE TCSVT 2025) — paper, Table VI | 76.80 | 69.20 | 81.40 | – | – | – | – | – |
+| SparseTrack — our faithful execution (official code+ckpt) | 77.85 | 68.88 | 81.97 | 124 | 2231 | 9582 | 95.21 | 82.22 |
+| SparseTrack + frozen V6-TF (same detections) | 71.71 | 64.72 | 77.49 | 108 | 601 | 14537 | 98.50 | 73.02 |
+|   diagnostic: + V6-TF without duplicate suppression | 75.27 | 67.31 | 80.23 | 106 | 1039 | 12182 | 97.57 | 77.39 |
+|   diagnostic: + V6-TF without motion rule | 71.73 | 64.86 | 77.78 | 106 | 594 | 14536 | 98.51 | 73.03 |
+| BoostTrack (MVA 2024) — authors' re-reported online (issue #8) | 75.56 | 68.37 | 81.35 | 118 | – | – | – | – |
+| BoostTrack — our execution (online) | 75.50 | 68.49 | 81.41 | 113 | 1637 | 11452 | 96.29 | 78.75 |
+| BoostTrack + frozen V6-TF (online) | 66.64 | 62.61 | 75.19 | 75 | 286 | 17619 | 99.22 | 67.31 |
+| BoostTrack — authors' re-reported + GBI | 80.55 | 71.33 | 83.84 | 106 | – | – | – | – |
+| BoostTrack — our execution + GBI | 81.03 | 71.72 | 84.16 | 97 | 2674 | 7451 | 94.56 | 86.17 |
+| BoostTrack + frozen V6-TF + GBI | 72.30 | 66.35 | 78.51 | 70 | 676 | 14183 | 98.33 | 73.68 |
+
+## Δ frozen V6-TF (paired sequence bootstrap, 10,000 resamples, seed 42, 95% CI)
+
+| Host system | ΔMOTA | ΔHOTA | ΔIDF1 | ΔIDS | ΔFP | ΔFN |
+|---|---|---|---|---|---|---|
+| SparseTrack | -6.14 [-8.10, -2.74] | -4.15 [-5.54, -1.66] | -4.49 [-6.19, -1.96] | -16.00 [-47.00, 12.00] | -1630.00 [-2977.15, -490.00] | +4955.00 [1973.00, 9493.00] |
+| BoostTrack (online) | -8.87 [-12.37, -7.14] | -5.89 [-7.76, -2.87] | -6.22 [-9.33, -2.85] | -38.00 [-81.00, -1.00] | -1351.00 [-2749.00, -356.98] | +6167.00 [3090.00, 10367.07] |
+| BoostTrack + GBI | -8.73 [-12.59, -6.50] | -5.37 [-7.30, -2.75] | -5.65 [-8.96, -2.77] | -27.00 [-73.00, 11.00] | -1998.00 [-3546.00, -668.00] | +6732.00 [3238.00, 10997.00] |
 
 ## confirmation-16 (ONE-WAY, post-freeze) — internal protocol
 
@@ -190,6 +242,33 @@ deferred (Amendment 9 §5).
 | val7 | official | fasterrcnn | Shared static (raw 0.5) | 4 | -4.20 | 32.85 | 36.37 | 947 | 33104 | 40795 | 48.39 | 43.21 |
 | val7 | official | fasterrcnn | Tracker default (raw 0.25) | 5 | -14.42 | 31.36 | 33.52 | 1463 | 40965 | 39761 | 43.91 | 44.65 |
 | val7 | official | fasterrcnn | V6-TF (ours, frozen) | 3 | 10.64 | 32.67 | 36.83 | 278 | 16301 | 47607 | 59.77 | 33.72 |
+
+## Faster R-CNN (unseen detector) on test-dev (post-hoc) — internal protocol
+
+| split | protocol | detector | system | n_catastrophic | MOTA | HOTA | IDF1 | IDS | FP | FN | Precision | Recall |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| testdev | internal | fasterrcnn | V4 (frozen, VisDrone-tuned) | 1 | 25.99 | 36.09 | 44.53 | 977 | 31243 | 126922 | 73.82 | 40.97 |
+| testdev | internal | fasterrcnn | Shared static (raw 0.5) | 5 | 13.35 | 37.16 | 44.72 | 2141 | 89961 | 94209 | 57.32 | 56.18 |
+| testdev | internal | fasterrcnn | Tracker default (raw 0.25) | 8 | -1.49 | 35.05 | 41.07 | 3047 | 125283 | 89896 | 49.97 | 58.19 |
+| testdev | internal | fasterrcnn | V6-TF (ours, frozen) | 1 | 26.19 | 36.10 | 44.89 | 1028 | 32514 | 125151 | 73.43 | 41.79 |
+
+## Faster R-CNN (unseen detector) on test-dev (post-hoc) — official protocol
+
+| split | protocol | detector | system | n_catastrophic | MOTA | HOTA | IDF1 | IDS | FP | FN | Precision | Recall |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| testdev | official | fasterrcnn | V4 (frozen, VisDrone-tuned) | 2 | 21.68 | 32.62 | 39.76 | 1226 | 28583 | 149813 | 73.56 | 34.68 |
+| testdev | official | fasterrcnn | Shared static (raw 0.5) | 3 | 17.79 | 35.58 | 42.49 | 3269 | 67570 | 117697 | 62.30 | 48.68 |
+| testdev | official | fasterrcnn | Tracker default (raw 0.25) | 6 | 10.38 | 33.97 | 39.55 | 6041 | 87078 | 112421 | 57.31 | 50.98 |
+| testdev | official | fasterrcnn | V6-TF (ours, frozen) | 1 | 23.34 | 34.07 | 41.61 | 1006 | 29625 | 145177 | 73.96 | 36.70 |
+
+## Faster R-CNN on UAVDT (post-freeze) — internal protocol
+
+| split | protocol | detector | system | n_catastrophic | MOTA | HOTA | IDF1 | IDS | FP | FN | Precision | Recall |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| uavdt | internal | fasterrcnn | V4 (frozen, VisDrone-tuned) | 8 | 18.22 | 35.14 | 44.12 | 342 | 65072 | 213389 | 66.21 | 37.41 |
+| uavdt | internal | fasterrcnn | Shared static (raw 0.5) | 7 | 14.15 | 37.17 | 46.90 | 698 | 109364 | 182606 | 59.14 | 46.44 |
+| uavdt | internal | fasterrcnn | Tracker default (raw 0.25) | 13 | -5.13 | 34.55 | 41.84 | 1774 | 181930 | 174702 | 47.74 | 48.75 |
+| uavdt | internal | fasterrcnn | V6-TF (ours, frozen) | 8 | 18.68 | 34.91 | 44.26 | 381 | 65161 | 211682 | 66.48 | 37.91 |
 
 ## UAVDT test (dataset transfer, post-freeze) — internal protocol
 

@@ -18,17 +18,17 @@ evaluations → external published-system transfer → paper package in
   freeze or evaluation commit.
 
 ## NEXT EXACT ACTION
-1. When `outputs/v6/after_frcnn.log` shows AFTER_DONE: regenerate
-   `tools/v6/make_tables.py`, append the Faster R-CNN test-dev/UAVDT results to
-   research/final/FINAL_RESULTS.md (re-run the compose step in CODEX_HANDOFF.md)
-   and update E52 / PROJECT_COMPLETION C3.
-2. External published-system transfer (C8): after the owner approves the
-   downloads listed in research/final/EXTERNAL_PAPER_TRANSFER.md §3, clone
-   BoostTrack (primary) and OC-SORT/SparseTrack, reproduce the baseline on
-   MOT17 val-half, attach the SAME frozen V6-TF via an integration-only
-   adapter, evaluate once.
-3. T4 fidelity gate + official timing (pre-paper; retarget
-   notebooks/Colab_T4_gate_and_benchmark.ipynb to 2cff95f / v6tf config).
+All post-freeze evaluations are done: confirmation-16, BoT-SORT, Faster R-CNN
+(val-7, test-dev, UAVDT), UAVDT, test-dev post-hoc, and the external
+SparseTrack/BoostTrack transfers (negative). Remaining:
+1. The owner's pre-paper step: the Amendment-5f T4 fidelity gate and
+   official GPU timing. Retarget notebooks/Colab_T4_gate_and_benchmark.ipynb
+   to 2cff95f and configs/universal_acmot_policy_v6tf.json.
+2. Optional: TOPICTrack (IEEE TIP 2025) external run. The environment and
+   weights are in acmot_external/TOPICTrack. The same detector checkpoint is
+   used, and the result is expected but not tested.
+3. Write the paper from research/final/ (claims restricted per
+   PAPER_CLAIMS.md).
 
 ## DO NOT DO
 - No retuning of V6-TF after the tag; no second confirmation run.

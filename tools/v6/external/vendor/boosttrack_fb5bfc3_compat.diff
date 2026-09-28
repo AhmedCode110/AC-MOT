@@ -1,0 +1,168 @@
+diff --git a/external/YOLOX/yolox/models/yolo_head.py b/external/YOLOX/yolox/models/yolo_head.py
+index 1cc5975..1545d22 100755
+--- a/external/YOLOX/yolox/models/yolo_head.py
++++ b/external/YOLOX/yolox/models/yolo_head.py
+@@ -164,7 +164,7 @@ class YOLOXHead(nn.Module):
+             if self.training:
+                 output = torch.cat([reg_output, obj_output, cls_output], 1)
+                 output, grid = self.get_output_and_grid(
+-                    output, k, stride_this_level, xin[0].type()
++                    output, k, stride_this_level, xin[0]  # MAC-COMPAT: pass reference tensor
+                 )
+                 x_shifts.append(grid[:, :, 0])
+                 y_shifts.append(grid[:, :, 1])
+@@ -209,7 +209,7 @@ class YOLOXHead(nn.Module):
+                 [x.flatten(start_dim=2) for x in outputs], dim=2
+             ).permute(0, 2, 1)
+             if self.decode_in_inference:
+-                return self.decode_outputs(outputs, dtype=xin[0].type())
++                return self.decode_outputs(outputs, dtype=xin[0])  # MAC-COMPAT
+             else:
+                 return outputs
+ 
+@@ -221,7 +221,7 @@ class YOLOXHead(nn.Module):
+         hsize, wsize = output.shape[-2:]
+         if grid.shape[2:4] != output.shape[2:4]:
+             yv, xv = meshgrid([torch.arange(hsize), torch.arange(wsize)])
+-            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).type(dtype)
++            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+             self.grids[k] = grid
+ 
+         output = output.view(batch_size, self.n_anchors, n_ch, hsize, wsize)
+@@ -243,8 +243,8 @@ class YOLOXHead(nn.Module):
+             shape = grid.shape[:2]
+             strides.append(torch.full((*shape, 1), stride))
+ 
+-        grids = torch.cat(grids, dim=1).type(dtype)
+-        strides = torch.cat(strides, dim=1).type(dtype)
++        grids = torch.cat(grids, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
++        strides = torch.cat(strides, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+ 
+         outputs[..., :2] = (outputs[..., :2] + grids) * strides
+         outputs[..., 2:4] = torch.exp(outputs[..., 2:4]) * strides
+diff --git a/external/adaptors/yolox_adaptor.py b/external/adaptors/yolox_adaptor.py
+index 71fb467..d4b92b2 100755
+--- a/external/adaptors/yolox_adaptor.py
++++ b/external/adaptors/yolox_adaptor.py
+@@ -31,13 +31,13 @@ class PostModel(nn.Module):
+ def get_model(path, dataset):
+     exp = Exp(dataset)
+     model = exp.get_model()
+-    ckpt = torch.load(path)
++    ckpt = torch.load(path, map_location='cpu', weights_only=False)  # MAC-COMPAT
+     model.load_state_dict(ckpt["model"])
+     with warnings.catch_warnings():
+         model = fuse_model(model)
+     model = model.half()
+     model = PostModel(model, exp)
+-    model.cuda()
++    model.to(torch.device('mps' if torch.backends.mps.is_available() else 'cpu'))  # MAC-COMPAT: was model.cuda()
+     model.eval()
+     return model
+ 
+diff --git a/main.py b/main.py
+index 9025e6e..e8361c2 100755
+--- a/main.py
++++ b/main.py
+@@ -9,6 +9,8 @@ from default_settings import GeneralSettings, get_detector_path_and_im_size, Boo
+ from external.adaptors import detector
+ from tracker.GBI import GBInterpolation
+ from tracker.boost_track import BoostTrack
++import torch  # MAC-COMPAT
++DEVICE = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')  # MAC-COMPAT
+ 
+ """
+ Script modified from Deep OC-SORT: 
+@@ -83,7 +85,7 @@ def main():
+         if video_name not in results:
+             results[video_name] = []
+ 
+-        img = img.cuda()
++        img = img.to(DEVICE)  # MAC-COMPAT: was img.cuda()
+ 
+         # Initialize tracker on first frame of a new video
+         print(f"Processing {video_name}:{frame_id}\r", end="")
+diff --git a/external/YOLOX/yolox/models/yolo_head.py b/external/YOLOX/yolox/models/yolo_head.py
+index 1cc5975..1545d22 100755
+--- a/external/YOLOX/yolox/models/yolo_head.py
++++ b/external/YOLOX/yolox/models/yolo_head.py
+@@ -164,7 +164,7 @@ class YOLOXHead(nn.Module):
+             if self.training:
+                 output = torch.cat([reg_output, obj_output, cls_output], 1)
+                 output, grid = self.get_output_and_grid(
+-                    output, k, stride_this_level, xin[0].type()
++                    output, k, stride_this_level, xin[0]  # MAC-COMPAT: pass reference tensor
+                 )
+                 x_shifts.append(grid[:, :, 0])
+                 y_shifts.append(grid[:, :, 1])
+@@ -209,7 +209,7 @@ class YOLOXHead(nn.Module):
+                 [x.flatten(start_dim=2) for x in outputs], dim=2
+             ).permute(0, 2, 1)
+             if self.decode_in_inference:
+-                return self.decode_outputs(outputs, dtype=xin[0].type())
++                return self.decode_outputs(outputs, dtype=xin[0])  # MAC-COMPAT
+             else:
+                 return outputs
+ 
+@@ -221,7 +221,7 @@ class YOLOXHead(nn.Module):
+         hsize, wsize = output.shape[-2:]
+         if grid.shape[2:4] != output.shape[2:4]:
+             yv, xv = meshgrid([torch.arange(hsize), torch.arange(wsize)])
+-            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).type(dtype)
++            grid = torch.stack((xv, yv), 2).view(1, 1, hsize, wsize, 2).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+             self.grids[k] = grid
+ 
+         output = output.view(batch_size, self.n_anchors, n_ch, hsize, wsize)
+@@ -243,8 +243,8 @@ class YOLOXHead(nn.Module):
+             shape = grid.shape[:2]
+             strides.append(torch.full((*shape, 1), stride))
+ 
+-        grids = torch.cat(grids, dim=1).type(dtype)
+-        strides = torch.cat(strides, dim=1).type(dtype)
++        grids = torch.cat(grids, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
++        strides = torch.cat(strides, dim=1).to(device=dtype.device, dtype=dtype.dtype)  # MAC-COMPAT
+ 
+         outputs[..., :2] = (outputs[..., :2] + grids) * strides
+         outputs[..., 2:4] = torch.exp(outputs[..., 2:4]) * strides
+diff --git a/external/adaptors/yolox_adaptor.py b/external/adaptors/yolox_adaptor.py
+index 71fb467..d4b92b2 100755
+--- a/external/adaptors/yolox_adaptor.py
++++ b/external/adaptors/yolox_adaptor.py
+@@ -31,13 +31,13 @@ class PostModel(nn.Module):
+ def get_model(path, dataset):
+     exp = Exp(dataset)
+     model = exp.get_model()
+-    ckpt = torch.load(path)
++    ckpt = torch.load(path, map_location='cpu', weights_only=False)  # MAC-COMPAT
+     model.load_state_dict(ckpt["model"])
+     with warnings.catch_warnings():
+         model = fuse_model(model)
+     model = model.half()
+     model = PostModel(model, exp)
+-    model.cuda()
++    model.to(torch.device('mps' if torch.backends.mps.is_available() else 'cpu'))  # MAC-COMPAT: was model.cuda()
+     model.eval()
+     return model
+ 
+diff --git a/main.py b/main.py
+index 9025e6e..e8361c2 100755
+--- a/main.py
++++ b/main.py
+@@ -9,6 +9,8 @@ from default_settings import GeneralSettings, get_detector_path_and_im_size, Boo
+ from external.adaptors import detector
+ from tracker.GBI import GBInterpolation
+ from tracker.boost_track import BoostTrack
++import torch  # MAC-COMPAT
++DEVICE = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')  # MAC-COMPAT
+ 
+ """
+ Script modified from Deep OC-SORT: 
+@@ -83,7 +85,7 @@ def main():
+         if video_name not in results:
+             results[video_name] = []
+ 
+-        img = img.cuda()
++        img = img.to(DEVICE)  # MAC-COMPAT: was img.cuda()
+ 
+         # Initialize tracker on first frame of a new video
+         print(f"Processing {video_name}:{frame_id}\r", end="")

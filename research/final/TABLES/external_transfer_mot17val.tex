@@ -1,0 +1,18 @@
+% External transfer, MOT17 val-half (TrackEval)
+\begin{tabular}{lrrrrrr}
+\toprule
+System & MOTA & HOTA & IDF1 & IDS & FP & FN \\
+\midrule
+SparseTrack (IEEE TCSVT 2025) — paper, Table VI & 76.80 & 69.20 & 81.40 & – & – & – \\
+SparseTrack — our faithful execution (official code+ckpt) & 77.85 & 68.88 & 81.97 & 124 & 2231 & 9582 \\
+SparseTrack + frozen V6-TF (same detections) & 71.71 & 64.72 & 77.49 & 108 & 601 & 14537 \\
+  diagnostic: + V6-TF without duplicate suppression & 75.27 & 67.31 & 80.23 & 106 & 1039 & 12182 \\
+  diagnostic: + V6-TF without motion rule & 71.73 & 64.86 & 77.78 & 106 & 594 & 14536 \\
+BoostTrack (MVA 2024) — authors' re-reported online (issue #8) & 75.56 & 68.37 & 81.35 & 118 & – & – \\
+BoostTrack — our execution (online) & 75.50 & 68.49 & 81.41 & 113 & 1637 & 11452 \\
+BoostTrack + frozen V6-TF (online) & 66.64 & 62.61 & 75.19 & 75 & 286 & 17619 \\
+BoostTrack — authors' re-reported + GBI & 80.55 & 71.33 & 83.84 & 106 & – & – \\
+BoostTrack — our execution + GBI & 81.03 & 71.72 & 84.16 & 97 & 2674 & 7451 \\
+BoostTrack + frozen V6-TF + GBI & 72.30 & 66.35 & 78.51 & 70 & 676 & 14183 \\
+\bottomrule
+\end{tabular}

@@ -157,6 +157,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Experiment: E48 confirmation-16 | PLANNED POST-FREEZE | one-way evaluation of frozen V6-TF vs V4 vs shared-static, paired bootstrap 10000 seed 42 | NEXT_STEPS.md |
 | Component: Duplicate Suppression | FINAL | class-agnostic greedy suppression at the IoU-0.5 correspondence rule | ARCHITECTURE.md |
 | Component: Nested Otsu Bands | FINAL | background/foreground then extension/primary exact 2-class Otsu on pooled logits of frames t-10..t-1 | ARCHITECTURE.md |
+| Experiment: E54 SparseTrack external transfer | DONE NEGATIVE | SparseTrack TCSVT 2025 faithful execution plus frozen V6-TF on identical detections: HOTA -4.15, MOTA -6.14, IDF1 -4.49; dedup and over-conservative bands in crowds | EXPERIMENT_REGISTRY.md |
+| Decision: D-029 external transfer negative | ACTIVE | SparseTrack headline, BoostTrack supporting; frozen V6-TF degrades both; scope restricted to calibration and domain shift | DECISIONS.md |
 
 ## Relations
 | Subject | Relation | Object |
@@ -391,6 +393,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Version: V6-TF | USES_COMPONENT | Component: ECDF Normaliser |
 | Protocol: Amendment 9 | GOVERNS | Version: V6-TF |
 | Constraint: C0 final target V6-TF | DERIVED_FROM | Decision: D-026 E41 rejected V6-TF target |
+| Experiment: E54 SparseTrack external transfer | EVALUATES | Version: V6-TF |
+| Decision: D-029 external transfer negative | RECORDED_IN | Protocol: Amendment 9 |
 
 ## Code links
 | Entity | Relation | Code file |
@@ -428,3 +432,4 @@ Edit this file when the project state changes, then rebuild the graph.
 | Component: Nested Otsu Bands | IMPLEMENTED_IN | online_calibration.py |
 | Component: Nested Otsu Bands | IMPLEMENTED_IN | universal_policy_pipeline.py |
 | Experiment: E43 V6 development X1-X5 | IMPLEMENTED_IN | tools/v6/dev.py |
+| Experiment: E54 SparseTrack external transfer | IMPLEMENTED_IN | tools/v6/external/sparsetrack_v6.py |
