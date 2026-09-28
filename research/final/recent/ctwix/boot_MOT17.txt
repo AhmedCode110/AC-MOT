@@ -1,5 +1,4 @@
-Error importing BURST due to missing underlying dependency: No module named 'tabulate'
 pedestrian W/T/L [2, 1, 4]
-  dHOTA -0.039 [-0.456, +0.449]
-  dMOTA +0.254 [-0.575, +1.150]
-  dIDF1 +0.205 [-0.470, +1.175]
+  dHOTA -0.055 [-0.456, +0.398]
+  dMOTA +0.242 [-0.575, +1.116]
+  dIDF1 +0.175 [-0.470, +1.138]

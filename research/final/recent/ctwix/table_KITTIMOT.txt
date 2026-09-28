@@ -1,4 +1,3 @@
-Error importing BURST due to missing underlying dependency: No module named 'tabulate'
 CT_BASELINE                  car        HOTA 89.266 DetA 88.911 AssA 89.778 MOTA 98.225 IDF1 98.610 IDS 16 FP 62 FN 56
 CT_BASELINE                  pedestrian HOTA 70.772 DetA 70.142 AssA 71.508 MOTA 84.465 IDF1 89.114 IDS 52 FP 118 FN 338
 CT_V7f                       car        HOTA 87.745 DetA 87.160 AssA 88.483 MOTA 96.119 IDF1 97.397 IDS 14 FP 62 FN 217
