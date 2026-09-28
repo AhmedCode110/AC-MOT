@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{Frozen configurations compared in this study. Confidence and NMS entries give the value at $S=0$ and at $S=1$ (linear in between); resolution is the short-side input size in pixels. All adaptive controllers analyze every $K=10$ frames with a moving mean over $W=7$ analyses.}
+\label{tab:settings}
+\small
+\begin{tabular}{lccccc}
+\hline
+Configuration & Confidence & NMS IoU & Resolution & Tracker profile & Selection \\
+\hline
+Static default & 0.25 & 0.45 & 640 & default & none (project reference) \\
+Heuristic controller & $0.245-0.05S$ (clipped 0.19--0.28) & $0.49-0.05S$ (clipped 0.40--0.52) & 640/736/832 & tuned & hand-designed \\
+Quality profile Q (trial 24) & 0.30$\to$0.40 & 0.35$\to$0.35 & 512/928/960 at $S\ge0.135/0.287$ & tuned & max MOTA s.t. IDS gate \\
+Balanced profile B (trial 22) & 0.40$\to$0.40 & 0.60$\to$0.35 & 512/928/960 at $S\ge0.293/0.666$ & tuned & balanced Pareto score \\
+Matched static anchor & 0.35 & 0.35 & 960 & tuned & post hoc attribution \\
+\hline
+\multicolumn{6}{l}{Tracker profiles (ByteTrack): default = high 0.25, low 0.10, new 0.25, buffer 30, match 0.80;}\\
+\multicolumn{6}{l}{tuned = high 0.18, low 0.04, new 0.20, buffer 45, match 0.86.}\\
+\hline
+\end{tabular}
+\end{table}

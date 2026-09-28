@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{Data splits and their role. No test sequence was used for any selection, calibration, or tuning decision.}
+\label{tab:data}
+\small
+\begin{tabular}{llrrl}
+\hline
+Dataset & Split & Sequences & Frames & Role \\
+\hline
+VisDrone2019-MOT & validation & 7 & 2,846 & cue calibration, sweeps, ablations, optimization \\
+VisDrone2019-MOT & test-dev & 17 & 6,635 & locked held-out comparison \\
+UAVDT & test & 20 & 16,592 & zero-tuning cross-dataset test \\
+\hline
+\end{tabular}
+\end{table}
