@@ -1,0 +1,3576 @@
+[
+ {
+  "key": "zhu2022visdrone",
+  "query_title": "Detection and Tracking Meet Drones Challenge",
+  "crossref": {
+   "doi": "10.1109/tpami.2021.3119563",
+   "type": "journal-article",
+   "title": "Detection and Tracking Meet Drones Challenge",
+   "authors": [
+    "Pengfei Zhu",
+    "Longyin Wen",
+    "Dawei Du",
+    "Xiao Bian",
+    "Heng Fan",
+    "Qinghua Hu",
+    "Haibin Ling"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": "44",
+   "issue": "11",
+   "pages": "7380-7399",
+   "year": 2022,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "du2018uavdt",
+  "query_title": "The Unmanned Aerial Vehicle Benchmark: Object Detection and Tracking",
+  "crossref": {
+   "doi": "10.1007/978-3-030-01249-6_23",
+   "type": "book-chapter",
+   "title": "The Unmanned Aerial Vehicle Benchmark: Object Detection and Tracking",
+   "authors": [
+    "Dawei Du",
+    "Yuankai Qi",
+    "Hongyang Yu",
+    "Yifan Yang",
+    "Kaiwen Duan",
+    "Guorong Li",
+    "Weigang Zhang",
+    "Qingming Huang",
+    "Qi Tian"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "375-391",
+   "year": 2018,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "zhang2022bytetrack",
+  "query_title": "ByteTrack: Multi-object Tracking by Associating Every Detection Box",
+  "crossref": {
+   "doi": "10.1007/978-3-031-20047-2_1",
+   "type": "book-chapter",
+   "title": "ByteTrack: Multi-object Tracking by\u00a0Associating Every Detection Box",
+   "authors": [
+    "Yifu Zhang",
+    "Peize Sun",
+    "Yi Jiang",
+    "Dongdong Yu",
+    "Fucheng Weng",
+    "Zehuan Yuan",
+    "Ping Luo",
+    "Wenyu Liu",
+    "Xinggang Wang"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "1-21",
+   "year": 2022,
+   "publisher": "Springer Nature Switzerland",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.9922480620155039,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "luiten2021hota",
+  "query_title": "HOTA: A Higher Order Metric for Evaluating Multi-object Tracking",
+  "crossref": {
+   "doi": "10.1007/s11263-020-01375-2",
+   "type": "journal-article",
+   "title": "HOTA: A Higher Order Metric for Evaluating Multi-object Tracking",
+   "authors": [
+    "Jonathon Luiten",
+    "Aljos\u0306a Os\u0306ep",
+    "Patrick Dendorfer",
+    "Philip Torr",
+    "Andreas Geiger",
+    "Laura Leal-Taix\u00e9",
+    "Bastian Leibe"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "129",
+   "issue": "2",
+   "pages": "548-578",
+   "year": 2020,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "bernardin2008clear",
+  "query_title": "Evaluating Multiple Object Tracking Performance: The CLEAR MOT Metrics",
+  "crossref": {
+   "doi": "10.1155/2008/246309",
+   "type": "journal-article",
+   "title": "Evaluating Multiple Object Tracking Performance: The CLEAR MOT Metrics",
+   "authors": [
+    "Keni Bernardin",
+    "Rainer Stiefelhagen"
+   ],
+   "container": "EURASIP Journal on Image and Video Processing",
+   "volume": "2008",
+   "issue": null,
+   "pages": "1-10",
+   "year": 2008,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "ristani2016idf1",
+  "query_title": "Performance Measures and a Data Set for Multi-target, Multi-camera Tracking",
+  "crossref": {
+   "doi": "10.1007/978-3-319-48881-3_2",
+   "type": "book-chapter",
+   "title": "Performance Measures and a Data Set for\u00a0Multi-target, Multi-camera Tracking",
+   "authors": [
+    "Ergys Ristani",
+    "Francesco Solera",
+    "Roger Zou",
+    "Rita Cucchiara",
+    "Carlo Tomasi"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "17-35",
+   "year": 2016,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.993006993006993,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "bewley2016sort",
+  "query_title": "Simple online and realtime tracking",
+  "crossref": {
+   "doi": "10.1109/icip.2016.7533003",
+   "type": "proceedings-article",
+   "title": "Simple online and realtime tracking",
+   "authors": [
+    "Alex Bewley",
+    "Zongyuan Ge",
+    "Lionel Ott",
+    "Fabio Ramos",
+    "Ben Upcroft"
+   ],
+   "container": "2016 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "3464-3468",
+   "year": 2016,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2016 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "wojke2017deepsort",
+  "query_title": "Simple online and realtime tracking with a deep association metric",
+  "crossref": {
+   "doi": "10.1109/icip.2017.8296962",
+   "type": "proceedings-article",
+   "title": "Simple online and realtime tracking with a deep association metric",
+   "authors": [
+    "Nicolai Wojke",
+    "Alex Bewley",
+    "Dietrich Paulus"
+   ],
+   "container": "2017 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "3645-3649",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "kalman1960",
+  "query_title": "A New Approach to Linear Filtering and Prediction Problems",
+  "crossref": {
+   "doi": "10.1115/1.3662552",
+   "type": "journal-article",
+   "title": "A New Approach to Linear Filtering and Prediction Problems",
+   "authors": [
+    "R. E. Kalman"
+   ],
+   "container": "Journal of Basic Engineering",
+   "volume": "82",
+   "issue": "1",
+   "pages": "35-45",
+   "year": 1960,
+   "publisher": "ASME International",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "kuhn1955hungarian",
+  "query_title": "The Hungarian method for the assignment problem",
+  "crossref": {
+   "doi": "10.1002/nav.3800020109",
+   "type": "journal-article",
+   "title": "The Hungarian method for the assignment problem",
+   "authors": [
+    "H. W. Kuhn"
+   ],
+   "container": "Naval Research Logistics Quarterly",
+   "volume": "2",
+   "issue": "1-2",
+   "pages": "83-97",
+   "year": 1955,
+   "publisher": "Wiley",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "akiba2019optuna",
+  "query_title": "Optuna: A Next-generation Hyperparameter Optimization Framework",
+  "crossref": {
+   "doi": "10.1145/3292500.3330701",
+   "type": "proceedings-article",
+   "title": "Optuna",
+   "authors": [
+    "Takuya Akiba",
+    "Shotaro Sano",
+    "Toshihiko Yanase",
+    "Takeru Ohta",
+    "Masanori Koyama"
+   ],
+   "container": "Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining",
+   "volume": null,
+   "issue": null,
+   "pages": "2623-2631",
+   "year": 2019,
+   "publisher": "ACM",
+   "article_number": null,
+   "event": "KDD '19: The 25th ACM SIGKDD Conference on Knowledge Discovery and Data Mining"
+  },
+  "title_similarity": 0.1791044776119403,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "bergstra2011tpe",
+  "query_title": "Algorithms for Hyper-Parameter Optimization",
+  "candidates": [
+   {
+    "doi": "10.3390/a14060163",
+    "type": "journal-article",
+    "title": "A New Hyper-Parameter Optimization Method for Power Load Forecast Based on Recurrent Neural Networks",
+    "authors": [
+     "Yaru Li",
+     "Yulai Zhang",
+     "Yongping Cai"
+    ],
+    "container": "Algorithms",
+    "volume": "14",
+    "issue": "6",
+    "pages": "163",
+    "year": 2021,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerj.15552/supp-1",
+    "type": "component",
+    "title": "Supplemental Information 1: Hyper parameter space of machine learning algorithms.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerj-cs.2644/table-2",
+    "type": "component",
+    "title": "Table 2: Summary of hyper-parameter optimization techniques.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.21203/rs.3.rs-2615380/v1",
+    "type": "posted-content",
+    "title": "Optimization of Machine Learning Algorithms Through Hyper-parameter Tuning Applied for the classification of Arabic news",
+    "authors": [
+     "IMAD JAMALEDDYN",
+     "Rachid EL AYACHI",
+     "Mohmed BINIZ"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Research Square Platform LLC",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/synasc51798.2020.00042",
+    "type": "proceedings-article",
+    "title": "Hybrid Hyper-parameter Optimization for Collaborative Filtering",
+    "authors": [
+     "Peter Szabo",
+     "Bela Genge"
+    ],
+    "container": "2020 22nd International Symposium on Symbolic and Numeric Algorithms for Scientific Computing (SYNASC)",
+    "volume": null,
+    "issue": null,
+    "pages": "210-217",
+    "year": 2020,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2020 22nd International Symposium on Symbolic and Numeric Algorithms for Scientific Computing (SYNASC)"
+   }
+  ],
+  "best": {
+   "doi": "10.7717/peerj-cs.2644/table-2",
+   "type": "component",
+   "title": "Table 2: Summary of hyper-parameter optimization techniques.",
+   "authors": [],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": null,
+   "publisher": "PeerJ",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.6464646464646465,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "bodla2017softnms",
+  "query_title": "Soft-NMS \u2014 Improving Object Detection with One Line of Code",
+  "crossref": {
+   "doi": "10.1109/iccv.2017.593",
+   "type": "proceedings-article",
+   "title": "Soft-NMS \u2014 Improving Object Detection with One Line of Code",
+   "authors": [
+    "Navaneeth Bodla",
+    "Bharat Singh",
+    "Rama Chellappa",
+    "Larry S. Davis"
+   ],
+   "container": "2017 IEEE International Conference on Computer Vision (ICCV)",
+   "volume": null,
+   "issue": null,
+   "pages": "5562-5570",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 IEEE International Conference on Computer Vision (ICCV)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "cheng2023smallobject",
+  "query_title": "Towards Large-Scale Small Object Detection: Survey and Benchmarks",
+  "crossref": {
+   "doi": "10.1109/tpami.2023.3290594",
+   "type": "journal-article",
+   "title": "Towards Large-Scale Small Object Detection: Survey and Benchmarks",
+   "authors": [
+    "Gong Cheng",
+    "Xiang Yuan",
+    "Xiwen Yao",
+    "Kebing Yan",
+    "Qinghua Zeng",
+    "Xingxing Xie",
+    "Junwei Han"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": null,
+   "issue": null,
+   "pages": "1-20",
+   "year": 2023,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "wu2022uavsurvey",
+  "query_title": "Deep Learning for Unmanned Aerial Vehicle-Based Object Detection and Tracking: A survey",
+  "crossref": {
+   "doi": "10.1109/mgrs.2021.3115137",
+   "type": "journal-article",
+   "title": "Deep Learning for Unmanned Aerial Vehicle-Based Object Detection and Tracking: A survey",
+   "authors": [
+    "Xin Wu",
+    "Wei Li",
+    "Danfeng Hong",
+    "Ran Tao",
+    "Qian Du"
+   ],
+   "container": "IEEE Geoscience and Remote Sensing Magazine",
+   "volume": "10",
+   "issue": "1",
+   "pages": "91-124",
+   "year": 2022,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "han2022dynamic",
+  "query_title": "Dynamic Neural Networks: A Survey",
+  "crossref": {
+   "doi": "10.1109/tpami.2021.3117837",
+   "type": "journal-article",
+   "title": "Dynamic Neural Networks: A Survey",
+   "authors": [
+    "Yizeng Han",
+    "Gao Huang",
+    "Shiji Song",
+    "Le Yang",
+    "Honghui Wang",
+    "Yulin Wang"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": "44",
+   "issue": "11",
+   "pages": "7436-7456",
+   "year": 2022,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "jiang2018chameleon",
+  "query_title": "Chameleon: scalable adaptation of video analytics",
+  "crossref": {
+   "doi": "10.1145/3230543.3230574",
+   "type": "proceedings-article",
+   "title": "Chameleon",
+   "authors": [
+    "Junchen Jiang",
+    "Ganesh Ananthanarayanan",
+    "Peter Bodik",
+    "Siddhartha Sen",
+    "Ion Stoica"
+   ],
+   "container": "Proceedings of the 2018 Conference of the ACM Special Interest Group on Data Communication",
+   "volume": null,
+   "issue": null,
+   "pages": "253-266",
+   "year": 2018,
+   "publisher": "ACM",
+   "article_number": null,
+   "event": "SIGCOMM '18: ACM SIGCOMM 2018 Conference"
+  },
+  "title_similarity": 0.3157894736842105,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "xu2020approxdet",
+  "query_title": "ApproxDet: content and contention-aware approximate object detection for mobiles",
+  "crossref": {
+   "doi": "10.1145/3384419.3430771",
+   "type": "proceedings-article",
+   "title": "Exploring commodity RFID for contactless sub-millimeter vibration sensing",
+   "authors": [
+    "Binbin Xie",
+    "Jie Xiong",
+    "Xiaojiang Chen",
+    "Dingyi Fang"
+   ],
+   "container": "Proceedings of the 18th Conference on Embedded Networked Sensor Systems",
+   "volume": null,
+   "issue": null,
+   "pages": "15-27",
+   "year": 2020,
+   "publisher": "ACM",
+   "article_number": null,
+   "event": "SenSys '20: The 18th ACM Conference on Embedded Networked Sensor Systems"
+  },
+  "title_similarity": 0.32,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "liu2022uavmot",
+  "query_title": "Multi-Object Tracking Meets Moving UAV",
+  "crossref": {
+   "doi": "10.1109/cvpr52688.2022.00867",
+   "type": "proceedings-article",
+   "title": "Multi-Object Tracking Meets Moving UAV",
+   "authors": [
+    "Shuai Liu",
+    "Xin Li",
+    "Huchuan Lu",
+    "You He"
+   ],
+   "container": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "8866-8875",
+   "year": 2022,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "pechpacheco2000blur",
+  "query_title": "Diatom autofocusing in brightfield microscopy: a comparative study",
+  "crossref": {
+   "doi": "10.1109/icpr.2000.903548",
+   "type": "proceedings-article",
+   "title": "Diatom autofocusing in brightfield microscopy: a comparative study",
+   "authors": [
+    "J.L. Pech-Pacheco",
+    "G. Cristobal",
+    "J. Chamorro-Martinez",
+    "J. Fernandez-Valdivia"
+   ],
+   "container": "Proceedings 15th International Conference on Pattern Recognition. ICPR-2000",
+   "volume": "3",
+   "issue": null,
+   "pages": "314-317",
+   "year": null,
+   "publisher": "IEEE Comput. Soc",
+   "article_number": null,
+   "event": "15th International Conference on Pattern Recognition"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "efron1993bootstrap",
+  "query_title": "An Introduction to the Bootstrap",
+  "crossref": {
+   "doi": "10.1007/978-1-4899-4541-9",
+   "type": "book",
+   "title": "An Introduction to the Bootstrap",
+   "authors": [
+    "Bradley Efron",
+    "Robert J. Tibshirani"
+   ],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": 1993,
+   "publisher": "Springer US",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "kanellakis2017uavvision",
+  "query_title": "Survey on Computer Vision for UAVs: Current Developments and Trends",
+  "crossref": {
+   "doi": "10.1007/s10846-017-0483-z",
+   "type": "journal-article",
+   "title": "Survey on Computer Vision for UAVs: Current Developments and Trends",
+   "authors": [
+    "Christoforos Kanellakis",
+    "George Nikolakopoulos"
+   ],
+   "container": "Journal of Intelligent &amp; Robotic Systems",
+   "volume": "87",
+   "issue": "1",
+   "pages": "141-168",
+   "year": 2017,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "dendorfer2021motchallenge",
+  "query_title": "MOTChallenge: A Benchmark for Single-Camera Multiple Target Tracking",
+  "crossref": {
+   "doi": "10.1007/s11263-020-01393-0",
+   "type": "journal-article",
+   "title": "MOTChallenge: A Benchmark for Single-Camera Multiple Target Tracking",
+   "authors": [
+    "Patrick Dendorfer",
+    "Aljos\u0306a Os\u0306ep",
+    "Anton Milan",
+    "Konrad Schindler",
+    "Daniel Cremers",
+    "Ian Reid",
+    "Stefan Roth",
+    "Laura Leal-Taix\u00e9"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "129",
+   "issue": "4",
+   "pages": "845-881",
+   "year": 2020,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "cao2023ocsort",
+  "query_title": "Observation-Centric SORT: Rethinking SORT for Robust Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/cvpr52729.2023.00934",
+   "type": "proceedings-article",
+   "title": "Observation-Centric SORT: Rethinking SORT for Robust Multi-Object Tracking",
+   "authors": [
+    "Jinkun Cao",
+    "Jiangmiao Pang",
+    "Xinshuo Weng",
+    "Rawal Khirodkar",
+    "Kris Kitani"
+   ],
+   "container": "2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "9686-9696",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "stanojevic2024boosttrack",
+  "query_title": "BoostTrack: boosting the similarity measure and detection confidence for improved multiple object tracking",
+  "crossref": {
+   "doi": "10.1007/s00138-024-01531-5",
+   "type": "journal-article",
+   "title": "BoostTrack: boosting the similarity measure and detection confidence for improved multiple object tracking",
+   "authors": [
+    "Vukasin D. Stanojevic",
+    "Branimir T. Todorovic"
+   ],
+   "container": "Machine Vision and Applications",
+   "volume": "35",
+   "issue": "3",
+   "pages": null,
+   "year": 2024,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": "53",
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "liu2025sparsetrack",
+  "query_title": "SparseTrack: Multi-Object Tracking by Performing Scene Decomposition Based on Pseudo-Depth",
+  "candidates": [
+   {
+    "doi": "10.1109/tcsvt.2024.3524670",
+    "type": "journal-article",
+    "title": "SparseTrack: Multi-Object Tracking by Performing Scene Decomposition Based on Pseudo-Depth",
+    "authors": [
+     "Zelin Liu",
+     "Xinggang Wang",
+     "Cheng Wang",
+     "Wenyu Liu",
+     "Xiang Bai"
+    ],
+    "container": "IEEE Transactions on Circuits and Systems for Video Technology",
+    "volume": "35",
+    "issue": "5",
+    "pages": "4870-4882",
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/mlmc65154.2025.11189308",
+    "type": "proceedings-article",
+    "title": "Pseudo-depth Guided Multi-object Tracking",
+    "authors": [
+     "Zijie Zhuang",
+     "Xiaokai Yi",
+     "Shuaixiong Hui",
+     "Jing Yang",
+     "Hanli Wang"
+    ],
+    "container": "2025 International Symposium on Machine Learning and Media Computing (MLMC)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-6",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 International Symposium on Machine Learning and Media Computing (MLMC)"
+   },
+   {
+    "doi": "10.1017/cbo9780511975837.013",
+    "type": "other",
+    "title": "Pseudo-functions in object tracking",
+    "authors": [],
+    "container": "Fundamentals of Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "358-360",
+    "year": 2011,
+    "publisher": "Cambridge University Press",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.23919/fusion43075.2019.9011185",
+    "type": "proceedings-article",
+    "title": "Object Detection in Tensor Decomposition Based Multi Target Tracking",
+    "authors": [
+     "Felix Govaers"
+    ],
+    "container": "2019 22th International Conference on Information Fusion (FUSION)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-8",
+    "year": 2019,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2019 22th International Conference on Information Fusion (FUSION)"
+   },
+   {
+    "doi": "10.3390/machines14050472",
+    "type": "journal-article",
+    "title": "Adaptive Multi-Level 3D Multi-Object Tracking with Transformer-Based Association and Scene-Aware Thresholds for Autonomous Driving",
+    "authors": [
+     "Yongze Zhang",
+     "Feipeng Da",
+     "Haocheng Zhou"
+    ],
+    "container": "Machines",
+    "volume": "14",
+    "issue": "5",
+    "pages": "472",
+    "year": 2026,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/tcsvt.2024.3524670",
+   "type": "journal-article",
+   "title": "SparseTrack: Multi-Object Tracking by Performing Scene Decomposition Based on Pseudo-Depth",
+   "authors": [
+    "Zelin Liu",
+    "Xinggang Wang",
+    "Cheng Wang",
+    "Wenyu Liu",
+    "Xiang Bai"
+   ],
+   "container": "IEEE Transactions on Circuits and Systems for Video Technology",
+   "volume": "35",
+   "issue": "5",
+   "pages": "4870-4882",
+   "year": 2025,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "wang2025pdsort",
+  "query_title": "PD-SORT: Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth Cues",
+  "candidates": [
+   {
+    "doi": "10.1109/tce.2025.3541839",
+    "type": "journal-article",
+    "title": "PD-SORT: Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth Cues",
+    "authors": [
+     "Yanchao Wang",
+     "Dawei Zhang",
+     "Run Li",
+     "Zhonglong Zheng",
+     "Minglu Li"
+    ],
+    "container": "IEEE Transactions on Consumer Electronics",
+    "volume": "71",
+    "issue": "1",
+    "pages": "165-177",
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.4838053",
+    "type": "posted-content",
+    "title": "Finite Memory Observation-Centric Sort for Occlusion-Robust Multi-Object Tracking",
+    "authors": [
+     "Vitaliy Kim",
+     "Young-Eun Kim",
+     "Seong-Whan Lee"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.31219/osf.io/ku6e2",
+    "type": "posted-content",
+    "title": "Occlusion-Robust Online Multi-Object Visual Tracking using a GM-PHD Filter with CNN-Based Re-Identification",
+    "authors": [
+     "Nathanael L. Baisa"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2022,
+    "publisher": "Center for Open Science",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/fskd.2015.7382068",
+    "type": "proceedings-article",
+    "title": "Robust object tracking using color and depth images with a depth based occlusion handling and recovery",
+    "authors": [
+     "Ping Ding",
+     "Yan Song"
+    ],
+    "container": "2015 12th International Conference on Fuzzy Systems and Knowledge Discovery (FSKD)",
+    "volume": null,
+    "issue": null,
+    "pages": "930-935",
+    "year": 2015,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2015 12th International Conference on Fuzzy Systems and Knowledge Discovery (FSKD)"
+   },
+   {
+    "doi": "10.2139/ssrn.5436573",
+    "type": "posted-content",
+    "title": "Occlusion-Robust Multi-Object Tracking against viewpoint changing for UAV",
+    "authors": [
+     "Yue Zhai",
+     "Ding Lu",
+     "Jianjun Li",
+     "Yong Wang"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/tce.2025.3541839",
+   "type": "journal-article",
+   "title": "PD-SORT: Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth Cues",
+   "authors": [
+    "Yanchao Wang",
+    "Dawei Zhang",
+    "Run Li",
+    "Zhonglong Zheng",
+    "Minglu Li"
+   ],
+   "container": "IEEE Transactions on Consumer Electronics",
+   "volume": "71",
+   "issue": "1",
+   "pages": "165-177",
+   "year": 2025,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "yang2024hybridsort",
+  "query_title": "Hybrid-SORT: Weak Cues Matter for Online Multi-Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.1609/aaai.v38i7.28471",
+    "type": "journal-article",
+    "title": "Hybrid-SORT: Weak Cues Matter for Online Multi-Object Tracking",
+    "authors": [
+     "Mingzhan Yang",
+     "Guangxin Han",
+     "Bin Yan",
+     "Wenhua Zhang",
+     "Jinqing Qi",
+     "Huchuan Lu",
+     "Dong Wang"
+    ],
+    "container": "Proceedings of the AAAI Conference on Artificial Intelligence",
+    "volume": "38",
+    "issue": "7",
+    "pages": "6504-6512",
+    "year": 2024,
+    "publisher": "Association for the Advancement of Artificial Intelligence (AAAI)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1007/s11227-025-07730-9",
+    "type": "journal-article",
+    "title": "Multi-cue SORT: integrating weak cues with appearance and motion for multi-object tracking",
+    "authors": [
+     "Hong Liang",
+     "Mingchen Xu",
+     "Qian Zhang",
+     "Mingwen Shao"
+    ],
+    "container": "The Journal of Supercomputing",
+    "volume": "81",
+    "issue": "13",
+    "pages": null,
+    "year": 2025,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": "1251",
+    "event": null
+   },
+   {
+    "doi": "10.1109/ijcnn64981.2025.11229397",
+    "type": "proceedings-article",
+    "title": "Multi-Object Pedestrian Tracking Based on YOLO-RED and Hybrid-SORT",
+    "authors": [
+     "Kai Wang",
+     "Jian Wang",
+     "Huawei Liang"
+    ],
+    "container": "2025 International Joint Conference on Neural Networks (IJCNN)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-8",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 International Joint Conference on Neural Networks (IJCNN)"
+   },
+   {
+    "doi": "10.1007/s10489-024-06037-1",
+    "type": "journal-article",
+    "title": "BAM-SORT: border-guided activated matching for online multi-object tracking",
+    "authors": [
+     "Yuan Chao",
+     "Huaiyang Zhu",
+     "Hengyu Lu"
+    ],
+    "container": "Applied Intelligence",
+    "volume": "55",
+    "issue": "5",
+    "pages": null,
+    "year": 2025,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": "351",
+    "event": null
+   },
+   {
+    "doi": "10.1109/tce.2025.3541839",
+    "type": "journal-article",
+    "title": "PD-SORT: Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth Cues",
+    "authors": [
+     "Yanchao Wang",
+     "Dawei Zhang",
+     "Run Li",
+     "Zhonglong Zheng",
+     "Minglu Li"
+    ],
+    "container": "IEEE Transactions on Consumer Electronics",
+    "volume": "71",
+    "issue": "1",
+    "pages": "165-177",
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1609/aaai.v38i7.28471",
+   "type": "journal-article",
+   "title": "Hybrid-SORT: Weak Cues Matter for Online Multi-Object Tracking",
+   "authors": [
+    "Mingzhan Yang",
+    "Guangxin Han",
+    "Bin Yan",
+    "Wenhua Zhang",
+    "Jinqing Qi",
+    "Huchuan Lu",
+    "Dong Wang"
+   ],
+   "container": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "volume": "38",
+   "issue": "7",
+   "pages": "6504-6512",
+   "year": 2024,
+   "publisher": "Association for the Advancement of Artificial Intelligence (AAAI)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "miah2025twix",
+  "query_title": "Learning data association for multi-object tracking using only coordinates",
+  "crossref": {
+   "doi": "10.1016/j.patcog.2024.111169",
+   "type": "journal-article",
+   "title": "Learning data association for multi-object tracking using only coordinates",
+   "authors": [
+    "Mehdi Miah",
+    "Guillaume-Alexandre Bilodeau",
+    "Nicolas Saunier"
+   ],
+   "container": "Pattern Recognition",
+   "volume": "160",
+   "issue": null,
+   "pages": "111169",
+   "year": 2025,
+   "publisher": "Elsevier BV",
+   "article_number": "111169",
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "cao2025topictrack",
+  "query_title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking Under Complex Motions and Diverse Scenes",
+  "candidates": [
+   {
+    "doi": "10.1109/tip.2025.3526066/mm1",
+    "type": "component",
+    "title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking under Complex Motions and Diverse Scenes_supp1-3526066.pdf",
+    "authors": [
+     "Shihui Guo"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tip.2025.3526066",
+    "type": "journal-article",
+    "title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking Under Complex Motions and Diverse Scenes",
+    "authors": [
+     "Xiaoyan Cao",
+     "Yiyao Zheng",
+     "Yao Yao",
+     "Huapeng Qin",
+     "Xiaoyu Cao",
+     "Shihui Guo"
+    ],
+    "container": "IEEE Transactions on Image Processing",
+    "volume": "34",
+    "issue": null,
+    "pages": "743-758",
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.36227/techrxiv.24071700.v1",
+    "type": "posted-content",
+    "title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking under Complex Motions and Diverse Scenes",
+    "authors": [
+     "Xiaoyan Cao",
+     "Yiyao Zheng",
+     "Yao Yao",
+     "Huapeng Qin",
+     "Xiaoyu Cao",
+     "Shihui Guo"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.36227/techrxiv.24071700",
+    "type": "posted-content",
+    "title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking under Complex Motions and Diverse Scenes",
+    "authors": [
+     "Xiaoyan Cao",
+     "Yiyao Zheng",
+     "Yao Yao",
+     "Huapeng Qin",
+     "Xiaoyu Cao",
+     "Shihui Guo"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.17760/d20741532",
+    "type": "dissertation",
+    "title": "Multi-object tracking in complex scenes: extending human perception",
+    "authors": [
+     "Bishoy Galoaa"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Northeastern University Library",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/tip.2025.3526066",
+   "type": "journal-article",
+   "title": "TOPIC: A Parallel Association Paradigm for Multi-Object Tracking Under Complex Motions and Diverse Scenes",
+   "authors": [
+    "Xiaoyan Cao",
+    "Yiyao Zheng",
+    "Yao Yao",
+    "Huapeng Qin",
+    "Xiaoyu Cao",
+    "Shihui Guo"
+   ],
+   "container": "IEEE Transactions on Image Processing",
+   "volume": "34",
+   "issue": null,
+   "pages": "743-758",
+   "year": 2025,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "shim2025tracktrack",
+  "query_title": "Focusing on Tracks for Online Multi-Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.1109/cvpr52734.2025.01091",
+    "type": "proceedings-article",
+    "title": "Focusing on Tracks for Online Multi-Object Tracking",
+    "authors": [
+     "Kyujin Shim",
+     "Kangwook Ko",
+     "Yujin Yang",
+     "Changick Kim"
+    ],
+    "container": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "volume": null,
+    "issue": null,
+    "pages": "11687-11696",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+   },
+   {
+    "doi": "10.14711/thesis-991013114652703412",
+    "type": "dissertation",
+    "title": "Towards robust online multi-object tracking",
+    "authors": [
+     "Jeongseok Hyun"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "The Hong Kong University of Science and Technology Library",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/access.2024.3394534/mm1",
+    "type": "component",
+    "title": "An effective method for semi-online multi-object tracking refinement_supp1-3394534.pdf",
+    "authors": [
+     "MENGJIAO WANG"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/mot.2001.937981",
+    "type": "proceedings-article",
+    "title": "Engineering statistics for multi-object tracking",
+    "authors": [
+     "R. Mahler"
+    ],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "53-60",
+    "year": null,
+    "publisher": "IEEE Comput. Soc",
+    "article_number": null,
+    "event": "2001 IEEE Workshop on Multi-Object Tracking"
+   },
+   {
+    "doi": "10.1109/mot.2001.937974",
+    "type": "proceedings-article",
+    "title": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "authors": [],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "i",
+    "year": 2001,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking"
+   }
+  ],
+  "best": {
+   "doi": "10.1109/cvpr52734.2025.01091",
+   "type": "proceedings-article",
+   "title": "Focusing on Tracks for Online Multi-Object Tracking",
+   "authors": [
+    "Kyujin Shim",
+    "Kangwook Ko",
+    "Yujin Yang",
+    "Changick Kim"
+   ],
+   "container": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "11687-11696",
+   "year": 2025,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "aharon2022botsort",
+  "query_title": "BoT-SORT: Robust Associations Multi-Pedestrian Tracking",
+  "candidates": [
+   {
+    "doi": "10.1117/12.2684256",
+    "type": "proceedings-article",
+    "title": "Pedestrian multi-object tracking based on YOLOv7 and BoT-SORT",
+    "authors": [
+     "Tingting Li",
+     "Zhanbo Li",
+     "Yuhong Mu",
+     "Jie Su"
+    ],
+    "container": "Third International Conference on Computer Vision and Pattern Analysis (ICCPA 2023)",
+    "volume": null,
+    "issue": null,
+    "pages": "68",
+    "year": 2023,
+    "publisher": "SPIE",
+    "article_number": null,
+    "event": "2023 3rd International Conference on Computer Vision and Pattern Analysis (ICCPA 2023)"
+   },
+   {
+    "doi": "10.3390/s23208439",
+    "type": "journal-article",
+    "title": "Multi-Object Pedestrian Tracking Using Improved YOLOv8 and OC-SORT",
+    "authors": [
+     "Xin Xiao",
+     "Xinlong Feng"
+    ],
+    "container": "Sensors",
+    "volume": "23",
+    "issue": "20",
+    "pages": "8439",
+    "year": 2023,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.4838053",
+    "type": "posted-content",
+    "title": "Finite Memory Observation-Centric Sort for Occlusion-Robust Multi-Object Tracking",
+    "authors": [
+     "Vitaliy Kim",
+     "Young-Eun Kim",
+     "Seong-Whan Lee"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/ijcnn64981.2025.11229397",
+    "type": "proceedings-article",
+    "title": "Multi-Object Pedestrian Tracking Based on YOLO-RED and Hybrid-SORT",
+    "authors": [
+     "Kai Wang",
+     "Jian Wang",
+     "Huawei Liang"
+    ],
+    "container": "2025 International Joint Conference on Neural Networks (IJCNN)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-8",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 International Joint Conference on Neural Networks (IJCNN)"
+   },
+   {
+    "doi": "10.1145/3724979.3725061",
+    "type": "proceedings-article",
+    "title": "KAD-SORT: Multi-target tracking algorithm for autonomous driving scenarios based on BoT-SORT",
+    "authors": [
+     "Sheng Gao",
+     "Shixian Wang",
+     "Zhijia Zhang"
+    ],
+    "container": "Proceedings of the 2025 5th International Conference on Bioinformatics and Intelligent Computing",
+    "volume": null,
+    "issue": null,
+    "pages": "523-528",
+    "year": 2025,
+    "publisher": "ACM",
+    "article_number": null,
+    "event": "BIC 2025: 2025 5th International Conference on Bioinformatics and Intelligent Computing"
+   }
+  ],
+  "best": {
+   "doi": "10.2139/ssrn.4838053",
+   "type": "posted-content",
+   "title": "Finite Memory Observation-Centric Sort for Occlusion-Robust Multi-Object Tracking",
+   "authors": [
+    "Vitaliy Kim",
+    "Young-Eun Kim",
+    "Seong-Whan Lee"
+   ],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": 2024,
+   "publisher": "Elsevier BV",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.47692307692307695,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2206.14651",
+   "title": "BoT-SORT: Robust Associations Multi-Pedestrian Tracking",
+   "authors": [
+    "Nir Aharon",
+    "Roy Orfaig",
+    "Ben-Zion Bobrovsky"
+   ],
+   "published": "2022-06-29T13:45:03Z"
+  }
+ },
+ {
+  "key": "ge2021yolox",
+  "query_title": "YOLOX: Exceeding YOLO Series in 2021",
+  "candidates": [
+   {
+    "doi": "10.1088/1742-6596/2405/1/012015",
+    "type": "journal-article",
+    "title": "YOLO-infrared: Enhancing YOLOX for Infrared Scene",
+    "authors": [
+     "Yao Zhang",
+     "Ke Jiong Shen",
+     "Zhen Fang He",
+     "Zhi Song Pan"
+    ],
+    "container": "Journal of Physics: Conference Series",
+    "volume": "2405",
+    "issue": "1",
+    "pages": "012015",
+    "year": 2022,
+    "publisher": "IOP Publishing",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.20944/preprints202212.0049.v2",
+    "type": "posted-content",
+    "title": "TransLearn-YOLOx: Improved-YOLO with Transfer Learning for Fast and Accurate Multiclass UAV Detection",
+    "authors": [
+     "Misha Urooj Khan",
+     "Mahnoor Dil",
+     "Maham Misbah",
+     "Farooq Alam Orakzai",
+     "Muhammad Zeshan Alam",
+     "Zeeshan Kaleem"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerj-cs.3151/fig-13",
+    "type": "component",
+    "title": "Figure 13: Heatmap comparing Sec-YOLO with the YOLO series.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1145/3584376.3584524",
+    "type": "proceedings-article",
+    "title": "AC-YOLO: A Safety Helmet Detection based on YOLOX",
+    "authors": [
+     "Yusong Lin",
+     "Mengdi Liu",
+     "Cong Yang",
+     "Shuang Li",
+     "Weixing Zhang"
+    ],
+    "container": "Proceedings of the 2022 4th International Conference on Robotics, Intelligent Control and Artificial Intelligence",
+    "volume": null,
+    "issue": null,
+    "pages": "827-832",
+    "year": 2022,
+    "publisher": "ACM",
+    "article_number": null,
+    "event": "RICAI 2022: 2022 4th International Conference on Robotics, Intelligent Control and Artificial Intelligence"
+   },
+   {
+    "doi": "10.1088/1742-6596/1883/1/012094",
+    "type": "journal-article",
+    "title": "M-YOLO: A Nighttime Vehicle Detection Method Combining Mobilenet v2 and YOLO v3",
+    "authors": [
+     "Shan Huang",
+     "Ye He",
+     "Xiao-an Chen"
+    ],
+    "container": "Journal of Physics: Conference Series",
+    "volume": "1883",
+    "issue": "1",
+    "pages": "012094",
+    "year": 2021,
+    "publisher": "IOP Publishing",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1088/1742-6596/2405/1/012015",
+   "type": "journal-article",
+   "title": "YOLO-infrared: Enhancing YOLOX for Infrared Scene",
+   "authors": [
+    "Yao Zhang",
+    "Ke Jiong Shen",
+    "Zhen Fang He",
+    "Zhi Song Pan"
+   ],
+   "container": "Journal of Physics: Conference Series",
+   "volume": "2405",
+   "issue": "1",
+   "pages": "012015",
+   "year": 2022,
+   "publisher": "IOP Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.5121951219512195,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2107.08430",
+   "title": "YOLOX: Exceeding YOLO Series in 2021",
+   "authors": [
+    "Zheng Ge",
+    "Songtao Liu",
+    "Feng Wang",
+    "Zeming Li",
+    "Jian Sun"
+   ],
+   "published": "2021-07-18T12:55:11Z"
+  }
+ },
+ {
+  "key": "zhao2024rtdetr",
+  "query_title": "DETRs Beat YOLOs on Real-time Object Detection",
+  "candidates": [
+   {
+    "doi": "10.1109/cvpr52733.2024.01605",
+    "type": "proceedings-article",
+    "title": "DETRs Beat YOLOs on Real-time Object Detection",
+    "authors": [
+     "Yian Zhao",
+     "Wenyu Lv",
+     "Shangliang Xu",
+     "Jinman Wei",
+     "Guanzhong Wang",
+     "Qingqing Dang",
+     "Yi Liu",
+     "Jie Chen"
+    ],
+    "container": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "volume": null,
+    "issue": null,
+    "pages": "16965-16974",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+   },
+   {
+    "doi": "10.3390/app10020612",
+    "type": "journal-article",
+    "title": "Exploring a Multimodal Mixture-Of-YOLOs Framework for Advanced Real-Time Object Detection",
+    "authors": [
+     "Jinsoo Kim",
+     "Jeongho Cho"
+    ],
+    "container": "Applied Sciences",
+    "volume": "10",
+    "issue": "2",
+    "pages": "612",
+    "year": 2020,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1002/rob.70001",
+    "type": "journal-article",
+    "title": "FCN\u2010YOLOS: An Effective Deep\u2010Learning Model for Real\u2010Time Object Detection",
+    "authors": [
+     "Shraddha Subhash More",
+     "Rajesh Bansode"
+    ],
+    "container": "Journal of Field Robotics",
+    "volume": "42",
+    "issue": "8",
+    "pages": "4053-4074",
+    "year": 2025,
+    "publisher": "Wiley",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.5220/0010267902120222",
+    "type": "proceedings-article",
+    "title": "Automatic Real-time Beat-to-beat Detection of Arrhythmia Conditions",
+    "authors": [
+     "Giovanni Rosa",
+     "Gennaro Laudato",
+     "Angela Colavita",
+     "Simone Scalabrino",
+     "Rocco Oliveto"
+    ],
+    "container": "Proceedings of the 14th International Joint Conference on Biomedical Engineering Systems and Technologies",
+    "volume": null,
+    "issue": null,
+    "pages": "212-222",
+    "year": 2021,
+    "publisher": "SCITEPRESS - Science and Technology Publications",
+    "article_number": null,
+    "event": "14th International Conference on Health Informatics"
+   },
+   {
+    "doi": "10.1007/s11554-026-01977-y",
+    "type": "journal-article",
+    "title": "LSO-YOLO: a lightweight real-time object detection network for UAV small-object detection",
+    "authors": [
+     "Pengfei Dai",
+     "Liang Chen",
+     "Yangwu Lian",
+     "Le Xie"
+    ],
+    "container": "Journal of Real-Time Image Processing",
+    "volume": "23",
+    "issue": "5",
+    "pages": null,
+    "year": 2026,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": "176",
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/cvpr52733.2024.01605",
+   "type": "proceedings-article",
+   "title": "DETRs Beat YOLOs on Real-time Object Detection",
+   "authors": [
+    "Yian Zhao",
+    "Wenyu Lv",
+    "Shangliang Xu",
+    "Jinman Wei",
+    "Guanzhong Wang",
+    "Qingqing Dang",
+    "Yi Liu",
+    "Jie Chen"
+   ],
+   "container": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "16965-16974",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "ren2017fasterrcnn",
+  "query_title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks",
+  "crossref": {
+   "doi": "10.1109/tpami.2016.2577031",
+   "type": "journal-article",
+   "title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks",
+   "authors": [
+    "Shaoqing Ren",
+    "Kaiming He",
+    "Ross Girshick",
+    "Jian Sun"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": "39",
+   "issue": "6",
+   "pages": "1137-1149",
+   "year": 2017,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "otsu1979",
+  "query_title": "A Threshold Selection Method from Gray-Level Histograms",
+  "crossref": {
+   "doi": "10.1109/tsmc.1979.4310076",
+   "type": "journal-article",
+   "title": "A Threshold Selection Method from Gray-Level Histograms",
+   "authors": [
+    "Nobuyuki Otsu"
+   ],
+   "container": "IEEE Transactions on Systems, Man, and Cybernetics",
+   "volume": "9",
+   "issue": "1",
+   "pages": "62-66",
+   "year": 1979,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "geiger2012kitti",
+  "query_title": "Are we ready for autonomous driving? The KITTI vision benchmark suite",
+  "crossref": {
+   "doi": "10.1109/cvpr.2012.6248074",
+   "type": "proceedings-article",
+   "title": "Are we ready for autonomous driving? The KITTI vision benchmark suite",
+   "authors": [
+    "A. Geiger",
+    "P. Lenz",
+    "R. Urtasun"
+   ],
+   "container": "2012 IEEE Conference on Computer Vision and Pattern Recognition",
+   "volume": null,
+   "issue": null,
+   "pages": "3354-3361",
+   "year": 2012,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2012 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "sun2022dancetrack",
+  "query_title": "DanceTrack: Multi-Object Tracking in Uniform Appearance and Diverse Motion",
+  "crossref": {
+   "doi": "10.1109/cvpr52688.2022.02032",
+   "type": "proceedings-article",
+   "title": "DanceTrack: Multi-Object Tracking in Uniform Appearance and Diverse Motion",
+   "authors": [
+    "Peize Sun",
+    "Jinkun Cao",
+    "Yi Jiang",
+    "Zehuan Yuan",
+    "Song Bai",
+    "Kris Kitani",
+    "Ping Luo"
+   ],
+   "container": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "20961-20970",
+   "year": 2022,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "milan2016mot16",
+  "query_title": "MOT16: A Benchmark for Multi-Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.70675/50050937zc83ez41f0zaabdze5339cbde4bf",
+    "type": "dissertation",
+    "title": "Multi-object tracking in complex scenarios : benchmark, in-depth analysis, and pair-dependent representations for visual similarity",
+    "authors": [
+     "Anis Yassine Ben Mabrouk"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Agence Bibliographique de l'Enseignement Sup\u00e9rieur",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.4500700",
+    "type": "posted-content",
+    "title": "Pigtrack: A Novel Benchmark for Multi Object Tracking",
+    "authors": [
+     "Guokun Cao",
+     "Daowan Peng",
+     "Wei Wei",
+     "Xian-Ling Mao",
+     "Yuanyuan Fu",
+     "Dangyang Chen"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.52202/079017-0474",
+    "type": "proceedings-article",
+    "title": "OVT-B: A New Large-Scale Benchmark for Open-Vocabulary Multi-Object Tracking",
+    "authors": [
+     "Haiji Liang",
+     "Ruize Han"
+    ],
+    "container": "Advances in Neural Information Processing Systems 37",
+    "volume": null,
+    "issue": null,
+    "pages": "14849-14863",
+    "year": 2024,
+    "publisher": "Neural Information Processing Systems Foundation, Inc. (NeurIPS)",
+    "article_number": null,
+    "event": "Advances in Neural Information Processing Systems 37"
+   },
+   {
+    "doi": "10.1109/mot.2001.937981",
+    "type": "proceedings-article",
+    "title": "Engineering statistics for multi-object tracking",
+    "authors": [
+     "R. Mahler"
+    ],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "53-60",
+    "year": null,
+    "publisher": "IEEE Comput. Soc",
+    "article_number": null,
+    "event": "2001 IEEE Workshop on Multi-Object Tracking"
+   },
+   {
+    "doi": "10.1109/mot.2001.937974",
+    "type": "proceedings-article",
+    "title": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "authors": [],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "i",
+    "year": 2001,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking"
+   }
+  ],
+  "best": {
+   "doi": "10.2139/ssrn.4500700",
+   "type": "posted-content",
+   "title": "Pigtrack: A Novel Benchmark for Multi Object Tracking",
+   "authors": [
+    "Guokun Cao",
+    "Daowan Peng",
+    "Wei Wei",
+    "Xian-Ling Mao",
+    "Yuanyuan Fu",
+    "Dangyang Chen"
+   ],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": 2023,
+   "publisher": "Elsevier BV",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.8085106382978723,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "1603.00831",
+   "title": "MOT16: A Benchmark for Multi-Object Tracking",
+   "authors": [
+    "Anton Milan",
+    "Laura Leal-Taixe",
+    "Ian Reid",
+    "Stefan Roth",
+    "Konrad Schindler"
+   ],
+   "published": "2016-03-02T19:07:56Z"
+  }
+ },
+ {
+  "key": "maggiolino2023deepocsort",
+  "query_title": "Deep OC-Sort: Multi-Pedestrian Tracking by Adaptive Re-Identification",
+  "crossref": {
+   "doi": "10.1109/icip49359.2023.10222576",
+   "type": "proceedings-article",
+   "title": "Deep OC-Sort: Multi-Pedestrian Tracking by Adaptive Re-Identification",
+   "authors": [
+    "Gerard Maggiolino",
+    "Adnan Ahmad",
+    "Jinkun Cao",
+    "Kris Kitani"
+   ],
+   "container": "2023 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "3025-3029",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "du2023strongsort",
+  "query_title": "StrongSORT: Make DeepSORT Great Again",
+  "crossref": {
+   "doi": "10.1109/tmm.2023.3240881",
+   "type": "journal-article",
+   "title": "StrongSORT: Make DeepSORT Great Again",
+   "authors": [
+    "Yunhao Du",
+    "Zhicheng Zhao",
+    "Yang Song",
+    "Yanyun Zhao",
+    "Fei Su",
+    "Tao Gong",
+    "Hongying Meng"
+   ],
+   "container": "IEEE Transactions on Multimedia",
+   "volume": "25",
+   "issue": null,
+   "pages": "8725-8737",
+   "year": 2023,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "guo2017calibration",
+  "query_title": "On Calibration of Modern Neural Networks",
+  "candidates": [
+   {
+    "doi": "10.1016/j.neunet.2025.108172",
+    "type": "journal-article",
+    "title": "Newton\u2013Puiseux analysis for interpretability and calibration of complex-valued neural networks",
+    "authors": [
+     "Piotr Migus"
+    ],
+    "container": "Neural Networks",
+    "volume": "195",
+    "issue": null,
+    "pages": "108172",
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": "108172",
+    "event": null
+   },
+   {
+    "doi": "10.1109/ijcnn.1989.118324",
+    "type": "proceedings-article",
+    "title": "Sensor calibration using artificial neural networks",
+    "authors": [
+     "Masory",
+     "Aguirre"
+    ],
+    "container": "International Joint Conference on Neural Networks",
+    "volume": null,
+    "issue": null,
+    "pages": "577 vol.2",
+    "year": 1989,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "International Joint Conference on Neural Networks"
+   },
+   {
+    "doi": "10.1049/cp:19970730",
+    "type": "proceedings-article",
+    "title": "Validation of neural networks in automotive engine calibration",
+    "authors": [
+     "D. Lowe"
+    ],
+    "container": "Fifth International Conference on Artificial Neural Networks",
+    "volume": "1997",
+    "issue": null,
+    "pages": "221-226",
+    "year": 1997,
+    "publisher": "IEE",
+    "article_number": null,
+    "event": "Fifth International Conference on Artificial Neural Networks"
+   },
+   {
+    "doi": "10.2139/ssrn.3798513",
+    "type": "posted-content",
+    "title": "FX Volatility Calibration Using Artificial Neural Networks",
+    "authors": [
+     "Alex Winter"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2021,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1021/acs.analchem.0c01863.s001",
+    "type": "component",
+    "title": "Sensitivity for Multivariate Calibration Based on Multilayer Perceptron Artificial Neural Networks",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "American Chemical Society (ACS)",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/ijcnn.1989.118324",
+   "type": "proceedings-article",
+   "title": "Sensor calibration using artificial neural networks",
+   "authors": [
+    "Masory",
+    "Aguirre"
+   ],
+   "container": "International Joint Conference on Neural Networks",
+   "volume": null,
+   "issue": null,
+   "pages": "577 vol.2",
+   "year": 1989,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "International Joint Conference on Neural Networks"
+  },
+  "title_similarity": 0.6813186813186813,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "kuppers2020detcalib",
+  "query_title": "Multivariate Confidence Calibration for Object Detection",
+  "crossref": {
+   "doi": "10.1109/cvprw50498.2020.00171",
+   "type": "proceedings-article",
+   "title": "Multivariate Confidence Calibration for Object Detection",
+   "authors": [
+    "Fabian Kuppers",
+    "Jan Kronenberger",
+    "Amirhossein Shantia",
+    "Anselm Haselhoff"
+   ],
+   "container": "2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)",
+   "volume": null,
+   "issue": null,
+   "pages": "1322-1330",
+   "year": 2020,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "zeng2022motr",
+  "query_title": "MOTR: End-to-End Multiple-Object Tracking with Transformer",
+  "crossref": {
+   "doi": "10.1007/978-3-031-19812-0_38",
+   "type": "book-chapter",
+   "title": "MOTR: End-to-End Multiple-Object Tracking with\u00a0Transformer",
+   "authors": [
+    "Fangao Zeng",
+    "Bin Dong",
+    "Yuang Zhang",
+    "Tiancai Wang",
+    "Xiangyu Zhang",
+    "Yichen Wei"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "659-675",
+   "year": 2022,
+   "publisher": "Springer Nature Switzerland",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.9906542056074766,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "gao2025motip",
+  "query_title": "Multiple Object Tracking as ID Prediction",
+  "candidates": [
+   {
+    "doi": "10.1109/cvpr52734.2025.02596",
+    "type": "proceedings-article",
+    "title": "Multiple Object Tracking as ID Prediction",
+    "authors": [
+     "Ruopeng Gao",
+     "Ji Qi",
+     "Limin Wang"
+    ],
+    "container": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "volume": null,
+    "issue": null,
+    "pages": "27883-27893",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+   },
+   {
+    "doi": "10.1037/e520562012-077",
+    "type": "dataset",
+    "title": "Do distractors disrupt prediction in multiple object tracking?",
+    "authors": [
+     "Todd S. Horowitz",
+     "Michael A. Cohen"
+    ],
+    "container": "PsycEXTRA Dataset",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2009,
+    "publisher": "American Psychological Association (APA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/iceccme62383.2024.10796883",
+    "type": "proceedings-article",
+    "title": "Efficient CNN-based Object ID Association Model for Multiple Object Tracking",
+    "authors": [
+     "Parisa Danesh",
+     "Ehsan Amini",
+     "Huseyin Kusetogullari"
+    ],
+    "container": "2024 4th International Conference on Electrical, Computer, Communications and Mechatronics Engineering (ICECCME)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-6",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 4th International Conference on Electrical, Computer, Communications and Mechatronics Engineering (ICECCME)"
+   },
+   {
+    "doi": "10.1017/cbo9780511975837.006",
+    "type": "book-chapter",
+    "title": "Single- and multiple-object tracking in clutter: object-existence-based approach",
+    "authors": [],
+    "container": "Fundamentals of Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "133-222",
+    "year": 2011,
+    "publisher": "Cambridge University Press",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1017/cbo9780511975837.007",
+    "type": "book-chapter",
+    "title": "Multiple-object tracking in clutter: random-set-based approach",
+    "authors": [],
+    "container": "Fundamentals of Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "223-264",
+    "year": 2011,
+    "publisher": "Cambridge University Press",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/cvpr52734.2025.02596",
+   "type": "proceedings-article",
+   "title": "Multiple Object Tracking as ID Prediction",
+   "authors": [
+    "Ruopeng Gao",
+    "Ji Qi",
+    "Limin Wang"
+   ],
+   "container": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "27883-27893",
+   "year": 2025,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "wang2021tent",
+  "query_title": "Tent: Fully Test-Time Adaptation by Entropy Minimization",
+  "candidates": [
+   {
+    "doi": "10.21437/interspeech.2023-1282",
+    "type": "proceedings-article",
+    "title": "SGEM: Test-Time Adaptation for Automatic Speech Recognition via Sequential-Level Generalized Entropy Minimization",
+    "authors": [
+     "Changhun Kim",
+     "Joonhyung Park",
+     "Hajin Shim",
+     "Eunho Yang"
+    ],
+    "container": "INTERSPEECH 2023",
+    "volume": null,
+    "issue": null,
+    "pages": "3367-3371",
+    "year": 2023,
+    "publisher": "ISCA",
+    "article_number": null,
+    "event": "INTERSPEECH 2023"
+   },
+   {
+    "doi": "10.1109/icip46576.2022.9897419",
+    "type": "proceedings-article",
+    "title": "Multi-Step Test-Time Adaptation with Entropy Minimization and Pseudo-Labeling",
+    "authors": [
+     "Hiroaki Kingetsu",
+     "Kenichi Kobayashi",
+     "Yoshihiro Okawa",
+     "Yasuto Yokota",
+     "Katsuhito Nakazawa"
+    ],
+    "container": "2022 IEEE International Conference on Image Processing (ICIP)",
+    "volume": null,
+    "issue": null,
+    "pages": "4153-4157",
+    "year": 2022,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2022 IEEE International Conference on Image Processing (ICIP)"
+   },
+   {
+    "doi": "10.1145/3637528.3671672",
+    "type": "proceedings-article",
+    "title": "Towards Test Time Adaptation via Calibrated Entropy Minimization",
+    "authors": [
+     "Hao Yang",
+     "Min Wang",
+     "Jinshen Jiang",
+     "Yun Zhou"
+    ],
+    "container": "Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+    "volume": null,
+    "issue": null,
+    "pages": "3736-3746",
+    "year": 2024,
+    "publisher": "ACM",
+    "article_number": null,
+    "event": "KDD '24: The 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining"
+   },
+   {
+    "doi": "10.1109/tpami.2026.3721895/mm1",
+    "type": "component",
+    "title": "Adapt in the Wild: Test-Time Entropy Minimization with Sharpness and Feature Regularization_supp1-3721895.pdf",
+    "authors": [
+     "Shuaicheng Niu"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/iccv51070.2023.01501",
+    "type": "proceedings-article",
+    "title": "Towards Open-Set Test-Time Adaptation Utilizing the Wisdom of Crowds in Entropy Minimization",
+    "authors": [
+     "Jungsoo Lee",
+     "Debasmit Das",
+     "Jaegul Choo",
+     "Sungha Choi"
+    ],
+    "container": "2023 IEEE/CVF International Conference on Computer Vision (ICCV)",
+    "volume": null,
+    "issue": null,
+    "pages": "16334-16334",
+    "year": 2023,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2023 IEEE/CVF International Conference on Computer Vision (ICCV)"
+   }
+  ],
+  "best": {
+   "doi": "10.1145/3637528.3671672",
+   "type": "proceedings-article",
+   "title": "Towards Test Time Adaptation via Calibrated Entropy Minimization",
+   "authors": [
+    "Hao Yang",
+    "Min Wang",
+    "Jinshen Jiang",
+    "Yun Zhou"
+   ],
+   "container": "Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+   "volume": null,
+   "issue": null,
+   "pages": "3736-3746",
+   "year": 2024,
+   "publisher": "ACM",
+   "article_number": null,
+   "event": "KDD '24: The 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining"
+  },
+  "title_similarity": 0.7457627118644068,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "zhang2021fairmot",
+  "query_title": "FairMOT: On the Fairness of Detection and Re-identification in Multiple Object Tracking",
+  "crossref": {
+   "doi": "10.1007/s11263-021-01513-4",
+   "type": "journal-article",
+   "title": "FairMOT: On the Fairness of Detection and Re-identification in Multiple Object Tracking",
+   "authors": [
+    "Yifu Zhang",
+    "Chunyu Wang",
+    "Xinggang Wang",
+    "Wenjun Zeng",
+    "Wenyu Liu"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "129",
+   "issue": "11",
+   "pages": "3069-3087",
+   "year": 2021,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "redmon2016yolo",
+  "query_title": "You Only Look Once: Unified, Real-Time Object Detection",
+  "crossref": {
+   "doi": "10.1109/cvpr.2016.91",
+   "type": "proceedings-article",
+   "title": "You Only Look Once: Unified, Real-Time Object Detection",
+   "authors": [
+    "Joseph Redmon",
+    "Santosh Divvala",
+    "Ross Girshick",
+    "Ali Farhadi"
+   ],
+   "container": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "779-788",
+   "year": 2016,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "bochinski2017iou",
+  "query_title": "High-Speed tracking-by-detection without using image information",
+  "crossref": {
+   "doi": "10.1109/avss.2017.8078516",
+   "type": "proceedings-article",
+   "title": "High-Speed tracking-by-detection without using image information",
+   "authors": [
+    "Erik Bochinski",
+    "Volker Eiselein",
+    "Thomas Sikora"
+   ],
+   "container": "2017 14th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS)",
+   "volume": null,
+   "issue": null,
+   "pages": "1-6",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 14th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "evangelidis2008ecc",
+  "query_title": "Parametric Image Alignment Using Enhanced Correlation Coefficient Maximization",
+  "crossref": {
+   "doi": "10.1109/tpami.2008.113",
+   "type": "journal-article",
+   "title": "Parametric Image Alignment Using Enhanced Correlation Coefficient Maximization",
+   "authors": [
+    "G.D. Evangelidis",
+    "E.Z. Psarakis"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": "30",
+   "issue": "10",
+   "pages": "1858-1865",
+   "year": 2008,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "reddy1996phasecorr",
+  "query_title": "An FFT-based technique for translation, rotation, and scale-invariant image registration",
+  "crossref": {
+   "doi": "10.1109/83.506761",
+   "type": "journal-article",
+   "title": "An FFT-based technique for translation, rotation, and scale-invariant image registration",
+   "authors": [
+    "B.S. Reddy",
+    "B.N. Chatterji"
+   ],
+   "container": "IEEE Transactions on Image Processing",
+   "volume": "5",
+   "issue": "8",
+   "pages": "1266-1271",
+   "year": 1996,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "lin2017fpn",
+  "query_title": "Feature Pyramid Networks for Object Detection",
+  "crossref": {
+   "doi": "10.1109/cvpr.2017.106",
+   "type": "proceedings-article",
+   "title": "Feature Pyramid Networks for Object Detection",
+   "authors": [
+    "Tsung-Yi Lin",
+    "Piotr Dollar",
+    "Ross Girshick",
+    "Kaiming He",
+    "Bharath Hariharan",
+    "Serge Belongie"
+   ],
+   "container": "2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "936-944",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "carion2020detr",
+  "query_title": "End-to-End Object Detection with Transformers",
+  "crossref": {
+   "doi": "10.1007/978-3-030-58452-8_13",
+   "type": "book-chapter",
+   "title": "End-to-End Object Detection with Transformers",
+   "authors": [
+    "Nicolas Carion",
+    "Francisco Massa",
+    "Gabriel Synnaeve",
+    "Nicolas Usunier",
+    "Alexander Kirillov",
+    "Sergey Zagoruyko"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "213-229",
+   "year": 2020,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "xiao2023uavmotsurvey",
+  "query_title": "UAV-based object tracking survey multi-object tracking unmanned aerial vehicle",
+  "candidates": [
+   {
+    "doi": "10.1109/icassp.2005.1415496",
+    "type": "proceedings-article",
+    "title": "Object Tracking in Unmanned Aerial Vehicle (UAV) Videos Using a Combined Approach",
+    "authors": [
+     "Shuqun Zhang"
+    ],
+    "container": "Proceedings. (ICASSP '05). IEEE International Conference on Acoustics, Speech, and Signal Processing, 2005.",
+    "volume": "2",
+    "issue": null,
+    "pages": "681-684",
+    "year": null,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "(ICASSP '05). IEEE International Conference on Acoustics, Speech, and Signal Processing, 2005."
+   },
+   {
+    "doi": "10.1117/12.3073908",
+    "type": "proceedings-article",
+    "title": "A comprehensive survey on unmanned aerial vehicle-based single object tracking",
+    "authors": [
+     "Bangyin Xiang"
+    ],
+    "container": "Fifth International Conference on Image Processing and Intelligent Control (IPIC 2025)",
+    "volume": null,
+    "issue": null,
+    "pages": "6",
+    "year": 2025,
+    "publisher": "SPIE",
+    "article_number": null,
+    "event": "Fifth International Conference on Image Processing and Intelligent Control"
+   },
+   {
+    "doi": "10.1109/icmla61862.2024.00149",
+    "type": "proceedings-article",
+    "title": "Exploring Machine Learning Engineering for Object Detection and Tracking by Unmanned Aerial Vehicle (UAV)",
+    "authors": [
+     "Aneesha Guna",
+     "Parth Ganeriwala",
+     "Siddhartha Bhattacharyya"
+    ],
+    "container": "2024 International Conference on Machine Learning and Applications (ICMLA)",
+    "volume": null,
+    "issue": null,
+    "pages": "1001-1004",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 International Conference on Machine Learning and Applications (ICMLA)"
+   },
+   {
+    "doi": "10.64820/aepjmldl.22.28.34.122025",
+    "type": "journal-article",
+    "title": "UAV (Unmanned Aerial Vehicle)-based Object Tracking with prototypical networks using Deep Learning",
+    "authors": [
+     "V Tharun",
+     "S Navin",
+     "C Hemanth Varma",
+     "P Visalakshi"
+    ],
+    "container": "Journal of Machine Learning and Deep Learning",
+    "volume": "2",
+    "issue": "2",
+    "pages": "28-34",
+    "year": 2025,
+    "publisher": "Academic Edge Press",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/icusac68314.2025.11414296",
+    "type": "proceedings-article",
+    "title": "A Review of Multi Object Tracking Methods for UAV Aerial Video Based on Deep Learning",
+    "authors": [
+     "Ling Wen",
+     "Caihong Ma",
+     "Shengzhou Ma"
+    ],
+    "container": "2025 2nd International Conference on Unmanned Systems and Automation Control (ICUSAC)",
+    "volume": null,
+    "issue": null,
+    "pages": "117-126",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 2nd International Conference on Unmanned Systems and Automation Control (ICUSAC)"
+   }
+  ],
+  "best": {
+   "doi": "10.1109/icassp.2005.1415496",
+   "type": "proceedings-article",
+   "title": "Object Tracking in Unmanned Aerial Vehicle (UAV) Videos Using a Combined Approach",
+   "authors": [
+    "Shuqun Zhang"
+   ],
+   "container": "Proceedings. (ICASSP '05). IEEE International Conference on Acoustics, Speech, and Signal Processing, 2005.",
+   "volume": "2",
+   "issue": null,
+   "pages": "681-684",
+   "year": null,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "(ICASSP '05). IEEE International Conference on Acoustics, Speech, and Signal Processing, 2005."
+  },
+  "title_similarity": 0.5419354838709678,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "jaisquery_uav_tracking",
+  "query_title": "Journal of Aerospace Information Systems unmanned aerial vehicle object detection tracking onboard",
+  "candidates": [
+   {
+    "doi": "10.2514/1.i010503",
+    "type": "journal-article",
+    "title": "Efficient Feature Descriptor for Unmanned Aerial Vehicle Ground Moving Object Tracking",
+    "authors": [
+     "Alok Desai",
+     "Dah-Jye Lee"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "14",
+    "issue": "6",
+    "pages": "345-350",
+    "year": 2017,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011378",
+    "type": "journal-article",
+    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
+    "authors": [
+     "You-Ru Lu",
+     "Dengfeng Sun"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "21",
+    "issue": "7",
+    "pages": "547-553",
+    "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010345",
+    "type": "journal-article",
+    "title": "Simultaneous Tracking of Multiple Ground Targets from a Multirotor Unmanned Aerial Vehicle",
+    "authors": [
+     "Nathaniel Miller",
+     "Jonathan Rogers"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "12",
+    "issue": "3",
+    "pages": "345-364",
+    "year": 2015,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011037",
+    "type": "journal-article",
+    "title": "Distributed Unmanned Aerial Vehicle Positioning for Multitarget Tracking with Bearing-Only Information",
+    "authors": [
+     "Xiwen Yang",
+     "Shaoming He",
+     "Defu Lin",
+     "Yadong Wang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "19",
+    "issue": "5",
+    "pages": "355-365",
+    "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010900",
+    "type": "journal-article",
+    "title": "Unmanned Aerial Vehicle Mid-Air Collision Detection and Resolution Using Avoidance Maps",
+    "authors": [
+     "Lima Agnel Tony",
+     "Debasish Ghose",
+     "Animesh Chakravarthy"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "8",
+    "pages": "506-529",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010457",
+    "type": "journal-article",
+    "title": "Image Segmentation-Based Unmanned Aerial Vehicle Safe Navigation",
+    "authors": [
+     "Pooja Agrawal",
+     "Ashwini Ratnoo",
+     "Debasish Ghose"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "14",
+    "issue": "7",
+    "pages": "391-410",
+    "year": 2017,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010911",
+    "type": "journal-article",
+    "title": "Detection and Tracking of Aircraft from Small Unmanned Aerial Systems",
+    "authors": [
+     "Chester V. Dolph",
+     "Cyrus Minwalla",
+     "Louis J. Glaab",
+     "Michael J. Logan",
+     "B. Danette Allen",
+     "Khan M. Iftekharuddin"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "11",
+    "pages": "838-851",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010939",
+    "type": "journal-article",
+    "title": "Small Unmanned Aerial Vehicle Flight Planning in Urban Environments",
+    "authors": [
+     "Min Xue",
+     "Melissa Wei"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "10",
+    "pages": "702-710",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010843",
+    "type": "journal-article",
+    "title": "Goal-Aware Robocentric Mapping and Navigation of a Quadrotor Unmanned Aerial Vehicle",
+    "authors": [
+     "Srijanee Biswas",
+     "Rajnikant Sharma"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "8",
+    "pages": "488-505",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011183",
+    "type": "journal-article",
+    "title": "Aerodynamic Parameter Estimation for a Morphing Unmanned Aerial Vehicle from Flight Tests",
+    "authors": [
+     "Zhe Hui",
+     "Gang Chen"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "20",
+    "issue": "9",
+    "pages": "588-595",
+    "year": 2023,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010603",
+    "type": "journal-article",
+    "title": "Rudder-Augmented Trajectory Correction for Small Unmanned Aerial Vehicle to Minimize Lateral Image Errors",
+    "authors": [
+     "Thomas Fisher",
+     "Rajnikant Sharma"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "15",
+    "issue": "9",
+    "pages": "544-552",
+    "year": 2018,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010615",
+    "type": "journal-article",
+    "title": "Airport Detection for Fixed-Wing Unmanned Aerial Vehicle Landing Using a Hierarchical Architecture",
+    "authors": [
+     "Yunqiang Hu",
+     "Yunfeng Cao",
+     "Meng Ding",
+     "Likui Zhuang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "16",
+    "issue": "6",
+    "pages": "214-223",
+    "year": 2019,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010759",
+    "type": "journal-article",
+    "title": "Imitation Learning-Based Unmanned Aerial Vehicle Planning for Multitarget Reconnaissance Under Uncertainty",
+    "authors": [
+     "Uihwan Choi",
+     "Jaemyung Ahn"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "1",
+    "pages": "36-50",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010795",
+    "type": "journal-article",
+    "title": "Failure Analysis for an Unmanned Aerial Vehicle Using Safe Path Planning",
+    "authors": [
+     "Chin E. Lin",
+     "Pei-Chi Shao"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "7",
+    "pages": "358-369",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010797",
+    "type": "journal-article",
+    "title": "Mitigation of Ground Impact Hazard for Safe Unmanned Aerial Vehicle Operations",
+    "authors": [
+     "Andrew Poissant",
+     "Lina Castano",
+     "Huan Xu"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "12",
+    "pages": "647-658",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.2514/1.i011378",
+   "type": "journal-article",
+   "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
+   "authors": [
+    "You-Ru Lu",
+    "Dengfeng Sun"
+   ],
+   "container": "Journal of Aerospace Information Systems",
+   "volume": "21",
+   "issue": "7",
+   "pages": "547-553",
+   "year": 2024,
+   "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.5829145728643216,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "jaisquery_onboard_vision",
+  "query_title": "Journal of Aerospace Information Systems onboard vision real-time embedded",
+  "candidates": [
+   {
+    "doi": "10.2514/1.i010658",
+    "type": "journal-article",
+    "title": "Analysis of Simulated Imagery for Real-Time Vision-Based Automated Aerial Refueling",
+    "authors": [
+     "Christopher Parsons",
+     "Zachary Paulson",
+     "Scott Nykl",
+     "William Dallman",
+     "Brian G. Woolley",
+     "John Pecarina"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "16",
+    "issue": "3",
+    "pages": "77-93",
+    "year": 2019,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011053",
+    "type": "journal-article",
+    "title": "Automated Aerial Docking System Using Onboard Vision-Based Deep Learning",
+    "authors": [
+     "Andrew Jaeyong Choi",
+     "Jeonghwan Park",
+     "Jae-Hung Han"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "19",
+    "issue": "6",
+    "pages": "421-436",
+    "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010028",
+    "type": "journal-article",
+    "title": "Novel Feature Descriptor for Low-Resource Embedded Vision Sensors for Micro Unmanned-Aerial-Vehicle Applications",
+    "authors": [
+     "Spencer G. Fowers",
+     "Dah-Jye Lee",
+     "Dan A. Ventura",
+     "Beau J. Tippetts"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "10",
+    "issue": "8",
+    "pages": "385-395",
+    "year": 2013,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.53403",
+    "type": "journal-article",
+    "title": "Real-Time Millimeter Wave Radar Simulation",
+    "authors": [
+     "Niklas Peinecke",
+     "Hans-Ullrich Doehler",
+     "Bernd R. Korn"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "10",
+    "issue": "7",
+    "pages": "337-347",
+    "year": 2013,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010077",
+    "type": "journal-article",
+    "title": "Effective Real-Time Unmanned Air Vehicle Path Planning in Presence of Threat Netting",
+    "authors": [
+     "Fu Xiaowei",
+     "Gao Xiaoguang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "11",
+    "issue": "4",
+    "pages": "170-177",
+    "year": 2014,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010388",
+    "type": "journal-article",
+    "title": "Real-Time Safety Assessment of Unmanned Aircraft Systems Against Stealthy Cyber Attacks",
+    "authors": [
+     "Cheolhyeon Kwon",
+     "Scott Yantek",
+     "Inseok Hwang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "13",
+    "issue": "1",
+    "pages": "27-45",
+    "year": 2016,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010555",
+    "type": "journal-article",
+    "title": "High-Performance Embedded Computing in Space: Evaluation of Platforms for Vision-Based Navigation",
+    "authors": [
+     "George Lentaris",
+     "Konstantinos Maragos",
+     "Ioannis Stratakos",
+     "Lazaros Papadopoulos",
+     "Odysseas Papanikolaou",
+     "Dimitrios Soudris",
+     "Manolis Lourakis",
+     "Xenophon Zabulis",
+     "David Gonzalez-Arjona",
+     "Gianluca Furano"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "15",
+    "issue": "4",
+    "pages": "178-192",
+    "year": 2018,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010940",
+    "type": "journal-article",
+    "title": "Data-Driven Approach Using Machine Learning for Real-Time Flight Path Optimization",
+    "authors": [
+     "Junghyun Kim",
+     "Cedric Justin",
+     "Dimitri Mavris",
+     "Simon Briceno"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "19",
+    "issue": "1",
+    "pages": "3-21",
+    "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010924",
+    "type": "journal-article",
+    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "authors": [
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "9",
+    "pages": "616-631",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010021",
+    "type": "journal-article",
+    "title": "Real-Time Data Processing for the Airborne Detection of Hot Spots",
+    "authors": [
+     "Esther Salam\u00ed",
+     "Cristina Barrado",
+     "Enric Pastor",
+     "Pablo Royo",
+     "Eduard Santamaria"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "10",
+    "issue": "10",
+    "pages": "444-451",
+    "year": 2013,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011365",
+    "type": "journal-article",
+    "title": "Artificial Intelligence for Real-Time Tolerance to Critical Flight Data Errors in Large Aircraft",
+    "authors": [
+     "Cynthia Koopman",
+     "David Zammit-Mangion"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "21",
+    "issue": "9",
+    "pages": "726-734",
+    "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010876",
+    "type": "journal-article",
+    "title": "Modeling and Validating Launch Vehicle Onboard Software Using the SPIN Model Checker",
+    "authors": [
+     "Ranjani Krishnan",
+     "V. R. Lalithambika"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "12",
+    "pages": "695-699",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011204",
+    "type": "journal-article",
+    "title": "Time Delay Mitigation in Aerial Telerobotic Operations Using Heterogeneous Stereo-Vision Systems",
+    "authors": [
+     "Nazmus Sakib",
+     "Kenneth C. Gahan",
+     "Craig A. Woolsey"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "20",
+    "issue": "9",
+    "pages": "526-545",
+    "year": 2023,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010127",
+    "type": "journal-article",
+    "title": "Scalable Open-Source Architecture for Real-Time Monitoring of Adaptive Wiring Panels",
+    "authors": [
+     "Daniel Llamocca",
+     "Victor Murray",
+     "Yuebing Jiang",
+     "Marios Pattichis",
+     "James Lyke",
+     "Keith Avery"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "11",
+    "issue": "6",
+    "pages": "344-358",
+    "year": 2014,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010924.c1",
+    "type": "journal-article",
+    "title": "Correction: Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "authors": [
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "7",
+    "pages": "AU1-AU1",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.2514/1.i011053",
+   "type": "journal-article",
+   "title": "Automated Aerial Docking System Using Onboard Vision-Based Deep Learning",
+   "authors": [
+    "Andrew Jaeyong Choi",
+    "Jeonghwan Park",
+    "Jae-Hung Han"
+   ],
+   "container": "Journal of Aerospace Information Systems",
+   "volume": "19",
+   "issue": "6",
+   "pages": "421-436",
+   "year": 2022,
+   "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.5138888888888888,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "jaisquery_detection",
+  "query_title": "Journal of Aerospace Information Systems deep learning detection aerial imagery",
+  "candidates": [
+   {
+    "doi": "10.2514/1.i011671",
+    "type": "journal-article",
+    "title": "Deep Learning Approach to Cooperative Localization for Uncrewed Aerial Systems",
+    "authors": [
+     "Michael R. Variny",
+     "Robert J. Geng",
+     "Jay P. Wilhelm"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": null,
+    "issue": null,
+    "pages": "1-8",
+    "year": 2026,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011378",
+    "type": "journal-article",
+    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
+    "authors": [
+     "You-Ru Lu",
+     "Dengfeng Sun"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "21",
+    "issue": "7",
+    "pages": "547-553",
+    "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011053",
+    "type": "journal-article",
+    "title": "Automated Aerial Docking System Using Onboard Vision-Based Deep Learning",
+    "authors": [
+     "Andrew Jaeyong Choi",
+     "Jeonghwan Park",
+     "Jae-Hung Han"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "19",
+    "issue": "6",
+    "pages": "421-436",
+    "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010684",
+    "type": "journal-article",
+    "title": "Deep Learning-Based Opponent Aircraft Attitude Detection in Autonomous Air Combat",
+    "authors": [
+     "Yiqun Dong"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "16",
+    "issue": "4",
+    "pages": "162-167",
+    "year": 2019,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010658",
+    "type": "journal-article",
+    "title": "Analysis of Simulated Imagery for Real-Time Vision-Based Automated Aerial Refueling",
+    "authors": [
+     "Christopher Parsons",
+     "Zachary Paulson",
+     "Scott Nykl",
+     "William Dallman",
+     "Brian G. Woolley",
+     "John Pecarina"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "16",
+    "issue": "3",
+    "pages": "77-93",
+    "year": 2019,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011280",
+    "type": "journal-article",
+    "title": "Anomaly Detection for Agile Satellite Attitude Control System Using Hybrid Deep-Learning Technique",
+    "authors": [
+     "Moamen Ibrahim Mohamed",
+     "Khaled Mahmoud Badran",
+     "Ahmed Esmat Hussien"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "20",
+    "issue": "12",
+    "pages": "890-904",
+    "year": 2023,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010959",
+    "type": "journal-article",
+    "title": "Multiclass Anomaly Detection in Flight Data Using Semi-Supervised Explainable Deep Learning Model",
+    "authors": [
+     "Milad Memarzadeh",
+     "Bryan Matthews",
+     "Thomas Templin"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "19",
+    "issue": "2",
+    "pages": "83-97",
+    "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011508",
+    "type": "journal-article",
+    "title": "Advancing Autonomous Aerial Refueling with Deep-Neural-Network-Based Image Segmentation",
+    "authors": [
+     "Violet Mwaffo",
+     "Dillon Miller",
+     "Donald H. Costello"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "22",
+    "issue": "6",
+    "pages": "500-509",
+    "year": 2025,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011232",
+    "type": "journal-article",
+    "title": "Anomaly Detection Using Deep Learning Respecting the Resources on Board a CubeSat",
+    "authors": [
+     "Ross Horne",
+     "Sjouke Mauw",
+     "Andrzej Mizera",
+     "Andr\u00e9 Stemper",
+     "Jan Thoemel"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "20",
+    "issue": "12",
+    "pages": "859-872",
+    "year": 2023,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010842",
+    "type": "journal-article",
+    "title": "Long-Range Pose Estimation for Aerial Refueling Approaches Using Deep Neural Networks",
+    "authors": [
+     "Andrew Lee",
+     "Will Dallmann",
+     "Scott Nykl",
+     "Clark Taylor",
+     "Brett Borghetti"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "11",
+    "pages": "634-646",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010759",
+    "type": "journal-article",
+    "title": "Imitation Learning-Based Unmanned Aerial Vehicle Planning for Multitarget Reconnaissance Under Uncertainty",
+    "authors": [
+     "Uihwan Choi",
+     "Jaemyung Ahn"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "17",
+    "issue": "1",
+    "pages": "36-50",
+    "year": 2020,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011617",
+    "type": "journal-article",
+    "title": "Determining Relative Positioning for Aerial Refueling Through Deep Neural Network Bounding Box Geometry",
+    "authors": [
+     "Akshat Maheshwari",
+     "Ryan Lowe",
+     "Violet Mwaffo",
+     "Danielle Clement",
+     "Sarah Mottino",
+     "Donald H. Costello"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "23",
+    "issue": "8",
+    "pages": "804-810",
+    "year": 2026,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010961",
+    "type": "journal-article",
+    "title": "Cooperative Planning for an Unmanned Combat Aerial Vehicle Fleet Using Reinforcement Learning",
+    "authors": [
+     "Burak Yuksek",
+     "Mustafa Umut Demirezen",
+     "Gokhan Inalhan",
+     "Antonios Tsourdos"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "10",
+    "pages": "739-750",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010900",
+    "type": "journal-article",
+    "title": "Unmanned Aerial Vehicle Mid-Air Collision Detection and Resolution Using Avoidance Maps",
+    "authors": [
+     "Lima Agnel Tony",
+     "Debasish Ghose",
+     "Animesh Chakravarthy"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "8",
+    "pages": "506-529",
+    "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010531",
+    "type": "journal-article",
+    "title": "Distributed Observes for Cyberattack Detection and Isolation in Formation-Flying Unmanned Aerial Vehicles",
+    "authors": [
+     "Lebsework Negash",
+     "Sang-Hyeon Kim",
+     "Han-Lim Choi"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "14",
+    "issue": "10",
+    "pages": "551-565",
+    "year": 2017,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.2514/1.i011232",
+   "type": "journal-article",
+   "title": "Anomaly Detection Using Deep Learning Respecting the Resources on Board a CubeSat",
+   "authors": [
+    "Ross Horne",
+    "Sjouke Mauw",
+    "Andrzej Mizera",
+    "Andr\u00e9 Stemper",
+    "Jan Thoemel"
+   ],
+   "container": "Journal of Aerospace Information Systems",
+   "volume": "20",
+   "issue": "12",
+   "pages": "859-872",
+   "year": 2023,
+   "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.475,
+  "status": "SEARCHED"
+ }
+]
