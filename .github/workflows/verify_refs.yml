@@ -1,0 +1,25 @@
+name: Verify manuscript references (Crossref / arXiv)
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: ["JAIS_PAPERS/refs/candidates.json", "JAIS_PAPERS/refs/verify_refs.py", ".github/workflows/verify_refs.yml"]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify
+        run: python3 JAIS_PAPERS/refs/verify_refs.py JAIS_PAPERS/refs/candidates.json JAIS_PAPERS/refs/verified.json
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f JAIS_PAPERS/refs/verified.json || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Reference verification against Crossref/arXiv (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done
