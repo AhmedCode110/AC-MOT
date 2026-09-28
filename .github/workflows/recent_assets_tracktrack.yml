@@ -1,0 +1,27 @@
+name: Mirror official TrackTrack assets
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/recent_assets_tracktrack.yml", "tools/v7/recent/fetch_assets_tracktrack.sh"]
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch, hash and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/v7/recent/fetch_assets_tracktrack.sh
+      - name: Commit manifest
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/recent/assets || true
+          git diff --cached --quiet && exit 0
+          git commit -m "TrackTrack: official asset manifest and paper text (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done
