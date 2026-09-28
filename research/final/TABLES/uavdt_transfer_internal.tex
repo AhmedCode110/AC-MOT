@@ -1,0 +1,15 @@
+% UAVDT test (dataset transfer, post-freeze) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & V4 (frozen, VisDrone-tuned) & 8 & 17.3 & 31.2 & 39.6 & 312 & 48373 & 233109 & 69.0 & 31.6 \\
+rtdetr & V4 (frozen, VisDrone-tuned) & 4 & 25.6 & 40.6 & 50.8 & 258 & 61116 & 192374 & 70.8 & 43.6 \\
+yolov8 & Shared static (raw 0.5) & 2 & 15.5 & 26.3 & 30.5 & 102 & 17828 & 270132 & 79.9 & 20.8 \\
+rtdetr & Shared static (raw 0.5) & 4 & 24.2 & 40.9 & 51.4 & 190 & 71269 & 186802 & 68.4 & 45.2 \\
+yolov8 & Tracker default (raw 0.25) & 6 & 17.5 & 29.0 & 34.6 & 508 & 37512 & 243137 & 72.3 & 28.7 \\
+rtdetr & Tracker default (raw 0.25) & 7 & 3.3 & 40.1 & 48.6 & 1041 & 187041 & 141614 & 51.6 & 58.5 \\
+yolov8 & V6-TF (ours, frozen) & 7 & 17.3 & 30.7 & 38.6 & 355 & 46297 & 235300 & 69.5 & 31.0 \\
+rtdetr & V6-TF (ours, frozen) & 5 & 27.0 & 40.4 & 51.5 & 303 & 62829 & 185849 & 71.2 & 45.5 \\
+\bottomrule
+\end{tabular}

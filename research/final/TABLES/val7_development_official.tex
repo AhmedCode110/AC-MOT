@@ -1,0 +1,13 @@
+% val-7 (DEVELOPMENT sandbox; V4 in-sample) — official protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & V4 (frozen, VisDrone-tuned) & 2 & 10.4 & 29.6 & 30.7 & 190 & 9602 & 54587 & 64.2 & 24.0 \\
+rtdetr & V4 (frozen, VisDrone-tuned) & 3 & 10.3 & 32.9 & 33.3 & 186 & 10217 & 54003 & 63.6 & 24.8 \\
+yolov8 & Shared static (raw 0.5) & 0 & 12.5 & 27.4 & 26.4 & 110 & 5850 & 56862 & 71.9 & 20.8 \\
+rtdetr & Shared static (raw 0.5) & 2 & 10.4 & 34.8 & 37.5 & 375 & 17757 & 46249 & 59.0 & 35.6 \\
+yolov8 & E41 (rejected V5-TF lock) & 4 & -3.7 & 29.0 & 30.6 & 762 & 26734 & 46976 & 48.2 & 34.6 \\
+rtdetr & E41 (rejected V5-TF lock) & 3 & -26.0 & 32.0 & 33.3 & 1071 & 48722 & 40694 & 39.0 & 43.3 \\
+\bottomrule
+\end{tabular}

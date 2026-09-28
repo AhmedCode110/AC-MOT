@@ -1,0 +1,11 @@
+% Faster R-CNN (unseen detector) on val-7 (post-freeze) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+fasterrcnn & V4 (frozen, VisDrone-tuned) & 0 & 18.1 & 34.8 & 40.2 & 242 & 11796 & 43092 & 67.3 & 36.0 \\
+fasterrcnn & Shared static (raw 0.5) & 3 & 3.3 & 37.0 & 42.6 & 670 & 32611 & 31838 & 52.1 & 52.7 \\
+fasterrcnn & Tracker default (raw 0.25) & 6 & -9.6 & 35.0 & 38.7 & 941 & 42011 & 30830 & 46.5 & 54.2 \\
+fasterrcnn & V6-TF (ours, frozen) & 0 & 20.2 & 37.0 & 44.0 & 305 & 13766 & 39683 & 66.8 & 41.1 \\
+\bottomrule
+\end{tabular}

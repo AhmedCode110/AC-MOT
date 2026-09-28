@@ -26,23 +26,23 @@ DEFERRED (owner).
 | # | Item | Status | Evidence |
 |---|---|---|---|
 | B1 | Clean tree; unknown files preserved outside the freeze | DONE | D-028 |
-| B2 | Policy file + lock with file hashes | see FROZEN_VERSIONS.md | research/V6TF_POLICY_LOCK.json |
-| B3 | Freeze tag universal-acmot-v6-freeze + freeze record | see FROZEN_VERSIONS.md | research/final/FREEZE_RECORD_V6TF.md |
+| B2 | Policy file + lock with file hashes | DONE | research/V6TF_POLICY_LOCK.json |
+| B3 | Freeze tag universal-acmot-v6-freeze + freeze record | DONE (2cff95f) | research/final/FREEZE_RECORD_V6TF.md |
 | B4 | Amendment-5f T4 fidelity gate | DEFERRED (owner, Amendment 9 §5) | run before publication; report either way |
 
 ## C. Post-freeze evaluation (once each, no retuning)
 | # | Item | Status |
 |---|---|---|
-| C1 | Confirmation-16: V6-TF vs V4 vs shared-static (internal + official-compatible, paired bootstrap) | TODO |
-| C2 | VisDrone val official-compatible table (development, labelled) | TODO |
-| C3 | Unseen detector: Faster R-CNN ResNet50-FPN v2 | TODO |
-| C4 | Tracker transfer: BoT-SORT | TODO |
-| C5 | Unseen dataset: UAVDT | TODO |
+| C1 | Confirmation-16: V6-TF vs V4 vs shared-static (internal + official-compatible, paired bootstrap) | DONE (E48) |
+| C2 | VisDrone val official-compatible table (development, labelled) | DONE (E47, TABLES/val7_development_official) |
+| C3 | Unseen detector: Faster R-CNN ResNet50-FPN v2 | val-7 DONE; test-dev/UAVDT IN PROGRESS (E52) |
+| C4 | Tracker transfer: BoT-SORT | DONE (E51) |
+| C5 | Unseen dataset: UAVDT | DONE (E50) |
 | C6 | Official T4 timing | DEFERRED (owner) |
-| C7 | VisDrone test-dev post-hoc (labelled post-hoc) | TODO |
-| C8 | External published MOT system(s) + frozen layer, reproduced baseline first | TODO |
+| C7 | VisDrone test-dev post-hoc (labelled post-hoc) | DONE (E49) |
+| C8 | External published MOT system(s) + frozen layer, reproduced baseline first | BLOCKED: owner permission for downloads (MOT17, weights, repos); survey done (research/final/EXTERNAL_PAPER_TRANSFER.md) |
 
-## D. Paper package (research/final/)
+## D. Paper package (research/final/) — drafted; FRCNN test-dev/UAVDT and external transfer sections pending
 FINAL_METHOD · EXPERIMENT_LEDGER · FINAL_RESULTS · FAILURE_ANALYSIS · ABLATION ·
 REPRODUCIBILITY · PAPER_CLAIMS · TABLES/ · FIGURES/ · FINAL_SUMMARY ·
 EXTERNAL_PAPER_TRANSFER — each evidence-backed; claims split into supported /

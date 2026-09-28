@@ -1,0 +1,17 @@
+% confirmation-16 (ONE-WAY, post-freeze) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & V4 (frozen, VisDrone-tuned) & 0 & 20.6 & 34.1 & 38.1 & 295 & 14419 & 155662 & 80.3 & 27.4 \\
+rtdetr & V4 (frozen, VisDrone-tuned) & 3 & 24.2 & 39.4 & 44.4 & 222 & 22458 & 139981 & 76.8 & 34.7 \\
+yolov8 & Shared static (raw 0.5) & 0 & 17.4 & 29.9 & 30.2 & 190 & 5744 & 171265 & 88.3 & 20.1 \\
+rtdetr & Shared static (raw 0.5) & 3 & 22.3 & 39.3 & 45.0 & 532 & 36654 & 129541 & 69.8 & 39.6 \\
+yolov8 & Tracker default (raw 0.25) & 0 & 20.6 & 33.2 & 36.0 & 616 & 14146 & 155595 & 80.6 & 27.4 \\
+rtdetr & Tracker default (raw 0.25) & 6 & 8.8 & 41.9 & 48.2 & 1467 & 103961 & 90228 & 54.4 & 57.9 \\
+yolov8 & E41 (rejected V5-TF lock) & 4 & 11.0 & 35.0 & 39.5 & 1211 & 56952 & 132638 & 59.0 & 38.2 \\
+rtdetr & E41 (rejected V5-TF lock) & 5 & 4.3 & 41.5 & 47.8 & 1103 & 110120 & 93993 & 52.2 & 56.2 \\
+yolov8 & V6-TF (ours, frozen) & 0 & 20.2 & 33.6 & 37.9 & 334 & 16981 & 153825 & 78.1 & 28.3 \\
+rtdetr & V6-TF (ours, frozen) & 1 & 26.6 & 39.7 & 46.0 & 312 & 23675 & 133357 & 77.4 & 37.8 \\
+\bottomrule
+\end{tabular}

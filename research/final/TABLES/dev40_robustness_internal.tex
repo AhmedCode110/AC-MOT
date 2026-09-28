@@ -1,0 +1,17 @@
+% development-40 robustness check (not iterated; X5 = V6-TF) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & V4 (frozen, VisDrone-tuned) & 0 & 25.1 & 35.2 & 42.2 & 1188 & 49574 & 375254 & 79.6 & 34.1 \\
+rtdetr & V4 (frozen, VisDrone-tuned) & 3 & 26.3 & 38.4 & 44.4 & 753 & 48120 & 370453 & 80.5 & 34.9 \\
+yolov8 & Shared static (raw 0.5) & 0 & 22.7 & 31.1 & 35.5 & 838 & 19967 & 418951 & 88.3 & 26.4 \\
+rtdetr & Shared static (raw 0.5) & 2 & 28.5 & 41.8 & 49.8 & 1855 & 112025 & 292840 & 71.1 & 48.5 \\
+yolov8 & Tracker default (raw 0.25) & 0 & 25.2 & 34.1 & 39.7 & 2394 & 52765 & 370212 & 79.0 & 34.9 \\
+rtdetr & Tracker default (raw 0.25) & 17 & 12.5 & 41.2 & 47.8 & 4837 & 285920 & 207341 & 55.8 & 63.6 \\
+yolov8 & E41 (rejected V5-TF lock) & 8 & 12.7 & 35.7 & 42.2 & 4285 & 189385 & 303162 & 58.4 & 46.7 \\
+rtdetr & E41 (rejected V5-TF lock) & 7 & 19.1 & 43.2 & 52.0 & 2646 & 225399 & 232225 & 59.9 & 59.2 \\
+yolov8 & X5 & 0 & 25.5 & 35.8 & 43.5 & 1272 & 57592 & 364865 & 78.0 & 35.9 \\
+rtdetr & X5 & 2 & 29.6 & 39.9 & 47.7 & 999 & 58696 & 341150 & 79.5 & 40.0 \\
+\bottomrule
+\end{tabular}

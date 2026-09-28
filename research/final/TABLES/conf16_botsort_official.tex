@@ -1,0 +1,15 @@
+% tracker transfer: BoT-SORT on confirmation-16 (post-freeze) — official protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & Tracker default (raw 0.25) + BoT-SORT & 1 & 16.0 & 31.6 & 33.8 & 442 & 19305 & 172792 & 74.5 & 24.6 \\
+rtdetr & Tracker default (raw 0.25) + BoT-SORT & 10 & -6.4 & 36.8 & 40.6 & 2874 & 120478 & 120635 & 47.4 & 47.4 \\
+yolov8 & Shared static (raw 0.5) + BoT-SORT & 1 & 13.5 & 27.7 & 27.3 & 90 & 9486 & 188768 & 81.0 & 17.7 \\
+rtdetr & Shared static (raw 0.5) + BoT-SORT & 3 & 14.5 & 36.4 & 41.1 & 381 & 44315 & 151360 & 63.7 & 34.0 \\
+yolov8 & V4 (frozen, VisDrone-tuned) + BoT-SORT & 1 & 14.7 & 31.1 & 33.5 & 313 & 20357 & 174893 & 72.8 & 23.7 \\
+rtdetr & V4 (frozen, VisDrone-tuned) + BoT-SORT & 4 & 9.0 & 32.1 & 33.9 & 368 & 37733 & 170574 & 60.9 & 25.6 \\
+yolov8 & V6-TF (ours, frozen) + BoT-SORT & 1 & 14.3 & 31.0 & 33.5 & 231 & 22847 & 173365 & 71.0 & 24.4 \\
+rtdetr & V6-TF (ours, frozen) + BoT-SORT & 1 & 14.5 & 35.1 & 38.6 & 200 & 36177 & 159544 & 65.8 & 30.4 \\
+\bottomrule
+\end{tabular}

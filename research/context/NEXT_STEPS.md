@@ -18,22 +18,17 @@ evaluations → external published-system transfer → paper package in
   freeze or evaluation commit.
 
 ## NEXT EXACT ACTION
-After tag universal-acmot-v6-freeze exists: run the one-way post-freeze
-evaluations with the frozen config, exactly once each, no retuning. Record
-each result as it lands in research/final/FINAL_RESULTS.md and here.
-
-## AFTER THAT
-1. Confirmation-16 (`V6_SPLIT=conf16 tools/v6/dev.py run V6TF V4 shared_static`),
-   internal + official-compatible, paired sequence bootstrap (10,000, seed 42).
-2. Val-7 official-compatible table of the frozen policy (development, labelled).
-3. Faster R-CNN transfer (val-7 + test-dev post-hoc + UAVDT caches exist),
-   BoT-SORT transfer, UAVDT transfer; each under a transfer lock written
-   before running.
-4. Test-dev post-hoc (labelled post-hoc).
-5. External published MOT system(s): select, reproduce the baseline, attach
-   the SAME frozen layer (integration-only adapter), evaluate
-   (`research/final/EXTERNAL_PAPER_TRANSFER.md`).
-6. T4 gate + official timing (pre-paper step).
+1. When `outputs/v6/after_frcnn.log` shows AFTER_DONE: regenerate
+   `tools/v6/make_tables.py`, append the Faster R-CNN test-dev/UAVDT results to
+   research/final/FINAL_RESULTS.md (re-run the compose step in CODEX_HANDOFF.md)
+   and update E52 / PROJECT_COMPLETION C3.
+2. External published-system transfer (C8): after the owner approves the
+   downloads listed in research/final/EXTERNAL_PAPER_TRANSFER.md §3, clone
+   BoostTrack (primary) and OC-SORT/SparseTrack, reproduce the baseline on
+   MOT17 val-half, attach the SAME frozen V6-TF via an integration-only
+   adapter, evaluate once.
+3. T4 fidelity gate + official timing (pre-paper; retarget
+   notebooks/Colab_T4_gate_and_benchmark.ipynb to 2cff95f / v6tf config).
 
 ## DO NOT DO
 - No retuning of V6-TF after the tag; no second confirmation run.

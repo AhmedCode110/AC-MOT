@@ -1,0 +1,13 @@
+split,protocol,system,baseline,detector,metric,diff,ci_lo,ci_hi,p_le0,n_boot,seed
+uavdt,internal,V6TF,V4,yolov8,HOTA,-0.476,-0.78,-0.137,0.997,10000,42
+uavdt,internal,V6TF,V4,yolov8,IDF1,-0.994,-1.511,-0.406,0.999,10000,42
+uavdt,internal,V6TF,V4,yolov8,MOTA,-0.046,-0.827,0.63,0.554,10000,42
+uavdt,internal,V6TF,V4,rtdetr,HOTA,-0.171,-2.313,1.966,0.548,10000,42
+uavdt,internal,V6TF,V4,rtdetr,IDF1,0.66,-3.073,4.183,0.362,10000,42
+uavdt,internal,V6TF,V4,rtdetr,MOTA,1.398,-2.839,5.924,0.252,10000,42
+uavdt,internal,V6TF,shared_static,yolov8,HOTA,4.421,1.936,7.218,0.0,10000,42
+uavdt,internal,V6TF,shared_static,yolov8,IDF1,8.117,3.804,12.61,0.0,10000,42
+uavdt,internal,V6TF,shared_static,yolov8,MOTA,1.792,-3.349,6.854,0.257,10000,42
+uavdt,internal,V6TF,shared_static,rtdetr,HOTA,-0.527,-2.362,1.338,0.657,10000,42
+uavdt,internal,V6TF,shared_static,rtdetr,IDF1,0.099,-3.169,3.375,0.424,10000,42
+uavdt,internal,V6TF,shared_static,rtdetr,MOTA,2.722,-1.92,9.714,0.144,10000,42

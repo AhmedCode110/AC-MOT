@@ -1,0 +1,17 @@
+% val-7 (DEVELOPMENT sandbox; V4 in-sample) — internal protocol
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+Detector & System & Cat. & MOTA & HOTA & IDF1 & IDS & FP & FN & Precision & Recall \\
+\midrule
+yolov8 & V4 (frozen, VisDrone-tuned) & 0 & 17.5 & 33.2 & 36.6 & 159 & 7639 & 47765 & 71.9 & 29.1 \\
+rtdetr & V4 (frozen, VisDrone-tuned) & 0 & 21.5 & 39.0 & 42.4 & 81 & 7084 & 45681 & 75.4 & 32.2 \\
+yolov8 & Shared static (raw 0.5) & 0 & 18.6 & 30.7 & 31.3 & 119 & 4206 & 50499 & 80.0 & 25.0 \\
+rtdetr & Shared static (raw 0.5) & 0 & 23.0 & 40.6 & 46.1 & 312 & 14698 & 36874 & 67.5 & 45.2 \\
+yolov8 & Tracker default (raw 0.25) & 0 & 18.4 & 31.6 & 33.6 & 320 & 8414 & 46219 & 71.5 & 31.4 \\
+rtdetr & Tracker default (raw 0.25) & 5 & -6.2 & 36.8 & 40.7 & 839 & 42646 & 28065 & 47.9 & 58.3 \\
+yolov8 & E41 (rejected V5-TF lock) & 3 & 4.0 & 32.8 & 36.3 & 640 & 25140 & 38844 & 53.1 & 42.3 \\
+rtdetr & E41 (rejected V5-TF lock) & 3 & -13.8 & 37.5 & 41.8 & 577 & 45968 & 30068 & 44.8 & 55.4 \\
+yolov8 & V6-TF (ours, frozen) & 0 & 18.6 & 34.3 & 38.6 & 159 & 8427 & 46260 & 71.4 & 31.3 \\
+rtdetr & V6-TF (ours, frozen) & 0 & 25.0 & 41.6 & 48.1 & 150 & 9474 & 40877 & 73.6 & 39.3 \\
+\bottomrule
+\end{tabular}
