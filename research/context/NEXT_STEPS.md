@@ -1,47 +1,43 @@
 # NEXT STEPS (operational; keep short; move finished items to DECISIONS/EXPERIMENT_REGISTRY)
 
 ## CURRENT GOAL
-Complete V5-TF — the FINAL system (V4 = baseline/ablation only). E36 selected
-F3 over F5 by the declared rule; E41 removes the E39 OTSU_BINS and Otsu-window
-dependencies with a predeclared training-free family. Complete the T4 gate and
-freeze. Full checklist: PROJECT_COMPLETION.md.
+Complete V6-TF, the FINAL system (Amendment 9; V4 = baseline/ablation only;
+E41/V5-TF = rejected development history). Freeze → one-way post-freeze
+evaluations → external published-system transfer → paper package in
+`research/final/`. Full checklist: PROJECT_COMPLETION.md.
 
 ## BLOCKERS
-- T4 fidelity gate (E38) needs a Colab T4 session (owner: do not ask them to
-  run Colab manually; run when a T4 is reachable).
-- Official T4 timing still to run (harness ready: scene / calib / decision /
-  detector / tracker / total / P95 timers, commit 1eaa3c6; Mac numbers are
-  development-only).
-- Single-writer rule: any interactive session must stop the supervisor or hold
-  its lock before editing tracked files (AGENTS.md, D-021).
-- Uncommitted working-tree code of unknown provenance: `universal_pipeline.py`
-  (+effective-controls reporting, legacy-SCI path),
-  `tests/test_full_pipeline_equivalence.py`; untracked `tools/calibrate_detector_*.py`,
-  `tools/build_calibration_split.py`, `tools/audit/nms_audit_frcnn.py`,
-  `tools/sync_t4_caches.sh`. Not on the V5-TF path. Never commit them with
-  context/V5-TF changes; record `git status --short` next to E36.
+- T4 fidelity gate (Amendment 5f) and official T4 timing: deferred by the
+  owner to the final pre-paper step (Amendment 9 §5). Harness:
+  notebooks/Colab_T4_gate_and_benchmark.ipynb must be retargeted to the V6-TF
+  freeze commit and configs/universal_acmot_policy_v6tf.json first.
+- Single-writer rule (AGENTS.md): hold outputs/autonomous_v5tf/repo_writer.lock
+  before editing tracked files; the old V5-TF supervisor must NOT be restarted
+  (its stage machine targets the rejected E41 path).
+- Unknown-provenance WIP preserved in git stash (D-028); do not pop it into a
+  freeze or evaluation commit.
 
 ## NEXT EXACT ACTION
-E41 is complete and locked: 80/80 development-40 replays, 15 catastrophic
-cells, and +0.69% worst-detector relative gain vs V4. The policy lock is
-`research/V5TF_POLICY_LOCK.json`. Prepare the fixed T4 fidelity gate. Do not
-run protected quality evaluations before the freeze.
+After tag universal-acmot-v6-freeze exists: run the one-way post-freeze
+evaluations with the frozen config, exactly once each, no retuning. Record
+each result as it lands in research/final/FINAL_RESULTS.md and here.
 
 ## AFTER THAT
-0. Live V5-TF parity: DONE (`outputs/v5tf_dev/live_replay_parity_v2.json`,
-   80/80 frames; v1 preserved as a harness failure caused by process-global
-   track IDs). Per-component timers: DONE (1eaa3c6).
-1. Parameter audit: DONE for the locked E41 rule; E39 bins/window are excluded.
-2. V5-TF policy file + lock are DONE; T4 fidelity gate (E38) → tag
-   universal-acmot-v5tf-freeze.
-3. Confirmation-16 once (reported vs V4); then val (secondary), Faster R-CNN,
-   BoT-SORT, UAVDT, official T4 timing; test-dev post-hoc.
+1. Confirmation-16 (`V6_SPLIT=conf16 tools/v6/dev.py run V6TF V4 shared_static`),
+   internal + official-compatible, paired sequence bootstrap (10,000, seed 42).
+2. Val-7 official-compatible table of the frozen policy (development, labelled).
+3. Faster R-CNN transfer (val-7 + test-dev post-hoc + UAVDT caches exist),
+   BoT-SORT transfer, UAVDT transfer; each under a transfer lock written
+   before running.
+4. Test-dev post-hoc (labelled post-hoc).
+5. External published MOT system(s): select, reproduce the baseline, attach
+   the SAME frozen layer (integration-only adapter), evaluate
+   (`research/final/EXTERNAL_PAPER_TRANSFER.md`).
+6. T4 gate + official timing (pre-paper step).
 
-## DO NOT DO YET
-- No quality metrics on confirmation-16, Faster R-CNN, BoT-SORT (V5-TF), UAVDT.
-- Do not treat V4 as a fallback final system or compare "V4 vs V5-TF" as rival finals.
-- Do not run `tools/v5_train.py final` (forbidden by Amendment 6).
-- Do not run `tools/audit/nms_audit_frcnn.py` (Faster R-CNN tracking metrics).
-- Do not run any undeclared family; new families must be added to the protocol first.
-- Do not tag V5-TF before the fidelity gate passes.
-- Do not change V1/V3/V4 policy files or locks.
+## DO NOT DO
+- No retuning of V6-TF after the tag; no second confirmation run.
+- Do not treat V4 as a fallback final system.
+- Do not restart tools/autonomous_v5tf_supervisor.py (targets E41).
+- Do not run `tools/v5_train.py final` (Amendment 6).
+- Do not change V1/V3/V4/V5-TF policy files, tags or locks.

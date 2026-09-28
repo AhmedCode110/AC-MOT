@@ -1,5 +1,16 @@
 # ARCHITECTURE
 
+## CURRENT: V6-TF (final; research/final/FINAL_METHOD.md is authoritative)
+Frame → image cue (global motion, frame t) → Detector (compute budget B) →
+duplicate suppression (IoU 0.5) → logits → nested exact-Otsu bands from the
+pooled logits of frames t−10..t−1 (background | extension | primary) →
+ECDF order within band → Tracker adapter (native thresholds 0.5 / 0.1;
+motion-conditioned IoU-match tolerance) → frozen tracker → tracks; frame-t
+statistics update state for t+1. Pre-detector resolution adaptation (F5)
+was rejected (FX-17); resolution is the compute-budget input.
+Sections below describe the V5-TF target architecture (history).
+
+
 Labels: CURRENT · FROZEN · SUPERSEDED · ABLATION · EXPERIMENTAL.
 Code pointers are to the working tree at the commit in PROJECT_STATE.md.
 

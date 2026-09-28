@@ -2,8 +2,8 @@
 
 Generated: 2026-09-27 20:26 UTC
 Repository: https://github.com/AhmedCode110/AC-MOT.git
-Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 16 / behind 0
-HEAD: 20455f371df5496176a698286295b791d647dbe3
+Branch: universal-adapters-v1 · upstream origin/universal-adapters-v1 · ahead 17 / behind 0
+HEAD: baa7958d3870e1387561ca902d085f3f1414e6b3
 
 ## Tags (creation order)
 | Tag | Commit | Date |
@@ -14,6 +14,7 @@ HEAD: 20455f371df5496176a698286295b791d647dbe3
 | universal-acmot-v4-freeze | fc003bf96621214dc09a0e55f720128093972927 | 2026-09-27 |
 
 ## Recent commits
+- baa7958 2026-09-27 Refresh context after V5-TF policy lock
 - 20455f3 2026-09-27 Lock V5-TF E41 policy before T4 gate
 - fd25762 2026-09-27 Refresh E41 context graph
 - b4a8052 2026-09-27 Record E41 development validation and next gate
@@ -28,11 +29,11 @@ HEAD: 20455f371df5496176a698286295b791d647dbe3
 - 4600630 2026-09-27 Tidy autonomous supervisor control files
 - acf231a 2026-09-27 Add artifact-gated autonomous V5-TF supervisor
 - 81a6c53 2026-09-27 V5-TF live entry point: compute frame motion with the cached-cue function when assoc_motion is on (no replay change)
-- 679a868 2026-09-27 Amendment 7: V5-TF is the final target (V4 baseline only); scene-adaptive resolution R-res, F5/F5R, constant audit — declared before any V5-TF result
 
 ## Working tree
 Uncommitted paths (NOT part of any context commit; provenance must be checked before committing them):
-- `M tests/test_full_pipeline_equivalence.py`
+- `M research/context/AGENT_STATE.md`
+- ` M tests/test_full_pipeline_equivalence.py`
 - ` M universal_pipeline.py`
 - `?? tools/audit/nms_audit_frcnn.py`
 - `?? tools/build_calibration_split.py`

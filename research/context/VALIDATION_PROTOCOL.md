@@ -3,7 +3,26 @@
 Authoritative text: `research/OPTIMIZATION_PROTOCOL.md` (append-only
 amendments). This file summarises; on conflict the protocol file wins.
 
-## CURRENT protocol (Amendments 6 + 7, V5-TF = FINAL TARGET) — with 5d, 5f, 5g still in force
+## CURRENT protocol (Amendment 9, V6-TF = FINAL TARGET)
+1. Development sandbox val-7 (iterative); development-40 = robustness check
+   of the candidate (not iterated); V4's val-7 numbers are in-sample.
+2. Acceptance priorities (owner): catastrophic cells → FP inflation →
+   precision → MOTA → HOTA → IDF1 → IDS → recall → cross-detector
+   consistency; each experiment logged in research/final/EXPERIMENT_LEDGER.md.
+3. Causality: control decisions for frame t use frames < t (+ frame-t image
+   cues); asserted by tests/test_v6_adaptive_layer.py.
+4. Protected until universal-acmot-v6-freeze: confirmation-16, test-dev,
+   UAVDT, Faster R-CNN and BoT-SORT quality. After the freeze each runs once.
+   Confirmation-16 is reported with a paired sequence bootstrap (10,000,
+   seed 42), vs V4 and shared-static, as a report and not a gate.
+5. Evaluation: internal protocol (canonical, continuity) AND
+   official-compatible VisDrone protocol, reported separately.
+6. T4 fidelity gate (5f) and official timing: deferred to the pre-paper step
+   (owner); freeze not conditioned on them.
+7. After freeze: external transfer to published MOT systems with the same
+   frozen layer (reproduced baseline first).
+
+## PREVIOUS protocol (Amendments 6 + 7, V5-TF target) — superseded by Amendment 9 for the final target
 V4 is a comparison baseline/ablation only; no step below selects between V4 and V5-TF.
 1. Units are sequences; frames are never split; no random frame splitting.
 2. Development = VisDrone2019-MOT-train development-40, YOLOv8n + RT-DETR-L

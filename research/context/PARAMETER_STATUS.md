@@ -1,4 +1,4 @@
-# PARAMETER STATUS — current constants (V5-TF focus)
+# PARAMETER STATUS — current constants (V6-TF final; V5-TF history below)
 
 Categories: A mathematical/structural · B online-derived · C research-only
 optimisation variable / generic safety bound (see note) · D API-required ·
@@ -7,6 +7,24 @@ E unjustified/manual ("worked on VisDrone"). Historical audit (V1–V4):
 Note on C: Amendment 6 uses C = "generic engineering safety bound"; the V4
 audit used C = "globally optimised". Below, C(safety) and C(opt) are kept apart.
 C(opt) values are NOT allowed in V5-TF.
+
+## V6-TF parameters (FINAL; every value in the decision path)
+Sensitivity = Amendment-9 audit on val-7 with the E28 criterion (|ΔHOTA| ≤ 0.4
+per detector and no additional catastrophic cell); evidence in
+research/final/EXPERIMENT_LEDGER.md and outputs/v6/val7/X5@*/.
+| Parameter | Component | Value | Cat. | Justification | Sensitivity | Status |
+|---|---|---|---|---|---|---|
+| Duplicate-suppression IoU | candidate handling | 0.5 | A | the IoU-0.5 correspondence rule of MOT evaluation: two boxes with IoU > 0.5 cannot both match distinct objects | ablation: removing it → 4 (val-7) / 6 (dev-40) catastrophic cells | final |
+| Band thresholds t1, t2 | candidate handling | nested exact 2-class Otsu on pooled logits of frames t−W..t−1 | B | online-derived; affine-equivariant on logits (exact Platt invariance); no bins | — | final |
+| Otsu memory W | candidate handling | 10 frames | A | declared default | 5 / 20 → |ΔHOTA| ≤ 0.3, no new cat (insensitive) | final |
+| No-history rule | candidate handling | no candidate admitted before any history (frame 1) | A | causality (C3) | — | final |
+| Band → tracker score map | candidate→tracker | primary 0.5+0.5u, extension 0.1+0.4u (u = ECDF rank) | A | maps bands onto the tracker's native birth/association 0.5 and low 0.1 | — | final |
+| ECDF normaliser memory | score order within band | stride 10, window 20 | A | order-only | window 10/40, stride 5/20 → |ΔHOTA| ≤ 0.1 | final |
+| Motion history window / warm-up | association control | 100 / 5 | A | declared default | 50/200, 3/10 → |ΔHOTA| ≤ 0.1 | final |
+| F3 association cap | association control | min(0.95, 1−(1−m0)/max(1,r)) | C(safety) | keeps IoU-match threshold < 1 | ablation: removing motion → HOTA −0.3/−0.5, IDS +6%/+2% (val-7) | final |
+| m0, retention, tracker thresholds | tracker | native (0.8, 30, 0.1 low) | D | tracker defaults | — | final |
+| Resolution | compute budget | 736 (deployment input) | D | same compute as V4 | — | final |
+| Adapter emission floor / max det | detector adapter interface | 0.01 / 1000 | D | interface contract: expose the low-score candidate stream | 0.05 / 0.1 → YOLO HOTA −4.9 / −8.9, no cat (SENSITIVE: documented dependency on the adapter contract) | final (reported limitation) |
 
 ## Historical E39 items excluded from the locked V5-TF rule
 | Parameter | Component | Value | E39 evidence | Required action |

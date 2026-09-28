@@ -26,9 +26,12 @@ REQUIRED = ["README.md", "PROJECT_STATE.md", "ARCHITECTURE.md", "HARD_CONSTRAINT
 CONTEXT_PATHS = ("research/context/", "AGENTS.md", "CLAUDE.md", ".graphifyignore", ".gitignore",
                  "tools/update_project_context.py", "tools/context_health_check.py",
                  "tools/build_context_graph.py")
-V5TF_TAG = "universal-acmot-v5tf-freeze"
+FINAL = "V6-TF"                      # Amendment 9 (supersedes V5-TF/E41)
+V5TF_TAG = "universal-acmot-v6-freeze"   # freeze tag of the FINAL target
 # Artifacts that must not exist before the V5-TF freeze (protected evaluations).
 FORBIDDEN_BEFORE_FREEZE = ["outputs/v5tf_confirm*", "outputs/confirmation*",
+                           "outputs/v6/conf16*", "outputs/v6/testdev*",
+                           "outputs/v6/uavdt*", "outputs/v6/*frcnn*", "outputs/v6/*botsort*",
                            "outputs/transfer_*", "outputs/heldout_v5*",
                            "outputs/nms_audit_frcnn*", "outputs/v5/final*",
                            "outputs/*uavdt*/**/stats", "outputs/*fasterrcnn*/**/stats"]
@@ -116,7 +119,7 @@ def check_protected() -> None:
         if hits:
             report("FAIL", f"protected-evaluation artifacts exist before {V5TF_TAG}: {hits[:5]}")
         else:
-            report("PASS", "no protected-evaluation artifacts before V5-TF freeze")
+            report("PASS", f"no protected-evaluation artifacts before {FINAL} freeze")
 
 
 def check_versions() -> None:
@@ -138,25 +141,25 @@ def check_versions() -> None:
     frozen = [t for t in git("tag", "--sort=creatordate").split()
               if re.fullmatch(r"universal-acmot-v\w+-freeze", t)]
     latest = re.fullmatch(r"universal-acmot-(v\w+)-freeze", frozen[-1]).group(1).upper() if frozen else None
-    latest = {"V5TF": "V5-TF"}.get(latest, latest)
+    latest = {"V5TF": "V5-TF", "V6": "V6-TF"}.get(latest, latest)
     if klat and latest and klat.group(1) != latest:
         report("FAIL", f"latest frozen version in KNOWLEDGE_GRAPH ({klat.group(1)}) != git tags ({latest})")
     if V5TF_TAG in git("tag").split() and "not frozen" in ps:
-        report("FAIL", "V5-TF is tagged but PROJECT_STATE.md still says 'not frozen'")
+        report("FAIL", f"{FINAL} is tagged but PROJECT_STATE.md still says 'not frozen'")
     if cur and kcur and klat and (not latest or klat.group(1) == latest):
         report("PASS", f"version labels consistent (current {cur.group(1)}, latest frozen {latest})")
 
 
 def check_final_target() -> None:
-    """FINAL TARGET = V5-TF everywhere; V4 never presented as fallback/final."""
+    """FINAL TARGET = FINAL everywhere; V4 never presented as fallback/final."""
     ps, hc, kg = read("PROJECT_STATE.md"), read("HARD_CONSTRAINTS.md"), read("KNOWLEDGE_GRAPH.md")
     ok = True
-    if "FINAL TARGET: V5-TF" not in ps:
-        report("FAIL", "PROJECT_STATE.md lacks 'FINAL TARGET: V5-TF'"); ok = False
-    if "## C0 — FINAL TARGET = V5-TF" not in hc:
+    if f"FINAL TARGET: {FINAL}" not in ps:
+        report("FAIL", f"PROJECT_STATE.md lacks 'FINAL TARGET: {FINAL}'"); ok = False
+    if f"## C0 — FINAL TARGET = {FINAL}" not in hc:
         report("FAIL", "HARD_CONSTRAINTS.md lacks C0 final-target constraint"); ok = False
-    if "| Project: Universal AC-MOT | FINAL_TARGET | Version: V5-TF |" not in kg:
-        report("FAIL", "KNOWLEDGE_GRAPH.md lacks Project FINAL_TARGET V5-TF"); ok = False
+    if f"| Project: Universal AC-MOT | FINAL_TARGET | Version: {FINAL} |" not in kg:
+        report("FAIL", f"KNOWLEDGE_GRAPH.md lacks Project FINAL_TARGET {FINAL}"); ok = False
     bad = re.compile(r"V4 (remains|is|becomes|stays) (the )?(final|fallback)", re.I)
     allowed = re.compile(r"supersed|never|not |NOT |no longer", re.I)
     for f in CTX.glob("*.md"):
@@ -165,7 +168,7 @@ def check_final_target() -> None:
                 report("FAIL", f"{f.name}:{n} presents V4 as final/fallback: {line.strip()[:90]}")
                 ok = False
     if ok:
-        report("PASS", "final target = V5-TF consistently; V4 only baseline/ablation")
+        report("PASS", f"final target = {FINAL} consistently; V4 only baseline/ablation")
 
 
 def check_references() -> None:
@@ -234,8 +237,8 @@ def check_graphify(run_queries: bool) -> None:
     if g.stat().st_mtime < kg_mtime:
         report("WARN", "KNOWLEDGE_GRAPH.md newer than graph.json — rebuild the graph")
     if run_queries and shutil.which("graphify"):
-        probes = {"current version V5-TF training-free": "Version: V5-TF",
-                  "latest frozen version": "Version: V4",
+        probes = {"current version V6-TF training-free": "Version: V6-TF",
+                  "latest frozen version": f"Version: {FINAL}",
                   "protected datasets evaluations": "Constraint: C8"}
         for q, expect in probes.items():
             out = subprocess.run(["graphify", "query", q, "--budget", "400"], cwd=ROOT,

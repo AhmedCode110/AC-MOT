@@ -22,7 +22,10 @@ Evaluator for every row: internal class-agnostic protocol, HOTA TrackEval
 | V5-TF constant audit (E39) | Amendment 7 | DEVELOPMENT-40, COMPLETE | `outputs/v5tf_dev/constant_audit.json` | bins/window sensitive E; history/warm-up insensitive A; D-023 |
 | V5-TF exact-Otsu family (E41) | 240eba9 + Amendment 8 | DEVELOPMENT-40, COMPLETE | `outputs/v5tf_dev/E41/` | 80/80 PKLs; 15 catastrophic cells; worst-detector relative gain vs V4 +0.69%; no protected data; D-025 |
 | V5-TF live/replay parity (E40) | fd44a11 / 50f2a6f | DEVELOPMENT FIDELITY, PASS | `outputs/v5tf_dev/live_replay_parity_v2.json` | exact tracks + controls, 80/80 frames; v1 preserved as harness failure |
-| Faster R-CNN, UAVDT, BoT-SORT (V5-TF) | — | PROTECTED | none may exist before V5-TF freeze | — |
+| V6-TF development iterations (E43/E44) | Amendment 9 | DEVELOPMENT (val-7 sandbox; V4 in-sample) | `outputs/v6/val7/<system>/<det>/<seq>.pkl` (+ `.official.pkl`) | research/final/EXPERIMENT_LEDGER.md |
+| V6-TF development-40 check (E45) | Amendment 9 | DEVELOPMENT (not iterated) | `outputs/v6/dev40/` | EXPERIMENT_LEDGER.md |
+| V6-TF live/replay parity (E46) | Amendment 9 | FIDELITY PASS | `outputs/v6/live_replay_parity.json` | 80/80 frames |
+| Faster R-CNN, UAVDT, BoT-SORT, confirmation-16 (V6-TF) | — | PROTECTED until universal-acmot-v6-freeze | post-freeze: `outputs/v6/<split>/` | research/final/FINAL_RESULTS.md |
 | Official T4 timing | — | none official yet | will be `t4_benchmark*.json` from a T4 run | — |
 
 ## Headline held-out numbers (health-checked against pooled_metrics.json)
@@ -46,6 +49,13 @@ shared static on HOTA (−2.49) and IDF1 (−4.02). Bootstrap: 10,000 resamples,
 seed 42.
 
 ## Known conflicts / caveats
+- Two evaluation protocols are kept strictly apart (never mixed in one
+  comparison): INTERNAL class-agnostic (`tools/eval_local.py`: GT classes
+  {1,4,5,6,9}, score==1, occlusion<2, truncation<2; no ignored-region
+  handling) and OFFICIAL-COMPATIBLE VisDrone Task-4b port
+  (`tools/v6/eval_official.py`: class-aware, ignored/others regions dropped,
+  no occlusion filter). COCO detectors have no "van" class → van GT is all
+  FN under the official protocol.
 - E36 selected F3 over F5, but F3 has 17 catastrophic sequence-detector cells
   versus V4's 3 and worst-detector relative ½(HOTA+IDF1) gain −0.339%.
   This is development evidence, not protected confirmation; report honestly.

@@ -132,6 +132,16 @@ class PolicySpec:
     tf_warmup: int = 5
     ecdf_stride: int = 10
     ecdf_window: int = 20
+    # V6 (Amendment 9): class-agnostic duplicate suppression of the raw
+    # candidates at the IoU-0.5 correspondence rule (0 = off).
+    dedup_iou: float = 0.0
+    # V6 secondary (extension-only) band: "otsu" = Otsu middle class,
+    # "none" = no extension-only candidates.
+    tf_secondary: str = "otsu"
+    # "jitter": extension band [t2 - k*sigma, t2), sigma = robust spread
+    # (1.4826 MAD) of frame-to-frame logit changes of tracks matched to
+    # primary candidates in consecutive frames (frames < t only).
+    tf_jitter_k: float = 2.0
 
 
 POLICIES = {
@@ -209,6 +219,10 @@ class UniversalPolicyPipeline:
         self.gate_logits = deque(maxlen=self.policy.gate_window)
         from online_calibration import RobustHistory
         self.otsu_window = deque(maxlen=self.policy.gate_window)
+        self.jit_window = deque(maxlen=self.policy.gate_window)
+        self.prev_trk_logit = {}
+        self.prim_boxes = np.empty((0, 4))
+        self.prim_L = np.empty(0)
         hist = lambda: RobustHistory(self.policy.tf_history,
                                      self.policy.tf_warmup)
         self.motion_hist = hist()
@@ -236,15 +250,23 @@ class UniversalPolicyPipeline:
         """V5-TF candidate handling: 3-class Otsu on logits (frames < t for
         the window mode; frame t for the frame mode). Returns the banded
         candidates and the tracker thresholds (band boundaries)."""
-        from online_calibration import exact_otsu3, logits, otsu3
+        from online_calibration import exact_otsu3_fast, logits, otsu3
         if not raw:
             self.tf_primary = []
             return [], 0.1, 0.5, 0.5, np.empty(0)
         L = logits([r.confidence for r in raw])
-        ref = (np.concatenate(self.otsu_window)
-               if mode == "otsu3_window" and self.otsu_window else L)
-        th = (exact_otsu3(L) if mode == "exact3_frame"
-              else otsu3(ref, bins=self.policy.otsu_bins))
+        if mode in ("exact3_window", "nested_window"):
+            # V6: thresholds from frames < t only (causal); no history yet
+            # -> no candidate is admitted in this frame.
+            from online_calibration import nested_otsu
+            f = exact_otsu3_fast if mode == "exact3_window" else nested_otsu
+            th = (f(np.concatenate(self.otsu_window))
+                  if self.otsu_window else (np.inf, np.inf, 0.0))
+        else:
+            ref = (np.concatenate(self.otsu_window)
+                   if mode == "otsu3_window" and self.otsu_window else L)
+            th = (exact_otsu3_fast(L) if mode == "exact3_frame"
+                  else otsu3(ref, bins=self.policy.otsu_bins))
         out = []
         if th is None:
             t1, t2, eta = -np.inf, -np.inf, 0.0
@@ -252,17 +274,48 @@ class UniversalPolicyPipeline:
             t1, t2, eta = th
         n_prim = n_sec = 0
         self.tf_primary = [r for r, li in zip(raw, L) if li >= t2]
+        sec_mode = self.policy.tf_secondary
+        lo = t1 if sec_mode == "otsu" else np.inf
+        if sec_mode == "jitter":
+            dl = (np.concatenate(self.jit_window) if self.jit_window
+                  else np.empty(0))
+            if len(dl) >= self.policy.tf_warmup:
+                sig = 1.4826 * float(np.median(np.abs(dl - np.median(dl))))
+                lo = max(t1, t2 - self.policy.tf_jitter_k * sig)
+                self.tf_log["jitter_sigma"] = sig
         for li, d in zip(L, normalized):
             u = d.confidence
             if li >= t2:
                 out.append(replace_det(d, 0.5 + 0.5 * u))
                 n_prim += 1
-            elif li >= t1:
+            elif li >= lo:
                 out.append(replace_det(d, 0.1 + 0.4 * u))
                 n_sec += 1
-        self.tf_log.update(otsu_t1=t1, otsu_t2=t2, otsu_eta=eta,
+        prim = L >= t2
+        self.prim_boxes = np.array([[r.x1, r.y1, r.x2, r.y2] for r, k in
+                                    zip(raw, prim) if k]).reshape(-1, 4)
+        self.prim_L = L[prim]
+        self.tf_log.update(otsu_t1=t1, otsu_t2=t2, otsu_eta=eta, band_lo=lo,
                            n_primary=n_prim, n_secondary=n_sec)
         return out, 0.1, 0.5, 0.5, L
+
+    def _observe_jitter(self, tracks):
+        """Frame-to-frame logit change of tracks whose output box matches a
+        primary candidate (IoU >= 0.5) in consecutive frames; the sample is
+        used from frame t+1 on."""
+        cur = {}
+        if len(tracks) and len(self.prim_boxes):
+            from online_calibration import iou_xyxy
+            tb = np.array([[t.x1, t.y1, t.x2, t.y2] for t in tracks])
+            m = iou_xyxy(tb, self.prim_boxes)
+            j = m.argmax(1)
+            for t, jj, ok in zip(tracks, j, m[np.arange(len(tb)), j] >= 0.5):
+                if ok:
+                    cur[t.track_id] = float(self.prim_L[jj])
+        d = [v - self.prev_trk_logit[k] for k, v in cur.items()
+             if k in self.prev_trk_logit]
+        self.jit_window.append(np.asarray(d, dtype=np.float64))
+        self.prev_trk_logit = cur
 
     def _tf_level(self, frame_number, budget):
         """R-res (Amendment 7): resolution chosen before detection at the
@@ -416,6 +469,11 @@ class UniversalPolicyPipeline:
         raw = self.detector.detect(image, confidence=p.policy_raw_floor,
                                    suppression=params["nms"],
                                    resolution=params["size"])
+        if p.dedup_iou > 0 and len(raw) > 1:
+            from online_calibration import dedup
+            keep = dedup([[r.x1, r.y1, r.x2, r.y2] for r in raw],
+                         [r.confidence for r in raw], p.dedup_iou)
+            raw = [raw[i] for i in sorted(keep)]
         normalized = self.normalizer.process(raw)
         base = resolve_generic_score_controls(
             sci=params["sci"], scene=params["scene"],
@@ -517,6 +575,8 @@ class UniversalPolicyPipeline:
 
         if otsu_L is not None:
             self.otsu_window.append(otsu_L)
+        if p.tf_secondary == "jitter":
+            self._observe_jitter(tracks)
         if use_state:
             self.analyzer.observe_detector(
                 np.array([[r.x1, r.y1, r.x2, r.y2] for r in raw]).reshape(-1, 4),

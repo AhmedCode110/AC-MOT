@@ -1,0 +1,28 @@
+{
+ "name": "UniversalACMOT_v6tf",
+ "frozen_utc": null,
+ "selected_by": "Amendment 9 / val-7 development ledger (research/final/EXPERIMENT_LEDGER.md), candidate X5",
+ "base": "V1",
+ "overrides": {
+  "name": "UniversalACMOT_v6tf",
+  "feedback": "accepted",
+  "normalizer": "ecdf",
+  "scene_controller": false,
+  "scene_state": false,
+  "fixed_resolution": 736,
+  "nms_request": null,
+  "tracker_defaults": "native",
+  "policy_raw_floor": 0.0,
+  "gate_tau": 0.0,
+  "candidate_mode": "nested_window",
+  "tf_secondary": "otsu",
+  "dedup_iou": 0.5,
+  "assoc_motion": true,
+  "gate_window": 10,
+  "tf_history": 100,
+  "tf_warmup": 5
+ },
+ "resolution_levels": [640, 736, 832],
+ "policy_note": "V6-TF: IoU-0.5 duplicate suppression; nested (hierarchical) exact Otsu on the pooled detector logits of frames t-10..t-1 gives background | extension | primary bands (no candidate admitted before any history); ECDF order-only score within band; motion-aware association tolerance. fixed_resolution is the compute budget (same as V4).",
+ "density_kwargs": {}
+}

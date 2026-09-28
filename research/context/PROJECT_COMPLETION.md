@@ -1,50 +1,49 @@
-# PROJECT COMPLETION — definition of done for the final system (V5-TF)
+# PROJECT COMPLETION — definition of done for the final system (V6-TF)
 
-FINAL TARGET = Version: V5-TF. V4 = historical baseline / ablation only
-(HARD_CONSTRAINTS C0). The project is complete when every item below is DONE,
-with evidence recorded in DECISIONS / EXPERIMENT_REGISTRY / RESULTS_CANONICAL.
-Status values: DONE · IN PROGRESS · BLOCKED · TODO. Update in the same commit as
-the evidence.
+FINAL TARGET = Version: V6-TF (Amendment 9; HARD_CONSTRAINTS C0). V4 =
+historical baseline / ablation only. V5-TF/E41 = rejected development
+history (FX-18). The project is complete when every item below is DONE, with
+evidence in DECISIONS / EXPERIMENT_REGISTRY / RESULTS_CANONICAL and
+`research/final/`. Status values: DONE · IN PROGRESS · BLOCKED · TODO ·
+DEFERRED (owner).
 
-## A. Design (pre-freeze, development-40 only)
+## A. Design (pre-freeze, development only: val-7 sandbox, dev-40 check)
 | # | Item | Status | Evidence / pointer |
 |---|---|---|---|
-| A1 | Training-free requirement declared | DONE | Amendment 6 (3684684), C1 |
-| A2 | Final target = V5-TF, V4 baseline only | DONE | Amendment 7, C0, D-018 |
-| A3 | Candidate handling (ECDF + Otsu-3 bands) implemented | DONE | 71faf44 |
-| A4 | Motion-aware association (F3) implemented | DONE | 71faf44 |
-| A5 | Scene-adaptive resolution R-res + random control F5R declared | DONE | Amendment 7 §4 |
-| A6 | R-res, scene-state vector logging implemented | DONE (crash-tested, no metrics) | online_calibration.py, universal_policy_pipeline.py, tools/v5tf_dev.py |
-| A7 | Multi-resolution (640/832) development caches | DONE | 56/56 per detector; merged in outputs/det_cache_train_res/ |
-| A8 | E36 family validation (F1, F2, F3, F5, F5R + static, V4) | DONE | outputs/v5tf_dev/, D-022 |
-| A9 | Family choice among selectable F3/F5 (declared rule) | DONE — F3 | outputs/v5tf_dev/family_choice.json |
-| A10 | Constant audit (OTSU_BINS, Otsu window, RobustHistory window, warm-up) | DONE | outputs/v5tf_dev/constant_audit.json, D-023 |
-| A11 | Parameter audit: every V5-TF constant in A/B/C/D or reported E | BLOCKED | bins/window sensitive E; C5 forbids freeze |
-| A6b | Live == replay parity for the chosen V5-TF family (few development frames) | DONE | outputs/v5tf_dev/live_replay_parity_v2.json (80/80 PASS) |
-| A12 | Optional research upper bound D (S3 on development-40, never final) | TODO (optional) | E37 |
+| A1 | Training-free requirement declared | DONE | Amendment 6, C1 |
+| A2 | E41 audit; E41 not freeze-worthy | DONE | E42, FX-18, D-026 |
+| A3 | V6 development iterations with ledger | DONE | E43, research/final/EXPERIMENT_LEDGER.md |
+| A4 | Candidate selected by owner priorities (no catastrophic, FP, precision, MOTA, …) | DONE — X5 | D-027 |
+| A5 | Robustness: Platt/monotone recalibration, emission floor, memory constants, ablations | DONE | E44 |
+| A6 | Development-40 robustness check (not iterated) | DONE | E45 |
+| A7 | Parameter audit: every V6-TF constant A/B/C(safety)/D | DONE | PARAMETER_STATUS.md V6-TF table |
+| A8 | Causality audit (future-perturbation test) + no detector branching | DONE | tests/test_v6_adaptive_layer.py |
+| A9 | Live == replay parity for the actual candidate | DONE | E46, outputs/v6/live_replay_parity.json |
+| A10 | Functional tests pass | DONE | tests/ (V6 9 + legacy 3) |
+| A11 | Official-compatible VisDrone evaluator implemented and sanity-checked | DONE | tools/v6/eval_official.py, E47 |
 
-## B. Freeze gate
+## B. Freeze
 | # | Item | Status | Evidence |
 |---|---|---|---|
-| B1 | Amendment-5f T4 fidelity gate PASS (fixed thresholds) | BLOCKED (needs T4) | E38, tools/fidelity_gate.py |
-| B2 | Freeze tag universal-acmot-v5tf-freeze + V5-TF policy file + lock | TODO | FROZEN_VERSIONS.md |
+| B1 | Clean tree; unknown files preserved outside the freeze | DONE | D-028 |
+| B2 | Policy file + lock with file hashes | see FROZEN_VERSIONS.md | research/V6TF_POLICY_LOCK.json |
+| B3 | Freeze tag universal-acmot-v6-freeze + freeze record | see FROZEN_VERSIONS.md | research/final/FREEZE_RECORD_V6TF.md |
+| B4 | Amendment-5f T4 fidelity gate | DEFERRED (owner, Amendment 9 §5) | run before publication; report either way |
 
 ## C. Post-freeze evaluation (once each, no retuning)
 | # | Item | Status |
 |---|---|---|
-| C1 | Confirmation-16: V5-TF vs V4 (reported, not a gate) | TODO |
-| C2 | VisDrone val secondary check | TODO |
+| C1 | Confirmation-16: V6-TF vs V4 vs shared-static (internal + official-compatible, paired bootstrap) | TODO |
+| C2 | VisDrone val official-compatible table (development, labelled) | TODO |
 | C3 | Unseen detector: Faster R-CNN ResNet50-FPN v2 | TODO |
 | C4 | Tracker transfer: BoT-SORT | TODO |
-| C5 | Unseen dataset: UAVDT test | TODO |
-| C6 | Official T4 timing: scene analyzer, normaliser, AC decision, detector, tracker, total, P95, FPS, GPU memory, AC overhead % | TODO (harness ready, 1eaa3c6; needs a T4 run after freeze) |
+| C5 | Unseen dataset: UAVDT | TODO |
+| C6 | Official T4 timing | DEFERRED (owner) |
 | C7 | VisDrone test-dev post-hoc (labelled post-hoc) | TODO |
+| C8 | External published MOT system(s) + frozen layer, reproduced baseline first | TODO |
 
-## D. Final report answers (must all be evidence-backed)
-Does the AC layer require training? (NO) · labeled calibration data? (NO) ·
-detector-specific tuning? (NO) · tracker-specific tuning? (NO) · self-calibrates
-online? (YES) · causal? (YES) · real-time? (measured, C6) · transfers to Faster
-R-CNN / BoT-SORT / UAVDT without tuning? (C3–C5) · improvement over V4
-compute-only at matched compute? (C1, reported either way) · which scene/state
-cues help? (A8 ablations: F1 vs F3 vs F5 vs F5R) · which old cues were rejected?
-(D-005, D-010) · remaining failure cases? (FAILED_EXPERIMENTS.md).
+## D. Paper package (research/final/)
+FINAL_METHOD · EXPERIMENT_LEDGER · FINAL_RESULTS · FAILURE_ANALYSIS · ABLATION ·
+REPRODUCIBILITY · PAPER_CLAIMS · TABLES/ · FIGURES/ · FINAL_SUMMARY ·
+EXTERNAL_PAPER_TRANSFER — each evidence-backed; claims split into supported /
+partially supported / not supported.

@@ -81,6 +81,97 @@ def exact_otsu3(values):
     return float((v[i - 1] + v[i]) / 2), float((v[j - 1] + v[j]) / 2), eta
 
 
+def exact_otsu2(values):
+    """Exact 2-class Otsu threshold (midpoint of the optimal gap)."""
+    v = np.sort(np.asarray(values, dtype=np.float64))
+    v = v[np.isfinite(v)]
+    n = len(v)
+    if n < 2 or v[-1] - v[0] < 1e-12:
+        return None
+    P = np.cumsum(v)
+    i = np.arange(1, n)
+    m1, m2 = P[i - 1] / i, (P[-1] - P[i - 1]) / (n - i)
+    k = int(np.argmax(i * (n - i) * (m1 - m2) ** 2))
+    return float((v[k] + v[k + 1]) / 2)
+
+
+def nested_otsu(values):
+    """Hierarchical split: background | foreground by 2-class Otsu, then
+    extension | primary by 2-class Otsu inside the foreground only, so the
+    primary boundary does not depend on how many background candidates the
+    detector emits. Returns (t1, t2, eta) like exact_otsu3."""
+    v = np.asarray(values, dtype=np.float64)
+    v = v[np.isfinite(v)]
+    a = exact_otsu2(v)
+    if a is None:
+        return None
+    fg = v[v >= a]
+    b = exact_otsu2(fg)
+    t2 = a if b is None else b
+    var = float(np.var(v))
+    lab = (v >= a).astype(int) + (v >= t2)
+    sb = sum((lab == k).sum() * (v[lab == k].mean() - v.mean()) ** 2
+             for k in range(3) if (lab == k).any()) / len(v)
+    return float(a), float(t2), float(sb / var) if var > 0 else 0.0
+
+
+def iou_xyxy(a, b):
+    a = np.asarray(a, dtype=np.float64).reshape(-1, 4)
+    b = np.asarray(b, dtype=np.float64).reshape(-1, 4)
+    iw = np.clip(np.minimum(a[:, None, 2], b[None, :, 2]) -
+                 np.maximum(a[:, None, 0], b[None, :, 0]), 0, None)
+    ih = np.clip(np.minimum(a[:, None, 3], b[None, :, 3]) -
+                 np.maximum(a[:, None, 1], b[None, :, 1]), 0, None)
+    inter = iw * ih
+    ua = ((a[:, 2] - a[:, 0]) * (a[:, 3] - a[:, 1]))[:, None] + \
+        ((b[:, 2] - b[:, 0]) * (b[:, 3] - b[:, 1]))[None] - inter
+    return inter / np.maximum(ua, 1e-12)
+
+
+def dedup(boxes, scores, iou=0.5):
+    """Class-agnostic greedy duplicate suppression (indices kept, by score).
+    Two boxes with IoU > 0.5 cannot both be matched to distinct objects
+    under the IoU-0.5 correspondence rule, so the weaker one is redundant."""
+    b = np.asarray(boxes, dtype=np.float64).reshape(-1, 4)
+    order = np.argsort(-np.asarray(scores, dtype=np.float64), kind="stable")
+    area = np.maximum(b[:, 2] - b[:, 0], 0) * np.maximum(b[:, 3] - b[:, 1], 0)
+    keep = []
+    while len(order):
+        i = order[0]
+        keep.append(int(i))
+        rest = order[1:]
+        iw = np.clip(np.minimum(b[i, 2], b[rest, 2]) - np.maximum(b[i, 0], b[rest, 0]), 0, None)
+        ih = np.clip(np.minimum(b[i, 3], b[rest, 3]) - np.maximum(b[i, 1], b[rest, 1]), 0, None)
+        inter = iw * ih
+        ov = inter / np.maximum(area[i] + area[rest] - inter, 1e-12)
+        order = rest[ov <= iou]
+    return keep
+
+
+def exact_otsu3_fast(values):
+    """Same optimum as exact_otsu3 (identical tie-breaking: first (i, j) in
+    row-major order), vectorised over j; O(n^2) arithmetic, O(n) memory."""
+    v = np.sort(np.asarray(values, dtype=np.float64))
+    v = v[np.isfinite(v)]
+    if len(v) < 3 or v[-1] - v[0] < 1e-12:
+        return None
+    n = len(v)
+    P = np.concatenate(([0.0], np.cumsum(v)))
+    mu = P[n] / n
+    best, bi, bj = -np.inf, None, None
+    for i in range(1, n - 1):
+        j = np.arange(i + 1, n)
+        m1, m2, m3 = P[i] / i, (P[j] - P[i]) / (j - i), (P[n] - P[j]) / (n - j)
+        sb = (i * (m1 - mu) ** 2 + (j - i) * (m2 - mu) ** 2
+              + (n - j) * (m3 - mu) ** 2) / n
+        k = int(np.argmax(sb))
+        if sb[k] > best:
+            best, bi, bj = float(sb[k]), i, int(j[k])
+    total = float(np.var(v))
+    eta = float(best / total) if total > 0 else 0.0
+    return (float((v[bi - 1] + v[bi]) / 2), float((v[bj - 1] + v[bj]) / 2), eta)
+
+
 class RobustHistory:
     """Causal rolling median/MAD of a scalar (window of past values)."""
 

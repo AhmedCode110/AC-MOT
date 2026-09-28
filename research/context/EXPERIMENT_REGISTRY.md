@@ -38,3 +38,13 @@ NOT official VisDrone. HOTA = TrackEval 12c8791; others = motmetrics 1.4.0.
 Numbers in E34/E35 are quoted from the committed protocol text
 (research/OPTIMIZATION_PROTOCOL.md Amendments 5b/5c); they were not re-derived
 from `outputs/v5/s3*/` during the context build → re-derive before citing in a paper.
+
+## V6-TF era (Amendment 9) — authoritative detail: research/final/EXPERIMENT_LEDGER.md
+| ID | Commit / protocol | Question | Command | Data | Result | Status |
+|---|---|---|---|---|---|---|
+| E42 | Amendment 9 | Why does E41 fail? (D1–D6: candidate inflation, duplicates, ghost births, extension band, oracle threshold) | `tools/v6/det_audit.py`, ledger scripts | development-40 + val-7 (development) | primaries 2–3× GT in catastrophic cells; 19% duplicate boxes; no birth-time feature separates ghost births (AUC 0.43–0.58) | DONE |
+| E43 | Amendment 9 | V6 development iterations X1–X5j | `PYTHONPATH=. .venv/bin/python tools/v6/dev.py run <sys>` | val-7 × 2 detectors | X5: 0 cat; 18.6/34.3/38.6 · 25.0/41.6/48.1 (MOTA/HOTA/IDF1) vs V4 17.5/33.2/36.6 · 21.5/39.0/42.4 | DONE → X5 selected (D-027) |
+| E44 | Amendment 9 | X5 robustness pass (Platt, monotone, emission floor, memory constants, ablations) | `tools/v6/dev.py run "X5@..."` | val-7 | exact Platt invariance; memory constants insensitive (A); non-affine monotone and emission floor sensitive (limitations) | DONE |
+| E45 | Amendment 9 | development-40 robustness check + ablations (not iterated on) | `V6_SPLIT=dev40 tools/v6/dev.py run ...` | development-40 | X5 2 cat vs V4 3 / E41 15; 25.5/35.8/43.5 · 29.6/39.9/47.7 vs V4 25.1/35.2/42.2 · 26.3/38.4/44.4 | DONE |
+| E46 | Amendment 9 | live == replay parity of V6-TF (real detector + image cues) | `tools/v6/live_replay_parity.py` | 2 val seq × 20 frames × 2 det, no GT | PASS 80/80 frames | DONE |
+| E47 | Amendment 9 | official-compatible VisDrone evaluation (class-aware, ignored regions) of development runs | `tools/v6/dev.py official <sys>` | val-7 | X5 4 cat vs V4 5; 10.7/30.4/32.4 · 10.9/35.0/37.7 vs V4 10.4/29.6/30.7 · 10.3/32.9/33.3 | DONE (development) |

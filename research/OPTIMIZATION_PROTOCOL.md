@@ -434,3 +434,45 @@ histogram-bin count and no historical Otsu memory window. E41 is training-free,
 causal, detector-/tracker-agnostic, and is compared with the recorded F3 under
 the existing catastrophic-cell, worst-detector relative-gain, then simplicity
 rule. No parameter search and no protected evaluation is permitted.
+
+## Amendment 9 (2026-09-28) — E41 not freeze-worthy; V6-TF development on val-7 (owner directive, declared before any V6 result)
+
+Owner directive (2026-09-28): the E41 audit (development-40: 15 catastrophic
+cells, precision 58/60, FP ≈ 4× V4, MOTA 12.7/19.1 vs V4 25.1/26.3) makes E41
+NOT freeze-worthy; it is never frozen. Its successor, **V6-TF**, keeps every
+Amendment-6 requirement (training-free, online, causal, self-calibrating, one
+shared policy, no detector/tracker/sequence-specific logic or constants).
+
+1. Development sandbox: VisDrone2019-MOT-val (7 sequences), YOLOv8n +
+   RT-DETR-L, ByteTrack, 736. Iteration on val-7 is allowed; val-7 numbers are
+   development evidence only (V4 was selected on val-7, so V4's val-7 numbers
+   are in-sample). Development-40 is non-protected development data; it is
+   used only for a robustness check of the final candidate and reported as
+   such.
+2. Protected until tag `universal-acmot-v6-freeze`: confirmation-16, test-dev,
+   UAVDT, Faster R-CNN tracking quality, BoT-SORT tracking quality
+   (`tools/v6/dev.py` refuses them). After the freeze each is evaluated once
+   with the frozen policy; no retuning.
+3. Causality: every control decision for frame t (thresholds, bands,
+   association tolerance) uses only image cues of frame t and statistics of
+   frames < t. Frame-t detections update state only for frames > t.
+   Processing a frame's own candidate list geometrically (duplicate
+   suppression) is not a control decision.
+4. Priorities for accepting a change (owner): avoid catastrophic cells,
+   control FP inflation, healthy precision and MOTA, then HOTA, IDF1, IDS,
+   recall, cross-detector consistency. A change that gains HOTA/recall through
+   uncontrolled candidate inflation is rejected. Every experiment is logged in
+   `research/final/EXPERIMENT_LEDGER.md` (ID, hypothesis, diff, result,
+   decision).
+5. T4: the Amendment-5f fidelity gate and official timing are deferred by the
+   owner to the final pre-paper step; the V6 freeze is therefore NOT
+   conditioned on 5f. Declared limitation: all quality results are computed
+   from Mac-MPS caches (prior evidence E05: exact reproduction of CUDA
+   metrics); the gate is run with its fixed thresholds before publication and
+   reported either way.
+6. Confirmation-16 after freeze: V6-TF vs V4 vs shared-static, paired
+   sequence bootstrap with the frozen protocol settings (10,000 resamples,
+   seed 42), reported, not a gate.
+7. After freeze: external transfer to independently published MOT systems
+   with the SAME frozen layer (integration-only adapters), reproduced
+   baseline first (owner directive, 2026-09-28).

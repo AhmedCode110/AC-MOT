@@ -15,7 +15,8 @@ Edit this file when the project state changes, then rebuild the graph.
 | Version: V3 | FROZEN SUPERSEDED | calibration-invariant ECDF z-logit gate with legacy SCI | FROZEN_VERSIONS.md |
 | Version: V4 | FROZEN BASELINE ONLY | latest frozen version; baseline and ablation only, never the final system or a fallback; compute-budget-only, VisDrone-tuned constants | FROZEN_VERSIONS.md |
 | Version: V5 learned controller | SUPERSEDED RESEARCH-ONLY | scene-state learned stump tree Optuna controller research upper bound not deployable | DECISIONS.md |
-| Version: V5-TF | FINAL TARGET EXPERIMENTAL | final target and contribution: training-free online self-calibrating scene-state adaptive detector-agnostic tracker-agnostic real-time causal; under development, not frozen | ARCHITECTURE.md |
+| Version: V5-TF | SUPERSEDED DEVELOPMENT | training-free Otsu-band line F1-F5 and E41; E41 locked then rejected by audit (FX-18); never frozen; succeeded by V6-TF | ARCHITECTURE.md |
+| Version: V6-TF | FINAL TARGET | final target and contribution: training-free online self-calibrating causal detector-agnostic tracker-agnostic; dedup IoU 0.5, nested exact-Otsu bands on logits of frames t-10..t-1, motion-conditioned association; tag universal-acmot-v6-freeze | ARCHITECTURE.md |
 | Architecture: Original SCI architecture | SUPERSEDED | scene analysis SCI weighted sum resolution and sensitivity controller | ARCHITECTURE.md |
 | Architecture: V4 compute-budget architecture | ABLATION | V4 is not the final architecture: compute-budget-only ablation, scene adaptation deletion rejected (D-009), VisDrone-tuned category E constants; resolution budget ECDF z-gate | ARCHITECTURE.md |
 | Architecture: V5-TF target architecture | CURRENT | frame scene state analyzer online self-calibration AC controller before detector candidate handling tracker feedback | ARCHITECTURE.md |
@@ -110,14 +111,14 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-014 fidelity gate constants | ACTIVE | T4 gate thresholds never relaxed | DECISIONS.md |
 | Decision: D-015 training-free final AC | ACTIVE | final AC layer must not be trained Optuna discovery-only | DECISIONS.md |
 | Decision: D-016 F4 dropped | ACTIVE | F4 identical to F1 | DECISIONS.md |
-| Decision: D-018 final target V5-TF | ACTIVE | final target is V5-TF; V4 baseline ablation only never fallback; confirmation reported not a gate | DECISIONS.md |
+| Decision: D-018 final target V5-TF | SUPERSEDED | final target is V5-TF; V4 baseline ablation only never fallback; confirmation reported not a gate | DECISIONS.md |
 | Decision: D-019 scene-state control R-res | ACTIVE | frozen V5-TF must contain scene-state control; selectable F3 F5 | DECISIONS.md |
 | Decision: D-020 constant audit rule | ACTIVE | sensitivity audit insensitive to structural else reported category E never tuned | DECISIONS.md |
 | Decision: D-022 E36 selects F3 | ACTIVE | F3 selected honestly; F5 scene-adaptive resolution did not beat random control | DECISIONS.md |
 | Decision: D-023 E39 C5 blockers | ACTIVE | Otsu bins and window sensitive E block policy lock and freeze | DECISIONS.md |
 | Decision: D-024 live replay parity | ACTIVE | F3 live motion path exactly equals cached replay on declared development subset | DECISIONS.md |
 | Decision: D-017 repository is project memory | ACTIVE | context files over chat history | DECISIONS.md |
-| Constraint: C0 final target V5-TF | HARD | FINAL TARGET = V5-TF; V4 historical baseline ablation only; never revert to V4 | HARD_CONSTRAINTS.md |
+| Constraint: C0 final target V6-TF | HARD | FINAL TARGET = V6-TF (Amendment 9); V4 historical baseline ablation only; never revert to V4 | HARD_CONSTRAINTS.md |
 | Constraint: C1 training-free final AC layer | HARD | AC training NOT allowed no fitted controller no labels no GT at deployment | HARD_CONSTRAINTS.md |
 | Constraint: C3 causality | HARD | frame t uses only frames up to t no future no GT | HARD_CONSTRAINTS.md |
 | Constraint: C5 no category E constants | HARD | E39 resolved history and warm-up as A; sensitive Otsu window and bins remain freeze blockers | HARD_CONSTRAINTS.md |
@@ -129,7 +130,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Protocol: Amendment 4 | HISTORICAL | V4 whole-controller generalization audit | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 5d | PARTLY SUPERSEDED | 40/16 train split protocol | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 5f | ACTIVE | cross-hardware fidelity gate | VALIDATION_PROTOCOL.md |
-| Protocol: Amendment 7 | CURRENT | V5-TF final target, scene-adaptive resolution R-res, families F3 F5 F5R, constant audit | VALIDATION_PROTOCOL.md |
+| Protocol: Amendment 7 | SUPERSEDED IN PART | V5-TF final target, scene-adaptive resolution R-res, families F3 F5 F5R, constant audit | VALIDATION_PROTOCOL.md |
 | Protocol: Amendment 6 | CURRENT | V5-TF training-free protocol families comparison freeze | VALIDATION_PROTOCOL.md |
 | Tag: v1.0.0-acmot-frozen | FROZEN | legacy AC-MOT tag | FROZEN_VERSIONS.md |
 | Tag: universal-acmot-v1-freeze | FROZEN | V1 tag | FROZEN_VERSIONS.md |
@@ -148,6 +149,14 @@ Edit this file when the project state changes, then rebuild the graph.
 | Lock: TRAIN_SPLIT_V5 | ACTIVE | fixed 40/16 split seed 20260927 | ../TRAIN_SPLIT_V5.json |
 | Families: detector and tracker families tested | EVIDENCE | detector families tested YOLOv8n RT-DETR-L; Faster R-CNN cached not yet evaluated; tracker families tested ByteTrack BoT-SORT | RESULTS_CANONICAL.md |
 | Failure: Failures not to repeat | REGISTRY | failures that should not be repeated: legacy SCI, learned controllers, density budgets, temporal persistence, MOTA-aligned cost, closed-loop trust, max-min objective | FAILED_EXPERIMENTS.md |
+| Protocol: Amendment 9 | CURRENT | E41 not freeze-worthy; V6-TF developed on val-7 sandbox; protected sets until universal-acmot-v6-freeze; causality frames < t; T4 deferred to pre-paper step; external published-system transfer after freeze | VALIDATION_PROTOCOL.md |
+| Decision: D-026 E41 rejected V6-TF target | ACTIVE | E41 never frozen; final target V6-TF developed on val-7; supersedes D-018 and D-025 | DECISIONS.md |
+| Decision: D-027 V6-TF is X5 | ACTIVE | duplicate suppression + nested exact-Otsu bands + motion; 0 catastrophic cells val-7, 2 on dev-40 vs V4 3 | DECISIONS.md |
+| Experiment: E43 V6 development X1-X5 | DONE DEVELOPMENT | val-7 iterations X1 dedup, X2 no extension, X3 causal, X4 jitter band rejected, X5 nested Otsu selected | EXPERIMENT_REGISTRY.md |
+| Experiment: E45 V6 dev-40 robustness | DONE DEVELOPMENT | X5 on development-40, not iterated: 2 catastrophic cells vs V4 3 and E41 15 | EXPERIMENT_REGISTRY.md |
+| Experiment: E48 confirmation-16 | PLANNED POST-FREEZE | one-way evaluation of frozen V6-TF vs V4 vs shared-static, paired bootstrap 10000 seed 42 | NEXT_STEPS.md |
+| Component: Duplicate Suppression | FINAL | class-agnostic greedy suppression at the IoU-0.5 correspondence rule | ARCHITECTURE.md |
+| Component: Nested Otsu Bands | FINAL | background/foreground then extension/primary exact 2-class Otsu on pooled logits of frames t-10..t-1 | ARCHITECTURE.md |
 
 ## Relations
 | Subject | Relation | Object |
@@ -159,8 +168,9 @@ Edit this file when the project state changes, then rebuild the graph.
 | Project: Universal AC-MOT | HAS_VERSION | Version: V4 |
 | Project: Universal AC-MOT | HAS_VERSION | Version: V5 learned controller |
 | Project: Universal AC-MOT | HAS_VERSION | Version: V5-TF |
-| Project: Universal AC-MOT | CURRENT_VERSION | Version: V5-TF |
-| Project: Universal AC-MOT | FINAL_TARGET | Version: V5-TF |
+| Project: Universal AC-MOT | CURRENT_VERSION | Version: V6-TF |
+| Project: Universal AC-MOT | FINAL_TARGET | Version: V6-TF |
+| Project: Universal AC-MOT | HAS_VERSION | Version: V6-TF |
 | Project: Universal AC-MOT | BASELINE_ONLY | Version: V4 |
 | Component: Universal AC Controller | HAS_CANDIDATE_RULE | Rule: F5 scene-adaptive resolution R-res |
 | Rule: F5R random resolution control | CONTROLS_FOR | Rule: F5 scene-adaptive resolution R-res |
@@ -177,14 +187,14 @@ Edit this file when the project state changes, then rebuild the graph.
 | Decision: D-023 E39 C5 blockers | SUPPORTED_BY | Experiment: E39 constant audit |
 | Decision: D-023 E39 C5 blockers | REQUIRES | Experiment: E41 exact-Otsu family |
 | Decision: D-024 live replay parity | SUPPORTED_BY | Experiment: E40 F3 live replay parity |
-| Constraint: C0 final target V5-TF | APPLIES_TO | Version: V5-TF |
-| Constraint: C0 final target V5-TF | APPLIES_TO | Version: V4 |
-| Constraint: C0 final target V5-TF | DERIVED_FROM | Decision: D-018 final target V5-TF |
+| Constraint: C0 final target V6-TF | APPLIES_TO | Version: V6-TF |
+| Constraint: C0 final target V6-TF | APPLIES_TO | Version: V4 |
+| Constraint: C0 final target V6-TF | DERIVED_FROM | Decision: D-018 final target V5-TF |
 | Protocol: Amendment 7 | GOVERNS | Version: V5-TF |
 | Protocol: Amendment 7 | GOVERNS | Experiment: E39 constant audit |
 | Experiment: E39 constant audit | EVALUATES | Version: V5-TF |
-| Project: Universal AC-MOT | LATEST_FROZEN_VERSION | Version: V4 |
-| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E41 exact-Otsu family |
+| Project: Universal AC-MOT | LATEST_FROZEN_VERSION | Version: V6-TF |
+| Project: Universal AC-MOT | NEXT_EXPERIMENT | Experiment: E48 confirmation-16 |
 | Version: V1 | SUPERSEDES | Version: Legacy AC-MOT |
 | Version: V3 | SUPERSEDES | Version: V1 |
 | Version: V4 | SUPERSEDES | Version: V3 |
@@ -367,6 +377,20 @@ Edit this file when the project state changes, then rebuild the graph.
 | Component: Legacy SCI | HAD_CUE | Cue: img_edges |
 | Component: Legacy SCI | HAD_CUE | Cue: img_brightness |
 | Component: Legacy SCI | HAD_CUE | Cue: img_blur |
+| Decision: D-026 E41 rejected V6-TF target | SELECTS | Version: V6-TF |
+| Decision: D-026 E41 rejected V6-TF target | RECORDED_IN | Protocol: Amendment 9 |
+| Decision: D-026 E41 rejected V6-TF target | SUPERSEDES | Decision: D-018 final target V5-TF |
+| Decision: D-027 V6-TF is X5 | SELECTS | Version: V6-TF |
+| Experiment: E43 V6 development X1-X5 | EVALUATES | Version: V6-TF |
+| Experiment: E45 V6 dev-40 robustness | EVALUATES | Version: V6-TF |
+| Experiment: E48 confirmation-16 | EVALUATES | Version: V6-TF |
+| Version: V6-TF | SUPERSEDES | Version: V5-TF |
+| Version: V6-TF | COMPARED_AGAINST | Version: V4 |
+| Version: V6-TF | USES_COMPONENT | Component: Duplicate Suppression |
+| Version: V6-TF | USES_COMPONENT | Component: Nested Otsu Bands |
+| Version: V6-TF | USES_COMPONENT | Component: ECDF Normaliser |
+| Protocol: Amendment 9 | GOVERNS | Version: V6-TF |
+| Constraint: C0 final target V6-TF | DERIVED_FROM | Decision: D-026 E41 rejected V6-TF target |
 
 ## Code links
 | Entity | Relation | Code file |
@@ -400,3 +424,7 @@ Edit this file when the project state changes, then rebuild the graph.
 | Detector: Faster R-CNN ResNet50-FPN v2 | IMPLEMENTED_IN | adapters/detectors/fasterrcnn.py |
 | Tracker: ByteTrack | IMPLEMENTED_IN | adapters/trackers/bytetrack.py |
 | Tracker: BoT-SORT | IMPLEMENTED_IN | adapters/trackers/botsort.py |
+| Component: Duplicate Suppression | IMPLEMENTED_IN | online_calibration.py |
+| Component: Nested Otsu Bands | IMPLEMENTED_IN | online_calibration.py |
+| Component: Nested Otsu Bands | IMPLEMENTED_IN | universal_policy_pipeline.py |
+| Experiment: E43 V6 development X1-X5 | IMPLEMENTED_IN | tools/v6/dev.py |

@@ -18,6 +18,7 @@ E41 against the recorded F3; no parameter search or protected data is allowed.
 Status: VALIDATED in E41: 80/80 PKLs, 15 catastrophic cells, and +0.69%
 worst-detector relative gain vs V4. E41 is retained as the candidate-band
 family for the next policy audit; no protected data was used.
+Superseded by D-026 (E41 not freeze-worthy; Amendment 9).
 
 ### D-001 — Original AC-MOT: handcrafted SCI controller around YOLOv8n + ByteTrack
 Date 2026-09-11 · Commit a6c1fa4 (tag v1.0.0-acmot-frozen)
@@ -155,6 +156,7 @@ fixes need a new revision and new clean data. Reason: owner direction;
 consistent with C1–C11 (honest reporting retained). Alternatives rejected:
 V4 fallback; choosing between V4 and V5-TF as rival finals. Revisit: only by
 owner.
+Superseded by D-026 (final target = V6-TF, the training-free successor; Amendment 9). V4 stays baseline only.
 
 ### D-019 — Scene-state control required in the frozen V5-TF; R-res declared
 Date 2026-09-27 · Amendment 7 §3–5
@@ -228,3 +230,66 @@ the two paths sequentially from the same ID state. Result: exact tracks and
 selected control-audit fields on 80/80 frames (2 development sequences × 20
 frames × 2 detectors), no GT or quality metric. Decision: the live motion fix
 81a6c53 is behaviourally equivalent to cached replay on the declared subset.
+
+### D-026 — E41 is not freeze-worthy; final target becomes V6-TF, developed on val-7 (Amendment 9)
+Date 2026-09-28 · owner directive + audit · Amendment 9
+Evidence: the E41 audit on development-40 found 15 catastrophic cells,
+precision 58/60, FP ≈ 4× V4 and MOTA 12.7/19.1 vs V4 25.1/26.3. The
+diagnostics D1–D6 are in research/final/EXPERIMENT_LEDGER.md. Decision:
+E41 is never frozen (FX-18). Its training-free successor V6-TF is developed
+on VisDrone-MOT-val (val-7 sandbox, iterative) and checked once on
+development-40 (not iterated on). Protected sets stay protected until the
+tag universal-acmot-v6-freeze. Control decisions for frame t use frames < t
+only (C3 tightened). The owner deferred the T4 fidelity gate and official
+timing to the final pre-paper step, so the freeze is not conditioned on them;
+this is declared as a limitation. Supersedes: D-018, D-025.
+
+### D-027 — V6-TF = candidate X5 (duplicate suppression + nested exact-Otsu bands + motion)
+Date 2026-09-28 · Evidence: EXPERIMENT_LEDGER X1–X5j, robustness pass, dev-40 check
+Hypotheses:
+- H3 (duplicates): ACCEPTED. E41 has 19% duplicate output boxes; IoU-0.5
+  suppression removes them.
+- H4 (the extension band sustains ghost tracks): PARTIAL. The band is needed
+  for HOTA/IDF1, so it is restricted rather than removed.
+- Causal thresholds from frames < t: ACCEPTED at no cost.
+- H5 (jitter-width band): REJECTED.
+- H6 (3-class Otsu is dominated by the volume of background emissions; a
+  nested background|foreground → extension|primary split fixes the primary
+  boundary): ACCEPTED.
+
+Result, val-7:
+- 0 catastrophic cells.
+- MOTA/HOTA/IDF1: 18.6/34.3/38.6 (YOLO) and 25.0/41.6/48.1 (RT-DETR),
+  vs V4 17.5/33.2/36.6 and 21.5/39.0/42.4 (V4 in-sample).
+
+Result, dev-40:
+- 2 catastrophic cells vs V4 3 and E41 15.
+- 25.5/35.8/43.5 and 29.6/39.9/47.7, vs V4 25.1/35.2/42.2 and 26.3/38.4/44.4.
+
+Robustness:
+- Exact Platt invariance.
+- Memory constants insensitive.
+- Sensitive to non-affine monotone recalibration and to the adapter
+  emission floor; both are reported limitations.
+- Live == replay parity PASS (80/80 frames).
+- 9 V6 tests pass.
+
+Selection was by the owner's priority order (catastrophic cells → FP
+control → precision → MOTA → HOTA → IDF1 → IDS). It never used a protected
+set. V4's val-7 numbers are in-sample, which favours V4.
+
+### D-028 — Unknown-provenance working-tree files preserved outside the freeze
+Date 2026-09-28
+The uncommitted `universal_pipeline.py`, `tests/test_full_pipeline_equivalence.py`
+and the untracked tools/audit/nms_audit_frcnn.py (stashed, D-028),
+tools/build_calibration_split.py (stashed, D-028), `tools/calibrate_detector_*.py` and
+tools/sync_t4_caches.sh (stashed, D-028) were not on the V5-TF/V6-TF path and were not
+authored by this session. They are preserved, not deleted:
+- git stash `stash@{0}` (51a46971306419b9358b8eff7106ee3c6027b286,
+  message "UNKNOWN-PROVENANCE WIP preserved before V6-TF freeze");
+- the tarball outputs/quarantine/unknown_provenance_files_2026-09-28.tgz;
+- the diff outputs/quarantine/unknown_provenance_tracked.diff.
+
+The freeze commit is built from a clean tree. The owner may restore them with
+`git stash pop`.
+

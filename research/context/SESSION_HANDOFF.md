@@ -5,6 +5,22 @@ Repo: `/Users/ahmedgouda/Desktop/Universal-ACMOT`, branch
 Current HEAD / dirty state: see GIT_STATE.md (auto-generated) — verify with git.
 
 ## Direction
+FINAL TARGET = V6-TF (Amendment 9, HARD_CONSTRAINTS C0). V4 = historical
+baseline / ablation ONLY. V5-TF (F1–F5, E41) = rejected development
+history (E41 audit: FX-18). V6-TF is training-free, online self-calibrating,
+causal, detector-/tracker-agnostic: IoU-0.5 duplicate suppression +
+nested exact-Otsu bands on pooled logits of frames t−10..t−1 + ECDF order
+within band + motion-conditioned association. Details:
+research/final/FINAL_METHOD.md; development ledger:
+research/final/EXPERIMENT_LEDGER.md; runner: tools/v6/dev.py.
+
+## Where things stand
+Read NEXT_STEPS.md (NEXT EXACT ACTION) and research/final/. Freeze tag:
+universal-acmot-v6-freeze (FROZEN_VERSIONS.md). Protected until the tag:
+confirmation-16, Faster R-CNN, BoT-SORT, UAVDT (tools/v6/dev.py refuses).
+
+## Historical notes (V5-TF era, superseded)
+### (old) Direction
 FINAL TARGET = V5-TF (Amendment 7, HARD_CONSTRAINTS C0). V4 = historical
 baseline / ablation ONLY — never a fallback, never a rival final.
 Universal AC-MOT = adaptive-control layer around a FROZEN detector and FROZEN
