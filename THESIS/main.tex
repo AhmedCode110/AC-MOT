@@ -1,6 +1,3 @@
-% Compile with LuaLaTeX (Overleaf: Menu > Compiler > LuaLaTeX), then BibTeX.
-\RequirePackage{iftex}
-\RequireLuaTeX
 \documentclass[12pt,a4paper,oneside]{report}
 
 % ---------------------------------------------------------------------------
@@ -20,27 +17,12 @@
 \newcommand{\SupervisorTwoAffil}{Computer Engineering Department, Egypt University of Informatics}
 \newcommand{\PaperOneStatus}{submitted}
 \newcommand{\PaperTwoStatus}{submitted}
-% Arabic front data
-\newcommand{\ArabicTitle}{التحكم التكيفي دون تدريب في نقاط تشغيل الكاشف والمتتبع لتتبع الأجسام المتعددة}
-\newcommand{\ArabicAuthor}{أحمد جودة إسماعيل}
-\newcommand{\ArabicSupervisorOne}{محمد س. محمد}
-\newcommand{\ArabicSupervisorTwo}{طارق أحمد محمود}
-\newcommand{\ArabicDegree}{رسالة مقدمة استكمالاً لمتطلبات الحصول على درجة ماجستير العلوم في هندسة الحاسبات}
-\newcommand{\ArabicDepartment}{قسم هندسة الحاسبات والذكاء الاصطناعي}
-\newcommand{\ArabicInstitution}{الكلية الفنية العسكرية}
-\newcommand{\ArabicCity}{القاهرة، مصر}
-
 % ---------------------------------------------------------------------------
 % Packages
 % ---------------------------------------------------------------------------
-\usepackage[bidi=basic,layout=tabular]{babel}
-\babelprovide[import,main]{english}
-\babelprovide[import]{arabic}
-\babelfont{rm}{Latin Modern Roman}
-\babelfont{sf}{Latin Modern Sans}
-\babelfont{tt}{Latin Modern Mono}
-\directlua{luaotfload.add_fallback("arabicfallback", {"lmroman10-regular:mode=node;"})}
-\babelfont[arabic]{rm}[Path=fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,Scale=1.05,RawFeature={fallback=arabicfallback}]{NotoNaskhArabic}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
 \usepackage{amsmath,amssymb}
 \usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.5cm,bottom=2.5cm,headheight=15pt]{geometry}
 \usepackage{setspace}
@@ -56,6 +38,7 @@
 \usepackage[labelfont=bf,font=small]{caption}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{pdfpages}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
 \usepackage[numbers,sort&compress]{natbib}
@@ -112,6 +95,10 @@
 \appendix
 \input{appendices/appA_reproducibility}
 
-\input{frontmatter/arabic_summary}
+% Arabic summary and Arabic title page (source: arabic/arabic_summary.tex, built with LuaLaTeX)
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Arabic Summary}
+\includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{arabic/arabic_summary.pdf}
 
 \end{document}

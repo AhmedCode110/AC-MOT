@@ -1,8 +1,32 @@
-\cleardoublepage
+% Arabic summary and Arabic title page of the thesis. Build with LuaLaTeX:
+%   lualatex arabic_summary.tex
+% The resulting arabic_summary.pdf is included at the end of main.tex.
+\documentclass[12pt,a4paper]{article}
+\usepackage[bidi=basic,layout=tabular]{babel}
+\babelprovide[import,main]{english}
+\babelprovide[import]{arabic}
+\babelfont{rm}{Latin Modern Roman}
+\directlua{luaotfload.add_fallback("arabicfallback", {"lmroman10-regular:mode=node;"})}
+\babelfont[arabic]{rm}[Path=fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,Scale=1.05,RawFeature={fallback=arabicfallback}]{NotoNaskhArabic}
+\usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
 \pagestyle{empty}
-\phantomsection\addcontentsline{toc}{chapter}{Arabic Summary}
+\setlength{\emergencystretch}{3em}
+% Arabic front data
+\newcommand{\ArabicTitle}{التحكم التكيفي دون تدريب في نقاط تشغيل الكاشف والمتتبع لتتبع الأجسام المتعددة}
+\newcommand{\ArabicAuthor}{أحمد جودة إسماعيل}
+\newcommand{\ArabicSupervisorOne}{محمد س. محمد}
+\newcommand{\ArabicSupervisorTwo}{طارق أحمد محمود}
+\newcommand{\ArabicDegree}{رسالة مقدمة استكمالاً لمتطلبات الحصول على درجة ماجستير العلوم في هندسة الحاسبات}
+\newcommand{\ArabicDepartment}{قسم هندسة الحاسبات والذكاء الاصطناعي}
+\newcommand{\ArabicInstitution}{الكلية الفنية العسكرية}
+\newcommand{\ArabicCity}{القاهرة، مصر}
+
+
+\begin{document}
 \begin{otherlanguage}{arabic}
-\chapter*{الملخص}
+\section*{\LARGE الملخص}
 \thispagestyle{empty}
 
 يُعدّ تتبع الأجسام المتعددة بالاعتماد على الكشف الأسلوبَ السائد للحصول على هويات ثابتة للأجسام في الفيديو؛ إذ يقترح الكاشف في كل إطار صناديق مصحوبة بدرجات ثقة، ثم يربط المتتبع هذه الصناديق عبر الزمن. ويتحكم في هذه المنظومة عدد قليل من معاملات نقطة التشغيل، هي عتبة الثقة وعتبة الإخماد ودقة الإدخال في الكاشف، وعتبات الربط وبدء المسارات في المتتبع. وعادةً ما تُضبط هذه المعاملات مرة واحدة لكاشف واحد ونوع واحد من المشاهد، مع أن المشهد يتغير داخل الفيديو الواحد، ومع أن الكاشف يُستبدل أو يُعاد تدريبه أو يُضغط أكثر مما يُعاد ضبط المتتبع. تدرس هذه الرسالة ما إذا كان التحكم السببي في نقاط التشغيل، دون تدريب ودون بيانات معنونة، يجعل منظومات التتبع أدق وأكثر متانة، وتقيس بعناية متى يفيد هذا التحكم ومتى لا يفيد.
@@ -39,6 +63,8 @@
 {\large \ArabicSupervisorTwo\par}
 \vfill
 {\normalsize \ArabicCity\par}
-{\normalsize \foreignlanguage{english}{\ThesisYear}\par}
+{\normalsize \foreignlanguage{english}{2026}\par}
 \end{center}
 \end{otherlanguage}
+
+\end{document}
