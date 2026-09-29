@@ -210,7 +210,7 @@
  {
   "key": "guo2017calibration",
   "title": "On Calibration of Modern Neural Networks",
-  "doi": null
+  "arxiv": "1706.04599"
  },
  {
   "key": "kuppers2020detcalib",
@@ -230,7 +230,7 @@
  {
   "key": "wang2021tent",
   "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization",
-  "doi": null
+  "arxiv": "2006.10726"
  },
  {
   "key": "zhang2021fairmot",

@@ -27,14 +27,24 @@ JAIS = {
     "parsons2019refueling": ("jaisquery_onboard_vision", "10.2514/1.i010658"),
 }
 # Entries resolved by title search (status SEARCHED) whose best candidate is the paper itself.
-SEARCHED_OK = ["ma2023adaptivebytetrack", "shim2024adaptrack", "liu2025sparsetrack", "wang2025pdsort", "yang2024hybridsort", "cao2025topictrack",
+SEARCHED_OK = ["wang2024smiletrack", "yang2023cbiou", "awais2025foundation", "li2025motreview", "bakirci2025lowpower",
+               "chae2024radar", "ma2023adaptivebytetrack", "shim2024adaptrack", "liu2025sparsetrack", "wang2025pdsort", "yang2024hybridsort", "cao2025topictrack",
                "shim2025tracktrack", "zhao2024rtdetr", "gao2025motip"]
-ARXIV_OK = ["aharon2022botsort", "ge2021yolox", "milan2016mot16"]
+ARXIV_OK = ["aharon2022botsort", "ge2021yolox", "milan2016mot16", "sun2020transtrack", "redmon2018yolov3",
+            "bochkovskiy2020yolov4", "robinson2025rfdetr", "dendorfer2020mot20", "vaswani2017attention", "dosovitskiy2021vit"]
 
 OVERRIDES = {
     # Lecture Notes in Computer Science chapters: Crossref gives the series, not the proceedings title.
     "zhang2022bytetrack": dict(booktitle="Computer Vision -- ECCV 2022", title="ByteTrack: Multi-object Tracking by Associating Every Detection Box"),
     "du2018uavdt": dict(booktitle="Computer Vision -- ECCV 2018"),
+    "liu2016ssd": dict(booktitle="Computer Vision -- ECCV 2016"),
+    "lin2014coco": dict(booktitle="Computer Vision -- ECCV 2014"),
+    "wang2020jde": dict(booktitle="Computer Vision -- ECCV 2020"),
+    "zhou2020centertrack": dict(booktitle="Computer Vision -- ECCV 2020"),
+    # Crossref has no year for the CVPR'05 proceedings record.
+    "dalal2005hog": dict(year="2005"),
+    # Crossref title uses a Unicode hyphen (U+2010).
+    "li2025motreview": dict(title="A Review of Multi-Object Tracking in Recent Times"),
     "ristani2016idf1": dict(booktitle="Computer Vision -- ECCV 2016 Workshops"),
     "zeng2022motr": dict(booktitle="Computer Vision -- ECCV 2022"),
     "carion2020detr": dict(booktitle="Computer Vision -- ECCV 2020"),
@@ -50,6 +60,16 @@ OVERRIDES = {
     "jiang2018chameleon": dict(title="Chameleon: Scalable Adaptation of Video Analytics"),
     # Crossref capitalizes the system name as "Adaptrack"; the paper writes "AdapTrack".
     "shim2024adaptrack": dict(title="AdapTrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking"),
+}
+# The authors' own published conference paper, entered from the published PDF.
+MANUAL = {
+    "ismail2026realtime": """@inproceedings{ismail2026realtime,
+  title = {{Real-Time Object Detection and Tracking: Challenges, Innovations and Future Directions}},
+  author = {Ahmed Gouda Ismail and Mohamed S. Mohamed and Tarek Ahmed Mahmoud},
+  booktitle = {International Conference ICMISI 2026},
+  year = {2026}
+}
+""",
 }
 # DOI records whose Crossref title differs from the cited title and that are NOT the cited paper.
 REJECTED = {"xu2020approxdet": "DOI 10.1145/3384419.3430771 resolves to an unrelated paper (RFID vibration sensing)"}
@@ -120,20 +140,22 @@ def all_entries():
             out[k] = entry(k, r["crossref"], OVERRIDES.get(k))
     for k in SEARCHED_OK:
         b = REC[k]["best"]
-        assert b["title"].lower().startswith(REC[k]["query_title"].lower()[:30]), k
+        assert b["title"].lower().replace("\u2010", "-").startswith(REC[k]["query_title"].lower()[:30]), k
         out[k] = entry(k, b, OVERRIDES.get(k))
     for k in ARXIV_OK:
         out[k] = arxiv_entry(k, REC[k]["arxiv"])
     for k, (src, doi) in JAIS.items():
         c = next(x for x in REC[src]["candidates"] if x["doi"] == doi)
         out[k] = entry(k, c)
+    out.update(MANUAL)
     return out
 
 
 if __name__ == "__main__":
     tex, bib = Path(sys.argv[1]), Path(sys.argv[2])
     springer = "--springer" in sys.argv   # sn-mathphys-num prints "???" for a publisher without address
-    src = tex.read_text()
+    # a directory (thesis) is read as the concatenation of its .tex files in sorted order
+    src = "".join(p.read_text() for p in sorted(tex.rglob("*.tex"))) if tex.is_dir() else tex.read_text()
     cited = []
     for m in re.finditer(r"\\cite[pt]?\*?\{([^}]*)\}", src):
         for k in m.group(1).split(","):
