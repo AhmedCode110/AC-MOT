@@ -17,7 +17,8 @@
 | Related manuscript | disclosed in cover letter | done |
 | Author block | name and affiliation | affiliation line must be completed by the author |
 | AIAA membership footnote, funding, conflict-of-interest statement | journal forms | to be completed by the author at submission |
-| Word count | full-length paper | about 9,900 words including tables and references (pdftotext count) |
+| Length | AIAA guideline (Rev. Aug. 2024, `JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`): regular article 7–10 published pages, 10,000–12,000 words; = 20–26 double-spaced 10-pt serif manuscript pages, all pages counted | 24 manuscript pages (within 20–26) |
+| Fees | AIAA: "The only potential fee associated with publication of journal articles is that required if publishing with an Open Access status" (voluntary APC $2,700; `refs/aiaa_rules/open_access.txt`) | no page or overlength charge; do not select Open Access to avoid any fee |
 
 Build: `python JAIS_PAPERS/refs/make_bib.py manuscript.tex references.bib` (only if citations change), then
 `pdflatex manuscript && bibtex manuscript && pdflatex manuscript && pdflatex manuscript`.
