@@ -1,0 +1,327 @@
+\chapter{Scene-Adaptive Operating-Point Control for UAV Tracking}\label{ch:scene}
+
+This chapter addresses the first research question: whether a lightweight, causal, training-free controller that reads the scene and adjusts the detector operating point improves multi-object tracking in UAV video under a throughput constraint, and where the improvement comes from. The chapter is based on the journal manuscript [P2] listed in the front matter.
+
+\section{Overview}\label{sec:ch4-overview}
+A detector deployed in a tracking pipeline is configured by three operating-point parameters: the confidence threshold that decides which boxes are passed to the tracker, the overlap threshold of non-maximum suppression, and the input resolution (Sec.~\ref{sec:bg-problem}). They are usually set once, often to library defaults, and left unchanged. That choice has two costs in aerial video. First, the defaults were chosen for generic ground-level benchmarks, not for footage with many objects of a few pixels. Second, a fixed setting cannot follow the scene: a threshold that suppresses clutter in a crowded intersection may discard the few visible vehicles on an empty road, and the resolution needed to see small objects is wasted on frames that contain none.
+
+The controller studied here combines five inexpensive cues, namely detection density, the fraction of tiny objects, image edge strength, low light, and blur, into a scalar scene complexity index (SCI) and maps that index to the three operating-point parameters every ten frames. It learns nothing at run time, needs no labelled calibration beyond a small validation set, and adds negligible computation. The chapter contributes the design of the controller, a validation-only selection protocol, a locked held-out evaluation on VisDrone2019 test-dev and a zero-tuning test on UAVDT, and an attribution analysis that determines where the measured gain comes from.
+
+The attribution result shapes the reading of the chapter. The optimized controller improves substantially over the static default and over a hand-designed controller, and it generalizes to a second aerial dataset without retuning. However, a matched static configuration, evaluated after the freeze for attribution, reaches the same held-out accuracy. The gain is therefore produced by the validation-calibrated operating point and tracker profile, while switching itself contributes no measurable accuracy for this detector and this operating range. The chapter reports that result as it is, explains why the optimization converged to near-static behavior, and uses the hand-designed controller's ablation to show the regime in which scene-driven resolution switching does pay off.
+
+\section{Problem Formulation}\label{sec:ch4-problem}
+Let $I_1, I_2, \ldots$ be the frames of a video. A detector $D$ applied to frame $I_t$ with operating point $\theta_t=(c_t,\eta_t,r_t)$ returns a set of boxes with confidence scores: the image is resized so that its long side equals $r_t$ pixels, candidate boxes are produced, boxes overlapping a higher-scoring box by more than $\eta_t$ are suppressed, and boxes with score below $c_t$ are discarded. An online tracker $T$ consumes the kept boxes and outputs identified tracks. A controller $\pi$ chooses the operating point,
+\begin{equation}
+\theta_t = \pi\left(I_{1:t}, \mathcal{D}_{1:t-1}\right), \qquad \theta_t \in \Theta = \mathcal{C} \times \mathcal{H} \times \mathcal{R},
+\label{eq:ch4-policy}
+\end{equation}
+where $\mathcal{D}_{1:t-1}$ are the detections of earlier frames and $\mathcal{C}$, $\mathcal{H}$, $\mathcal{R}$ are the admissible sets of confidence thresholds, suppression thresholds, and resolutions. Equation~\eqref{eq:ch4-policy} makes the controller causal: it may use the current image and past detections but no future frame and no ground truth.
+
+The design objective is to maximize tracking accuracy on held-out sequences subject to a processing-throughput constraint and without increasing identity fragmentation:
+\begin{equation}
+\max_{\pi}\; \mathrm{Acc}(\pi) \quad \text{s.t.} \quad \mathrm{FPS}(\pi) \ge 25, \qquad \mathrm{IDS}(\pi) \le \mathrm{IDS}_{\mathrm{ref}},
+\label{eq:ch4-objective}
+\end{equation}
+where FPS is the number of processed frames per second and IDS the number of identity switches. The accuracy term and the reference are made concrete in Sec.~\ref{sec:ch4-setup}: MOTA was the selection objective, HOTA is the primary reporting metric, and $\mathrm{IDS}_{\mathrm{ref}}$ is the identity-switch count of the hand-designed controller on validation. Because held-out accuracy cannot be observed during design, Eq.~\eqref{eq:ch4-objective} is solved on a validation split, and the held-out test measures how well that solution transfers.
+
+Three restrictions define the scope. The controller is training-free: it has no learned weights, only a small number of scalar parameters selected on validation data. The detector and the tracker are fixed and pretrained; neither is fine-tuned on aerial data. The admissible sets are finite and are themselves derived from validation sweeps (Sec.~\ref{sec:ch4-setup}), so that the controller only chooses among operating points with measured validation support.
+
+\section{Scene Complexity Index}\label{sec:ch4-method}
+
+Figure~\ref{fig:ch4-system} shows the pipeline. Every $K$ frames, the controller computes five cues from a quarter-scale grayscale copy of the current frame and from the detections of the previous frame, ranks them against a calibration set, combines them into the raw index $s_j$, smooths the index over the last $W$ analyses, and maps the smoothed index $S_t$ to the operating point used until the next analysis.
+
+\begin{figure}[tbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=5mm and 6mm,
+  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=9mm, inner sep=3pt},
+  arr/.style={-{Stealth[length=2.2mm]}, thick}]
+\node[box] (frame) {Frame $I_t$};
+\node[box, right=of frame] (det) {Detector $D$\\(resolution $r_t$,\\suppression $\eta_t$)};
+\node[box, right=of det] (conf) {Confidence\\filter $c_t$};
+\node[box, right=of conf] (trk) {Online tracker\\(ByteTrack)};
+\node[box, right=of trk] (out) {Tracks with\\identities};
+\node[box, below=11mm of frame] (cue) {Image cues\\(edge $\gamma$, light $\beta$,\\blur $\nu$), $\tfrac14$ scale};
+\node[box, right=of cue] (rank) {Rank against\\calibration $\hat F_k$};
+\node[box, right=of rank] (sci) {Index $s_j=\sum_k w_k q_k$\\moving mean over $W$};
+\node[box, right=of sci] (map) {Control laws\\$S_t \mapsto (c_t,\eta_t,r_t)$};
+\node[box, below=7mm of cue] (prev) {Kept detections of frame $t-1$\\(count $N_{t-1}$, tiny-object ratio)};
+\draw[arr] (frame) -- (det);
+\draw[arr] (det) -- (conf);
+\draw[arr] (conf) -- (trk);
+\draw[arr] (trk) -- (out);
+\draw[arr] (frame) -- node[right, font=\scriptsize]{every $K$ frames} (cue);
+\draw[arr] (cue) -- (rank);
+\draw[arr] (rank) -- (sci);
+\draw[arr] (sci) -- (map);
+\coordinate (bus) at ($(map.north)+(0,5mm)$);
+\draw[thick] (map.north) -- (bus);
+\draw[arr] (bus) -| (det.south);
+\fill (bus -| conf.south) circle (1.2pt);
+\draw[arr] (bus -| conf.south) -- (conf.south);
+\draw[arr] (conf.north) -- ++(0,4mm) -| ($(prev.west)+(-5mm,0)$) -- (prev.west);
+\draw[arr] (prev.east) -| (rank.south);
+\end{tikzpicture}}
+\caption{Scene-adaptive operating-point control. The controller runs every $K=10$ frames on a quarter-scale grayscale image and on the detections kept at the previous frame; the chosen operating point is held until the next analysis.}
+\label{fig:ch4-system}
+\end{figure}
+
+\subsection{Scene cues}
+Five cues are computed at each analysis. They were chosen because each targets a failure mode of aerial detection and each costs at most a few image passes on a quarter-resolution frame.
+
+\emph{Crowd.} The number $N_{t-1}$ of detections kept at the previous frame measures density. It is a detector-derived quantity, not a ground-truth count.
+
+\emph{Tiny-object ratio.} The fraction of the previous frame's kept detections whose box area is below $32\times32$ pixels,
+\begin{equation}
+q_{\mathrm{tiny}} = \frac{1}{N_{t-1}} \sum_{i=1}^{N_{t-1}} \mathbf{1}\left[a_i < 32^2\right],
+\label{eq:ch4-tiny}
+\end{equation}
+with $q_{\mathrm{tiny}}=0$ when $N_{t-1}=0$, measures how much of the scene is at the scale where detectors lose recall \cite{cheng2023smallobject}.
+
+\emph{Edge strength.} The mean Sobel gradient magnitude $\gamma$ of the quarter-scale grayscale image measures texture and clutter.
+
+\emph{Low light.} The mean gray level $\beta$ of the same image measures illumination.
+
+\emph{Blur.} The variance $\nu$ of the Laplacian of the same image is a standard focus measure \cite{pechpacheco2000blur}; low values indicate blur.
+
+\subsection{Label-free calibration}
+Raw cue values have incomparable units and dataset-dependent ranges. Each cue is therefore mapped to $[0,1]$ by its empirical distribution function on a calibration set,
+\begin{equation}
+\hat F_k(x) = \frac{1}{M} \left|\{ m : x_m^{(k)} \le x \}\right|,
+\label{eq:ch4-rank}
+\end{equation}
+where $x_m^{(k)}$, $m=1,\ldots,M$, are the calibration values of cue $k$. The normalized cues are
+\begin{equation}
+q_{\mathrm{crowd}}=\hat F_{N}(N_{t-1}),\quad q_{\mathrm{edge}}=\hat F_{\gamma}(\gamma),\quad q_{\mathrm{light}}=1-\hat F_{\beta}(\beta),\quad q_{\mathrm{blur}}=1-\hat F_{\nu}(\nu),
+\label{eq:ch4-cues}
+\end{equation}
+and $q_{\mathrm{tiny}}$ is already a fraction. The calibration set contains $M=288$ analysis samples taken every ten frames from the seven VisDrone validation sequences, with image statistics from the frames and crowd counts from the fixed detector run at a single anchor operating point (960 pixels, confidence 0.35, suppression threshold 0.35; person, car, bus, and truck classes). No ground-truth count enters the calibration. On this set the median gray level is 107.6 (interquartile range 85.4--185.1), the median Laplacian variance is 1980, the median gradient magnitude is 66.2, and the median detection count is 10.5 (maximum 41).
+
+The ranking makes the index invariant to monotone rescaling of each cue, and it makes the weights interpretable: a weight multiplies a quantile, not a unit-dependent value. It also means that the index describes a scene relative to the calibration distribution, so that a scene is "complex" if it is more cluttered, darker, blurrier, denser, or has more tiny objects than typical validation scenes.
+
+\subsection{Scene complexity index}
+The raw index of analysis $j$ is a convex combination of the normalized cues,
+\begin{equation}
+s_j = \mathrm{clip}\left(\sum_{k} w_k q_k,\, 0,\, 1\right), \qquad w_k \ge 0,\quad \sum_k w_k = 1,
+\label{eq:ch4-sci}
+\end{equation}
+and the smoothed index is the mean of the last $W$ raw values,
+\begin{equation}
+S_t = \frac{1}{\min(j,W)} \sum_{i=\max(1,j-W+1)}^{j} s_i, \qquad t \in [\,1+(j-1)K,\; jK\,].
+\label{eq:ch4-smooth}
+\end{equation}
+Analyses occur at frames $t=1, 1+K, 1+2K, \ldots$; between analyses the index and the operating point are held. With $K=10$ and $W=7$, the index at 30 frames per second reflects roughly the last two seconds and changes at most three times per second. The controller state is reset at the start of each sequence.
+
+\section{Analysis of the Scene Complexity Index}\label{sec:ch4-sci}
+
+\subsection{Frozen weights}
+Figure~\ref{fig:ch4-sci}a shows the normalized weights of the two frozen profiles, the quality profile Q (trial 24 of the single-objective search) and the balanced profile B (trial 22 of the multi-objective search). Both place the largest weight on edge strength (0.434 for Q and 0.508 for B), a second tier on the tiny-object ratio (0.222 and 0.175) and on crowd density (0.129 and 0.165), and small weights on low light and blur (0.054 and 0.161 for Q; 0.121 and 0.032 for B). The weight on edge strength agrees with the intuition that textured urban scenes are the hard ones for aerial detection. The two searches disagree on blur and low light, which suggests that those cues are weakly identified by seven validation sequences.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ch4_fig2_sci_composition.pdf}
+\caption{Composition of the scene complexity index. (a) Normalized cue weights of the frozen quality profile Q and balanced profile B. (b) Importance of each search parameter for validation MOTA in the single-objective search that produced Q, as stored with the search record; the two index thresholds dominate.}
+\label{fig:ch4-sci}
+\end{figure}
+
+\subsection{What the search actually tuned}
+The parameter importance scores stored with the single-objective search (Fig.~\ref{fig:ch4-sci}b) are more revealing than the weights. The two thresholds of the resolution rule account for most of the explained variation in validation MOTA (0.575 and 0.161), followed by the easy-end suppression threshold (0.145); every cue weight has importance below 0.03. In other words, the search mostly tuned \emph{how often the controller uses high resolution}, not how the scene is described. The frozen thresholds of Q ($\tau_{\mathrm{m}}=0.135$, $\tau_{\mathrm{h}}=0.287$) are low relative to the typical index, so Q runs at 960 pixels on almost every frame: its mean resolution is 957 pixels on validation and 955 pixels on UAVDT. Its suppression threshold is constant ($\eta_{\mathrm{e}}=\eta_{\mathrm{h}}=0.35$), and only its confidence threshold moves, between 0.30 and 0.40, with a validation mean of 0.341. The optimized quality controller is therefore close to a static operating point at (960, 0.34, 0.35). This observation is the key to the attribution result of Sec.~\ref{sec:ch4-results}.
+
+The balanced profile behaves differently. Its thresholds ($\tau_{\mathrm{m}}=0.293$, $\tau_{\mathrm{h}}=0.666$) place typical scenes in the intermediate and high levels and simple scenes at 512 pixels, giving mean resolutions of 825 pixels on validation, 869 pixels on test-dev, and 829 pixels on UAVDT. Its confidence threshold is constant at 0.40, and its suppression threshold tightens from 0.60 in simple scenes to 0.35 in complex ones (mean 0.47--0.50). Profile B is thus the one that actually switches, and it trades accuracy for fewer identity switches, fewer false positives, and higher throughput.
+
+\subsection{Feedback through the crowd cue}
+The crowd and tiny-object cues are computed from detections that already passed the controller's own confidence filter, which closes a loop. In Q the confidence threshold rises with the index; a higher index therefore removes low-scoring boxes, lowers the next crowd count, and pulls the index back down. This is negative feedback, which keeps the operating point stable. The hand-designed controller of Sec.~\ref{sec:ch4-control} lowers the confidence threshold as the index rises, which admits more boxes and raises the next crowd count: positive feedback, bounded only by the clipping of its thresholds. The moving mean of Eq.~\eqref{eq:ch4-smooth} and the ten-frame stride damp both loops. The analysis does not change any result, but it explains why the validation search preferred a controller whose confidence threshold increases with complexity.
+
+\section{Adaptive Control Strategy}\label{sec:ch4-control}
+
+\subsection{Calibrated control laws}
+The calibrated controller maps the smoothed index to the operating point by two linear laws and one piecewise-constant law:
+\begin{align}
+c_t &= c_{\mathrm{e}} + S_t\,(c_{\mathrm{h}} - c_{\mathrm{e}}), \label{eq:ch4-conf}\\
+\eta_t &= \eta_{\mathrm{e}} + S_t\,(\eta_{\mathrm{h}} - \eta_{\mathrm{e}}), \label{eq:ch4-nms}\\
+r_t &= \begin{cases} r_0, & S_t < \tau_{\mathrm{m}},\\ r_1, & \tau_{\mathrm{m}} \le S_t < \tau_{\mathrm{h}},\\ r_2, & S_t \ge \tau_{\mathrm{h}}, \end{cases} \label{eq:ch4-res}
+\end{align}
+with resolution levels $(r_0, r_1, r_2) = (512, 928, 960)$ pixels. The eleven parameters are the five weights, the four endpoints $c_{\mathrm{e}}, c_{\mathrm{h}}, \eta_{\mathrm{e}}, \eta_{\mathrm{h}}$, and the two thresholds $\tau_{\mathrm{m}}, \tau_{\mathrm{h}}$. Figure~\ref{fig:ch4-map} plots the three laws for both profiles, and Table~\ref{tab:ch4-settings} lists all frozen configurations.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ch4_fig3_adaptation_map.pdf}
+\caption{Adaptation maps: confidence threshold, suppression threshold, and input resolution as functions of the smoothed index for the quality profile Q, the balanced profile B, and the hand-designed controller (scene-label adjustments of the hand-designed controller omitted).}
+\label{fig:ch4-map}
+\end{figure}
+
+\input{tables/ch4_tab1_settings.tex}
+
+\subsection{Hand-designed controller}
+The hand-designed controller is the earlier version of the same idea and serves as the adaptive baseline. Its index uses fixed saturating transforms instead of calibrated ranks:
+\begin{equation}
+\begin{split}
+s_j = \mathrm{clip}\Big(&0.30\min\left(\tfrac{N_{t-1}}{30},1\right) + 0.20\min\left(\tfrac{e}{0.14},1\right) + 0.30\,q_{\mathrm{tiny}}\\
+&+ 0.10\,\mathbf{1}[\beta<80] + 0.05\,\mathbf{1}[\nu<180],\;0,\;1\Big),
+\end{split}
+\label{eq:ch4-heur}
+\end{equation}
+where $e$ is the fraction of Canny edge pixels of the quarter-scale image. It also assigns a scene label (night, blur, tiny, crowded, or clear) from the same cues. Its confidence threshold $0.245-0.05S_t$ decreases with complexity, is lowered by a further 0.012 in crowded, tiny, or night scenes, and is clipped to $[0.19, 0.28]$; its suppression threshold $0.49-0.05S_t$ is lowered by 0.012 in blurred scenes and clipped to $[0.40, 0.52]$. Its resolution is 832 pixels when $S_t>0.60$ or the tiny-object ratio exceeds 0.5, 736 pixels when $S_t>0.35$ or the scene is labelled crowded or tiny, and 640 pixels otherwise. It uses the same analysis stride and smoothing window as the calibrated controller ($K=10$, $W=7$).
+
+The two controllers encode opposite hypotheses about confidence. The hand-designed controller is recall-oriented: in hard scenes it admits weaker boxes. The calibrated profiles are precision-oriented: Q raises the confidence threshold in hard scenes, and B holds it at 0.40 while tightening suppression. The validation evidence of Sec.~\ref{sec:ch4-ablation} favors the precision-oriented choice for this detector and tracker.
+
+\subsection{Update schedule and cost}
+All controllers analyze the first frame of each sequence and every tenth frame thereafter; the image cues require one resize, one color conversion, two Sobel filters, and one Laplacian on a quarter-scale image, and the detection cues reuse boxes that the tracker already holds. In the matched static run on test-dev, where the controller code path ran without cue analysis, the per-frame controller time was 0.005 ms against 19.5 ms for the detector and 3.6 ms for the tracker. The cue analysis cost of the adaptive runs was not profiled separately; it is included in their end-to-end processing throughput.
+
+\section{Detection and Tracking Pipeline}\label{sec:ch4-pipeline}
+
+\subsection{Detector}
+The detector is the Ultralytics YOLOv8n model pretrained on the COCO dataset (Ultralytics library version 8.3.200), run in half precision through PyTorch on one NVIDIA Tesla T4 graphics processor with at most 1000 detections per frame. Only the person, car, bus, and truck classes are kept on VisDrone; car, bus, and truck are kept on UAVDT, whose annotations cover vehicles only. The detector is not fine-tuned on aerial data, which keeps the controller evaluation independent of any training choice but also bounds the absolute accuracy (Sec.~\ref{sec:ch4-limits}).
+
+\subsection{Tracker}
+The tracker is the Ultralytics implementation of ByteTrack \cite{zhang2022bytetrack} with score fusion and a nominal frame rate of 30. Two profiles are used (Table~\ref{tab:ch4-settings}): the library-style default profile (high threshold 0.25, low threshold 0.10, new-track threshold 0.25, buffer 30 frames, matching threshold 0.80) and a tuned profile selected in earlier validation work (0.18, 0.04, 0.20, 45 frames, 0.86). The tuned profile is part of every adaptive system and of the matched static anchor; the static default uses the default profile.
+
+One interaction between detector and tracker needs to be stated explicitly. Detections below the controller's confidence threshold are removed before the tracker. Because every confidence threshold used in this study (0.19 or higher) is at or above the tracker's high threshold, every detection reaching the tracker counts as high-confidence, and all of them except boxes of the hand-designed controller scored between 0.19 and 0.20 are eligible to start a new track. ByteTrack's second association stage, which recovers occluded objects from low-confidence boxes, therefore receives no input in these configurations. The tuned profile acts mainly through its longer buffer and its looser matching threshold.
+
+\subsection{Timing protocol}
+Throughput is reported as processing frames per second: the number of frames divided by the summed per-frame time of cue analysis, detection (with device synchronization), and tracking. Frames are decoded from JPEG files before timing, and all resolutions a system can request are warmed up before the first timed frame. Decoding is excluded because an onboard pipeline receives decoded frames from the camera. In the matched static run, decoding cost 22.5 ms per frame on average, and throughput including decoding was 21.90 frames per second, below the 25 frames-per-second target. The real-time statements of this chapter therefore apply to already-decoded frames. The gate of 25 frames per second was applied to the whole-split processing throughput.
+
+\section{Experimental Setup}\label{sec:ch4-setup}
+
+\subsection{Data}
+Table~\ref{tab:ch4-data} lists the data. All design decisions used the seven sequences of the VisDrone2019 multi-object tracking validation split \cite{zhu2022visdrone}. The seventeen sequences of the test-dev split were held out until a locked three-system comparison. The twenty sequences of the UAVDT test split \cite{du2018uavdt} were used once, as a zero-tuning cross-dataset test.
+
+\input{tables/ch4_tab2_data.tex}
+
+\subsection{Evaluation protocol}
+Evaluation is class-agnostic. On VisDrone, ground-truth boxes of the pedestrian, car, van, truck, and bus categories are kept when they are marked as considered, with occlusion and truncation levels below 2; all detector classes are pooled. This is a research protocol, not the official VisDrone evaluation, so the absolute numbers are not comparable with the VisDrone leaderboard. On UAVDT, a frozen adapter (checked by a self-test on a training sequence, which it reproduced with perfect scores) removes ground truth marked out of scope, normalizes identities, removes predictions strictly contained in ignore regions for the eighteen sequences that provide them, and matches at an overlap of 0.5. All metrics were computed with the TrackEval library pinned to commit 12c8791.
+
+HOTA is the primary metric because it weighs detection and association equally \cite{luiten2021hota}; MOTA, IDF1, identity switches, false negatives, and false positives are reported alongside. Uncertainty is quantified by a paired bootstrap over sequences \cite{efron1993bootstrap}: sequences are resampled with replacement 5,000 times (seed 42), the metric difference between two systems is recomputed on each resample from the pooled counts, and the 2.5th and 97.5th percentiles form the 95\% interval. A win, tie, or loss count per sequence is reported as a complementary, distribution-free summary.
+
+\subsection{Selection chain}
+The selection chain used the validation split only.
+
+\emph{Operating-point sweeps.} With the tuned tracker, three one-at-a-time sweeps measured validation accuracy and throughput for resolutions from 512 to 960 pixels in steps of 32, confidence thresholds from 0.05 to 0.50, and suppression thresholds from 0.30 to 0.80. Confidence and suppression values were kept if they met the throughput gate and at least the reference accuracy of the sweep, which retained confidence values 0.25--0.45 and suppression values 0.30--0.70. Three resolution levels were retained by a predeclared rule: a low-compute feasible level, the highest-quality feasible level, and the highest-quality distinct intermediate level, which gave 512, 960, and 928 pixels.
+
+\emph{Temporal settings.} A grid of smoothing windows $W\in\{1,3,5,7,9\}$ and analysis strides $K\in\{1,5,10,15,20\}$ was evaluated with the hand-designed controller, and $W=7$, $K=10$ was frozen.
+
+\emph{Quality profile.} A tree-structured Parzen estimator search of at most 50 trials explored the five raw weights (normalized to sum to one), the confidence and suppression endpoints within the retained sets, and the two resolution thresholds. The selection rule, fixed before the search, required the throughput gate and no more identity switches than the hand-designed controller on validation (271), and then selected the highest MOTA, breaking ties by fewer identity switches, then HOTA, IDF1, and throughput. Trial 24 was selected, with validation HOTA 36.11\%, MOTA 23.04\%, IDF1 40.76\%, 270 identity switches, and 37.17 frames per second.
+
+\emph{Balanced profile.} A second, multi-objective search (seed 42) maximized MOTA and minimized identity switches with only the throughput gate. Of 50 planned trials, 49 completed. The Pareto front ranged from trial 16 (MOTA 22.83\%, 308 switches) to trial 8 (11.54\%, 114 switches). A balanced score, declared before the search, averaged min--max normalized MOTA and normalized identity-switch reduction, and it selected trial 22 (validation MOTA 19.33\%, HOTA 31.65\%, 168 switches, 51.41 frames per second).
+
+\subsection{Held-out protocol}
+Before the test split was opened, a protocol file fixed the three compared systems (static default, hand-designed controller, quality profile Q), their configuration hashes, the calibration hash, the ground-truth filter, the evaluator commit, the throughput gate, and the requirement of a T4 processor. Each system ran as a separate worker in its own session and wrote an immutable result file; the merge step refused to run until all three existed. The quality-profile worker resumed from per-sequence checkpoints after an interruption, with no parameter change. The balanced profile was frozen after its selection and tested with the same machinery; its first test attempt was interrupted before any result was saved, and an exact technical rerun of the frozen configuration produced the reported result. The UAVDT test was run for the static default and both frozen profiles under a separate lock that forbade any tuning, recalibration, or selection on UAVDT.
+
+After these tests were complete, the matched static anchor (960 pixels, confidence 0.35, suppression 0.35, tuned tracker, no adaptation) was evaluated on test-dev and paired with the quality profile. It was not part of the preregistered comparison: it serves only to attribute the measured gain, and its throughput was measured in a separate session.
+
+\section{Main Results}\label{sec:ch4-results}
+
+\subsection{Held-out test-dev}
+Table~\ref{tab:ch4-main} gives the held-out results and Table~\ref{tab:ch4-boot} the paired bootstrap intervals.
+
+\input{tables/ch4_tab3_main.tex}
+
+\input{tables/ch4_tab4_bootstrap.tex}
+
+Against the static default, the quality profile raised HOTA from 28.43\% to 33.84\% ($\Delta=+5.41$, 95\% interval $[+4.13, +6.90]$), MOTA by 7.22 points, and IDF1 by 8.82 points, and it won on all 17 sequences. The gain comes mostly from recall: false negatives fell by 18,193, while false positives rose by 2,721. Identity switches fell by 51, but that interval includes zero. Throughput was 38.98 frames per second against 36.53 for the default, both above the gate.
+
+Against the hand-designed controller, the quality profile gained 1.14 HOTA points ($[+0.14, +2.27]$), 3.71 MOTA points, and 2.03 IDF1 points, and it won on 13 of 17 sequences. It produced 5,996 fewer false positives and 2,109 fewer false negatives, but 123 more identity switches, and that difference is significant ($[-244, -14]$ in switch reduction). The hand-designed controller therefore remains the identity-switch leader of the preregistered comparison, and the quality profile is not better on every metric.
+
+The balanced profile sits at a different point of the trade-off. On test-dev it had the fewest identity switches (919), the fewest false positives (13,632), and the highest throughput (46.02 frames per second), with HOTA 31.22\%. It was significantly better than the static default on every metric, including 316 fewer identity switches ($[+175, +470]$), and significantly worse than the quality profile in HOTA ($-2.62$), MOTA, and IDF1, while having 265 fewer switches ($[+82, +502]$).
+
+\subsection{Cross-dataset test without tuning}
+On UAVDT, no parameter was changed. The quality profile raised HOTA from 24.08\% to 28.39\% ($[+2.74, +5.71]$), MOTA by 3.56 points, and IDF1 by 6.57 points, and it reduced identity switches from 558 to 321 ($[+104, +377]$), winning 15 of 20 sequences with 2 ties and 3 losses. The balanced profile improved over the default by 2.85 HOTA points ($[+1.24, +4.35]$) with 250 fewer switches, but it was significantly below the quality profile in HOTA ($-1.46$), MOTA, and IDF1, and its 13-switch advantage over the quality profile is not significant ($[-20, +50]$). Both profiles ran slower than the static default on UAVDT (58.35 and 61.46 against 65.01 frames per second), because both use higher mean resolutions than the default's 640 pixels.
+
+Across both datasets, the quality profile is the accuracy leader of the frozen systems, and the balanced profile is a reproducible identity, false-positive, and throughput trade-off on VisDrone whose identity advantage over the quality profile does not transfer significantly to UAVDT.
+
+\subsection{Attribution: the matched static anchor}
+The quality profile runs at the top resolution on almost every frame with a confidence threshold near 0.34 and a constant suppression threshold of 0.35 (Sec.~\ref{sec:ch4-sci}). Its natural control is therefore the static operating point (960, 0.35, 0.35) with the same tuned tracker, which is also the anchor of the cue calibration. On validation, that anchor reached 36.08\% HOTA against 36.11\% for the full quality profile (Table~\ref{tab:ch4-ablation}). On test-dev, the anchor reached 33.93\% HOTA against 33.84\% for the quality profile: $\Delta=-0.09$ for the profile, with interval $[-0.25, +0.06]$ (Table~\ref{tab:ch4-boot}). MOTA, IDF1, and identity switches likewise differ by amounts whose intervals include zero.
+
+The held-out gains of the quality profile over the static default (+5.41 HOTA) and over the hand-designed controller (+1.14) are therefore attributable to the validation-calibrated operating point, namely high resolution, a precision-oriented confidence threshold, a tight suppression threshold, and the tuned tracker profile, and not to frame-to-frame switching. The frozen protocol and the post hoc anchor jointly support that conclusion; the anchor was not available as a preregistered competitor, which is why it is reported as an attribution analysis rather than as a fourth system of the locked comparison.
+
+\subsection{Per-sequence behavior}
+Figure~\ref{fig:ch4-perseq} shows the per-sequence HOTA differences. On test-dev, the gain of the quality profile over the default is positive everywhere and ranges from +1.07 to +13.10 points; the largest gain occurs on the sequence where all systems are weakest (default HOTA 7.10\%). Against the hand-designed controller, four sequences are losses, the largest by 4.69 points. On UAVDT, the gains of both profiles are positive on most sequences, with a tail of losses discussed in Sec.~\ref{sec:ch4-failure}.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ch4_fig6_per_sequence.pdf}
+\caption{Per-sequence HOTA differences, sorted. (a) VisDrone test-dev: quality profile minus static default and minus the hand-designed controller. (b) UAVDT: quality and balanced profiles minus static default, without any tuning on UAVDT.}
+\label{fig:ch4-perseq}
+\end{figure}
+
+\section{Ablation}\label{sec:ch4-ablation}
+Table~\ref{tab:ch4-ablation} and Fig.~\ref{fig:ch4-ablation} decompose both controllers on the validation split.
+
+\input{tables/ch4_tab5_ablation.tex}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ch4_fig5_ablation.pdf}
+\caption{Validation ablations. (a) Hand-designed controller: H0 static default with default tracker; H1 tuned tracker; H2 adaptive confidence and suppression at 640 pixels; H2R adaptive resolution only; H3 full controller. (b) Calibrated controller: C0 static anchor; C1 adaptive confidence; C2 adaptive confidence and suppression; C3 full quality profile; H3 shown for reference. (c) Temporal grid of the hand-designed controller, selected setting outlined.}
+\label{fig:ch4-ablation}
+\end{figure}
+
+\subsection{Hand-designed controller}
+Starting from the static default (H0, 29.84\% HOTA), tuning the tracker (H1) added 1.03 HOTA points and removed 66 identity switches at unchanged throughput. Adaptive confidence and suppression at a fixed 640 pixels (H2) added a further 0.52 points. Adaptive resolution alone, with static confidence and suppression (H2R), reached 32.45\%, 1.59 points above H1, at a mean resolution of 722 pixels. The full controller (H3) reached 33.06\%, 2.20 points above H1, at 38.0 frames per second against 44.5 for H1. For the hand-designed controller, therefore, scene-driven switching does add accuracy, and most of it comes from resolution. The operating range of that controller is narrow and low (640--832 pixels), and its adaptive resolution moves the operating point into the range where accuracy grows fastest with resolution (Table~\ref{tab:ch4-speed}).
+
+\subsection{Calibrated controller}
+For the quality profile the picture is different. The static anchor (C0) already reached 36.08\% HOTA, 3.01 points above the full hand-designed controller. Adding adaptive confidence (C1) changed HOTA by +0.03 points and identity switches by +5. Adding adaptive suppression (C2) changed nothing, as expected, because the profile's two suppression endpoints are equal; the identical metrics confirm that the ablation machinery isolates components exactly. Adding adaptive resolution (C3) changed HOTA by less than 0.01 points, because the index almost never falls below the resolution thresholds. The components of the calibrated controller are therefore measurable but negligible, which the held-out anchor comparison of Sec.~\ref{sec:ch4-results} confirms on unseen data.
+
+\subsection{Temporal settings}
+Across the 25 temporal settings, HOTA of the hand-designed controller varied only between 32.74\% and 33.12\% (Table~\ref{tab:ch4-temporal}); the frozen setting $W=7$, $K=10$ gave 33.06\%. Analyzing every frame ($K=1$) cost 6 to 14 frames per second relative to $K\ge5$ in the same grid without an accuracy benefit, so infrequent analysis is the right design for this controller. Temporal parameters are second-order for accuracy and first-order for cost.
+
+\input{tables/ch4_tab7_temporal.tex}
+
+\section{Accuracy--Runtime Analysis}\label{sec:ch4-runtime}
+Figure~\ref{fig:ch4-runtime} and Table~\ref{tab:ch4-speed} relate accuracy and throughput.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ch4_fig4_accuracy_runtime.pdf}
+\caption{Accuracy versus processing throughput on one Tesla T4. (a) Validation operating points: resolution sweep at confidence 0.25 and confidence sweep at 960 pixels. (b) Held-out systems on VisDrone test-dev (circles) and UAVDT (triangles); the matched static anchor (diamond) was timed in a separate session. The dotted line marks 25 frames per second.}
+\label{fig:ch4-runtime}
+\end{figure}
+
+\input{tables/ch4_tab6_speed.tex}
+
+\subsection{Resolution dominates both accuracy and cost}
+In the validation sweep, raising the input resolution from 512 to 960 pixels raised HOTA from 26.05\% to 36.03\% and lowered throughput from 62.7 to 42.0 frames per second, with the 95th-percentile per-frame latency growing from 26.1 to 40.9 ms. The confidence threshold mostly moves the balance between false positives and false negatives: at 960 pixels, HOTA stayed within 36.9\% and 35.6\% for thresholds between 0.05 and 0.35 and fell to 30.6\% at 0.50, while false positives fell from 18,056 to 3,426. The very low thresholds cost throughput through the tracker (24.8 frames per second at 0.05), which is why they failed the gate. The suppression threshold had almost no effect between 0.30 and 0.55 and hurt identity switches above 0.60 (266 switches at 0.30--0.50, 467 at 0.80). The calibrated profiles lie close to the best sweep points, which is consistent with the finding that their benefit is the operating point itself.
+
+\subsection{Held-out throughput}
+All held-out systems met the gate on the whole split, and every individual test-dev sequence was processed above 25 frames per second by every system (the slowest sequence of the quality profile ran at 27.5). The balanced profile was the fastest adaptive system (46.02 frames per second on test-dev), because it spends part of the time at 512 pixels.
+
+\subsection{Measurement variability}
+Throughput measured in separate sessions on the same processor class varies more than the differences between some systems. The static anchor configuration was timed at 37.92 frames per second in the component ablation and at 44.78 in the suppression sweep, with identical tracking metrics. The full hand-designed controller was timed at 37.96, 42.09, and 43.95 frames per second in three validation runs of the same configuration. Throughput differences of a few frames per second between systems measured in different sessions, including the 2.97 frames-per-second difference between the quality profile and the hand-designed controller on test-dev, should therefore not be interpreted as algorithmic differences. The accuracy metrics are unaffected by this variability.
+
+\section{Failure Analysis}\label{sec:ch4-failure}
+
+\subsection{Identity switches}
+The largest failure of the quality profile is identity fragmentation relative to the hand-designed controller on test-dev (123 more switches, significant). On validation the two were matched by construction (270 against 271 switches), so the constraint of Eq.~\eqref{eq:ch4-objective} did not transfer. A plausible mechanism is the tracker interaction of Sec.~\ref{sec:ch4-pipeline}: with a precision-oriented confidence threshold, boxes that briefly drop below the threshold disappear from the tracker entirely, and ByteTrack's low-score recovery cannot bridge them. The balanced profile, which optimized identity switches directly, did control them on both datasets.
+
+\subsection{Sequences where adaptation loses}
+Against the hand-designed controller, the quality profile lost on four of the 17 test-dev sequences by 0.10, 0.79, 1.87, and 4.69 HOTA points. On UAVDT, the quality profile lost to the static default on three of 20 sequences, by 1.48 to 2.29 points. The balanced profile's worst UAVDT sequence lost 12.52 points against the default, with false negatives rising from 3,477 to 4,256: its fixed confidence threshold of 0.40 removes true detections that the default's 0.25 keeps. A fixed precision-oriented threshold is therefore a risk under a domain shift that lowers detector confidence.
+
+\subsection{Scenes outside the detector's reach}
+Three UAVDT sequences had HOTA below 0.5\% for every system, and in one of them every system missed all 75,412 ground-truth boxes. No operating point recovers objects that the detector does not produce at any threshold. These sequences were kept in all aggregates. Their cause (detector coverage, class definitions, or annotation conventions) was not diagnosed within the frozen protocol, so they are not attributed here.
+
+\subsection{Why switching did not help}
+The calibrated search removed the conditions under which switching helps. The hand-designed controller switches between resolutions on the steep part of the accuracy--resolution curve (640--832 pixels), where a scene-dependent increase buys real recall. The calibrated profile starts from the top of that curve; above 928 pixels, the sweep gains only 0.92 HOTA points up to 960 pixels, so downward switches cost accuracy and upward switches are impossible. With seven validation sequences and a throughput gate that 960 pixels already meets, the search's best strategy was to stay high. Scene-driven switching should therefore be expected to pay off when the throughput budget does not admit the best static operating point, which is the regime of the hand-designed controller and of lower-power processors.
+
+\section{Limitations}\label{sec:ch4-limits}
+The study has the following limitations.
+\begin{enumerate}
+\item \emph{One detector and one tracker.} All results use a COCO-pretrained YOLOv8n and ByteTrack. The absolute accuracy is limited by the absence of aerial fine-tuning, and the conclusions about which parameters matter may differ for detectors with different confidence calibration or for trackers with appearance models.
+\item \emph{Research evaluation protocol.} The VisDrone evaluation is class-agnostic and uses a custom ground-truth filter; it is not the official VisDrone protocol, and the numbers are not comparable with published leaderboard results.
+\item \emph{Scope of comparison.} The controller acts on the operating point of a given detector and tracker, so it is compared with static and adaptive settings of the same pipeline rather than with trackers designed specifically for aerial video \cite{liu2022uavmot}; such trackers could in principle host the same controller, which was not tested.
+\item \emph{Processor and timing.} Throughput was measured on a Tesla T4, a data-center graphics processor, not on an embedded flight computer, and excludes JPEG decoding. With decoding, throughput fell below the gate. No flight test was performed. Between-session timing variability is several frames per second.
+\item \emph{Small validation set.} All design decisions used seven validation sequences. The weakly identified blur and low-light weights, and the transfer failure of the identity-switch constraint, are consistent with that size.
+\item \emph{Post hoc attribution.} The matched static anchor was evaluated after the freeze and timed in another session. It is the correct control for the attribution question, but it was not a preregistered competitor.
+\item \emph{Statistical resolution.} Intervals come from 5,000 resamples of 17 or 20 sequences; differences of a few tenths of a HOTA point are below the resolution of the test.
+\item \emph{Provenance.} The notebook cell that produced the hand-designed controller's component ablation was not recovered, although its outputs and the evaluation chain are preserved; the quality-profile test worker resumed from sequence checkpoints; and the balanced profile's first test attempt was interrupted before any result was saved. Early exploratory robustness experiments (noise, compression, frame dropping) have no canonical record and are not reported.
+\end{enumerate}
+
+\section{Summary}\label{sec:ch4-conclusions}
+This chapter studied causal, training-free control of the detector operating point for multi-object tracking in unmanned aerial vehicle video. A scene complexity index built from five calibrated cues drove the confidence threshold, the suppression threshold, and the input resolution of a fixed detector feeding ByteTrack, and all parameters were selected on validation data and frozen before a locked held-out test.
+
+The validation-selected quality profile improved held-out HOTA over a static default by 5.41 points on VisDrone test-dev and by 4.30 points on UAVDT without retuning, and it improved over a hand-designed adaptive controller by 1.14 points while producing significantly more identity switches. A matched static configuration at the profile's typical operating point reached the same held-out accuracy, so the improvement is due to the validation-calibrated operating point and tracker profile rather than to frame-to-frame switching. The balanced profile provided a reproducible trade-off with fewer identity switches, fewer false positives, and higher throughput on VisDrone.
+
+The ablations bound the value of scene-driven switching: it added accuracy for the hand-designed controller, whose resolution range lies on the steep part of the accuracy--resolution curve, and it added none for the calibrated controller, whose search placed it at the top of that curve within the available throughput budget. For aerial tracking systems, the practical conclusion is that the detector operating point and the tracker profile should be calibrated on representative aerial validation data before any adaptive mechanism is added, and that adaptation should be evaluated against a matched static operating point.
+
+
+The results of this chapter also define what a scene-driven controller cannot do. Its cue scale and its mapping to thresholds were calibrated with one detector; it acts on the detector, not on the tracker; and it cannot observe a change of the detector's confidence scale, because such a change leaves the image unchanged. Chapter~\ref{ch:layer} addresses these three limitations with a controller that reads the detector's score stream and acts on the tracker.

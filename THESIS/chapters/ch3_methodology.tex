@@ -1,0 +1,106 @@
+\chapter{Evaluation Methodology}\label{ch:method}
+
+The two controllers of this thesis are evaluated with a common methodology, which is described in this chapter so that Chapters~\ref{ch:scene} and~\ref{ch:layer} can concentrate on the methods and their results. Section~\ref{sec:m-data} describes the datasets and splits, Sec.~\ref{sec:m-metrics} defines the metrics, Sec.~\ref{sec:m-bootstrap} the paired bootstrap, Sec.~\ref{sec:m-protocol} the development and freeze discipline, Sec.~\ref{sec:m-repro} the reproduction of published trackers, and Sec.~\ref{sec:m-timing} the timing protocol.
+
+\section{Datasets and Splits}\label{sec:m-data}
+Table~\ref{tab:m-data} lists every dataset split used in the thesis and its role. The roles are strict: a split used for any design, selection, or calibration decision is never used to report a held-out result.
+
+\begin{table}[tbp]
+\centering
+\caption{Datasets and splits used in the thesis and their roles.}
+\label{tab:m-data}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{1.8cm}>{\raggedright\arraybackslash}p{6.4cm}}
+\toprule
+Dataset & Split & Sequences & Role \\
+\midrule
+\multicolumn{4}{l}{\textit{Chapter~\ref{ch:scene}: scene-adaptive controller}}\\
+VisDrone2019-MOT \cite{zhu2022visdrone} & validation & 7 & cue calibration, sweeps, ablations, selection \\
+VisDrone2019-MOT & test-dev & 17 & locked held-out comparison \\
+UAVDT \cite{du2018uavdt} & test & 20 & zero-tuning cross-dataset test \\
+\midrule
+\multicolumn{4}{l}{\textit{Chapter~\ref{ch:layer}: self-calibrating control layer}}\\
+MOT17 \cite{milan2016mot16} & val-half & 7 & development trackers, score-transform stress tests; predeclared and post-freeze external systems \\
+KITTI tracking \cite{geiger2012kitti} & training & 21 & development, detector transfer \\
+KITTI MOTS & validation & 9 & post-freeze external system \\
+DanceTrack \cite{sun2022dancetrack} & validation & 25 & post-freeze external systems \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\paragraph{VisDrone2019-MOT.} The multi-object tracking task of VisDrone2019 contains drone video of urban and rural scenes at several altitudes and illumination conditions \cite{zhu2022visdrone}. The validation split (7 sequences, 2,846 frames) was used for every design decision of Chapter~\ref{ch:scene}, and the test-dev split (17 sequences, 6,635 frames) was held out until a locked comparison.
+
+\paragraph{UAVDT.} UAVDT contains vehicle tracking from UAVs in varied weather, altitude, and viewpoint \cite{du2018uavdt}. Its test split (20 sequences, 16,592 frames) was used once, as a zero-tuning cross-dataset test of the frozen scene-adaptive controllers.
+
+\paragraph{MOT17.} MOT17 contains pedestrian sequences from static and moving cameras \cite{milan2016mot16,dendorfer2021motchallenge}. Because the test annotations are not public, published trackers are commonly evaluated on the second half of each training sequence (val-half), which is the split used in Chapter~\ref{ch:layer}, with the published YOLOX-X detections of the tracker authors or their released detections.
+
+\paragraph{KITTI.} The KITTI tracking benchmark contains driving sequences with car and pedestrian annotations \cite{geiger2012kitti}. Chapter~\ref{ch:layer} uses its 21 training sequences with live detectors as a development set for detector transfer, and the 9-sequence KITTI MOTS validation split for one post-freeze external tracker.
+
+\paragraph{DanceTrack.} DanceTrack contains dancers with similar appearance and diverse, non-linear motion \cite{sun2022dancetrack}; its 25-sequence validation split is used for post-freeze external trackers.
+
+\section{Evaluation Metrics}\label{sec:m-metrics}
+Tracking accuracy is reported with three complementary metrics and with raw error counts.
+
+\subsection{Multi-object tracking accuracy}
+The CLEAR MOT accuracy combines the three error types over all frames \cite{bernardin2008clear}:
+\begin{equation}
+\mathrm{MOTA} = 1 - \frac{\sum_t \left(\mathrm{FN}_t + \mathrm{FP}_t + \mathrm{IDS}_t\right)}{\sum_t \mathrm{GT}_t},
+\label{eq:m-mota}
+\end{equation}
+where $\mathrm{FN}_t$, $\mathrm{FP}_t$, and $\mathrm{IDS}_t$ are the false negatives, false positives, and identity switches of frame $t$ and $\mathrm{GT}_t$ is the number of ground-truth objects. MOTA is dominated by detection errors, because false negatives and false positives usually far outnumber identity switches.
+
+\subsection{Identity F1 score}
+IDF1 measures how long each ground-truth object is followed by the same predicted identity \cite{ristani2016idf1}. After a global one-to-one matching between ground-truth and predicted trajectories,
+\begin{equation}
+\mathrm{IDF1} = \frac{2\,\mathrm{IDTP}}{2\,\mathrm{IDTP} + \mathrm{IDFP} + \mathrm{IDFN}},
+\label{eq:m-idf1}
+\end{equation}
+where IDTP, IDFP, and IDFN are the detections that are correctly, falsely, and not assigned under that identity matching. IDF1 is the harmonic mean of identity precision and identity recall.
+
+\subsection{Higher order tracking accuracy}
+HOTA balances detection, association, and localization \cite{luiten2021hota}. For a localization threshold $\alpha$, detections are matched to ground truth with IoU at least $\alpha$, giving true positives (TP), false negatives, and false positives. The detection accuracy is
+\begin{equation}
+\mathrm{DetA}_\alpha = \frac{|\mathrm{TP}|}{|\mathrm{TP}| + |\mathrm{FN}| + |\mathrm{FP}|}.
+\label{eq:m-deta}
+\end{equation}
+For each true positive $c$, the association accuracy compares the ground-truth trajectory and the predicted trajectory to which $c$ belongs: $\mathrm{TPA}(c)$ counts the true positives shared by both trajectories, $\mathrm{FNA}(c)$ those of the ground-truth trajectory matched to another prediction or missed, and $\mathrm{FPA}(c)$ those of the predicted trajectory matched to another ground truth or false. Then
+\begin{equation}
+\mathrm{AssA}_\alpha = \frac{1}{|\mathrm{TP}|} \sum_{c\in\mathrm{TP}} \frac{|\mathrm{TPA}(c)|}{|\mathrm{TPA}(c)| + |\mathrm{FNA}(c)| + |\mathrm{FPA}(c)|},
+\label{eq:m-assa}
+\end{equation}
+\begin{equation}
+\mathrm{HOTA}_\alpha = \sqrt{\mathrm{DetA}_\alpha \cdot \mathrm{AssA}_\alpha}, \qquad
+\mathrm{HOTA} = \frac{1}{19} \sum_{\alpha \in \{0.05, 0.10, \ldots, 0.95\}} \mathrm{HOTA}_\alpha .
+\label{eq:m-hota}
+\end{equation}
+HOTA is the primary metric of this thesis because it weighs detection and association equally; a change of an operating point typically trades detection errors against association errors, and HOTA exposes that trade-off where MOTA hides it.
+
+\subsection{Error counts and throughput}
+Identity switches (IDS), false negatives (FN), and false positives (FP) are reported alongside the aggregate metrics, because they show the mechanism of a change: a lower confidence threshold, for example, removes false negatives and adds false positives. Throughput is reported in processed frames per second (FPS) under the timing protocol of Sec.~\ref{sec:m-timing}.
+
+\subsection{Implementation}
+All metrics are computed with the TrackEval library pinned to commit 12c8791. Chapter~\ref{ch:scene} uses a class-agnostic research protocol on VisDrone and a frozen adapter on UAVDT (Sec.~\ref{sec:ch4-setup}); these are not the official VisDrone evaluation, and the absolute numbers are not comparable with leaderboard results. Chapter~\ref{ch:layer} uses the official ground truth of each benchmark; on KITTI tracking, HOTA is the official car and pedestrian HOTA averaged.
+
+\section{Paired Bootstrap}\label{sec:m-bootstrap}
+Tracking benchmarks contain few sequences (7 to 25 in this thesis), and sequences differ greatly in difficulty, so a difference of a fraction of a point between two systems can arise by chance. Every comparison in the thesis is therefore paired: both systems use the same sequences, the same detections (or the same detector), and the same environment, and the uncertainty of their difference is quantified by a percentile bootstrap over sequences \cite{efron1993bootstrap}:
+\begin{enumerate}
+\item Draw $n$ sequences with replacement from the $n$ sequences of the split.
+\item Recompute the metric of both systems on the resampled set from the pooled counts of the drawn sequences, and record the difference $\Delta^{(b)}$.
+\item Repeat $B$ times; the 2.5th and 97.5th percentiles of $\{\Delta^{(b)}\}$ form the 95\% interval.
+\end{enumerate}
+Chapter~\ref{ch:scene} uses $B=5{,}000$ resamples and Chapter~\ref{ch:layer} uses $B=10{,}000$, both with seed 42. A difference is called significant only when its interval excludes zero. Per-sequence wins, ties, and losses are reported as a distribution-free complement; in Chapter~\ref{ch:layer} a tie is $|\Delta\mathrm{HOTA}|<0.01$. With so few sequences the intervals are wide, and differences of a few tenths of a HOTA point are generally below the resolution of the test.
+
+\section{Development, Freeze, and Held-Out Discipline}\label{sec:m-protocol}
+Both studies separate the data that shaped the method from the data that report it.
+
+\paragraph{Scene-adaptive controller.} All design decisions used the VisDrone validation split. Before the test-dev split was opened, a protocol file fixed the compared systems, their configuration hashes, the calibration hash, the ground-truth filter, the evaluator commit, the throughput gate, and the processor. Each system ran as a separate worker and wrote an immutable result file, and the comparison was merged only when all result files existed. UAVDT was run under a separate lock that forbade any tuning, recalibration, or selection. An attribution control that was not part of the preregistered comparison was evaluated after the freeze and is reported as such.
+
+\paragraph{Control layer.} The control layer was developed on a set of development trackers and data. Its final configuration was then frozen, recorded in a version-control tag, and protected by a lock file containing cryptographic hashes of the layer, its configuration, and the evaluation runners; every later run verified the lock before running. Automated tests (61 in total) check causality, state reset, pass-through on clean streams, independence from detector, tracker, dataset, and sequence names, invariance to affine score transforms where designed, and lock integrity. Evaluation cells then have one of three roles: \emph{development} (visible during design; measured, but not held out), \emph{predeclared external} (selected and declared before being run, and run once), and \emph{post-freeze external} (selected under a protocol registered before any run, which fixed the host contracts, the reproduction criteria, and predictions of the layer's effect).
+
+\section{Reproduction of Published Trackers}\label{sec:m-repro}
+An external tracker can only test the layer if the tracker itself runs as its authors intended. Each post-freeze external tracker was therefore first reproduced without the layer and classified against the authors' reported HOTA: EXACT if within 0.2 points, CLOSE if within 1.0 point with a documented cause that involves no tuning, and FAILED otherwise. A tracker that failed reproduction was excluded from the analysis, and its result with the layer is recorded but not interpreted. The reproductions ran on central processing units in cloud runners rather than on the authors' graphics processors, which explains differences of up to 0.8 HOTA from the reported numbers; all comparisons with and without the layer are paired within one environment, so this offset cancels.
+
+\section{Timing Protocol}\label{sec:m-timing}
+Throughput claims in this thesis are restricted to what was measured. In Chapter~\ref{ch:scene}, throughput is processing throughput on one NVIDIA Tesla T4 graphics processor with the detector in half precision: the number of frames divided by the summed per-frame time of cue analysis, detection with device synchronization, and tracking. Frames are decoded before timing, and decoding is reported separately, because an onboard pipeline receives decoded frames from the camera. In Chapter~\ref{ch:layer}, the cost of the layer is measured on a four-core Intel Xeon processor without a graphics processor, with a live detector and tracker, as mean and 95th-percentile time per frame for every stage. No throughput is claimed for any other hardware, and no flight or embedded test was performed.

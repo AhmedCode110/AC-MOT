@@ -1,0 +1,49 @@
+\chapter*{List of Symbols}
+\addcontentsline{toc}{chapter}{List of Symbols}
+\thispagestyle{plain}
+\noindent\textbf{Chapter~\ref{ch:scene}: scene-adaptive operating-point control}
+\begin{longtable}{@{}p{3.2cm}>{\raggedright\arraybackslash}p{11cm}@{}}
+$c_t$ & detector confidence threshold applied at frame $t$ \\
+$c_{\mathrm{e}}, c_{\mathrm{h}}$ & confidence threshold at $S=0$ (easy end) and at $S=1$ (hard end) \\
+$\hat F_k$ & empirical distribution function of cue $k$ on the calibration set \\
+$K$ & analysis stride, frames between two cue analyses \\
+$M$ & number of calibration samples \\
+$N_{t}$ & number of detections kept by the confidence filter at frame $t$ \\
+$q_k$ & normalized value of scene cue $k \in \{\mathrm{crowd}, \mathrm{tiny}, \mathrm{edge}, \mathrm{light}, \mathrm{blur}\}$ \\
+$r_t$ & detector input resolution at frame $t$, pixels \\
+$r_0, r_1, r_2$ & low, intermediate, and high resolution levels, pixels \\
+$S_t$ & smoothed scene complexity index at frame $t$ \\
+$s_j$ & raw scene complexity index of analysis $j$ \\
+$W$ & smoothing window, number of analyses averaged \\
+$w_k$ & normalized weight of cue $k$ \\
+$\beta$ & mean gray level of the analysis image \\
+$\gamma$ & mean Sobel gradient magnitude of the analysis image \\
+$\eta_t$ & IoU threshold of non-maximum suppression at frame $t$ \\
+$\eta_{\mathrm{e}}, \eta_{\mathrm{h}}$ & suppression threshold at $S=0$ and at $S=1$ \\
+$\theta_t$ & detector operating point $(c_t, \eta_t, r_t)$ \\
+$\nu$ & variance of the Laplacian of the analysis image \\
+$\tau_{\mathrm{m}}, \tau_{\mathrm{h}}$ & index thresholds that switch resolution to $r_1$ and to $r_2$ \\
+\end{longtable}
+
+\noindent\textbf{Chapter~\ref{ch:layer}: self-calibrating control layer}
+\begin{longtable}{@{}p{3.2cm}>{\raggedright\arraybackslash}p{11cm}@{}}
+$a, b, \ell$ & tracker's declared association, track-birth, and lowest usable score thresholds \\
+$a_t, b_t$ & association and birth thresholds passed to the tracker at frame $t$ \\
+$K_t$ & set of candidates passed to the tracker at frame $t$ \\
+$m_0$ & tracker's declared matching tolerance, one minus its minimum overlap \\
+$m_t$ & matching tolerance passed to the tracker at frame $t$ \\
+$r_t$ & ratio of image motion at frame $t$ to the median of past motion \\
+$s_i$ & detector confidence score of candidate $i$ \\
+$t_1, t_2$ & background/foreground and ambiguous/confident thresholds on the logit scale \\
+$W$ & number of past frames pooled for the score statistics \\
+$z_i$ & logit of $s_i$, $\log\left(s_i/(1-s_i)\right)$ \\
+$\rho_t$ & confident share of the foreground at frame $t$ \\
+$\bar\rho_t$ & median of $\rho$ over all past non-cold frames of the stream \\
+$\sigma(\cdot)$ & logistic function \\
+\end{longtable}
+
+\noindent\textbf{Common}
+\begin{longtable}{@{}p{3.2cm}>{\raggedright\arraybackslash}p{11cm}@{}}
+$\Delta$ & paired difference between two systems, percentage points (Chapter~\ref{ch:scene}: first system minus second; Chapter~\ref{ch:layer}: tracker with the layer minus tracker alone) \\
+$B$ & number of bootstrap resamples \\
+\end{longtable}

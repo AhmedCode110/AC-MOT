@@ -1,0 +1,117 @@
+% Compile with LuaLaTeX (Overleaf: Menu > Compiler > LuaLaTeX), then BibTeX.
+\RequirePackage{iftex}
+\RequireLuaTeX
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ---------------------------------------------------------------------------
+% Thesis data
+% ---------------------------------------------------------------------------
+\newcommand{\ThesisTitle}{Training-Free Adaptive Control of Detector and Tracker Operating Points for Multi-Object Tracking}
+\newcommand{\ThesisAuthor}{Ahmed Gouda Ismail}
+\newcommand{\ThesisDegree}{Master of Science}
+\newcommand{\ThesisField}{Computer Engineering}
+\newcommand{\ThesisDepartment}{Computer Engineering and Artificial Intelligence Department}
+\newcommand{\ThesisInstitution}{Military Technical College}
+\newcommand{\ThesisCity}{Cairo, Egypt}
+\newcommand{\ThesisYear}{2026}
+\newcommand{\SupervisorOne}{Mohamed S. Mohamed}
+\newcommand{\SupervisorOneAffil}{Computer Engineering and Artificial Intelligence Department, Military Technical College}
+\newcommand{\SupervisorTwo}{Tarek Ahmed Mahmoud}
+\newcommand{\SupervisorTwoAffil}{Computer Engineering Department, Egypt University of Informatics}
+\newcommand{\PaperOneStatus}{submitted}
+\newcommand{\PaperTwoStatus}{submitted}
+% Arabic front data
+\newcommand{\ArabicTitle}{التحكم التكيفي دون تدريب في نقاط تشغيل الكاشف والمتتبع لتتبع الأجسام المتعددة}
+\newcommand{\ArabicAuthor}{أحمد جودة إسماعيل}
+\newcommand{\ArabicSupervisorOne}{محمد س. محمد}
+\newcommand{\ArabicSupervisorTwo}{طارق أحمد محمود}
+\newcommand{\ArabicDegree}{رسالة مقدمة استكمالاً لمتطلبات الحصول على درجة ماجستير العلوم في هندسة الحاسبات}
+\newcommand{\ArabicDepartment}{قسم هندسة الحاسبات والذكاء الاصطناعي}
+\newcommand{\ArabicInstitution}{الكلية الفنية العسكرية}
+\newcommand{\ArabicCity}{القاهرة، مصر}
+
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage[bidi=basic,layout=tabular]{babel}
+\babelprovide[import,main]{english}
+\babelprovide[import]{arabic}
+\babelfont{rm}{Latin Modern Roman}
+\babelfont{sf}{Latin Modern Sans}
+\babelfont{tt}{Latin Modern Mono}
+\directlua{luaotfload.add_fallback("arabicfallback", {"lmroman10-regular:mode=node;"})}
+\babelfont[arabic]{rm}[Path=fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,Scale=1.05,RawFeature={fallback=arabicfallback}]{NotoNaskhArabic}
+\usepackage{amsmath,amssymb}
+\usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.5cm,bottom=2.5cm,headheight=15pt]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{rotating}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt}
+\usepackage[labelfont=bf,font=small]{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{fancyhdr}
+\usepackage[nottoc]{tocbibind}
+\usepackage{emptypage}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={\ThesisTitle},pdfauthor={\ThesisAuthor}}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\thepage}}
+
+% Tables and figures are numbered within chapters.
+\numberwithin{equation}{chapter}
+
+\begin{document}
+
+\pagenumbering{roman}
+\pagestyle{plain}
+\input{frontmatter/titlepage}
+\input{frontmatter/approval}
+\input{frontmatter/declaration}
+\input{frontmatter/acknowledgments}
+\input{frontmatter/abstract}
+
+\cleardoublepage
+\tableofcontents
+\listoffigures
+\listoftables
+\input{frontmatter/abbreviations}
+\input{frontmatter/symbols}
+\input{frontmatter/publications}
+
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\input{chapters/ch1_introduction}
+\input{chapters/ch2_background}
+\input{chapters/ch3_methodology}
+\input{chapters/ch4_scene_adaptive}
+\input{chapters/ch5_self_calibrating}
+\input{chapters/ch6_conclusions}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\appendix
+\input{appendices/appA_reproducibility}
+
+\input{frontmatter/arabic_summary}
+
+\end{document}

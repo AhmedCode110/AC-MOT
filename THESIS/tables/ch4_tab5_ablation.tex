@@ -1,0 +1,25 @@
+\begin{table}[tbp]
+\centering
+\caption{Component ablations on VisDrone2019-MOT validation (7 sequences). FPS is processing throughput on a T4; mean resolution, confidence and NMS are averaged over frames.}
+\label{tab:ch4-ablation}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrrr}
+\hline
+Stage & Components & HOTA & MOTA & IDF1 & IDS & FPS & Res. & Conf. & NMS \\
+\hline
+\multicolumn{10}{l}{\textit{Hand-designed controller}}\\
+H0 & static default, default tracker & 29.84 & 17.63 & 30.89 & 283 & 44.1 & 640 & 0.250 & 0.450 \\
+H1 & + tuned tracker & 30.86 & 17.80 & 32.85 & 217 & 44.5 & 640 & 0.250 & 0.450 \\
+H2 & + adaptive conf./NMS (640 px) & 31.38 & 17.64 & 33.73 & 210 & 40.7 & 640 & 0.218 & 0.474 \\
+H2R & tuned tracker + adaptive resolution only & 32.45 & 18.42 & 35.67 & 241 & 39.6 & 722 & 0.250 & 0.450 \\
+H3 & full hand-designed controller & 33.06 & 18.16 & 36.30 & 271 & 38.0 & 725 & 0.218 & 0.474 \\
+\multicolumn{10}{l}{\textit{Optimized controller (quality profile Q)}}\\
+C0 & static anchor 960/0.35/0.35, tuned tracker & 36.08 & 23.08 & 40.60 & 266 & 37.9 & 960 & 0.350 & 0.350 \\
+C1 & + adaptive confidence & 36.11 & 23.01 & 40.73 & 271 & 35.3 & 960 & 0.341 & 0.350 \\
+C2 & + adaptive NMS & 36.11 & 23.01 & 40.73 & 271 & 35.5 & 960 & 0.341 & 0.350 \\
+C3 & + adaptive resolution (full Q) & 36.11 & 23.04 & 40.76 & 270 & 35.4 & 957 & 0.341 & 0.350 \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\end{table}

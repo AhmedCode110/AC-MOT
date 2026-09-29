@@ -31,7 +31,8 @@ SEARCHED_OK = ["wang2024smiletrack", "yang2023cbiou", "awais2025foundation", "li
                "chae2024radar", "ma2023adaptivebytetrack", "shim2024adaptrack", "liu2025sparsetrack", "wang2025pdsort", "yang2024hybridsort", "cao2025topictrack",
                "shim2025tracktrack", "zhao2024rtdetr", "gao2025motip"]
 ARXIV_OK = ["aharon2022botsort", "ge2021yolox", "milan2016mot16", "sun2020transtrack", "redmon2018yolov3",
-            "bochkovskiy2020yolov4", "robinson2025rfdetr", "dendorfer2020mot20", "vaswani2017attention", "dosovitskiy2021vit"]
+            "bochkovskiy2020yolov4", "robinson2025rfdetr", "dendorfer2020mot20", "vaswani2017attention", "dosovitskiy2021vit",
+            "guo2017calibration", "wang2021tent"]
 
 OVERRIDES = {
     # Lecture Notes in Computer Science chapters: Crossref gives the series, not the proceedings title.
