@@ -24,6 +24,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG=jais-overleaf-1
-          gh release delete $TAG --yes --cleanup-tag 2>/dev/null || true
-          gh release create $TAG out/*.zip --target "$GITHUB_SHA" --title "JAIS manuscripts (Overleaf upload)" \
-            --notes "Source zips of the two manuscripts for Overleaf (New Project > Upload Project, or the Open in Overleaf links)." --prerelease
+          for id in $(gh api repos/${{ github.repository }}/releases --jq '.[] | select(.draft) | .id'); do gh api -X DELETE repos/${{ github.repository }}/releases/$id; done
+          if gh release view $TAG >/dev/null 2>&1; then
+            gh release upload $TAG out/*.zip --clobber
+          else
+            gh release create $TAG out/*.zip --target "$GITHUB_SHA" --title "JAIS manuscripts (Overleaf upload)" \
+              --notes "Source zips of the two manuscripts for Overleaf (New Project > Upload Project)." --prerelease
+          fi
+          gh release view $TAG --json isDraft,assets --jq '{isDraft, assets: [.assets[].name]}'
