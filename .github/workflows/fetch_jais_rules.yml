@@ -23,6 +23,8 @@ jobs:
           curl -fsSL -A "$UA" -o policies.html "https://aiaa.org/publications/publish-with-aiaa/publication-policies/" || true
           curl -fsSL -A "$UA" -o open_access.html "https://www.aiaa.org/publications/Open-Access/" || true
           curl -fsSL -A "$UA" -o fees.html "https://aiaa.org/publications/open-access/open-access-and-publication-fees/" || true
+          curl -fsSL -A "$UA" -o sivp_publish.html "https://link.springer.com/journal/11760/how-to-publish-with-us" || true
+          curl -fsSL -A "$UA" -o sivp_guidelines.html "https://link.springer.com/journal/11760/submission-guidelines" || true
           curl -fsSL -A "$UA" -o acceptance.html "https://aiaa.org/publications/journals/Journal-Author/journal-acceptance-procedure/" || true
           for f in *.pdf; do [ -s "$f" ] && pdftotext -layout "$f" "${f%.pdf}.txt"; done
           for f in *.html; do [ -s "$f" ] && python3 -c "import re,sys,html;t=open(sys.argv[1],errors='ignore').read();t=re.sub(r'(?s)<(script|style).*?</\1>','',t);t=re.sub(r'<[^>]+>',' ',t);print(re.sub(r'\s+',' ',html.unescape(t)))" "$f" > "${f%.html}.txt"; done
