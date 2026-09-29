@@ -14,8 +14,8 @@ jobs:
       - name: Build zips (sources only; Overleaf compiles)
         run: |
           mkdir -p out
-          for P in PAPER1_SCENE_ADAPTIVE_JAIS PAPER2_UNIVERSAL_ACMOT_JAIS; do
-            (cd JAIS_PAPERS/$P && zip -qr ../../out/$P.zip manuscript.tex references.bib new-aiaa.cls new-aiaa.bst figures tables \
+          for P in PAPER1_SCENE_ADAPTIVE_JAIS PAPER2_SIVP_SPRINGER; do
+            (cd JAIS_PAPERS/$P && zip -qr ../../out/$P.zip manuscript.tex references.bib *.cls *.bst figures tables \
                -x "figures/scene_frames/*" -x "*.aux" -x "*.log")
           done
           ls -la out; unzip -l out/PAPER1_SCENE_ADAPTIVE_JAIS.zip | tail -3

@@ -46,7 +46,11 @@ OVERRIDES = {
                             booktitle="Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining"),
     # Crossref has no year for this proceedings record; the proceedings are ICPR-2000.
     "pechpacheco2000blur": dict(year="2000"),
+    # Crossref title truncated to the system name (the DOI record's title starts with the query title's first word).
+    "jiang2018chameleon": dict(title="Chameleon: Scalable Adaptation of Video Analytics"),
 }
+# DOI records whose Crossref title differs from the cited title and that are NOT the cited paper.
+REJECTED = {"xu2020approxdet": "DOI 10.1145/3384419.3430771 resolves to an unrelated paper (RFID vibration sensing)"}
 
 
 def esc(s):
@@ -105,8 +109,12 @@ def arxiv_entry(key, a):
 
 def all_entries():
     out = {}
+    import difflib
     for k, r in REC.items():
-        if r["status"] == "DOI_RESOLVED":
+        if r["status"] == "DOI_RESOLVED" and k not in REJECTED:
+            sim = difflib.SequenceMatcher(None, r["query_title"].lower(), r["crossref"]["title"].lower()).ratio()
+            if sim < 0.9 and "title" not in OVERRIDES.get(k, {}):
+                continue          # title mismatch: never emitted without an explicit, justified override
             out[k] = entry(k, r["crossref"], OVERRIDES.get(k))
     for k in SEARCHED_OK:
         b = REC[k]["best"]
@@ -122,6 +130,7 @@ def all_entries():
 
 if __name__ == "__main__":
     tex, bib = Path(sys.argv[1]), Path(sys.argv[2])
+    springer = "--springer" in sys.argv   # sn-mathphys-num prints "???" for a publisher without address
     src = tex.read_text()
     cited = []
     for m in re.finditer(r"\\cite[pt]?\*?\{([^}]*)\}", src):
@@ -133,5 +142,8 @@ if __name__ == "__main__":
     missing = [k for k in cited if k not in ents]
     if missing:
         sys.exit(f"cited but not verified: {missing}")
-    bib.write_text("".join(ents[k] + "\n" for k in cited))
+    text = "".join(ents[k] + "\n" for k in cited)
+    if springer:
+        text = re.sub(r",\n  publisher = \{[^}]*\}", "", text)
+    bib.write_text(text)
     print(f"{len(cited)} entries -> {bib}")

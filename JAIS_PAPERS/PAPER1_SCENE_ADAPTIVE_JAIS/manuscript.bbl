@@ -1,4 +1,4 @@
-\begin{thebibliography}{38}
+\begin{thebibliography}{37}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -225,15 +225,10 @@ Han, Y., Huang, G., Song, S., Yang, L., Wang, H., and Wang, Y.,
 \bibitem[{Jiang et~al.(2018)Jiang, Ananthanarayanan, Bodik, Sen, and
   Stoica}]{jiang2018chameleon}
 Jiang, J., Ananthanarayanan, G., Bodik, P., Sen, S., and Stoica, I.,
-  \enquote{{Chameleon},} \emph{Proceedings of the 2018 Conference of the ACM
-  Special Interest Group on Data Communication}, ACM, 2018, pp. 253--266.
+  \enquote{{Chameleon: Scalable Adaptation of Video Analytics},}
+  \emph{Proceedings of the 2018 Conference of the ACM Special Interest Group on
+  Data Communication}, ACM, 2018, pp. 253--266.
 \newblock \doi{10.1145/3230543.3230574}.
-
-\bibitem[{Xie et~al.(2020)Xie, Xiong, Chen, and Fang}]{xu2020approxdet}
-Xie, B., Xiong, J., Chen, X., and Fang, D., \enquote{{Exploring commodity RFID
-  for contactless sub-millimeter vibration sensing},} \emph{Proceedings of the
-  18th Conference on Embedded Networked Sensor Systems}, ACM, 2020, pp. 15--27.
-\newblock \doi{10.1145/3384419.3430771}.
 
 \bibitem[{Bernardin and Stiefelhagen(2008)}]{bernardin2008clear}
 Bernardin, K., and Stiefelhagen, R., \enquote{{Evaluating Multiple Object

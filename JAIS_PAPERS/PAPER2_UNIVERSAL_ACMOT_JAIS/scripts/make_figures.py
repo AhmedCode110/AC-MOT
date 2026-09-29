@@ -15,7 +15,7 @@ import evidence as E  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "figures"
 OUT.mkdir(exist_ok=True)
-plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 7,
+plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42, "font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 7,
                      "xtick.labelsize": 7, "ytick.labelsize": 7, "axes.spines.top": False,
                      "axes.spines.right": False, "savefig.bbox": "tight", "savefig.pad_inches": 0.02})
 C = dict(host="#7f7f7f", v6="#d62728", v7="#1f77b4", pos="#1f77b4", neg="#d62728", zero="#7f7f7f")
@@ -64,29 +64,35 @@ groups = []
 for r in rows:
     if r[2] not in groups:
         groups.append(r[2])
-fig, ax = plt.subplots(figsize=(6.4, 5.2))
-y = 0
-yt, yl = [], []
-for g in groups:
-    ax.text(-10.8, y, g, fontweight="bold", fontsize=7, va="center")
-    y -= 1
-    for lab_, (d, lo, hi), gg in rows:
-        if gg != g:
-            continue
-        col = C["pos"] if lo > 0 else C["neg"] if hi < 0 else C["zero"]
-        ax.plot([lo, hi], [y, y], color=col, lw=1.4)
-        ax.plot(d, y, "o", color=col, ms=3.5)
-        yt.append(y); yl.append(lab_)
+def forest(figsize, name, fs_lab, fs_grp):
+    fig, ax = plt.subplots(figsize=figsize)
+    y = 0
+    yt, yl = [], []
+    for g in groups:
+        ax.text(-10.8, y, g, fontweight="bold", fontsize=fs_grp, va="center")
         y -= 1
-    y -= 0.4
-ax.axvline(0, color="k", lw=0.6)
-ax.set_yticks(yt, yl, fontsize=6.5)
-ax.set_xlim(-11, 11)
-ax.set_xlabel("$\\Delta$HOTA, host + V7f minus host (points, 95% interval)")
-ax.spines["left"].set_visible(False)
-ax.tick_params(axis="y", length=0)
-fig.savefig(OUT / "fig3_forest.pdf")
-plt.close(fig)
+        for lab_, (d, lo, hi), gg in rows:
+            if gg != g:
+                continue
+            col = C["pos"] if lo > 0 else C["neg"] if hi < 0 else C["zero"]
+            ax.plot([lo, hi], [y, y], color=col, lw=1.4)
+            ax.plot(d, y, "o", color=col, ms=3.5)
+            yt.append(y); yl.append(lab_)
+            y -= 1
+        y -= 0.4
+    ax.axvline(0, color="k", lw=0.6)
+    ax.set_yticks(yt, yl, fontsize=fs_lab)
+    ax.set_xlim(-11, 11)
+    ax.set_xlabel("$\\Delta$HOTA, host + layer minus host (points, 95% interval)", fontsize=fs_lab + 0.5)
+    ax.tick_params(axis="x", labelsize=fs_lab)
+    ax.spines["left"].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    fig.savefig(OUT / name)
+    plt.close(fig)
+
+
+forest((6.4, 5.2), "fig3_forest.pdf", 6.5, 7)
+forest((3.45, 5.3), "fig3_forest_col.pdf", 5.8, 6)
 
 # ---------------------------------------------------------------- Fig. 4: per-sequence heatmap
 names = list(E.PER_SEQ)

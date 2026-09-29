@@ -1,0 +1,676 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{38}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{Bewley et~al.}{2016}]{bewley2016sort}
+\begin{bchapter}
+\bauthor{\bsnm{Bewley}, \binits{A.}},
+\bauthor{\bsnm{Ge}, \binits{Z.}},
+\bauthor{\bsnm{Ott}, \binits{L.}},
+\bauthor{\bsnm{Ramos}, \binits{F.}},
+\bauthor{\bsnm{Upcroft}, \binits{B.}}:
+\bctitle{{Simple online and realtime tracking}}.
+In: \bbtitle{2016 IEEE International Conference on Image Processing (ICIP)},
+pp. \bfpage{3464}--\blpage{3468}
+(\byear{2016}).
+\doiurl{10.1109/icip.2016.7533003}
+\end{bchapter}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Zhang et~al.}{2022}]{zhang2022bytetrack}
+\begin{bchapter}
+\bauthor{\bsnm{Zhang}, \binits{Y.}},
+\bauthor{\bsnm{Sun}, \binits{P.}},
+\bauthor{\bsnm{Jiang}, \binits{Y.}},
+\bauthor{\bsnm{Yu}, \binits{D.}},
+\bauthor{\bsnm{Weng}, \binits{F.}},
+\bauthor{\bsnm{Yuan}, \binits{Z.}},
+\bauthor{\bsnm{Luo}, \binits{P.}},
+\bauthor{\bsnm{Liu}, \binits{W.}},
+\bauthor{\bsnm{Wang}, \binits{X.}}:
+\bctitle{{ByteTrack: Multi-object Tracking by Associating Every Detection
+  Box}}.
+In: \bbtitle{Computer Vision -- ECCV 2022}.
+\bsertitle{Lecture Notes in Computer Science},
+pp. \bfpage{1}--\blpage{21}
+(\byear{2022}).
+\doiurl{10.1007/978-3-031-20047-2_1}
+\end{bchapter}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Cao et~al.}{2023}]{cao2023ocsort}
+\begin{bchapter}
+\bauthor{\bsnm{Cao}, \binits{J.}},
+\bauthor{\bsnm{Pang}, \binits{J.}},
+\bauthor{\bsnm{Weng}, \binits{X.}},
+\bauthor{\bsnm{Khirodkar}, \binits{R.}},
+\bauthor{\bsnm{Kitani}, \binits{K.}}:
+\bctitle{{Observation-Centric SORT: Rethinking SORT for Robust Multi-Object
+  Tracking}}.
+In: \bbtitle{2023 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)},
+pp. \bfpage{9686}--\blpage{9696}
+(\byear{2023}).
+\doiurl{10.1109/cvpr52729.2023.00934}
+\end{bchapter}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Miller and
+  Rogers}{2015}]{miller2015multitarget}
+\begin{barticle}
+\bauthor{\bsnm{Miller}, \binits{N.}},
+\bauthor{\bsnm{Rogers}, \binits{J.}}:
+\batitle{{Simultaneous Tracking of Multiple Ground Targets from a Multirotor
+  Unmanned Aerial Vehicle}}.
+\bjtitle{Journal of Aerospace Information Systems}
+\bvolume{12}(\bissue{3}),
+\bfpage{345}--\blpage{364}
+(\byear{2015})
+\doiurl{10.2514/1.i010345}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Lu and Sun}{2024}]{lu2024uavdetection}
+\begin{barticle}
+\bauthor{\bsnm{Lu}, \binits{Y.-R.}},
+\bauthor{\bsnm{Sun}, \binits{D.}}:
+\batitle{{Development of Real-Time Unmanned Aerial Vehicle Urban Object
+  Detection System with Federated Learning}}.
+\bjtitle{Journal of Aerospace Information Systems}
+\bvolume{21}(\bissue{7}),
+\bfpage{547}--\blpage{553}
+(\byear{2024})
+\doiurl{10.2514/1.i011378}
+\end{barticle}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Kuppers et~al.}{2020}]{kuppers2020detcalib}
+\begin{bchapter}
+\bauthor{\bsnm{Kuppers}, \binits{F.}},
+\bauthor{\bsnm{Kronenberger}, \binits{J.}},
+\bauthor{\bsnm{Shantia}, \binits{A.}},
+\bauthor{\bsnm{Haselhoff}, \binits{A.}}:
+\bctitle{{Multivariate Confidence Calibration for Object Detection}}.
+In: \bbtitle{2020 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition Workshops (CVPRW)},
+pp. \bfpage{1322}--\blpage{1330}
+(\byear{2020}).
+\doiurl{10.1109/cvprw50498.2020.00171}
+\end{bchapter}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Luiten et~al.}{2021}]{luiten2021hota}
+\begin{barticle}
+\bauthor{\bsnm{Luiten}, \binits{J.}},
+\bauthor{\bsnm{O\v{s}ep}, \binits{A.}},
+\bauthor{\bsnm{Dendorfer}, \binits{P.}},
+\bauthor{\bsnm{Torr}, \binits{P.}},
+\bauthor{\bsnm{Geiger}, \binits{A.}},
+\bauthor{\bsnm{Leal-Taix\'{e}}, \binits{L.}},
+\bauthor{\bsnm{Leibe}, \binits{B.}}:
+\batitle{{HOTA: A Higher Order Metric for Evaluating Multi-object Tracking}}.
+\bjtitle{International Journal of Computer Vision}
+\bvolume{129}(\bissue{2}),
+\bfpage{548}--\blpage{578}
+(\byear{2021})
+\doiurl{10.1007/s11263-020-01375-2}
+\end{barticle}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Kalman}{1960}]{kalman1960}
+\begin{barticle}
+\bauthor{\bsnm{Kalman}, \binits{R.E.}}:
+\batitle{{A New Approach to Linear Filtering and Prediction Problems}}.
+\bjtitle{Journal of Basic Engineering}
+\bvolume{82}(\bissue{1}),
+\bfpage{35}--\blpage{45}
+(\byear{1960})
+\doiurl{10.1115/1.3662552}
+\end{barticle}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Kuhn}{1955}]{kuhn1955hungarian}
+\begin{barticle}
+\bauthor{\bsnm{Kuhn}, \binits{H.W.}}:
+\batitle{{The Hungarian method for the assignment problem}}.
+\bjtitle{Naval Research Logistics Quarterly}
+\bvolume{2}(\bissue{1-2}),
+\bfpage{83}--\blpage{97}
+(\byear{1955})
+\doiurl{10.1002/nav.3800020109}
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Wojke et~al.}{2017}]{wojke2017deepsort}
+\begin{bchapter}
+\bauthor{\bsnm{Wojke}, \binits{N.}},
+\bauthor{\bsnm{Bewley}, \binits{A.}},
+\bauthor{\bsnm{Paulus}, \binits{D.}}:
+\bctitle{{Simple online and realtime tracking with a deep association metric}}.
+In: \bbtitle{2017 IEEE International Conference on Image Processing (ICIP)},
+pp. \bfpage{3645}--\blpage{3649}
+(\byear{2017}).
+\doiurl{10.1109/icip.2017.8296962}
+\end{bchapter}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Du et~al.}{2023}]{du2023strongsort}
+\begin{barticle}
+\bauthor{\bsnm{Du}, \binits{Y.}},
+\bauthor{\bsnm{Zhao}, \binits{Z.}},
+\bauthor{\bsnm{Song}, \binits{Y.}},
+\bauthor{\bsnm{Zhao}, \binits{Y.}},
+\bauthor{\bsnm{Su}, \binits{F.}},
+\bauthor{\bsnm{Gong}, \binits{T.}},
+\bauthor{\bsnm{Meng}, \binits{H.}}:
+\batitle{{StrongSORT: Make DeepSORT Great Again}}.
+\bjtitle{IEEE Transactions on Multimedia}
+\bvolume{25},
+\bfpage{8725}--\blpage{8737}
+(\byear{2023})
+\doiurl{10.1109/tmm.2023.3240881}
+\end{barticle}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Aharon et~al.}{2022}]{aharon2022botsort}
+\begin{botherref}
+\oauthor{\bsnm{Aharon}, \binits{N.}},
+\oauthor{\bsnm{Orfaig}, \binits{R.}},
+\oauthor{\bsnm{Bobrovsky}, \binits{B.-Z.}}:
+{BoT-SORT: Robust Associations Multi-Pedestrian Tracking}.
+arXiv preprint arXiv:2206.14651
+(2022)
+\end{botherref}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Liu et~al.}{2025}]{liu2025sparsetrack}
+\begin{barticle}
+\bauthor{\bsnm{Liu}, \binits{Z.}},
+\bauthor{\bsnm{Wang}, \binits{X.}},
+\bauthor{\bsnm{Wang}, \binits{C.}},
+\bauthor{\bsnm{Liu}, \binits{W.}},
+\bauthor{\bsnm{Bai}, \binits{X.}}:
+\batitle{{SparseTrack: Multi-Object Tracking by Performing Scene Decomposition
+  Based on Pseudo-Depth}}.
+\bjtitle{IEEE Transactions on Circuits and Systems for Video Technology}
+\bvolume{35}(\bissue{5}),
+\bfpage{4870}--\blpage{4882}
+(\byear{2025})
+\doiurl{10.1109/tcsvt.2024.3524670}
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Stanojevic and
+  Todorovic}{2024}]{stanojevic2024boosttrack}
+\begin{botherref}
+\oauthor{\bsnm{Stanojevic}, \binits{V.D.}},
+\oauthor{\bsnm{Todorovic}, \binits{B.T.}}:
+{BoostTrack: boosting the similarity measure and detection confidence for
+  improved multiple object tracking}.
+Machine Vision and Applications
+\textbf{35}(3)
+(2024)
+\doiurl{10.1007/s00138-024-01531-5}
+\end{botherref}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Yang et~al.}{2024}]{yang2024hybridsort}
+\begin{barticle}
+\bauthor{\bsnm{Yang}, \binits{M.}},
+\bauthor{\bsnm{Han}, \binits{G.}},
+\bauthor{\bsnm{Yan}, \binits{B.}},
+\bauthor{\bsnm{Zhang}, \binits{W.}},
+\bauthor{\bsnm{Qi}, \binits{J.}},
+\bauthor{\bsnm{Lu}, \binits{H.}},
+\bauthor{\bsnm{Wang}, \binits{D.}}:
+\batitle{{Hybrid-SORT: Weak Cues Matter for Online Multi-Object Tracking}}.
+\bjtitle{Proceedings of the AAAI Conference on Artificial Intelligence}
+\bvolume{38}(\bissue{7}),
+\bfpage{6504}--\blpage{6512}
+(\byear{2024})
+\doiurl{10.1609/aaai.v38i7.28471}
+\end{barticle}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Maggiolino
+  et~al.}{2023}]{maggiolino2023deepocsort}
+\begin{bchapter}
+\bauthor{\bsnm{Maggiolino}, \binits{G.}},
+\bauthor{\bsnm{Ahmad}, \binits{A.}},
+\bauthor{\bsnm{Cao}, \binits{J.}},
+\bauthor{\bsnm{Kitani}, \binits{K.}}:
+\bctitle{{Deep OC-Sort: Multi-Pedestrian Tracking by Adaptive
+  Re-Identification}}.
+In: \bbtitle{2023 IEEE International Conference on Image Processing (ICIP)},
+pp. \bfpage{3025}--\blpage{3029}
+(\byear{2023}).
+\doiurl{10.1109/icip49359.2023.10222576}
+\end{bchapter}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Wang et~al.}{2025}]{wang2025pdsort}
+\begin{barticle}
+\bauthor{\bsnm{Wang}, \binits{Y.}},
+\bauthor{\bsnm{Zhang}, \binits{D.}},
+\bauthor{\bsnm{Li}, \binits{R.}},
+\bauthor{\bsnm{Zheng}, \binits{Z.}},
+\bauthor{\bsnm{Li}, \binits{M.}}:
+\batitle{{PD-SORT: Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth
+  Cues}}.
+\bjtitle{IEEE Transactions on Consumer Electronics}
+\bvolume{71}(\bissue{1}),
+\bfpage{165}--\blpage{177}
+(\byear{2025})
+\doiurl{10.1109/tce.2025.3541839}
+\end{barticle}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Miah et~al.}{2025}]{miah2025twix}
+\begin{barticle}
+\bauthor{\bsnm{Miah}, \binits{M.}},
+\bauthor{\bsnm{Bilodeau}, \binits{G.-A.}},
+\bauthor{\bsnm{Saunier}, \binits{N.}}:
+\batitle{{Learning data association for multi-object tracking using only
+  coordinates}}.
+\bjtitle{Pattern Recognition}
+\bvolume{160},
+\bfpage{111169}
+(\byear{2025})
+\doiurl{10.1016/j.patcog.2024.111169}
+\end{barticle}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Cao et~al.}{2025}]{cao2025topictrack}
+\begin{barticle}
+\bauthor{\bsnm{Cao}, \binits{X.}},
+\bauthor{\bsnm{Zheng}, \binits{Y.}},
+\bauthor{\bsnm{Yao}, \binits{Y.}},
+\bauthor{\bsnm{Qin}, \binits{H.}},
+\bauthor{\bsnm{Cao}, \binits{X.}},
+\bauthor{\bsnm{Guo}, \binits{S.}}:
+\batitle{{TOPIC: A Parallel Association Paradigm for Multi-Object Tracking
+  Under Complex Motions and Diverse Scenes}}.
+\bjtitle{IEEE Transactions on Image Processing}
+\bvolume{34},
+\bfpage{743}--\blpage{758}
+(\byear{2025})
+\doiurl{10.1109/tip.2025.3526066}
+\end{barticle}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{Shim et~al.}{2025}]{shim2025tracktrack}
+\begin{bchapter}
+\bauthor{\bsnm{Shim}, \binits{K.}},
+\bauthor{\bsnm{Ko}, \binits{K.}},
+\bauthor{\bsnm{Yang}, \binits{Y.}},
+\bauthor{\bsnm{Kim}, \binits{C.}}:
+\bctitle{{Focusing on Tracks for Online Multi-Object Tracking}}.
+In: \bbtitle{2025 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)},
+pp. \bfpage{11687}--\blpage{11696}
+(\byear{2025}).
+\doiurl{10.1109/cvpr52734.2025.01091}
+\end{bchapter}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Zeng et~al.}{2022}]{zeng2022motr}
+\begin{bchapter}
+\bauthor{\bsnm{Zeng}, \binits{F.}},
+\bauthor{\bsnm{Dong}, \binits{B.}},
+\bauthor{\bsnm{Zhang}, \binits{Y.}},
+\bauthor{\bsnm{Wang}, \binits{T.}},
+\bauthor{\bsnm{Zhang}, \binits{X.}},
+\bauthor{\bsnm{Wei}, \binits{Y.}}:
+\bctitle{{MOTR: End-to-End Multiple-Object Tracking with Transformer}}.
+In: \bbtitle{Computer Vision -- ECCV 2022}.
+\bsertitle{Lecture Notes in Computer Science},
+pp. \bfpage{659}--\blpage{675}
+(\byear{2022}).
+\doiurl{10.1007/978-3-031-19812-0_38}
+\end{bchapter}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Gao et~al.}{2025}]{gao2025motip}
+\begin{bchapter}
+\bauthor{\bsnm{Gao}, \binits{R.}},
+\bauthor{\bsnm{Qi}, \binits{J.}},
+\bauthor{\bsnm{Wang}, \binits{L.}}:
+\bctitle{{Multiple Object Tracking as ID Prediction}}.
+In: \bbtitle{2025 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)},
+pp. \bfpage{27883}--\blpage{27893}
+(\byear{2025}).
+\doiurl{10.1109/cvpr52734.2025.02596}
+\end{bchapter}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Ge et~al.}{2021}]{ge2021yolox}
+\begin{botherref}
+\oauthor{\bsnm{Ge}, \binits{Z.}},
+\oauthor{\bsnm{Liu}, \binits{S.}},
+\oauthor{\bsnm{Wang}, \binits{F.}},
+\oauthor{\bsnm{Li}, \binits{Z.}},
+\oauthor{\bsnm{Sun}, \binits{J.}}:
+{YOLOX: Exceeding YOLO Series in 2021}.
+arXiv preprint arXiv:2107.08430
+(2021)
+\end{botherref}
+\endbibitem
+
+%%% 24
+\bibitem[\protect\citeauthoryear{Redmon et~al.}{2016}]{redmon2016yolo}
+\begin{bchapter}
+\bauthor{\bsnm{Redmon}, \binits{J.}},
+\bauthor{\bsnm{Divvala}, \binits{S.}},
+\bauthor{\bsnm{Girshick}, \binits{R.}},
+\bauthor{\bsnm{Farhadi}, \binits{A.}}:
+\bctitle{{You Only Look Once: Unified, Real-Time Object Detection}}.
+In: \bbtitle{2016 IEEE Conference on Computer Vision and Pattern Recognition
+  (CVPR)},
+pp. \bfpage{779}--\blpage{788}
+(\byear{2016}).
+\doiurl{10.1109/cvpr.2016.91}
+\end{bchapter}
+\endbibitem
+
+%%% 25
+\bibitem[\protect\citeauthoryear{Ren et~al.}{2017}]{ren2017fasterrcnn}
+\begin{barticle}
+\bauthor{\bsnm{Ren}, \binits{S.}},
+\bauthor{\bsnm{He}, \binits{K.}},
+\bauthor{\bsnm{Girshick}, \binits{R.}},
+\bauthor{\bsnm{Sun}, \binits{J.}}:
+\batitle{{Faster R-CNN: Towards Real-Time Object Detection with Region Proposal
+  Networks}}.
+\bjtitle{IEEE Transactions on Pattern Analysis and Machine Intelligence}
+\bvolume{39}(\bissue{6}),
+\bfpage{1137}--\blpage{1149}
+(\byear{2017})
+\doiurl{10.1109/tpami.2016.2577031}
+\end{barticle}
+\endbibitem
+
+%%% 26
+\bibitem[\protect\citeauthoryear{Carion et~al.}{2020}]{carion2020detr}
+\begin{bchapter}
+\bauthor{\bsnm{Carion}, \binits{N.}},
+\bauthor{\bsnm{Massa}, \binits{F.}},
+\bauthor{\bsnm{Synnaeve}, \binits{G.}},
+\bauthor{\bsnm{Usunier}, \binits{N.}},
+\bauthor{\bsnm{Kirillov}, \binits{A.}},
+\bauthor{\bsnm{Zagoruyko}, \binits{S.}}:
+\bctitle{{End-to-End Object Detection with Transformers}}.
+In: \bbtitle{Computer Vision -- ECCV 2020}.
+\bsertitle{Lecture Notes in Computer Science},
+pp. \bfpage{213}--\blpage{229}
+(\byear{2020}).
+\doiurl{10.1007/978-3-030-58452-8_13}
+\end{bchapter}
+\endbibitem
+
+%%% 27
+\bibitem[\protect\citeauthoryear{Zhao et~al.}{2024}]{zhao2024rtdetr}
+\begin{bchapter}
+\bauthor{\bsnm{Zhao}, \binits{Y.}},
+\bauthor{\bsnm{Lv}, \binits{W.}},
+\bauthor{\bsnm{Xu}, \binits{S.}},
+\bauthor{\bsnm{Wei}, \binits{J.}},
+\bauthor{\bsnm{Wang}, \binits{G.}},
+\bauthor{\bsnm{Dang}, \binits{Q.}},
+\bauthor{\bsnm{Liu}, \binits{Y.}},
+\bauthor{\bsnm{Chen}, \binits{J.}}:
+\bctitle{{DETRs Beat YOLOs on Real-time Object Detection}}.
+In: \bbtitle{2024 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)},
+pp. \bfpage{16965}--\blpage{16974}
+(\byear{2024}).
+\doiurl{10.1109/cvpr52733.2024.01605}
+\end{bchapter}
+\endbibitem
+
+%%% 28
+\bibitem[\protect\citeauthoryear{Han et~al.}{2022}]{han2022dynamic}
+\begin{barticle}
+\bauthor{\bsnm{Han}, \binits{Y.}},
+\bauthor{\bsnm{Huang}, \binits{G.}},
+\bauthor{\bsnm{Song}, \binits{S.}},
+\bauthor{\bsnm{Yang}, \binits{L.}},
+\bauthor{\bsnm{Wang}, \binits{H.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}}:
+\batitle{{Dynamic Neural Networks: A Survey}}.
+\bjtitle{IEEE Transactions on Pattern Analysis and Machine Intelligence}
+\bvolume{44}(\bissue{11}),
+\bfpage{7436}--\blpage{7456}
+(\byear{2022})
+\doiurl{10.1109/tpami.2021.3117837}
+\end{barticle}
+\endbibitem
+
+%%% 29
+\bibitem[\protect\citeauthoryear{Jiang et~al.}{2018}]{jiang2018chameleon}
+\begin{bchapter}
+\bauthor{\bsnm{Jiang}, \binits{J.}},
+\bauthor{\bsnm{Ananthanarayanan}, \binits{G.}},
+\bauthor{\bsnm{Bodik}, \binits{P.}},
+\bauthor{\bsnm{Sen}, \binits{S.}},
+\bauthor{\bsnm{Stoica}, \binits{I.}}:
+\bctitle{{Chameleon: Scalable Adaptation of Video Analytics}}.
+In: \bbtitle{Proceedings of the 2018 Conference of the ACM Special Interest
+  Group on Data Communication},
+pp. \bfpage{253}--\blpage{266}
+(\byear{2018}).
+\doiurl{10.1145/3230543.3230574}
+\end{bchapter}
+\endbibitem
+
+%%% 30
+\bibitem[\protect\citeauthoryear{Otsu}{1979}]{otsu1979}
+\begin{barticle}
+\bauthor{\bsnm{Otsu}, \binits{N.}}:
+\batitle{{A Threshold Selection Method from Gray-Level Histograms}}.
+\bjtitle{IEEE Transactions on Systems, Man, and Cybernetics}
+\bvolume{9}(\bissue{1}),
+\bfpage{62}--\blpage{66}
+(\byear{1979})
+\doiurl{10.1109/tsmc.1979.4310076}
+\end{barticle}
+\endbibitem
+
+%%% 31
+\bibitem[\protect\citeauthoryear{Reddy and
+  Chatterji}{1996}]{reddy1996phasecorr}
+\begin{barticle}
+\bauthor{\bsnm{Reddy}, \binits{B.S.}},
+\bauthor{\bsnm{Chatterji}, \binits{B.N.}}:
+\batitle{{An FFT-based technique for translation, rotation, and scale-invariant
+  image registration}}.
+\bjtitle{IEEE Transactions on Image Processing}
+\bvolume{5}(\bissue{8}),
+\bfpage{1266}--\blpage{1271}
+(\byear{1996})
+\doiurl{10.1109/83.506761}
+\end{barticle}
+\endbibitem
+
+%%% 32
+\bibitem[\protect\citeauthoryear{Milan et~al.}{2016}]{milan2016mot16}
+\begin{botherref}
+\oauthor{\bsnm{Milan}, \binits{A.}},
+\oauthor{\bsnm{Leal-Taixe}, \binits{L.}},
+\oauthor{\bsnm{Reid}, \binits{I.}},
+\oauthor{\bsnm{Roth}, \binits{S.}},
+\oauthor{\bsnm{Schindler}, \binits{K.}}:
+{MOT16: A Benchmark for Multi-Object Tracking}.
+arXiv preprint arXiv:1603.00831
+(2016)
+\end{botherref}
+\endbibitem
+
+%%% 33
+\bibitem[\protect\citeauthoryear{Geiger et~al.}{2012}]{geiger2012kitti}
+\begin{bchapter}
+\bauthor{\bsnm{Geiger}, \binits{A.}},
+\bauthor{\bsnm{Lenz}, \binits{P.}},
+\bauthor{\bsnm{Urtasun}, \binits{R.}}:
+\bctitle{{Are we ready for autonomous driving? The KITTI vision benchmark
+  suite}}.
+In: \bbtitle{2012 IEEE Conference on Computer Vision and Pattern Recognition},
+pp. \bfpage{3354}--\blpage{3361}
+(\byear{2012}).
+\doiurl{10.1109/cvpr.2012.6248074}
+\end{bchapter}
+\endbibitem
+
+%%% 34
+\bibitem[\protect\citeauthoryear{Efron and
+  Tibshirani}{1993}]{efron1993bootstrap}
+\begin{bbook}
+\bauthor{\bsnm{Efron}, \binits{B.}},
+\bauthor{\bsnm{Tibshirani}, \binits{R.J.}}:
+\bbtitle{{An Introduction to the Bootstrap}},
+(\byear{1993}).
+\doiurl{10.1007/978-1-4899-4541-9}
+\end{bbook}
+\endbibitem
+
+%%% 35
+\bibitem[\protect\citeauthoryear{Bernardin and
+  Stiefelhagen}{2008}]{bernardin2008clear}
+\begin{barticle}
+\bauthor{\bsnm{Bernardin}, \binits{K.}},
+\bauthor{\bsnm{Stiefelhagen}, \binits{R.}}:
+\batitle{{Evaluating Multiple Object Tracking Performance: The CLEAR MOT
+  Metrics}}.
+\bjtitle{EURASIP Journal on Image and Video Processing}
+\bvolume{2008},
+\bfpage{1}--\blpage{10}
+(\byear{2008})
+\doiurl{10.1155/2008/246309}
+\end{barticle}
+\endbibitem
+
+%%% 36
+\bibitem[\protect\citeauthoryear{Ristani et~al.}{2016}]{ristani2016idf1}
+\begin{bchapter}
+\bauthor{\bsnm{Ristani}, \binits{E.}},
+\bauthor{\bsnm{Solera}, \binits{F.}},
+\bauthor{\bsnm{Zou}, \binits{R.}},
+\bauthor{\bsnm{Cucchiara}, \binits{R.}},
+\bauthor{\bsnm{Tomasi}, \binits{C.}}:
+\bctitle{{Performance Measures and a Data Set for Multi-target, Multi-camera
+  Tracking}}.
+In: \bbtitle{Computer Vision -- ECCV 2016 Workshops}.
+\bsertitle{Lecture Notes in Computer Science},
+pp. \bfpage{17}--\blpage{35}
+(\byear{2016}).
+\doiurl{10.1007/978-3-319-48881-3_2}
+\end{bchapter}
+\endbibitem
+
+%%% 37
+\bibitem[\protect\citeauthoryear{Dendorfer
+  et~al.}{2021}]{dendorfer2021motchallenge}
+\begin{barticle}
+\bauthor{\bsnm{Dendorfer}, \binits{P.}},
+\bauthor{\bsnm{O\v{s}ep}, \binits{A.}},
+\bauthor{\bsnm{Milan}, \binits{A.}},
+\bauthor{\bsnm{Schindler}, \binits{K.}},
+\bauthor{\bsnm{Cremers}, \binits{D.}},
+\bauthor{\bsnm{Reid}, \binits{I.}},
+\bauthor{\bsnm{Roth}, \binits{S.}},
+\bauthor{\bsnm{Leal-Taix\'{e}}, \binits{L.}}:
+\batitle{{MOTChallenge: A Benchmark for Single-Camera Multiple Target
+  Tracking}}.
+\bjtitle{International Journal of Computer Vision}
+\bvolume{129}(\bissue{4}),
+\bfpage{845}--\blpage{881}
+(\byear{2021})
+\doiurl{10.1007/s11263-020-01393-0}
+\end{barticle}
+\endbibitem
+
+%%% 38
+\bibitem[\protect\citeauthoryear{Sun et~al.}{2022}]{sun2022dancetrack}
+\begin{bchapter}
+\bauthor{\bsnm{Sun}, \binits{P.}},
+\bauthor{\bsnm{Cao}, \binits{J.}},
+\bauthor{\bsnm{Jiang}, \binits{Y.}},
+\bauthor{\bsnm{Yuan}, \binits{Z.}},
+\bauthor{\bsnm{Bai}, \binits{S.}},
+\bauthor{\bsnm{Kitani}, \binits{K.}},
+\bauthor{\bsnm{Luo}, \binits{P.}}:
+\bctitle{{DanceTrack: Multi-Object Tracking in Uniform Appearance and Diverse
+  Motion}}.
+In: \bbtitle{2022 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)},
+pp. \bfpage{20961}--\blpage{20970}
+(\byear{2022}).
+\doiurl{10.1109/cvpr52688.2022.02032}
+\end{bchapter}
+\endbibitem
+
+\end{thebibliography}

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 EV = ROOT / "research/paper_split/evidence/legacy"
 OUT = Path(__file__).resolve().parents[1] / "figures"
 OUT.mkdir(exist_ok=True)
-plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 7,
+plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42, "font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 7,
                      "xtick.labelsize": 7, "ytick.labelsize": 7, "axes.spines.top": False,
                      "axes.spines.right": False, "savefig.bbox": "tight", "savefig.pad_inches": 0.02})
 C = dict(default="#7f7f7f", heur="#1f77b4", q="#d62728", b="#2ca02c", static="#9467bd")
