@@ -1,8 +1,0 @@
-
-CLEAR Config:
-THRESHOLD            : 0.5                           
-PRINT_CONFIG         : True                          
-
-Identity Config:
-THRESHOLD            : 0.5                           
-PRINT_CONFIG         : True                          
