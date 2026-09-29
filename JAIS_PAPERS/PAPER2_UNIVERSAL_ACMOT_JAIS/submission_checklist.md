@@ -16,7 +16,8 @@
 | Negative external result shown | C-TWiX KITTI car −1.52 [−4.05, −0.13] in abstract, Table 5, Fig. 3, Failure Cases | done |
 | Cold-start protection | future work only | done |
 | Related manuscript | disclosed in cover letter; mentioned in text without shared results | done |
-| Author block, AIAA forms | affiliation, membership, funding, conflict of interest | to be completed by the author |
+| Author block | names and affiliations | Ahmed Gouda Ismail, Mohamed S. Mohamed (Military Technical College), Tarek Ahmed Mahmoud (Egypt University of Informatics), as in the authors' ICMISI 2026 paper; cities to be confirmed by the authors |
+| AIAA forms | membership, funding, conflict of interest | to be completed by the authors |
 
 Build: `python JAIS_PAPERS/refs/make_bib.py manuscript.tex references.bib`; `pdflatex manuscript && bibtex manuscript && pdflatex manuscript && pdflatex manuscript`.
 Regenerate: `python scripts/make_figures.py`, `python scripts/make_tables.py`.

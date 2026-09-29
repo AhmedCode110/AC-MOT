@@ -11,8 +11,10 @@
 
 \title{Training-Free Self-Calibrating Control Layer for Heterogeneous Multi-Object Trackers}
 
-\author{Ahmed Gouda}
-\affil{Affiliation, City, Country}
+\author{Ahmed Gouda Ismail\footnote{Computer Engineering and Artificial Intelligence Department; corresponding author, a7medgouda1@gmail.com.} and Mohamed S. Mohamed\footnote{Computer Engineering and Artificial Intelligence Department, mohamedms@mtc.edu.eg.}}
+\affil{Military Technical College, Cairo, Egypt}
+\author{Tarek Ahmed Mahmoud\footnote{Computer Engineering Department, tarek.mohamed@eui.edu.eg.}}
+\affil{Egypt University of Informatics, Cairo, Egypt}
 
 \begin{document}
 
@@ -282,7 +284,7 @@ C-TWiX on DanceTrack lost 1.00 HOTA with an interval including zero, with two se
 This paper presented a training-free control layer that self-calibrates from a detector's score stream, estimates whether the stream is clean or noisy, and adapts a frozen tracker's input and thresholds through a declared host contract. One frozen configuration was evaluated on nine published trackers, four sources of detections, and three datasets, with development and external evidence kept separate. The layer improved single-stage trackers, including a predeclared external one by 0.61 HOTA points; it restored trackers whose thresholds no longer matched a shifted detector confidence scale; and it raised the multi-object tracking accuracy of two-stage trackers with a noisy detector by 6 to 8 points. On well-matched two-stage pipelines it left the output unchanged, which removed the degradation of the prior design. It failed on a short stream with few candidates, where false noisy calls cost one external tracker 1.52 HOTA points, and on an under-confident detector with low-threshold trackers. For aerospace pipelines in which detectors are exchanged more often than trackers are retuned, the layer provides a way to keep published trackers operating without labelled recalibration, together with an explicit record of where it should not be expected to help.
 
 \section*{Acknowledgments}
-The author thanks the authors of the evaluated trackers for releasing their code, weights, and detections, and the maintainers of MOT17, KITTI, DanceTrack, and TrackEval.
+The authors thank the authors of the evaluated trackers for releasing their code, weights, and detections, and the maintainers of MOT17, KITTI, DanceTrack, and TrackEval.
 
 \bibliography{references}
 

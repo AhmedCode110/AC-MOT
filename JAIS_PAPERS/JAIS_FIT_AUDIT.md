@@ -5,7 +5,7 @@ Source for rules: AIAA "Journal Page Limits and Word Count Guidelines", Rev. Aug
 
 | Requirement | Paper 1 | Paper 2 |
 |---|---|---|
-| Regular article length: 7–10 published pages; 20–26 double-spaced 10-pt manuscript pages (all pages counted) | 24 pages | 20 pages |
+| Regular article length: 7–10 published pages; 20–26 double-spaced 10-pt manuscript pages (all pages counted) | 25 pages | 20 pages |
 | Publication fees | none unless Open Access (voluntary $2,700) | same |
 | AIAA template (`new-aiaa.cls`, journal option) | yes | yes |
 | Title ≤ 12 words, no abbreviations | 10 words | 9 words |
