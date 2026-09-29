@@ -26,7 +26,7 @@ x = np.arange(len(E.V6))
 w = 0.26
 ax.bar(x - w, [r[1] for r in E.V6], w, color=C["host"], label="host alone")
 ax.bar(x, [r[2] for r in E.V6], w, color=C["v6"], label="host + prior design (V6)")
-ax.bar(x + w, [r[4] for r in E.V6], w, color=C["v7"], label="host + frozen V7f")
+ax.bar(x + w, [r[4] for r in E.V6], w, color=C["v7"], label="host + frozen layer")
 for i, r in enumerate(E.V6):
     ax.text(i, r[2] - 1.6, f"{r[3][0]:+.2f}", ha="center", color="white", fontsize=6.5)
 ax.set_xticks(x, [r[0] for r in E.V6])
@@ -116,7 +116,7 @@ for a, host in zip(axs, E.STRESS):
     ks = [k for k in E.STRESS_KEYS if k in d]
     xx = np.arange(len(ks))
     a.bar(xx - 0.19, [d[k][0] for k in ks], 0.38, color=C["host"], label="host alone")
-    a.bar(xx + 0.19, [d[k][1] for k in ks], 0.38, color=C["v7"], label="host + V7f")
+    a.bar(xx + 0.19, [d[k][1] for k in ks], 0.38, color=C["v7"], label="host + layer")
     a.set_xticks(xx, ks, fontsize=6, rotation=30)
     for i, k in enumerate(ks):
         if d[k][0] == 0:
@@ -172,7 +172,7 @@ for yi, arm in ((1, 1), (0, 2)):
         left += v
     tot = next(x for x in E.RUNTIME if x[0] == "End to end")[arm][0]
     ax.text(left + 0.8, yi, f"{tot:.2f} ms end to end", va="center", fontsize=6.5)
-ax.set_yticks([1, 0], ["host alone", "host + V7f"])
+ax.set_yticks([1, 0], ["host alone", "host + layer"])
 ax.set_xlabel("Mean time per frame (ms), 4-vCPU Xeon, no GPU")
 ax.set_xlim(0, 72)
 ax.legend(frameon=False, fontsize=6, ncol=2, loc="upper center", bbox_to_anchor=(0.5, 1.55))

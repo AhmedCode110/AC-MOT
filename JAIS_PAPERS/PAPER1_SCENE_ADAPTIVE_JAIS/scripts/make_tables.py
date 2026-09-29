@@ -144,7 +144,7 @@ bs = {(r["comparison"], r["metric"]): r for r in rows("V1_PAIRED_BOOTSTRAP_95CI.
 
 def ci(d, lo, hi, digits=2, sign=True):
     f = f"{{:+.{digits}f}}" if sign else f"{{:.{digits}f}}"
-    return f"{f.format(d)} [{f.format(lo)}, {f.format(hi)}]"
+    return f"${f.format(d)}$ [${f.format(lo)}$, ${f.format(hi)}$]"   # math mode: typographic minus
 
 
 t = r"""\begin{table}[t]

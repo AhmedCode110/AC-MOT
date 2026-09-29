@@ -17,8 +17,8 @@ def ci(t, bold=True):
         return "0 (identical)"
     d, lo, hi = t
     k = 3 if any(0 < abs(x) < 0.01 for x in (d, lo, hi)) or max(abs(d), abs(lo), abs(hi)) < 0.1 else 2
-    s = f"{d:+.{k}f} [{lo:+.{k}f}, {hi:+.{k}f}]"
-    return r"\textbf{" + s + "}" if bold and (lo > 0 or hi < 0) else s
+    s = f"${d:+.{k}f}$ [${lo:+.{k}f}$, ${hi:+.{k}f}$]"   # math mode: typographic minus
+    return r"{\boldmath " + s + "}" if bold and (lo > 0 or hi < 0) else s
 
 
 def hmi(t):

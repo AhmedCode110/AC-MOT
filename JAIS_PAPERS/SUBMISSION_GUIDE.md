@@ -27,7 +27,7 @@
 1. Open https://link.springer.com/journal/11760 → "Submit manuscript".
 2. Article type: Original Paper (research article).
 3. Upload `manuscript.tex`, `references.bib` (or the generated `manuscript.bbl`), `sn-jnl.cls`, `sn-mathphys-num.bst`, `figures/*.pdf`, `tables/*.tex`, and `manuscript.pdf`; paste `cover_letter.md`.
-4. Journal limits checked: at most 10 pages in the final two-column format with only references on page 10 (the manuscript is compiled in that format: 10 pages, page 10 references only); abstract 150–250 words (248); Springer Nature LaTeX template (used).
+4. Journal limits checked: at most 10 pages in the final two-column format with only references on page 10 (the manuscript is compiled in that format: 10 pages, page 10 references only); abstract 150–250 words (250); Springer Nature LaTeX template (used).
 5. Publishing model: choose the subscription (non-Open-Access) route.
 6. Declarations are in the manuscript; the submission form repeats them.
 
