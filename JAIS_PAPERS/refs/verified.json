@@ -2758,24 +2758,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010457",
-    "type": "journal-article",
-    "title": "Image Segmentation-Based Unmanned Aerial Vehicle Safe Navigation",
-    "authors": [
-     "Pooja Agrawal",
-     "Ashwini Ratnoo",
-     "Debasish Ghose"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "14",
-    "issue": "7",
-    "pages": "391-410",
-    "year": 2017,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010911",
     "type": "journal-article",
     "title": "Detection and Tracking of Aircraft from Small Unmanned Aerial Systems",
@@ -2792,6 +2774,24 @@
     "issue": "11",
     "pages": "838-851",
     "year": 2021,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010457",
+    "type": "journal-article",
+    "title": "Image Segmentation-Based Unmanned Aerial Vehicle Safe Navigation",
+    "authors": [
+     "Pooja Agrawal",
+     "Ashwini Ratnoo",
+     "Debasish Ghose"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "14",
+    "issue": "7",
+    "pages": "391-410",
+    "year": 2017,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3054,24 +3054,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010388",
-    "type": "journal-article",
-    "title": "Real-Time Safety Assessment of Unmanned Aircraft Systems Against Stealthy Cyber Attacks",
-    "authors": [
-     "Cheolhyeon Kwon",
-     "Scott Yantek",
-     "Inseok Hwang"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "13",
-    "issue": "1",
-    "pages": "27-45",
-    "year": 2016,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010555",
     "type": "journal-article",
     "title": "High-Performance Embedded Computing in Space: Evaluation of Platforms for Vision-Based Navigation",
@@ -3097,6 +3079,24 @@
     "event": null
    },
    {
+    "doi": "10.2514/1.i010388",
+    "type": "journal-article",
+    "title": "Real-Time Safety Assessment of Unmanned Aircraft Systems Against Stealthy Cyber Attacks",
+    "authors": [
+     "Cheolhyeon Kwon",
+     "Scott Yantek",
+     "Inseok Hwang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "13",
+    "issue": "1",
+    "pages": "27-45",
+    "year": 2016,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
     "doi": "10.2514/1.i010940",
     "type": "journal-article",
     "title": "Data-Driven Approach Using Machine Learning for Real-Time Flight Path Optimization",
@@ -3111,25 +3111,6 @@
     "issue": "1",
     "pages": "3-21",
     "year": 2022,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
-    "doi": "10.2514/1.i010924",
-    "type": "journal-article",
-    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
-    "authors": [
-     "Joel Dunham",
-     "Eric Johnson",
-     "Eric Feron",
-     "Brian German"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "18",
-    "issue": "9",
-    "pages": "616-631",
-    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3167,6 +3148,25 @@
     "issue": "9",
     "pages": "726-734",
     "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010924",
+    "type": "journal-article",
+    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "authors": [
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "9",
+    "pages": "616-631",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3228,20 +3228,18 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010924.c1",
+    "doi": "10.2514/1.i011378",
     "type": "journal-article",
-    "title": "Correction: Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
     "authors": [
-     "Joel Dunham",
-     "Eric Johnson",
-     "Eric Feron",
-     "Brian German"
+     "You-Ru Lu",
+     "Dengfeng Sun"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": "18",
+    "volume": "21",
     "issue": "7",
-    "pages": "AU1-AU1",
-    "year": 2021,
+    "pages": "547-553",
+    "year": 2024,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3571,6 +3569,286 @@
    "event": null
   },
   "title_similarity": 0.475,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "act2026adaptive",
+  "query_title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.3390/electronics15174047",
+   "type": "journal-article",
+   "title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking",
+   "authors": [
+    "Dong Uk Gwon",
+    "Won Il Lee"
+   ],
+   "container": "Electronics",
+   "volume": "15",
+   "issue": "17",
+   "pages": "4047",
+   "year": 2026,
+   "publisher": "MDPI AG",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "ma2023adaptivebytetrack",
+  "query_title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.1109/iccais59597.2023.10382403",
+    "type": "proceedings-article",
+    "title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+    "authors": [
+     "Linh Van Ma",
+     "Muhammad Ishfaq Hussain",
+     "JongHyun Park",
+     "Jeongbae Kim",
+     "Moongu Jeon"
+    ],
+    "container": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)",
+    "volume": null,
+    "issue": null,
+    "pages": "370-374",
+    "year": 2023,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)"
+   },
+   {
+    "doi": "10.2139/ssrn.6685377",
+    "type": "posted-content",
+    "title": "Adaptive Association for ByteTrack-based Multi-Object Tracking in Dense and Dynamic Scenes",
+    "authors": [
+     "Venkata  Kranthi Budigi",
+     "Surekha Borra",
+     "Ambika Annavarapu"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.6727703",
+    "type": "posted-content",
+    "title": "Adaptive Association for ByteTrack-based Multi-Object Tracking in Dense and Dynamic Scenes",
+    "authors": [
+     "Venkata  Kranthi Budigi",
+     "Surekha Borra",
+     "Ambika Annavarapu"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.3390/electronics15174047",
+    "type": "journal-article",
+    "title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking",
+    "authors": [
+     "Dong Uk Gwon",
+     "Won Il Lee"
+    ],
+    "container": "Electronics",
+    "volume": "15",
+    "issue": "17",
+    "pages": "4047",
+    "year": 2026,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.6981458",
+    "type": "posted-content",
+    "title": "A ByteTrack Based Lightweight Tracking-by-Detection Method for Stable Maritime Multi-Object Tracking",
+    "authors": [
+     "HongGuang Lyu",
+     "Ruiqi Wang",
+     "Qianfeng Jing",
+     "Tao Cheng",
+     "Yong Yin",
+     "TongTong Guo"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/iccais59597.2023.10382403",
+   "type": "proceedings-article",
+   "title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+   "authors": [
+    "Linh Van Ma",
+    "Muhammad Ishfaq Hussain",
+    "JongHyun Park",
+    "Jeongbae Kim",
+    "Moongu Jeon"
+   ],
+   "container": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)",
+   "volume": null,
+   "issue": null,
+   "pages": "370-374",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2312.01650",
+   "title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+   "authors": [
+    "Linh Van Ma",
+    "Muhammad Ishfaq Hussain",
+    "JongHyun Park",
+    "Jeongbae Kim",
+    "Moongu Jeon"
+   ],
+   "published": "2023-12-04T06:01:46Z"
+  }
+ },
+ {
+  "key": "shim2024adaptrack",
+  "query_title": "AdapTrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.1109/icip51287.2024.10648139",
+    "type": "proceedings-article",
+    "title": "Adaptrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking",
+    "authors": [
+     "Kyujin Shim",
+     "Kangwook Ko",
+     "Jubi Hwang",
+     "Changick Kim"
+    ],
+    "container": "2024 IEEE International Conference on Image Processing (ICIP)",
+    "volume": null,
+    "issue": null,
+    "pages": "2222-2228",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 IEEE International Conference on Image Processing (ICIP)"
+   },
+   {
+    "doi": "10.21203/rs.3.rs-5917001/v1",
+    "type": "posted-content",
+    "title": "PreAFTrack: Multi-Object Tracking Based on Adaptive Feature Matching from Detection Results",
+    "authors": [
+     "Mandun Zhang",
+     "Chenyue Hou",
+     "Yonghui Pang",
+     "Jiale Shi",
+     "Yiqi Zhang",
+     "Xiangsheng Huang"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/wcica.2006.1713983",
+    "type": "proceedings-article",
+    "title": "A Multi-Object Tracking Algorithm based on Adaptive Pattern Matching and Offset Estimating",
+    "authors": [
+     "Sanding Luo",
+     "Weige Tan"
+    ],
+    "container": "2006 6th World Congress on Intelligent Control and Automation",
+    "volume": null,
+    "issue": null,
+    "pages": "10135-10139",
+    "year": 2006,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2006 6th World Congress on Intelligent Control and Automation"
+   },
+   {
+    "doi": "10.1109/icarcv63323.2024.10821638",
+    "type": "proceedings-article",
+    "title": "Multi-Object Tracking Algorithm Based on Motion Estimation and Appearance Adaptive Matching",
+    "authors": [
+     "Xiaoqiang Huang",
+     "Yingguang Hao",
+     "Hongyu Wang"
+    ],
+    "container": "2024 18th International Conference on Control, Automation, Robotics and Vision (ICARCV)",
+    "volume": null,
+    "issue": null,
+    "pages": "381-386",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 18th International Conference on Control, Automation, Robotics and Vision (ICARCV)"
+   },
+   {
+    "doi": "10.1007/s11227-025-07466-6",
+    "type": "journal-article",
+    "title": "Preaftrack: multi-object tracking based on adaptive feature matching from detection results",
+    "authors": [
+     "Mandun Zhang",
+     "Chenyue Hou",
+     "Yonghui Pang",
+     "Jiale Shi",
+     "Yiqi Zhang",
+     "Xiangsheng Huang"
+    ],
+    "container": "The Journal of Supercomputing",
+    "volume": "81",
+    "issue": "10",
+    "pages": null,
+    "year": 2025,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": "1115",
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/icip51287.2024.10648139",
+   "type": "proceedings-article",
+   "title": "Adaptrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking",
+   "authors": [
+    "Kyujin Shim",
+    "Kangwook Ko",
+    "Jubi Hwang",
+    "Changick Kim"
+   ],
+   "container": "2024 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "2222-2228",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "title_similarity": 1.0,
   "status": "SEARCHED"
  }
 ]
