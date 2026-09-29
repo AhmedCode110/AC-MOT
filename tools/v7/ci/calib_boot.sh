@@ -58,9 +58,17 @@ sys.exit(1 if bad else 0)
 PYEOF
 
 log "runs: ByteTrack (official, ultralytics settings) and OC-SORT on the floor-0.01 stream"
+# The repository's tools/ is a namespace package; a regular 'tools' package in
+# the external venv's site-packages would shadow it, so the module is bound to
+# the repository directory before the unmodified driver runs.
+run_py() {
+  "$PY" -c 'import runpy, sys, types
+r = sys.argv[1]; m = types.ModuleType("tools"); m.__path__ = [r + "/tools"]; sys.modules["tools"] = m
+sys.argv = sys.argv[2:]; runpy.run_path(sys.argv[0], run_name="__main__")' "$REPO" "$@"
+}
 run_by() { # host prefix tf
   for S in NATIVE V7f; do
-    "$PY" "$REPO/tools/v7/external/mot17_bytetrack_v7.py" --system "$S@t:$3" --stream st --host "$1" \
+    run_py "$REPO/tools/v7/external/mot17_bytetrack_v7.py" --system "$S@t:$3" --stream st --host "$1" \
       --name "${2}_st_${S}_t_$3" >/dev/null
   done
 }
