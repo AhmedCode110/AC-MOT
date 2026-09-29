@@ -55,5 +55,8 @@
  {"key": "xiao2023uavmotsurvey", "title": "UAV-based object tracking survey multi-object tracking unmanned aerial vehicle", "doi": null, "search_only": true},
  {"key": "jaisquery_uav_tracking", "title": "Journal of Aerospace Information Systems unmanned aerial vehicle object detection tracking onboard", "doi": null, "search_only": true, "container": "Journal of Aerospace Information Systems"},
  {"key": "jaisquery_onboard_vision", "title": "Journal of Aerospace Information Systems onboard vision real-time embedded", "doi": null, "search_only": true, "container": "Journal of Aerospace Information Systems"},
- {"key": "jaisquery_detection", "title": "Journal of Aerospace Information Systems deep learning detection aerial imagery", "doi": null, "search_only": true, "container": "Journal of Aerospace Information Systems"}
+ {"key": "jaisquery_detection", "title": "Journal of Aerospace Information Systems deep learning detection aerial imagery", "doi": null, "search_only": true, "container": "Journal of Aerospace Information Systems"},
+ {"key": "act2026adaptive", "title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking", "doi": "10.3390/electronics15174047"},
+ {"key": "ma2023adaptivebytetrack", "title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking", "doi": null, "arxiv": "2312.01650"},
+ {"key": "shim2024adaptrack", "title": "AdapTrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking", "doi": null}
 ]
