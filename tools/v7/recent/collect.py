@@ -29,14 +29,14 @@ SYSTEMS = {
             "MOT17": dict(split="MOT17 val-half, CenterTrack split (second half of every sequence), "
                                 "GT from the authors' tools/create_halves_mot17.py",
                           detections="released YOLOX-X (ByteTrack bytetrack_x_mot17 weights)",
-                          config="script/c-twix_MOT17.sh", reference=dict(HOTA=77.8, source="official README, validation table"),
+                          config="script/c-twix_MOT17.sh", reproduction="CLOSE: HOTA 77.550 vs 77.8 (CPU float16 autocast)", reference=dict(HOTA=77.8, source="official README, validation table"),
                           classes=["pedestrian"]),
             "KITTIMOT": dict(split="KITTI tracking training, KITTIMOTS val sequences 0002 0006 0007 0008 0010 0013 0014 0016 0018",
-                             detections="released Permatrack", config="script/c-twix_KT.sh",
+                             detections="released Permatrack", config="script/c-twix_KT.sh", reproduction="car EXACT: 89.266 vs 89.3; pedestrian CLOSE: 70.772 vs 71.4",
                              reference=dict(car=dict(HOTA=89.3), pedestrian=dict(HOTA=71.4), source="official README, validation table"),
                              classes=["car", "pedestrian"]),
             "DanceTrack": dict(split="DanceTrack val (25 sequences)", detections="released YOLOX-X (ByteTrack DanceTrack model)",
-                               config="script/c-twix_DT.sh", reference=dict(HOTA=60.4, source="official README, validation table"),
+                               config="script/c-twix_DT.sh", reproduction="CLOSE: HOTA 59.615 vs 60.4", reference=dict(HOTA=60.4, source="official README, validation table"),
                                classes=["pedestrian"]),
         }),
     "topictrack": dict(
@@ -53,9 +53,26 @@ SYSTEMS = {
         runs={
             "MOT17": dict(split="MOT17 val-half (ByteTrack split, authors' shipped GT results/gt/MOT17-val)",
                           detections="official detector run on the frames (topictrack_ablation.pth.tar, conf 0.1, NMS 0.7, 800x1440)",
-                          config="run/mot17_val.sh", reference=dict(HOTA=69.6, MOTA=79.8, IDF1=81.2, FP=3028, FN=7612,
+                          config="run/mot17_val.sh", reproduction="FAILED: interpolated HOTA 67.538 vs 69.6 (> 1.0); exploratory only, not in the main table", reference=dict(HOTA=69.6, MOTA=79.8, IDF1=81.2, FP=3028, FN=7612,
                                                                      source="official README, MOT17-half-val"),
                           classes=["pedestrian"]),
+        }),
+    "tracktrack": dict(
+        name="TrackTrack",
+        citation="K. Shim, K. Ko, Y. Yang, C. Kim, 'Focusing on Tracks for Online Multi-Object Tracking', "
+                 "CVPR 2025, pp. 11687-11696, doi:10.1109/CVPR52734.2025.01091",
+        venue="CVPR", year=2025,
+        repository="https://github.com/kamkyu94/TrackTrack", commit="ee7f1c5fcbdcac48ed8bfab38d52c0006bf304da",
+        assets={"tt_dance_val_0.80.pickle / tt_dance_val_0.95.pickle (released detections)": "see research/final/recent/assets/SHA256SUMS_tracktrack.txt",
+                "tt_dance_sbs_S50.pth (released FastReID)": "3cdd4cbb8c450d6aa3a995f7f538bc0ef2e026cc872506b8842e0e5b71d6d40b"},
+        reid="FastReID SBS-S50 (official DanceTrack weights), features re-extracted on CPU float32",
+        compatibility="CPU run; features extracted with the official ext_feats code on CPU float32 (the authors used a GPU); "
+                      ".cuda() no-op, torch.load mapped to CPU, NumPy-2 alias np.float_",
+        runs={
+            "DanceTrack": dict(split="DanceTrack val (25 sequences)", detections="released detections (NMS 0.80 and 0.95 views)",
+                               config="3. Tracker/run.py, utils/etc.py::set_parameters (val), seed 10000; _post = AFLink", reproduction="CLOSE: post-processed HOTA 62.961 vs 63.3, AssA 49.111 vs 49.7 (CPU float32 ReID features)",
+                               reference=dict(HOTA=63.3, AssA=49.7, source="CVPR 2025 paper, full method, post-processed (AFLink)"),
+                               classes=["pedestrian"]),
         }),
 }
 
