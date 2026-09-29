@@ -1,0 +1,29 @@
+name: Overleaf project zips for the two JAIS papers
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/overleaf_zips.yml"]
+permissions:
+  contents: write
+jobs:
+  zip:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build zips (sources only; Overleaf compiles)
+        run: |
+          mkdir -p out
+          for P in PAPER1_SCENE_ADAPTIVE_JAIS PAPER2_UNIVERSAL_ACMOT_JAIS; do
+            (cd JAIS_PAPERS/$P && zip -qr ../../out/$P.zip manuscript.tex references.bib new-aiaa.cls new-aiaa.bst figures tables \
+               -x "figures/scene_frames/*" -x "*.aux" -x "*.log")
+          done
+          ls -la out; unzip -l out/PAPER1_SCENE_ADAPTIVE_JAIS.zip | tail -3
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=jais-overleaf-1
+          gh release delete $TAG --yes --cleanup-tag 2>/dev/null || true
+          gh release create $TAG out/*.zip --target "$GITHUB_SHA" --title "JAIS manuscripts (Overleaf upload)" \
+            --notes "Source zips of the two manuscripts for Overleaf (New Project > Upload Project, or the Open in Overleaf links)." --prerelease
