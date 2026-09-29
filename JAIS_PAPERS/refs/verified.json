@@ -763,20 +763,6 @@
     "event": "2025 International Symposium on Machine Learning and Media Computing (MLMC)"
    },
    {
-    "doi": "10.1017/cbo9780511975837.013",
-    "type": "other",
-    "title": "Pseudo-functions in object tracking",
-    "authors": [],
-    "container": "Fundamentals of Object Tracking",
-    "volume": null,
-    "issue": null,
-    "pages": "358-360",
-    "year": 2011,
-    "publisher": "Cambridge University Press",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.23919/fusion43075.2019.9011185",
     "type": "proceedings-article",
     "title": "Object Detection in Tensor Decomposition Based Multi Target Tracking",
@@ -791,6 +777,20 @@
     "publisher": "IEEE",
     "article_number": null,
     "event": "2019 22th International Conference on Information Fusion (FUSION)"
+   },
+   {
+    "doi": "10.1017/cbo9780511975837.013",
+    "type": "other",
+    "title": "Pseudo-functions in object tracking",
+    "authors": [],
+    "container": "Fundamentals of Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "358-360",
+    "year": 2011,
+    "publisher": "Cambridge University Press",
+    "article_number": null,
+    "event": null
    },
    {
     "doi": "10.3390/machines14050472",
@@ -3054,6 +3054,24 @@
     "event": null
    },
    {
+    "doi": "10.2514/1.i010388",
+    "type": "journal-article",
+    "title": "Real-Time Safety Assessment of Unmanned Aircraft Systems Against Stealthy Cyber Attacks",
+    "authors": [
+     "Cheolhyeon Kwon",
+     "Scott Yantek",
+     "Inseok Hwang"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "13",
+    "issue": "1",
+    "pages": "27-45",
+    "year": 2016,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
     "doi": "10.2514/1.i010555",
     "type": "journal-article",
     "title": "High-Performance Embedded Computing in Space: Evaluation of Platforms for Vision-Based Navigation",
@@ -3079,24 +3097,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010388",
-    "type": "journal-article",
-    "title": "Real-Time Safety Assessment of Unmanned Aircraft Systems Against Stealthy Cyber Attacks",
-    "authors": [
-     "Cheolhyeon Kwon",
-     "Scott Yantek",
-     "Inseok Hwang"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "13",
-    "issue": "1",
-    "pages": "27-45",
-    "year": 2016,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010940",
     "type": "journal-article",
     "title": "Data-Driven Approach Using Machine Learning for Real-Time Flight Path Optimization",
@@ -3111,6 +3111,25 @@
     "issue": "1",
     "pages": "3-21",
     "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010924",
+    "type": "journal-article",
+    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "authors": [
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "9",
+    "pages": "616-631",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3148,25 +3167,6 @@
     "issue": "9",
     "pages": "726-734",
     "year": 2024,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
-    "doi": "10.2514/1.i010924",
-    "type": "journal-article",
-    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
-    "authors": [
-     "Joel Dunham",
-     "Eric Johnson",
-     "Eric Feron",
-     "Brian German"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "18",
-    "issue": "9",
-    "pages": "616-631",
-    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3228,18 +3228,20 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i011378",
+    "doi": "10.2514/1.i010924.c1",
     "type": "journal-article",
-    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
+    "title": "Correction: Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
     "authors": [
-     "You-Ru Lu",
-     "Dengfeng Sun"
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": "21",
+    "volume": "18",
     "issue": "7",
-    "pages": "547-553",
-    "year": 2024,
+    "pages": "AU1-AU1",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3850,5 +3852,2056 @@
   },
   "title_similarity": 1.0,
   "status": "SEARCHED"
+ },
+ {
+  "key": "he2016resnet",
+  "query_title": "Deep Residual Learning for Image Recognition",
+  "crossref": {
+   "doi": "10.1109/cvpr.2016.90",
+   "type": "proceedings-article",
+   "title": "Deep Residual Learning for Image Recognition",
+   "authors": [
+    "Kaiming He",
+    "Xiangyu Zhang",
+    "Shaoqing Ren",
+    "Jian Sun"
+   ],
+   "container": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "770-778",
+   "year": 2016,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "he2017maskrcnn",
+  "query_title": "Mask R-CNN",
+  "crossref": {
+   "doi": "10.1109/iccv.2017.322",
+   "type": "proceedings-article",
+   "title": "Mask R-CNN",
+   "authors": [
+    "Kaiming He",
+    "Georgia Gkioxari",
+    "Piotr Dollar",
+    "Ross Girshick"
+   ],
+   "container": "2017 IEEE International Conference on Computer Vision (ICCV)",
+   "volume": null,
+   "issue": null,
+   "pages": "2980-2988",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 IEEE International Conference on Computer Vision (ICCV)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "lin2017focal",
+  "query_title": "Focal Loss for Dense Object Detection",
+  "crossref": {
+   "doi": "10.1109/iccv.2017.324",
+   "type": "proceedings-article",
+   "title": "Focal Loss for Dense Object Detection",
+   "authors": [
+    "Tsung-Yi Lin",
+    "Priya Goyal",
+    "Ross Girshick",
+    "Kaiming He",
+    "Piotr Dollar"
+   ],
+   "container": "2017 IEEE International Conference on Computer Vision (ICCV)",
+   "volume": null,
+   "issue": null,
+   "pages": "2999-3007",
+   "year": 2017,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2017 IEEE International Conference on Computer Vision (ICCV)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "tan2020efficientdet",
+  "query_title": "EfficientDet: Scalable and Efficient Object Detection",
+  "crossref": {
+   "doi": "10.1109/cvpr42600.2020.01079",
+   "type": "proceedings-article",
+   "title": "EfficientDet: Scalable and Efficient Object Detection",
+   "authors": [
+    "Mingxing Tan",
+    "Ruoming Pang",
+    "Quoc V. Le"
+   ],
+   "container": "2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "10778-10787",
+   "year": 2020,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "liu2016ssd",
+  "query_title": "SSD: Single Shot MultiBox Detector",
+  "crossref": {
+   "doi": "10.1007/978-3-319-46448-0_2",
+   "type": "book-chapter",
+   "title": "SSD: Single Shot MultiBox Detector",
+   "authors": [
+    "Wei Liu",
+    "Dragomir Anguelov",
+    "Dumitru Erhan",
+    "Christian Szegedy",
+    "Scott Reed",
+    "Cheng-Yang Fu",
+    "Alexander C. Berg"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "21-37",
+   "year": 2016,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "girshick2014rcnn",
+  "query_title": "Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation",
+  "crossref": {
+   "doi": "10.1109/cvpr.2014.81",
+   "type": "proceedings-article",
+   "title": "Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation",
+   "authors": [
+    "Ross Girshick",
+    "Jeff Donahue",
+    "Trevor Darrell",
+    "Jitendra Malik"
+   ],
+   "container": "2014 IEEE Conference on Computer Vision and Pattern Recognition",
+   "volume": null,
+   "issue": null,
+   "pages": "580-587",
+   "year": 2014,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2014 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "dalal2005hog",
+  "query_title": "Histograms of Oriented Gradients for Human Detection",
+  "crossref": {
+   "doi": "10.1109/cvpr.2005.177",
+   "type": "proceedings-article",
+   "title": "Histograms of Oriented Gradients for Human Detection",
+   "authors": [
+    "N. Dalal",
+    "B. Triggs"
+   ],
+   "container": "2005 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'05)",
+   "volume": "1",
+   "issue": null,
+   "pages": "886-893",
+   "year": null,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2005 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'05)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "lowe2004sift",
+  "query_title": "Distinctive Image Features from Scale-Invariant Keypoints",
+  "crossref": {
+   "doi": "10.1023/b:visi.0000029664.99615.94",
+   "type": "journal-article",
+   "title": "Distinctive Image Features from Scale-Invariant Keypoints",
+   "authors": [
+    "David G. Lowe"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "60",
+   "issue": "2",
+   "pages": "91-110",
+   "year": 2004,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "krizhevsky2017alexnet",
+  "query_title": "ImageNet classification with deep convolutional neural networks",
+  "crossref": {
+   "doi": "10.1145/3065386",
+   "type": "journal-article",
+   "title": "ImageNet classification with deep convolutional neural networks",
+   "authors": [
+    "Alex Krizhevsky",
+    "Ilya Sutskever",
+    "Geoffrey E. Hinton"
+   ],
+   "container": "Communications of the ACM",
+   "volume": "60",
+   "issue": "6",
+   "pages": "84-90",
+   "year": 2017,
+   "publisher": "Association for Computing Machinery (ACM)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "lin2014coco",
+  "query_title": "Microsoft COCO: Common Objects in Context",
+  "crossref": {
+   "doi": "10.1007/978-3-319-10602-1_48",
+   "type": "book-chapter",
+   "title": "Microsoft COCO: Common Objects in Context",
+   "authors": [
+    "Tsung-Yi Lin",
+    "Michael Maire",
+    "Serge Belongie",
+    "James Hays",
+    "Pietro Perona",
+    "Deva Ramanan",
+    "Piotr Doll\u00e1r",
+    "C. Lawrence Zitnick"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "740-755",
+   "year": 2014,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "russakovsky2015imagenet",
+  "query_title": "ImageNet Large Scale Visual Recognition Challenge",
+  "crossref": {
+   "doi": "10.1007/s11263-015-0816-y",
+   "type": "journal-article",
+   "title": "ImageNet Large Scale Visual Recognition Challenge",
+   "authors": [
+    "Olga Russakovsky",
+    "Jia Deng",
+    "Hao Su",
+    "Jonathan Krause",
+    "Sanjeev Satheesh",
+    "Sean Ma",
+    "Zhiheng Huang",
+    "Andrej Karpathy",
+    "Aditya Khosla",
+    "Michael Bernstein",
+    "Alexander C. Berg",
+    "Li Fei-Fei"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "115",
+   "issue": "3",
+   "pages": "211-252",
+   "year": 2015,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "meinhardt2022trackformer",
+  "query_title": "TrackFormer: Multi-Object Tracking with Transformers",
+  "crossref": {
+   "doi": "10.1109/cvpr52688.2022.00864",
+   "type": "proceedings-article",
+   "title": "TrackFormer: Multi-Object Tracking with Transformers",
+   "authors": [
+    "Tim Meinhardt",
+    "Alexander Kirillov",
+    "Laura Leal-Taixe",
+    "Christoph Feichtenhofer"
+   ],
+   "container": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "8834-8844",
+   "year": 2022,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "wang2020jde",
+  "query_title": "Towards Real-Time Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1007/978-3-030-58621-8_7",
+   "type": "book-chapter",
+   "title": "Towards Real-Time Multi-Object Tracking",
+   "authors": [
+    "Zhongdao Wang",
+    "Liang Zheng",
+    "Yixuan Liu",
+    "Yali Li",
+    "Shengjin Wang"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "107-122",
+   "year": 2020,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "zhou2020centertrack",
+  "query_title": "Tracking Objects as Points",
+  "crossref": {
+   "doi": "10.1007/978-3-030-58548-8_28",
+   "type": "book-chapter",
+   "title": "Tracking Objects as Points",
+   "authors": [
+    "Xingyi Zhou",
+    "Vladlen Koltun",
+    "Philipp Kr\u00e4henb\u00fchl"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "474-490",
+   "year": 2020,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "sun2020transtrack",
+  "query_title": "TransTrack: Multiple Object Tracking with Transformer",
+  "candidates": [
+   {
+    "doi": "10.5220/0014292200004084",
+    "type": "proceedings-article",
+    "title": "FutrTrack: A Camera-LiDAR Fusion Transformer for 3D Multiple Object Tracking",
+    "authors": [
+     "Martha Teye",
+     "Ori Maoz",
+     "Matthias Rottmann"
+    ],
+    "container": "Proceedings of the 21st International Conference on Computer Vision Theory and Applications",
+    "volume": null,
+    "issue": null,
+    "pages": "98-108",
+    "year": 2026,
+    "publisher": "SCITEPRESS - Science and Technology Publications",
+    "article_number": null,
+    "event": "21st International Conference on Computer Vision Theory and Applications"
+   },
+   {
+    "doi": "10.2139/ssrn.4143319",
+    "type": "posted-content",
+    "title": "Transformer for Multiple Object Tracking: Exploring Locality to Vision",
+    "authors": [
+     "Shan Wu",
+     "Amnir Hadachi",
+     "Chaoru Lu",
+     "Damien Vivet"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2022,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.4496392",
+    "type": "posted-content",
+    "title": "Multiple Templates Transformer for Visual Object Tracking",
+    "authors": [
+     "Haibo Pang",
+     "Jie Su",
+     "Rongqi Ma",
+     "Tingting Li",
+     "Cheng-ming Liu"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/dcoss.2016.27",
+    "type": "proceedings-article",
+    "title": "TransTrack: Tracking Multiple Targets by Sensing Their Zone Transitions",
+    "authors": [
+     "Avinash Kalyanaraman",
+     "Erin Griffiths",
+     "Kamin Whitehouse"
+    ],
+    "container": "2016 International Conference on Distributed Computing in Sensor Systems (DCOSS)",
+    "volume": null,
+    "issue": null,
+    "pages": "59-66",
+    "year": 2016,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2016 International Conference on Distributed Computing in Sensor Systems (DCOSS)"
+   },
+   {
+    "doi": "10.1109/isai63299.2024.00014",
+    "type": "proceedings-article",
+    "title": "Multiple Object Tracking Based On Feature Fusion Of Channel-wise Transformer",
+    "authors": [
+     "Yuanhao Li",
+     "Yifeng Zhang"
+    ],
+    "container": "2024 4th International Symposium on AI (ISAI)",
+    "volume": null,
+    "issue": null,
+    "pages": "21-26",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 4th International Symposium on AI (ISAI)"
+   }
+  ],
+  "best": {
+   "doi": "10.1109/isai63299.2024.00014",
+   "type": "proceedings-article",
+   "title": "Multiple Object Tracking Based On Feature Fusion Of Channel-wise Transformer",
+   "authors": [
+    "Yuanhao Li",
+    "Yifeng Zhang"
+   ],
+   "container": "2024 4th International Symposium on AI (ISAI)",
+   "volume": null,
+   "issue": null,
+   "pages": "21-26",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 4th International Symposium on AI (ISAI)"
+  },
+  "title_similarity": 0.6141732283464567,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2012.15460",
+   "title": "TransTrack: Multiple Object Tracking with Transformer",
+   "authors": [
+    "Peize Sun",
+    "Jinkun Cao",
+    "Yi Jiang",
+    "Rufeng Zhang",
+    "Enze Xie",
+    "Zehuan Yuan",
+    "Changhu Wang",
+    "Ping Luo"
+   ],
+   "published": "2020-12-31T06:03:00Z"
+  }
+ },
+ {
+  "key": "redmon2018yolov3",
+  "query_title": "YOLOv3: An Incremental Improvement",
+  "candidates": [
+   {
+    "doi": "10.4324/9780203978948-13",
+    "type": "book-chapter",
+    "title": "INCREMENTAL IMPROVEMENT",
+    "authors": [],
+    "container": "Psychology of Aid",
+    "volume": null,
+    "issue": null,
+    "pages": "101-118",
+    "year": 2005,
+    "publisher": "Routledge",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1016/j.asoc.2024.112029",
+    "type": "journal-article",
+    "title": "Incremental-based YoloV3 model with hyper-parameter optimization for product image classification in E-commerce sector",
+    "authors": [
+     "Munmi Dutta",
+     "Amrita Ganguly"
+    ],
+    "container": "Applied Soft Computing",
+    "volume": "165",
+    "issue": null,
+    "pages": "112029",
+    "year": 2024,
+    "publisher": "Elsevier BV",
+    "article_number": "112029",
+    "event": null
+   },
+   {
+    "doi": "10.1109/ijcnn48605.2020.9206848",
+    "type": "proceedings-article",
+    "title": "YOLOv3 Precision Improvement by the Weighted Centers of Confidence Selection",
+    "authors": [
+     "Adrian Horzyk",
+     "Efe Ergun"
+    ],
+    "container": "2020 International Joint Conference on Neural Networks (IJCNN)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-8",
+    "year": 2020,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2020 International Joint Conference on Neural Networks (IJCNN)"
+   },
+   {
+    "doi": "10.4135/9781071951378",
+    "type": "other",
+    "title": "Incremental Continuous Improvement",
+    "authors": [
+     "Karl Knapp"
+    ],
+    "container": "Quality Management",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "SAGE Publications, Inc.",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.5194/hess-2020-586-rc3",
+    "type": "peer-review",
+    "title": "Analytical solution is incremental improvement without any data or application",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2021,
+    "publisher": "Copernicus GmbH",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.4324/9780203978948-13",
+   "type": "book-chapter",
+   "title": "INCREMENTAL IMPROVEMENT",
+   "authors": [],
+   "container": "Psychology of Aid",
+   "volume": null,
+   "issue": null,
+   "pages": "101-118",
+   "year": 2005,
+   "publisher": "Routledge",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.8214285714285714,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "1804.02767",
+   "title": "YOLOv3: An Incremental Improvement",
+   "authors": [
+    "Joseph Redmon",
+    "Ali Farhadi"
+   ],
+   "published": "2018-04-08T22:27:57Z"
+  }
+ },
+ {
+  "key": "bochkovskiy2020yolov4",
+  "query_title": "YOLOv4: Optimal Speed and Accuracy of Object Detection",
+  "candidates": [
+   {
+    "doi": "10.21275/sr231020230143",
+    "type": "journal-article",
+    "title": "Comparative Study of the Different Object Detection Algorithms: YOLOv4, SSD, and RCNN based on Accuracy and Speed",
+    "authors": [
+     "Saurish Reddy Dirisala",
+     "Dileepkumar Padidem"
+    ],
+    "container": "International Journal of Science and Research (IJSR)",
+    "volume": "12",
+    "issue": "10",
+    "pages": "1560-1565",
+    "year": 2023,
+    "publisher": "International Journal of Science and Research",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerj-cs.586/table-1",
+    "type": "component",
+    "title": "Table 1: YOLO object detection comparison between YOLOv4 ONNX, YOLOv4 Darknet, YOLOv4 Darknet Tiny YOLOv4, PP-YOLO, OpenCV Leaky YOLOv4 and OpenCV YOLOv4.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.3390/electronics11223709",
+    "type": "journal-article",
+    "title": "Weed Detection in Potato Fields Based on Improved YOLOv4: Optimal Speed and Accuracy of Weed Detection in Potato Fields",
+    "authors": [
+     "Jiawei Zhao",
+     "Guangzhao Tian",
+     "Chang Qiu",
+     "Baoxing Gu",
+     "Kui Zheng",
+     "Qin Liu"
+    ],
+    "container": "Electronics",
+    "volume": "11",
+    "issue": "22",
+    "pages": "3709",
+    "year": 2022,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerj-cs.3268/table-7",
+    "type": "component",
+    "title": "Table 7: Speed and accuracy comparison among various object detection methods.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.7717/peerjcs.1065/fig-6",
+    "type": "component",
+    "title": "Figure 6: Schematic of YOLOv4-Tiny object detection algorithm for parasite egg detection.",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "PeerJ",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.7717/peerj-cs.3268/table-7",
+   "type": "component",
+   "title": "Table 7: Speed and accuracy comparison among various object detection methods.",
+   "authors": [],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": null,
+   "publisher": "PeerJ",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.6201550387596899,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2004.10934",
+   "title": "YOLOv4: Optimal Speed and Accuracy of Object Detection",
+   "authors": [
+    "Alexey Bochkovskiy",
+    "Chien-Yao Wang",
+    "Hong-Yuan Mark Liao"
+   ],
+   "published": "2020-04-23T02:10:02Z"
+  }
+ },
+ {
+  "key": "robinson2025rfdetr",
+  "query_title": "RF-DETR: Neural Architecture Search for Real-Time Detection Transformers",
+  "candidates": [
+   {
+    "doi": "10.1109/tgrs.2025.3560928/v1/review2",
+    "type": "peer-review",
+    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tgrs.2025.3560928/v1/review1",
+    "type": "peer-review",
+    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tgrs.2025.3560928/v2/review2",
+    "type": "peer-review",
+    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tgrs.2025.3560928/v2/review1",
+    "type": "peer-review",
+    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.3390/electronics15142982",
+    "type": "journal-article",
+    "title": "A Lightweight Real-Time Debris Flow Detection Method Based on RF-DETR",
+    "authors": [
+     "Zhen Hu",
+     "Ou Ou",
+     "Fuming Ma",
+     "Jiabao Zhao"
+    ],
+    "container": "Electronics",
+    "volume": "15",
+    "issue": "14",
+    "pages": "2982",
+    "year": 2026,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.3390/electronics15142982",
+   "type": "journal-article",
+   "title": "A Lightweight Real-Time Debris Flow Detection Method Based on RF-DETR",
+   "authors": [
+    "Zhen Hu",
+    "Ou Ou",
+    "Fuming Ma",
+    "Jiabao Zhao"
+   ],
+   "container": "Electronics",
+   "volume": "15",
+   "issue": "14",
+   "pages": "2982",
+   "year": 2026,
+   "publisher": "MDPI AG",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.35294117647058826,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2511.09554",
+   "title": "RF-DETR: Neural Architecture Search for Real-Time Detection Transformers",
+   "authors": [
+    "Isaac Robinson",
+    "Peter Robicheaux",
+    "Matvei Popov",
+    "Deva Ramanan",
+    "Neehar Peri"
+   ],
+   "published": "2025-11-12T18:58:39Z"
+  }
+ },
+ {
+  "key": "dendorfer2020mot20",
+  "query_title": "MOT20: A benchmark for multi object tracking in crowded scenes",
+  "candidates": [
+   {
+    "doi": "10.3390/s23073782",
+    "type": "journal-article",
+    "title": "CSMOT: Make One-Shot Multi-Object Tracking in Crowded Scenes Great Again",
+    "authors": [
+     "Haoxiong Hou",
+     "Chao Shen",
+     "Ximing Zhang",
+     "Wei Gao"
+    ],
+    "container": "Sensors",
+    "volume": "23",
+    "issue": "7",
+    "pages": "3782",
+    "year": 2023,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.20532/cit.2026.1006371",
+    "type": "journal-article",
+    "title": "Multi-Object Tracking in Crowded Scenes by Integrating Image Motion Compensation Mechanism and Improved ByteTrack Algorithm",
+    "authors": [
+     "Huanting Feng"
+    ],
+    "container": "Journal of Computing and Information Technology",
+    "volume": "34",
+    "issue": "2",
+    "pages": "99",
+    "year": 2026,
+    "publisher": "Faculty of Electrical Engineering and Computing, Univ. of Zagreb",
+    "article_number": "6371",
+    "event": null
+   },
+   {
+    "doi": "10.17760/d20741532",
+    "type": "dissertation",
+    "title": "Multi-object tracking in complex scenes: extending human perception",
+    "authors": [
+     "Bishoy Galoaa"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Northeastern University Library",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/cnml68938.2026.11453251",
+    "type": "proceedings-article",
+    "title": "Robust Multi-Object Tracking in Crowded Scenes via Trajectory-Guided Score Boosting",
+    "authors": [
+     "Shangchen Jiang",
+     "Yun Zhao",
+     "Yang Liu",
+     "Yufeng Wang",
+     "Wenrui Ding"
+    ],
+    "container": "2026 International Conference on Communication Networks and Machine Learning (CNML)",
+    "volume": null,
+    "issue": null,
+    "pages": "871-876",
+    "year": 2026,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2026 International Conference on Communication Networks and Machine Learning (CNML)"
+   },
+   {
+    "doi": "10.1109/icvrv62410.2024.00027",
+    "type": "proceedings-article",
+    "title": "AFSTrack: An Approach uses Adaptive Filtering and Spatial Analysis Techniques to Enhance Multi-Object Tracking in Crowded Scenes",
+    "authors": [
+     "Qian Li",
+     "Jinlong Yang",
+     "Jingchuan Lu"
+    ],
+    "container": "2024 International Conference on Virtual Reality and Visualization (ICVRV)",
+    "volume": null,
+    "issue": null,
+    "pages": "100-105",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 International Conference on Virtual Reality and Visualization (ICVRV)"
+   }
+  ],
+  "best": {
+   "doi": "10.3390/s23073782",
+   "type": "journal-article",
+   "title": "CSMOT: Make One-Shot Multi-Object Tracking in Crowded Scenes Great Again",
+   "authors": [
+    "Haoxiong Hou",
+    "Chao Shen",
+    "Ximing Zhang",
+    "Wei Gao"
+   ],
+   "container": "Sensors",
+   "volume": "23",
+   "issue": "7",
+   "pages": "3782",
+   "year": 2023,
+   "publisher": "MDPI AG",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.7384615384615385,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2003.09003",
+   "title": "MOT20: A benchmark for multi object tracking in crowded scenes",
+   "authors": [
+    "Patrick Dendorfer",
+    "Hamid Rezatofighi",
+    "Anton Milan",
+    "Javen Shi",
+    "Daniel Cremers",
+    "Ian Reid",
+    "Stefan Roth",
+    "Konrad Schindler",
+    "Laura Leal-Taix\u00e9"
+   ],
+   "published": "2020-03-19T20:08:24Z"
+  }
+ },
+ {
+  "key": "vaswani2017attention",
+  "query_title": "Attention Is All You Need",
+  "candidates": [
+   {
+    "doi": "10.1007/978-3-031-84300-6_13",
+    "type": "book-chapter",
+    "title": "Is Attention All You Need?",
+    "authors": [
+     "Patrick Mineault"
+    ],
+    "container": "From Human Attention to Computational Attention",
+    "volume": null,
+    "issue": null,
+    "pages": "297-314",
+    "year": 2025,
+    "publisher": "Springer Nature Switzerland",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.4993784",
+    "type": "posted-content",
+    "title": "Attention Is All You Need: An Analysis Of The Valuation Of Artificial Intelligence Tokens",
+    "authors": [
+     "Mfon Akpan"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.5967774",
+    "type": "posted-content",
+    "title": "Attention is All You Need... Unless You Are a CISO: The Inherent Incompatibility Between Transformer Architectures and Zero-Trust Environments",
+    "authors": [
+     "Giuseppe Canale"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.5040/9781350101272.00000005",
+    "type": "other",
+    "title": "All You Need Is LSD",
+    "authors": [
+     "Leo Butler"
+    ],
+    "container": "All You Need Is LSD",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2018,
+    "publisher": "Bloomsbury Methuen Drama",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.21203/rs.3.rs-10916252/v1",
+    "type": "posted-content",
+    "title": "One Vector Is All You Need for O(1) Self-Attention: The Ocean State",
+    "authors": [
+     "SHUYUAN YU"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1007/978-3-031-84300-6_13",
+   "type": "book-chapter",
+   "title": "Is Attention All You Need?",
+   "authors": [
+    "Patrick Mineault"
+   ],
+   "container": "From Human Attention to Computational Attention",
+   "volume": null,
+   "issue": null,
+   "pages": "297-314",
+   "year": 2025,
+   "publisher": "Springer Nature Switzerland",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.88,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "1706.03762",
+   "title": "Attention Is All You Need",
+   "authors": [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit",
+    "Llion Jones",
+    "Aidan N. Gomez",
+    "Lukasz Kaiser",
+    "Illia Polosukhin"
+   ],
+   "published": "2017-06-12T17:57:34Z"
+  }
+ },
+ {
+  "key": "dosovitskiy2021vit",
+  "query_title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+  "candidates": [
+   {
+    "doi": "10.2139/ssrn.5180447",
+    "type": "posted-content",
+    "title": "An Image Equals 16x16 Words: Scaling Image Recogni:on with Transformers",
+    "authors": [
+     "Alexy Beyer",
+     "Luca Alexy"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.31219/osf.io/9xswa_v1",
+    "type": "posted-content",
+    "title": "Worth 1000 Words? Image-Based Conjoints and Respondent Experience",
+    "authors": [
+     "Jacob R Turner"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Center for Open Science",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1007/978-3-032-31335-5_6",
+    "type": "book-chapter",
+    "title": "A Low-Resolution Image is Worth 1\u00a0$$\\times $$\u00a01 Words: Enabling Fine Image Super-Resolution with\u00a0Transformers and TaylorShift",
+    "authors": [
+     "Sanath B. Nagaraju",
+     "Brian B. Moser",
+     "Tobias C. Nauen",
+     "Stanislav Frolov",
+     "Federico Raue",
+     "Andreas Dengel"
+    ],
+    "container": "Lecture Notes in Computer Science",
+    "volume": null,
+    "issue": null,
+    "pages": "77-89",
+    "year": 2026,
+    "publisher": "Springer Nature Switzerland",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1117/12.3033531",
+    "type": "proceedings-article",
+    "title": "MdcFormer: transformers based on dynamic weights and multi-scale for medical image segmentation",
+    "authors": [
+     "Chenyang Ma",
+     "Xiaoru Wang",
+     "Bowen Deng"
+    ],
+    "container": "International Conference on Image, Signal Processing, and Pattern Recognition (ISPP 2024)",
+    "volume": null,
+    "issue": null,
+    "pages": "23",
+    "year": 2024,
+    "publisher": "SPIE",
+    "article_number": null,
+    "event": "International Conference on Image, Signal Processing, and Pattern Recognition (ISPP 2024)"
+   },
+   {
+    "doi": "10.5040/9781350397095.0005",
+    "type": "other",
+    "title": "Introduction: A Picture  is  Worth a Thousand Words",
+    "authors": [],
+    "container": "Snapshots",
+    "volume": null,
+    "issue": null,
+    "pages": "1-6",
+    "year": 2025,
+    "publisher": "Bloomsbury Publishing Plc",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.2139/ssrn.5180447",
+   "type": "posted-content",
+   "title": "An Image Equals 16x16 Words: Scaling Image Recogni:on with Transformers",
+   "authors": [
+    "Alexy Beyer",
+    "Luca Alexy"
+   ],
+   "container": "",
+   "volume": null,
+   "issue": null,
+   "pages": null,
+   "year": 2025,
+   "publisher": "Elsevier BV",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 0.6338028169014085,
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2010.11929",
+   "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+   "authors": [
+    "Alexey Dosovitskiy",
+    "Lucas Beyer",
+    "Alexander Kolesnikov",
+    "Dirk Weissenborn",
+    "Xiaohua Zhai",
+    "Thomas Unterthiner",
+    "Mostafa Dehghani",
+    "Matthias Minderer",
+    "Georg Heigold",
+    "Sylvain Gelly",
+    "Jakob Uszkoreit",
+    "Neil Houlsby"
+   ],
+   "published": "2020-10-22T17:55:59Z"
+  }
+ },
+ {
+  "key": "wang2024smiletrack",
+  "query_title": "SMILEtrack: SiMIlarity LEarning for Occlusion-Aware Multiple Object Tracking",
+  "candidates": [
+   {
+    "doi": "10.1609/aaai.v38i6.28386",
+    "type": "journal-article",
+    "title": "SMILEtrack: SiMIlarity LEarning for Occlusion-Aware Multiple Object Tracking",
+    "authors": [
+     "Yu-Hsiang Wang",
+     "Jun-Wei Hsieh",
+     "Ping-Yang Chen",
+     "Ming-Ching Chang",
+     "Hung-Hin So",
+     "Xin Li"
+    ],
+    "container": "Proceedings of the AAAI Conference on Artificial Intelligence",
+    "volume": "38",
+    "issue": "6",
+    "pages": "5740-5748",
+    "year": 2024,
+    "publisher": "Association for the Advancement of Artificial Intelligence (AAAI)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.70675/74da1028z94e4z4881za75czd22893bac75e",
+    "type": "dissertation",
+    "title": "Deep similarity metric learning for multiple object tracking",
+    "authors": [
+     "Bonan Cuan"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Agence Bibliographique de l'Enseignement Sup\u00e9rieur",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.5218069",
+    "type": "posted-content",
+    "title": "Incremental Template Learning for Occlusion-Aware Visual Object Tracking",
+    "authors": [
+     "Madhu Kiran",
+     "Le Thanh Nguyen-Meidine",
+     "Rafael Menelau-cruz",
+     "Eric Granger"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/icassp48485.2024.10446647",
+    "type": "proceedings-article",
+    "title": "Multiple Object Tracking Based on Occlusion-Aware Embedding Consistency Learning",
+    "authors": [
+     "Yaoqi Hu",
+     "Axi Niu",
+     "Yu Zhu",
+     "Qingsen Yan",
+     "Jinqiu Sun",
+     "Yanning Zhang"
+    ],
+    "container": "ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
+    "volume": null,
+    "issue": null,
+    "pages": "9521-9525",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
+   },
+   {
+    "doi": "10.2139/ssrn.4530457",
+    "type": "posted-content",
+    "title": "Incremental Template Learning for Occlusion-Aware Visual Object Tracking",
+    "authors": [
+     "Madhu Kiran",
+     "Le Thanh Nguyen-Meidine",
+     "Rafael Menelau-cruz",
+     "Louis-Antoine Blais-Morin",
+     "Eric Granger"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2023,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1609/aaai.v38i6.28386",
+   "type": "journal-article",
+   "title": "SMILEtrack: SiMIlarity LEarning for Occlusion-Aware Multiple Object Tracking",
+   "authors": [
+    "Yu-Hsiang Wang",
+    "Jun-Wei Hsieh",
+    "Ping-Yang Chen",
+    "Ming-Ching Chang",
+    "Hung-Hin So",
+    "Xin Li"
+   ],
+   "container": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "volume": "38",
+   "issue": "6",
+   "pages": "5740-5748",
+   "year": 2024,
+   "publisher": "Association for the Advancement of Artificial Intelligence (AAAI)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "yang2023cbiou",
+  "query_title": "Hard to Track Objects with Irregular Motions and Similar Appearances? Make It Easier by Buffering the Matching Space",
+  "candidates": [
+   {
+    "doi": "10.1109/wacv56688.2023.00478",
+    "type": "proceedings-article",
+    "title": "Hard to Track Objects with Irregular Motions and Similar Appearances? Make It Easier by Buffering the Matching Space",
+    "authors": [
+     "Fan Yang",
+     "Shigeyuki Odashima",
+     "Shoichi Masui",
+     "Shan Jiang"
+    ],
+    "container": "2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)",
+    "volume": null,
+    "issue": null,
+    "pages": "4788-4797",
+    "year": 2023,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)"
+   },
+   {
+    "doi": "10.64628/aa.s5e79vun5",
+    "type": "posted-content",
+    "title": "Forecasting space weather is hard. A new Australian satellite may help make it easier",
+    "authors": [
+     "Brett Carter",
+     "Iver Cairns"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2021,
+    "publisher": "The Conversation",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.31234/osf.io/mfkz4",
+    "type": "posted-content",
+    "title": "Scientifically-Flawed Bypass of the Hard Problem Doesn\u2019t Make It \u2018Easier\u2019!",
+    "authors": [
+     "Nicholas Martin Rosseinsky"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2021,
+    "publisher": "Center for Open Science",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1377/forefront.20240730.379920",
+    "type": "dataset",
+    "title": "Medicare Savings Program Benefits Are Hard To Access. Congress And States Can Make It Easier",
+    "authors": [],
+    "container": "Forefront Group",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2024,
+    "publisher": "Health Affairs Publishing, LLC",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1089/space.2015.0009",
+    "type": "journal-article",
+    "title": "Informed Consent: Using Behavioral Science to Make It Easier to Accept\u2009\u2026\u2009and Easier to Nullify at the Court?",
+    "authors": [
+     "Michael Chatzipanagiotis"
+    ],
+    "container": "New Space",
+    "volume": "4",
+    "issue": "2",
+    "pages": "68-74",
+    "year": 2015,
+    "publisher": "SAGE Publications",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/wacv56688.2023.00478",
+   "type": "proceedings-article",
+   "title": "Hard to Track Objects with Irregular Motions and Similar Appearances? Make It Easier by Buffering the Matching Space",
+   "authors": [
+    "Fan Yang",
+    "Shigeyuki Odashima",
+    "Shoichi Masui",
+    "Shan Jiang"
+   ],
+   "container": "2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)",
+   "volume": null,
+   "issue": null,
+   "pages": "4788-4797",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "awais2025foundation",
+  "query_title": "Foundation Models Defining a New Era in Vision: A Survey and Outlook",
+  "candidates": [
+   {
+    "doi": "10.1109/tpami.2024.3506283/mm1",
+    "type": "component",
+    "title": "Foundation Models Defining a New Era in Vision: a Survey and Outlook_supp1-3506283.pdf",
+    "authors": [
+     "Awais Muhammad"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": null,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tpami.2024.3506283",
+    "type": "journal-article",
+    "title": "Foundation Models Defining a New Era in Vision: A Survey and Outlook",
+    "authors": [
+     "Muhammad Awais",
+     "Muzammal Naseer",
+     "Salman Khan",
+     "Rao Muhammad Anwer",
+     "Hisham Cholakkal",
+     "Mubarak Shah",
+     "Ming-Hsuan Yang",
+     "Fahad Shahbaz Khan"
+    ],
+    "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+    "volume": "47",
+    "issue": "4",
+    "pages": "2245-2264",
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.36227/techrxiv.174119169.94570936/v2",
+    "type": "posted-content",
+    "title": "Foundation Models and Biometrics: A Survey and Outlook",
+    "authors": [
+     "Hatef Otroshi Shahreza",
+     "S\u00e9bastien Marcel"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.36227/techrxiv.174119169.94570936/v1",
+    "type": "posted-content",
+    "title": "Foundation Models and Biometrics: A Survey and Outlook",
+    "authors": [
+     "Hatef Otroshi Shahreza",
+     "S\u00e9bastien Marcel"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1016/j.cviu.2026.104679",
+    "type": "journal-article",
+    "title": "Recent advances of local mechanisms in vision foundation models: A survey and outlook",
+    "authors": [
+     "Qiangchang Wang",
+     "Jing Li",
+     "Yilong Yin",
+     "Huimin Lu"
+    ],
+    "container": "Computer Vision and Image Understanding",
+    "volume": "265",
+    "issue": null,
+    "pages": "104679",
+    "year": 2026,
+    "publisher": "Elsevier BV",
+    "article_number": "104679",
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/tpami.2024.3506283",
+   "type": "journal-article",
+   "title": "Foundation Models Defining a New Era in Vision: A Survey and Outlook",
+   "authors": [
+    "Muhammad Awais",
+    "Muzammal Naseer",
+    "Salman Khan",
+    "Rao Muhammad Anwer",
+    "Hisham Cholakkal",
+    "Mubarak Shah",
+    "Ming-Hsuan Yang",
+    "Fahad Shahbaz Khan"
+   ],
+   "container": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+   "volume": "47",
+   "issue": "4",
+   "pages": "2245-2264",
+   "year": 2025,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "li2025motreview",
+  "query_title": "A review of multi-object tracking in recent times",
+  "candidates": [
+   {
+    "doi": "10.1049/cvi2.70010",
+    "type": "journal-article",
+    "title": "A Review of Multi\u2010Object Tracking in Recent Times",
+    "authors": [
+     "Suya Li",
+     "Hengyi Ren",
+     "Xin Xie",
+     "Ying Cao"
+    ],
+    "container": "IET Computer Vision",
+    "volume": "19",
+    "issue": "1",
+    "pages": null,
+    "year": 2025,
+    "publisher": "Institution of Engineering and Technology (IET)",
+    "article_number": "e70010",
+    "event": null
+   },
+   {
+    "doi": "10.23919/icact60172.2024.10471984",
+    "type": "proceedings-article",
+    "title": "A Review of Detection-Related Multiple Object Tracking in Recent Times",
+    "authors": [
+     "Suya Li",
+     "Ying Cao",
+     "Xin Xie"
+    ],
+    "container": "2024 26th International Conference on Advanced Communications Technology (ICACT)",
+    "volume": null,
+    "issue": null,
+    "pages": "122-130",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 26th International Conference on Advanced Communications Technology (ICACT)"
+   },
+   {
+    "doi": "10.5220/0010341502340244",
+    "type": "proceedings-article",
+    "title": "Analysis of Recent Re-Identification Architectures for Tracking-by-Detection Paradigm in Multi-Object Tracking",
+    "authors": [
+     "Haruya Ishikawa",
+     "Masaki Hayashi",
+     "Trong Phan",
+     "Kazuma Yamamoto",
+     "Makoto Masuda",
+     "Yoshimitsu Aoki"
+    ],
+    "container": "Proceedings of the 16th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications",
+    "volume": null,
+    "issue": null,
+    "pages": "234-244",
+    "year": 2021,
+    "publisher": "SCITEPRESS - Science and Technology Publications",
+    "article_number": null,
+    "event": "16th International Conference on Computer Vision Theory and Applications"
+   },
+   {
+    "doi": "10.1109/mot.2001.937981",
+    "type": "proceedings-article",
+    "title": "Engineering statistics for multi-object tracking",
+    "authors": [
+     "R. Mahler"
+    ],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "53-60",
+    "year": null,
+    "publisher": "IEEE Comput. Soc",
+    "article_number": null,
+    "event": "2001 IEEE Workshop on Multi-Object Tracking"
+   },
+   {
+    "doi": "10.1109/mot.2001.937974",
+    "type": "proceedings-article",
+    "title": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "authors": [],
+    "container": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking",
+    "volume": null,
+    "issue": null,
+    "pages": "i",
+    "year": 2001,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "Proceedings 2001 IEEE Workshop on Multi-Object Tracking"
+   }
+  ],
+  "best": {
+   "doi": "10.1049/cvi2.70010",
+   "type": "journal-article",
+   "title": "A Review of Multi\u2010Object Tracking in Recent Times",
+   "authors": [
+    "Suya Li",
+    "Hengyi Ren",
+    "Xin Xie",
+    "Ying Cao"
+   ],
+   "container": "IET Computer Vision",
+   "volume": "19",
+   "issue": "1",
+   "pages": null,
+   "year": 2025,
+   "publisher": "Institution of Engineering and Technology (IET)",
+   "article_number": "e70010",
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "bakirci2025lowpower",
+  "query_title": "Performance evaluation of low-power and lightweight object detectors for real-time monitoring in resource-constrained drone systems",
+  "candidates": [
+   {
+    "doi": "10.1016/j.engappai.2025.111775",
+    "type": "journal-article",
+    "title": "Performance evaluation of low-power and lightweight object detectors for real-time monitoring in resource-constrained drone systems",
+    "authors": [
+     "Murat Bakirci"
+    ],
+    "container": "Engineering Applications of Artificial Intelligence",
+    "volume": "159",
+    "issue": null,
+    "pages": "111775",
+    "year": 2025,
+    "publisher": "Elsevier BV",
+    "article_number": "111775",
+    "event": null
+   },
+   {
+    "doi": "10.1109/icce-asia67487.2025.11263725",
+    "type": "proceedings-article",
+    "title": "Toward Efficient Deployment of Lightweight Object Detectors for Real-Time Inference on Resource-Constrained Edge Devices",
+    "authors": [
+     "Thaising Taing",
+     "Yousufzai Fawad Khan",
+     "Hayotjon Aliev",
+     "HyungWon Kim"
+    ],
+    "container": "2025 IEEE/IEIE International Conference on Consumer Electronics-Asia (ICCE-Asia)",
+    "volume": null,
+    "issue": null,
+    "pages": "1-5",
+    "year": 2025,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2025 IEEE/IEIE International Conference on Consumer Electronics-Asia (ICCE-Asia)"
+   },
+   {
+    "doi": "10.1166/jolpe.2019.1605",
+    "type": "journal-article",
+    "title": "A Low Power Wearable Device for Real-Time Electrocardiogram Monitoring and Cardiovascular Arrhythmia Detection for Resource Constrained Regions",
+    "authors": [
+     "Neha Arora",
+     "Biswajit Mishra",
+     "Yash Vora"
+    ],
+    "container": "Journal of Low Power Electronics",
+    "volume": "15",
+    "issue": "2",
+    "pages": "234-245",
+    "year": 2019,
+    "publisher": "American Scientific Publishers",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.3390/jlpea12020021",
+    "type": "journal-article",
+    "title": "Real-Time Embedded Implementation of Improved Object Detector for Resource-Constrained Devices",
+    "authors": [
+     "Niranjan Ravi",
+     "Mohamed El-Sharkawy"
+    ],
+    "container": "Journal of Low Power Electronics and Applications",
+    "volume": "12",
+    "issue": "2",
+    "pages": "21",
+    "year": 2022,
+    "publisher": "MDPI AG",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.4108/eetismla.12814",
+    "type": "journal-article",
+    "title": "Lightweight and Real-Time Object Detection on Edge Devices: A Unified Framework for Resource-Constrained Environments",
+    "authors": [
+     "Hewa Majeed Zangana"
+    ],
+    "container": "EAI Endorsed Transactions on Intelligent Systems and Machine Learning Applications",
+    "volume": "3",
+    "issue": null,
+    "pages": null,
+    "year": 2026,
+    "publisher": "European Alliance for Innovation n.o.",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1016/j.engappai.2025.111775",
+   "type": "journal-article",
+   "title": "Performance evaluation of low-power and lightweight object detectors for real-time monitoring in resource-constrained drone systems",
+   "authors": [
+    "Murat Bakirci"
+   ],
+   "container": "Engineering Applications of Artificial Intelligence",
+   "volume": "159",
+   "issue": null,
+   "pages": "111775",
+   "year": 2025,
+   "publisher": "Elsevier BV",
+   "article_number": "111775",
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "chae2024radar",
+  "query_title": "Towards Robust 3D Object Detection with LiDAR and 4D Radar Fusion in Various Weather Conditions",
+  "candidates": [
+   {
+    "doi": "10.1109/cvpr52733.2024.01436",
+    "type": "proceedings-article",
+    "title": "Towards Robust 3D Object Detection with LiDAR and 4D Radar Fusion in Various Weather Conditions",
+    "authors": [
+     "Yujeong Chae",
+     "Hyeonseong Kim",
+     "Kuk-Jin Yoon"
+    ],
+    "container": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "volume": null,
+    "issue": null,
+    "pages": "15162-15172",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+   },
+   {
+    "doi": "10.1016/j.neunet.2026.109439",
+    "type": "journal-article",
+    "title": "A 4D radar and LiDAR fusion framework for weather-robust 3D object detection",
+    "authors": [
+     "Huaijin Liu",
+     "Jixiang Du",
+     "Hongbo Zhang",
+     "Guoguang Hua",
+     "Jiandian Zeng"
+    ],
+    "container": "Neural Networks",
+    "volume": "205",
+    "issue": null,
+    "pages": "109439",
+    "year": 2027,
+    "publisher": "Elsevier BV",
+    "article_number": "109439",
+    "event": null
+   },
+   {
+    "doi": "10.23919/ccc63176.2024.10661603",
+    "type": "proceedings-article",
+    "title": "3D Object Detection Algorithm in Adverse Weather Conditions Based on LiDAR-Radar Fusion",
+    "authors": [
+     "Zeyu Wu",
+     "Qingwen Hou",
+     "Xianzhong Chen",
+     "Jie Zhang",
+     "Kexing Gao"
+    ],
+    "container": "2024 43rd Chinese Control Conference (CCC)",
+    "volume": null,
+    "issue": null,
+    "pages": "7268-7273",
+    "year": 2024,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2024 43rd Chinese Control Conference (CCC)"
+   },
+   {
+    "doi": "10.30574/wjarr.2024.24.1.3076",
+    "type": "journal-article",
+    "title": "Adaptive 4D Radar and LiDAR Fusion for All-Weather 3D Object Detection in Autonomous Driving",
+    "authors": [
+     "Satish Kumar Nadendla"
+    ],
+    "container": "World Journal of Advanced Research and Reviews",
+    "volume": "24",
+    "issue": "1",
+    "pages": "2769-2778",
+    "year": 2024,
+    "publisher": "GSC Online Press",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2139/ssrn.5383403",
+    "type": "posted-content",
+    "title": "L4drfusion: Lidar and 4d Millimeter-Wave Radar Fusion in Unified Space for 3d Object Detection",
+    "authors": [
+     "Hui Li",
+     "Yanli Wu",
+     "Zhengtang Chen",
+     "Meifang Wang",
+     "Ye Tao"
+    ],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
+    "publisher": "Elsevier BV",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1109/cvpr52733.2024.01436",
+   "type": "proceedings-article",
+   "title": "Towards Robust 3D Object Detection with LiDAR and 4D Radar Fusion in Various Weather Conditions",
+   "authors": [
+    "Yujeong Chae",
+    "Hyeonseong Kim",
+    "Kuk-Jin Yoon"
+   ],
+   "container": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+   "volume": null,
+   "issue": null,
+   "pages": "15162-15172",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+  },
+  "title_similarity": 1.0,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "zhu2021c_biou_check",
+  "query_title": "Complete-IoU loss and cluster-NMS for improving multi-object tracking accuracy",
+  "candidates": [
+   {
+    "doi": "10.1109/cvpr.2018.00719",
+    "type": "proceedings-article",
+    "title": "Improving Object Localization with Fitness NMS and Bounded IoU Loss",
+    "authors": [
+     "Lachlan Tychsen-Smith",
+     "Lars Petersson"
+    ],
+    "container": "2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition",
+    "volume": null,
+    "issue": null,
+    "pages": "6877-6885",
+    "year": 2018,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+   },
+   {
+    "doi": "10.1007/s11760-025-04374-3",
+    "type": "journal-article",
+    "title": "Cluster-NMS: Improving Crowded Object Detection through Clustering Pattern",
+    "authors": [
+     "Junguo Liao",
+     "Haonan Tian"
+    ],
+    "container": "Signal, Image and Video Processing",
+    "volume": "19",
+    "issue": "9",
+    "pages": null,
+    "year": 2025,
+    "publisher": "Springer Science and Business Media LLC",
+    "article_number": "758",
+    "event": null
+   },
+   {
+    "doi": "10.1109/cac57257.2022.10055877",
+    "type": "proceedings-article",
+    "title": "Online Multi-Object Tracking with Generalized IoU Gating Mechanism",
+    "authors": [
+     "Yongheng Wang",
+     "Detian Huang",
+     "Yifan Shi",
+     "Liqing Chen",
+     "Longtao Chen"
+    ],
+    "container": "2022 China Automation Congress (CAC)",
+    "volume": null,
+    "issue": null,
+    "pages": "3943-3947",
+    "year": 2022,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2022 China Automation Congress (CAC)"
+   },
+   {
+    "doi": "10.1109/icip40778.2020.9191188",
+    "type": "proceedings-article",
+    "title": "IOU \u2013 Siamtrack: IOU Guided Siamese Network For Visual Object Tracking",
+    "authors": [
+     "Mohana Murali Dasari",
+     "Rama Krishna Sai Subrahmanyam Gorthi"
+    ],
+    "container": "2020 IEEE International Conference on Image Processing (ICIP)",
+    "volume": null,
+    "issue": null,
+    "pages": "2061-2065",
+    "year": 2020,
+    "publisher": "IEEE",
+    "article_number": null,
+    "event": "2020 IEEE International Conference on Image Processing (ICIP)"
+   },
+   {
+    "doi": "10.15575/join.v10i1.1481",
+    "type": "journal-article",
+    "title": "Road Damage Detection Using YOLOv7 with Cluster Weighted Distance-IoU NMS",
+    "authors": [
+     "Rudy Rachman",
+     "Nanik Suciati",
+     "Shintami Chusnul Hidayati"
+    ],
+    "container": "Jurnal Online Informatika",
+    "volume": "10",
+    "issue": "1",
+    "pages": "122-131",
+    "year": 2025,
+    "publisher": "Sunan Gunung Djati State Islamic University of Bandung",
+    "article_number": null,
+    "event": null
+   }
+  ],
+  "best": {
+   "doi": "10.1007/s11760-025-04374-3",
+   "type": "journal-article",
+   "title": "Cluster-NMS: Improving Crowded Object Detection through Clustering Pattern",
+   "authors": [
+    "Junguo Liao",
+    "Haonan Tian"
+   ],
+   "container": "Signal, Image and Video Processing",
+   "volume": "19",
+   "issue": "9",
+   "pages": null,
+   "year": 2025,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": "758",
+   "event": null
+  },
+  "title_similarity": 0.5034013605442177,
+  "status": "SEARCHED"
+ },
+ {
+  "key": "zheng2020diou",
+  "query_title": "Distance-IoU Loss: Faster and Better Learning for Bounding Box Regression",
+  "crossref": {
+   "doi": "10.1609/aaai.v34i07.6999",
+   "type": "journal-article",
+   "title": "Distance-IoU Loss: Faster and Better Learning for Bounding Box Regression",
+   "authors": [
+    "Zhaohui Zheng",
+    "Ping Wang",
+    "Wei Liu",
+    "Jinze Li",
+    "Rongguang Ye",
+    "Dongwei Ren"
+   ],
+   "container": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "volume": "34",
+   "issue": "07",
+   "pages": "12993-13000",
+   "year": 2020,
+   "publisher": "Association for the Advancement of Artificial Intelligence (AAAI)",
+   "article_number": null,
+   "event": null
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
  }
 ]
