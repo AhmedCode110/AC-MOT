@@ -27,7 +27,7 @@ JAIS = {
     "parsons2019refueling": ("jaisquery_onboard_vision", "10.2514/1.i010658"),
 }
 # Entries resolved by title search (status SEARCHED) whose best candidate is the paper itself.
-SEARCHED_OK = ["liu2025sparsetrack", "wang2025pdsort", "yang2024hybridsort", "cao2025topictrack",
+SEARCHED_OK = ["ma2023adaptivebytetrack", "shim2024adaptrack", "liu2025sparsetrack", "wang2025pdsort", "yang2024hybridsort", "cao2025topictrack",
                "shim2025tracktrack", "zhao2024rtdetr", "gao2025motip"]
 ARXIV_OK = ["aharon2022botsort", "ge2021yolox", "milan2016mot16"]
 
@@ -48,6 +48,8 @@ OVERRIDES = {
     "pechpacheco2000blur": dict(year="2000"),
     # Crossref title truncated to the system name (the DOI record's title starts with the query title's first word).
     "jiang2018chameleon": dict(title="Chameleon: Scalable Adaptation of Video Analytics"),
+    # Crossref capitalizes the system name as "Adaptrack"; the paper writes "AdapTrack".
+    "shim2024adaptrack": dict(title="AdapTrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking"),
 }
 # DOI records whose Crossref title differs from the cited title and that are NOT the cited paper.
 REJECTED = {"xu2020approxdet": "DOI 10.1145/3384419.3430771 resolves to an unrelated paper (RFID vibration sensing)"}

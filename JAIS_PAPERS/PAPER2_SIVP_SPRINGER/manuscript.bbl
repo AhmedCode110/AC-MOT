@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{38}
+\begin{thebibliography}{41}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -493,6 +493,55 @@ pp. \bfpage{16965}--\blpage{16974}
 \endbibitem
 
 %%% 28
+\bibitem[\protect\citeauthoryear{Ma et~al.}{2023}]{ma2023adaptivebytetrack}
+\begin{bchapter}
+\bauthor{\bsnm{Ma}, \binits{L.V.}},
+\bauthor{\bsnm{Hussain}, \binits{M.I.}},
+\bauthor{\bsnm{Park}, \binits{J.}},
+\bauthor{\bsnm{Kim}, \binits{J.}},
+\bauthor{\bsnm{Jeon}, \binits{M.}}:
+\bctitle{{Adaptive Confidence Threshold for ByteTrack in Multi-Object
+  Tracking}}.
+In: \bbtitle{2023 12th International Conference on Control, Automation and
+  Information Sciences (ICCAIS)},
+pp. \bfpage{370}--\blpage{374}
+(\byear{2023}).
+\doiurl{10.1109/iccais59597.2023.10382403}
+\end{bchapter}
+\endbibitem
+
+%%% 29
+\bibitem[\protect\citeauthoryear{Shim et~al.}{2024}]{shim2024adaptrack}
+\begin{bchapter}
+\bauthor{\bsnm{Shim}, \binits{K.}},
+\bauthor{\bsnm{Ko}, \binits{K.}},
+\bauthor{\bsnm{Hwang}, \binits{J.}},
+\bauthor{\bsnm{Kim}, \binits{C.}}:
+\bctitle{{AdapTrack: Adaptive Thresholding-Based Matching for Multi-Object
+  Tracking}}.
+In: \bbtitle{2024 IEEE International Conference on Image Processing (ICIP)},
+pp. \bfpage{2222}--\blpage{2228}
+(\byear{2024}).
+\doiurl{10.1109/icip51287.2024.10648139}
+\end{bchapter}
+\endbibitem
+
+%%% 30
+\bibitem[\protect\citeauthoryear{Gwon and Lee}{2026}]{act2026adaptive}
+\begin{barticle}
+\bauthor{\bsnm{Gwon}, \binits{D.U.}},
+\bauthor{\bsnm{Lee}, \binits{W.I.}}:
+\batitle{{Adaptive Threshold Control Scheme Based on Detection Confidence
+  Distribution for Data Association in Multi-Object Tracking}}.
+\bjtitle{Electronics}
+\bvolume{15}(\bissue{17}),
+\bfpage{4047}
+(\byear{2026})
+\doiurl{10.3390/electronics15174047}
+\end{barticle}
+\endbibitem
+
+%%% 31
 \bibitem[\protect\citeauthoryear{Han et~al.}{2022}]{han2022dynamic}
 \begin{barticle}
 \bauthor{\bsnm{Han}, \binits{Y.}},
@@ -510,7 +559,7 @@ pp. \bfpage{16965}--\blpage{16974}
 \end{barticle}
 \endbibitem
 
-%%% 29
+%%% 32
 \bibitem[\protect\citeauthoryear{Jiang et~al.}{2018}]{jiang2018chameleon}
 \begin{bchapter}
 \bauthor{\bsnm{Jiang}, \binits{J.}},
@@ -527,7 +576,7 @@ pp. \bfpage{253}--\blpage{266}
 \end{bchapter}
 \endbibitem
 
-%%% 30
+%%% 33
 \bibitem[\protect\citeauthoryear{Otsu}{1979}]{otsu1979}
 \begin{barticle}
 \bauthor{\bsnm{Otsu}, \binits{N.}}:
@@ -540,7 +589,7 @@ pp. \bfpage{253}--\blpage{266}
 \end{barticle}
 \endbibitem
 
-%%% 31
+%%% 34
 \bibitem[\protect\citeauthoryear{Reddy and
   Chatterji}{1996}]{reddy1996phasecorr}
 \begin{barticle}
@@ -556,7 +605,7 @@ pp. \bfpage{253}--\blpage{266}
 \end{barticle}
 \endbibitem
 
-%%% 32
+%%% 35
 \bibitem[\protect\citeauthoryear{Milan et~al.}{2016}]{milan2016mot16}
 \begin{botherref}
 \oauthor{\bsnm{Milan}, \binits{A.}},
@@ -570,7 +619,7 @@ arXiv preprint arXiv:1603.00831
 \end{botherref}
 \endbibitem
 
-%%% 33
+%%% 36
 \bibitem[\protect\citeauthoryear{Geiger et~al.}{2012}]{geiger2012kitti}
 \begin{bchapter}
 \bauthor{\bsnm{Geiger}, \binits{A.}},
@@ -585,7 +634,7 @@ pp. \bfpage{3354}--\blpage{3361}
 \end{bchapter}
 \endbibitem
 
-%%% 34
+%%% 37
 \bibitem[\protect\citeauthoryear{Efron and
   Tibshirani}{1993}]{efron1993bootstrap}
 \begin{bbook}
@@ -597,7 +646,7 @@ pp. \bfpage{3354}--\blpage{3361}
 \end{bbook}
 \endbibitem
 
-%%% 35
+%%% 38
 \bibitem[\protect\citeauthoryear{Bernardin and
   Stiefelhagen}{2008}]{bernardin2008clear}
 \begin{barticle}
@@ -613,7 +662,7 @@ pp. \bfpage{3354}--\blpage{3361}
 \end{barticle}
 \endbibitem
 
-%%% 36
+%%% 39
 \bibitem[\protect\citeauthoryear{Ristani et~al.}{2016}]{ristani2016idf1}
 \begin{bchapter}
 \bauthor{\bsnm{Ristani}, \binits{E.}},
@@ -631,7 +680,7 @@ pp. \bfpage{17}--\blpage{35}
 \end{bchapter}
 \endbibitem
 
-%%% 37
+%%% 40
 \bibitem[\protect\citeauthoryear{Dendorfer
   et~al.}{2021}]{dendorfer2021motchallenge}
 \begin{barticle}
@@ -653,7 +702,7 @@ pp. \bfpage{17}--\blpage{35}
 \end{barticle}
 \endbibitem
 
-%%% 38
+%%% 41
 \bibitem[\protect\citeauthoryear{Sun et~al.}{2022}]{sun2022dancetrack}
 \begin{bchapter}
 \bauthor{\bsnm{Sun}, \binits{P.}},
