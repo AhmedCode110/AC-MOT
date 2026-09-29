@@ -2098,7 +2098,18 @@
    "event": "International Joint Conference on Neural Networks"
   },
   "title_similarity": 0.6813186813186813,
-  "status": "SEARCHED"
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "1706.04599",
+   "title": "On Calibration of Modern Neural Networks",
+   "authors": [
+    "Chuan Guo",
+    "Geoff Pleiss",
+    "Yu Sun",
+    "Kilian Q. Weinberger"
+   ],
+   "published": "2017-06-14T17:33:50Z"
+  }
  },
  {
   "key": "kuppers2020detcalib",
@@ -2377,7 +2388,19 @@
    "event": "KDD '24: The 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining"
   },
   "title_similarity": 0.7457627118644068,
-  "status": "SEARCHED"
+  "status": "SEARCHED",
+  "arxiv": {
+   "id": "2006.10726",
+   "title": "Tent: Fully Test-time Adaptation by Entropy Minimization",
+   "authors": [
+    "Dequan Wang",
+    "Evan Shelhamer",
+    "Shaoteng Liu",
+    "Bruno Olshausen",
+    "Trevor Darrell"
+   ],
+   "published": "2020-06-18T17:55:28Z"
+  }
  },
  {
   "key": "zhang2021fairmot",
@@ -3116,25 +3139,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010924",
-    "type": "journal-article",
-    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
-    "authors": [
-     "Joel Dunham",
-     "Eric Johnson",
-     "Eric Feron",
-     "Brian German"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "18",
-    "issue": "9",
-    "pages": "616-631",
-    "year": 2021,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010021",
     "type": "journal-article",
     "title": "Real-Time Data Processing for the Airborne Detection of Hot Spots",
@@ -3167,6 +3171,25 @@
     "issue": "9",
     "pages": "726-734",
     "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010924",
+    "type": "journal-article",
+    "title": "Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "authors": [
+     "Joel Dunham",
+     "Eric Johnson",
+     "Eric Feron",
+     "Brian German"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "9",
+    "pages": "616-631",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3228,20 +3251,18 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010924.c1",
+    "doi": "10.2514/1.i011378",
     "type": "journal-article",
-    "title": "Correction: Application of Dempster\u2013Shafer Networks to a Real-Time Unmanned Systems Risk Analysis Framework",
+    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
     "authors": [
-     "Joel Dunham",
-     "Eric Johnson",
-     "Eric Feron",
-     "Brian German"
+     "You-Ru Lu",
+     "Dengfeng Sun"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": "18",
+    "volume": "21",
     "issue": "7",
-    "pages": "AU1-AU1",
-    "year": 2021,
+    "pages": "547-553",
+    "year": 2024,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
