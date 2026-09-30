@@ -1,0 +1,80 @@
+{
+ "sparsetrack_wtl": "2/4/1",
+ "wtl::ByteTrack official, floor 0.01": "1/5/1",
+ "wtl::ByteTrack official, floor 0.1": "0/7/0",
+ "wtl::ByteTrack ultralytics, floor 0.01": "0/7/0",
+ "wtl::ByteTrack ultralytics, floor 0.1": "0/7/0",
+ "wtl::OC-SORT, floor 0.01": "7/0/0",
+ "wtl::OC-SORT, floor 0.1": "7/0/0",
+ "wtl::BoostTrack online, floor 0.1": "0/7/0",
+ "boost_gbi_identical": true,
+ "ext::PD-SORT$^{a}$::MOT17": {
+  "HOTA": [
+   0.613,
+   0.2677,
+   1.6458
+  ],
+  "wtl": "7/0/0"
+ },
+ "ext::Hybrid-SORT$^{a}$::MOT17": {
+  "HOTA": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "wtl": "0/7/0"
+ },
+ "ext::C-TWiX$^{b}$::MOT17": {
+  "HOTA": [
+   -0.054803802124652634,
+   -0.45556857052460487,
+   0.3982951222929405
+  ],
+  "wtl": "2/1/4"
+ },
+ "ext::C-TWiX$^{b}$::KITTI car": {
+  "HOTA": [
+   -1.5210259399118229,
+   -4.053026824312194,
+   -0.1337725201288264
+  ],
+  "wtl": "2/2/5"
+ },
+ "ext::C-TWiX$^{b}$::KITTI ped.": {
+  "HOTA": [
+   -0.10258831882896402,
+   -2.162930049405213,
+   0.03407538046975844
+  ],
+  "wtl": "1/7/1"
+ },
+ "ext::C-TWiX$^{b}$::DanceTrack": {
+  "HOTA": [
+   -1.004653933608303,
+   -2.6216417750884484,
+   0.6464053368379419
+  ],
+  "wtl": "10/3/12"
+ },
+ "ext::TrackTrack$^{b}$::DanceTrack": {
+  "HOTA": [
+   -0.01274491761786578,
+   -0.03240859193373904,
+   -0.0006684122976471592
+  ],
+  "wtl": "0/21/4"
+ },
+ "calib": {
+  "conditions": 14,
+  "significant_recovery": 7,
+  "significant_degradation": 0,
+  "all_replays_identical": true
+ },
+ "runtime": {
+  "ctrl": 2.9520425401531227,
+  "ctrl_p95": 4.38578910002434,
+  "e2e_delta": 2.5893650658251914,
+  "e2e_pct": 4.476019204041568,
+  "frames": 2279
+ }
+}

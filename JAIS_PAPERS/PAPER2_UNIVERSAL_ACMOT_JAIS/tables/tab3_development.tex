@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Development hosts on MOT17 val-half (7 sequences, published YOLOX-X detections, emission floor 0.01 or 0.1). Host = our reproduction; $\Delta$ = host + V7f $-$ host. Bracketed intervals: paired sequence bootstrap, 10,000 resamples, seed 42, 95\% percentile; bold = interval excludes 0. $\Delta$DetA and $\Delta$AssA without interval were not bootstrapped in the development record. W/T/L: sequences with $\Delta$HOTA $\ge 0.01$ / $|\Delta| < 0.01$ / $\le -0.01$. These hosts were visible while V7f was designed; they are development evidence, not held-out evidence.}
+\label{tab:dev}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllllllll l}
+\hline
+Host & Floor & Paper HOTA/MOTA/IDF1 & Host HOTA/MOTA/IDF1 & $\Delta$HOTA & $\Delta$DetA & $\Delta$AssA & $\Delta$MOTA & $\Delta$IDF1 & $\Delta$FP/$\Delta$FN & W/T/L \\
+\hline
+SparseTrack & 0.01 & 69.2/76.8/81.4 & 68.88/77.85/81.97 & $+0.06$ [$-0.01$, $+0.25$] & $+0.05$ [$-0.01$, $+0.18$] & $+0.06$ [$-0.01$, $+0.33$] & $+0.08$ [$-0.03$, $+0.30$] & $+0.16$ [$-0.02$, $+0.70$] & $+18$/$-67$ & 2/4/1 \\
+ByteTrack official & 0.01 & --/76.6/79.3 & 67.70/77.60/79.47 & $-0.01$ [$-0.06$, $+0.01$] & $+0.05$ & $-0.08$ & $+0.06$ [$-0.15$, $+0.34$] & $-0.03$ [$-0.14$, $+0.04$] & $+30$/$-65$ & 1/5/1 \\
+ByteTrack official & 0.1 & --/76.6/79.3 & 67.70/77.60/79.47 & \multicolumn{5}{c}{identical output (all sequences)} & 0/0 & 0/7/0 \\
+ByteTrack ultralytics & 0.01 & n/a & 66.00/74.76/76.42 & \multicolumn{5}{c}{identical output (all sequences)} & 0/0 & 0/7/0 \\
+ByteTrack ultralytics & 0.1 & n/a & 66.00/74.76/76.42 & \multicolumn{5}{c}{identical output (all sequences)} & 0/0 & 0/7/0 \\
+OC-SORT & 0.01 & 66.5/74.9/77.7 & 66.43/74.67/78.05 & {\bfseries\boldmath $+0.61$ [$+0.36$, $+1.24$]} & $+0.81$ & $+0.45$ & {\bfseries\boldmath $+1.27$ [$+0.17$, $+3.01$]} & $+0.66$ [$-0.25$, $+1.60$] & $+895$/$-1570$ & 7/0/0 \\
+OC-SORT & 0.1 & 66.5/74.9/77.7 & 66.44/74.67/78.05 & {\bfseries\boldmath $+0.46$ [$+0.27$, $+1.09$]} & $+0.85$ & $+0.10$ & {\bfseries\boldmath $+1.26$ [$+0.37$, $+3.34$]} & {\bfseries\boldmath $+0.287$ [$+0.003$, $+0.838$]} & $+678$/$-1344$ & 7/0/0 \\
+BoostTrack online & 0.1 & 68.37/75.56/81.35 & 68.49/75.50/81.41 & \multicolumn{5}{c}{identical output (all sequences)} & 0/0 & 0/7/0 \\
+BoostTrack + GBI & 0.1 & 71.33/80.55/83.84 & 71.72/81.03/84.16 & \multicolumn{5}{c}{identical output (all sequences)} & 0/0 & 0/7/0 \\
+\hline
+\end{tabular}}
+\end{table}

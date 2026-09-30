@@ -1,0 +1,316 @@
+\begin{thebibliography}{46}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem[{Bewley et~al.(2016)Bewley, Ge, Ott, Ramos, and
+  Upcroft}]{bewley2016sort}
+Bewley, A., Ge, Z., Ott, L., Ramos, F., and Upcroft, B., \enquote{{Simple
+  online and realtime tracking},} \emph{2016 IEEE International Conference on
+  Image Processing (ICIP)}, IEEE, 2016, pp. 3464--3468.
+\newblock \doi{10.1109/icip.2016.7533003}.
+
+\bibitem[{Wojke et~al.(2017)Wojke, Bewley, and Paulus}]{wojke2017deepsort}
+Wojke, N., Bewley, A., and Paulus, D., \enquote{{Simple online and realtime
+  tracking with a deep association metric},} \emph{2017 IEEE International
+  Conference on Image Processing (ICIP)}, IEEE, 2017, pp. 3645--3649.
+\newblock \doi{10.1109/icip.2017.8296962}.
+
+\bibitem[{Zhang et~al.(2022)Zhang, Sun, Jiang, Yu, Weng, Yuan, Luo, Liu, and
+  Wang}]{zhang2022bytetrack}
+Zhang, Y., Sun, P., Jiang, Y., Yu, D., Weng, F., Yuan, Z., Luo, P., Liu, W.,
+  and Wang, X., \enquote{{ByteTrack: Multi-object Tracking by Associating Every
+  Detection Box},} \emph{Computer Vision -- ECCV 2022}, Springer Nature
+  Switzerland, 2022, pp. 1--21.
+\newblock \doi{10.1007/978-3-031-20047-2_1}.
+
+\bibitem[{Ma et~al.(2023)Ma, Hussain, Park, Kim, and Jeon}]{ma2023adaptiveconf}
+Ma, L.~V., Hussain, M.~I., Park, J., Kim, J., and Jeon, M., \enquote{{Adaptive
+  Confidence Threshold for ByteTrack in Multi-Object Tracking},} \emph{2023
+  12th International Conference on Control, Automation and Information Sciences
+  (ICCAIS)}, IEEE, 2023, pp. 370--374.
+\newblock \doi{10.1109/iccais59597.2023.10382403}.
+
+\bibitem[{Miller and Rogers(2015)}]{miller2015multitarget}
+Miller, N., and Rogers, J., \enquote{{Simultaneous Tracking of Multiple Ground
+  Targets from a Multirotor Unmanned Aerial Vehicle},} \emph{Journal of
+  Aerospace Information Systems}, Vol.~12, No.~3, 2015, pp. 345--364.
+\newblock \doi{10.2514/1.i010345}.
+
+\bibitem[{Lu and Sun(2024)}]{lu2024uavdetection}
+Lu, Y.-R., and Sun, D., \enquote{{Development of Real-Time Unmanned Aerial
+  Vehicle Urban Object Detection System with Federated Learning},}
+  \emph{Journal of Aerospace Information Systems}, Vol.~21, No.~7, 2024, pp.
+  547--553.
+\newblock \doi{10.2514/1.i011378}.
+
+\bibitem[{Luiten et~al.(2021)Luiten, O\v{s}ep, Dendorfer, Torr, Geiger,
+  Leal-Taix\'{e}, and Leibe}]{luiten2021hota}
+Luiten, J., O\v{s}ep, A., Dendorfer, P., Torr, P., Geiger, A., Leal-Taix\'{e},
+  L., and Leibe, B., \enquote{{HOTA: A Higher Order Metric for Evaluating
+  Multi-object Tracking},} \emph{International Journal of Computer Vision},
+  Vol. 129, No.~2, 2021, pp. 548--578.
+\newblock \doi{10.1007/s11263-020-01375-2}.
+
+\bibitem[{Liu et~al.(2025)Liu, Wang, Wang, Liu, and Bai}]{liu2025sparsetrack}
+Liu, Z., Wang, X., Wang, C., Liu, W., and Bai, X., \enquote{{SparseTrack:
+  Multi-Object Tracking by Performing Scene Decomposition Based on
+  Pseudo-Depth},} \emph{IEEE Transactions on Circuits and Systems for Video
+  Technology}, Vol.~35, No.~5, 2025, pp. 4870--4882.
+\newblock \doi{10.1109/tcsvt.2024.3524670}.
+
+\bibitem[{Stanojevic and Todorovic(2024)}]{stanojevic2024boosttrack}
+Stanojevic, V.~D., and Todorovic, B.~T., \enquote{{BoostTrack: boosting the
+  similarity measure and detection confidence for improved multiple object
+  tracking},} \emph{Machine Vision and Applications}, Vol.~35, No.~3, 2024.
+\newblock \doi{10.1007/s00138-024-01531-5}.
+
+\bibitem[{Otsu(1979)}]{otsu1979}
+Otsu, N., \enquote{{A Threshold Selection Method from Gray-Level Histograms},}
+  \emph{IEEE Transactions on Systems, Man, and Cybernetics}, Vol.~9, No.~1,
+  1979, pp. 62--66.
+\newblock \doi{10.1109/tsmc.1979.4310076}.
+
+\bibitem[{Shim et~al.(2024{\natexlab{a}})Shim, Ko, Hwang, and
+  Kim}]{shim2024adaptrack}
+Shim, K., Ko, K., Hwang, J., and Kim, C., \enquote{{Adaptrack: Adaptive
+  Thresholding-Based Matching for Multi-Object Tracking},} \emph{2024 IEEE
+  International Conference on Image Processing (ICIP)}, IEEE,
+  2024{\natexlab{a}}, pp. 2222--2228.
+\newblock \doi{10.1109/icip51287.2024.10648139}.
+
+\bibitem[{Shim et~al.(2024{\natexlab{b}})Shim, Hwang, Ko, and
+  Kim}]{shim2024cmtrack}
+Shim, K., Hwang, J., Ko, K., and Kim, C., \enquote{{A Confidence-Aware Matching
+  Strategy For Generalized Multi-Object Tracking},} \emph{2024 IEEE
+  International Conference on Image Processing (ICIP)}, IEEE,
+  2024{\natexlab{b}}, pp. 4042--4048.
+\newblock \doi{10.1109/icip51287.2024.10647729}.
+
+\bibitem[{Gwon and Lee(2026)}]{gwon2026act}
+Gwon, D.~U., and Lee, W.~I., \enquote{{Adaptive Threshold Control Scheme Based
+  on Detection Confidence Distribution for Data Association in Multi-Object
+  Tracking},} \emph{Electronics}, Vol.~15, No.~17, 2026, p. 4047.
+\newblock \doi{10.3390/electronics15174047}.
+
+\bibitem[{Kalman(1960)}]{kalman1960}
+Kalman, R.~E., \enquote{{A New Approach to Linear Filtering and Prediction
+  Problems},} \emph{Journal of Basic Engineering}, Vol.~82, No.~1, 1960, pp.
+  35--45.
+\newblock \doi{10.1115/1.3662552}.
+
+\bibitem[{Kuhn(1955)}]{kuhn1955hungarian}
+Kuhn, H.~W., \enquote{{The Hungarian method for the assignment problem},}
+  \emph{Naval Research Logistics Quarterly}, Vol.~2, No. 1-2, 1955, pp. 83--97.
+\newblock \doi{10.1002/nav.3800020109}.
+
+\bibitem[{Cao et~al.(2023)Cao, Pang, Weng, Khirodkar, and
+  Kitani}]{cao2023ocsort}
+Cao, J., Pang, J., Weng, X., Khirodkar, R., and Kitani, K.,
+  \enquote{{Observation-Centric SORT: Rethinking SORT for Robust Multi-Object
+  Tracking},} \emph{2023 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, IEEE, 2023, pp. 9686--9696.
+\newblock \doi{10.1109/cvpr52729.2023.00934}.
+
+\bibitem[{Aharon et~al.(2022)Aharon, Orfaig, and Bobrovsky}]{aharon2022botsort}
+Aharon, N., Orfaig, R., and Bobrovsky, B.-Z., \enquote{{BoT-SORT: Robust
+  Associations Multi-Pedestrian Tracking},} arXiv preprint arXiv:2206.14651,
+  2022.
+
+\bibitem[{Du et~al.(2023)Du, Zhao, Song, Zhao, Su, Gong, and
+  Meng}]{du2023strongsort}
+Du, Y., Zhao, Z., Song, Y., Zhao, Y., Su, F., Gong, T., and Meng, H.,
+  \enquote{{StrongSORT: Make DeepSORT Great Again},} \emph{IEEE Transactions on
+  Multimedia}, Vol.~25, 2023, pp. 8725--8737.
+\newblock \doi{10.1109/tmm.2023.3240881}.
+
+\bibitem[{Maggiolino et~al.(2023)Maggiolino, Ahmad, Cao, and
+  Kitani}]{maggiolino2023deepocsort}
+Maggiolino, G., Ahmad, A., Cao, J., and Kitani, K., \enquote{{Deep OC-Sort:
+  Multi-Pedestrian Tracking by Adaptive Re-Identification},} \emph{2023 IEEE
+  International Conference on Image Processing (ICIP)}, IEEE, 2023, pp.
+  3025--3029.
+\newblock \doi{10.1109/icip49359.2023.10222576}.
+
+\bibitem[{Yang et~al.(2024)Yang, Han, Yan, Zhang, Qi, Lu, and
+  Wang}]{yang2024hybridsort}
+Yang, M., Han, G., Yan, B., Zhang, W., Qi, J., Lu, H., and Wang, D.,
+  \enquote{{Hybrid-SORT: Weak Cues Matter for Online Multi-Object Tracking},}
+  \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  Vol.~38, No.~7, 2024, pp. 6504--6512.
+\newblock \doi{10.1609/aaai.v38i7.28471}.
+
+\bibitem[{Wang et~al.(2025)Wang, Zhang, Li, Zheng, and Li}]{wang2025pdsort}
+Wang, Y., Zhang, D., Li, R., Zheng, Z., and Li, M., \enquote{{PD-SORT:
+  Occlusion-Robust Multi-Object Tracking Using Pseudo-Depth Cues},} \emph{IEEE
+  Transactions on Consumer Electronics}, Vol.~71, No.~1, 2025, pp. 165--177.
+\newblock \doi{10.1109/tce.2025.3541839}.
+
+\bibitem[{Cao et~al.(2025)Cao, Zheng, Yao, Qin, Cao, and
+  Guo}]{cao2025topictrack}
+Cao, X., Zheng, Y., Yao, Y., Qin, H., Cao, X., and Guo, S., \enquote{{TOPIC: A
+  Parallel Association Paradigm for Multi-Object Tracking Under Complex Motions
+  and Diverse Scenes},} \emph{IEEE Transactions on Image Processing}, Vol.~34,
+  2025, pp. 743--758.
+\newblock \doi{10.1109/tip.2025.3526066}.
+
+\bibitem[{Shim et~al.(2025)Shim, Ko, Yang, and Kim}]{shim2025tracktrack}
+Shim, K., Ko, K., Yang, Y., and Kim, C., \enquote{{Focusing on Tracks for
+  Online Multi-Object Tracking},} \emph{2025 IEEE/CVF Conference on Computer
+  Vision and Pattern Recognition (CVPR)}, IEEE, 2025, pp. 11687--11696.
+\newblock \doi{10.1109/cvpr52734.2025.01091}.
+
+\bibitem[{Miah et~al.(2025)Miah, Bilodeau, and Saunier}]{miah2025twix}
+Miah, M., Bilodeau, G.-A., and Saunier, N., \enquote{{Learning data association
+  for multi-object tracking using only coordinates},} \emph{Pattern
+  Recognition}, Vol. 160, 2025, p. 111169.
+\newblock \doi{10.1016/j.patcog.2024.111169}.
+
+\bibitem[{Jung et~al.(2024)Jung, Kang, Kim, and Kim}]{jung2024conftrack}
+Jung, H., Kang, S., Kim, T., and Kim, H., \enquote{{ConfTrack: Kalman
+  Filter-based Multi-Person Tracking by Utilizing Confidence Score of Detection
+  Box},} \emph{2024 IEEE/CVF Winter Conference on Applications of Computer
+  Vision (WACV)}, IEEE, 2024, pp. 6569--6578.
+\newblock \doi{10.1109/wacv57701.2024.00645}.
+
+\bibitem[{Zeng et~al.(2022)Zeng, Dong, Zhang, Wang, Zhang, and
+  Wei}]{zeng2022motr}
+Zeng, F., Dong, B., Zhang, Y., Wang, T., Zhang, X., and Wei, Y.,
+  \enquote{{MOTR: End-to-End Multiple-Object Tracking with Transformer},}
+  \emph{Computer Vision -- ECCV 2022}, Springer Nature Switzerland, 2022, pp.
+  659--675.
+\newblock \doi{10.1007/978-3-031-19812-0_38}.
+
+\bibitem[{Gao et~al.(2025)Gao, Qi, and Wang}]{gao2025motip}
+Gao, R., Qi, J., and Wang, L., \enquote{{Multiple Object Tracking as ID
+  Prediction},} \emph{2025 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, IEEE, 2025, pp. 27883--27893.
+\newblock \doi{10.1109/cvpr52734.2025.02596}.
+
+\bibitem[{Guo et~al.(2017)Guo, Pleiss, Sun, and
+  Weinberger}]{guo2017calibration}
+Guo, C., Pleiss, G., Sun, Y., and Weinberger, K.~Q., \enquote{{On Calibration
+  of Modern Neural Networks},} arXiv preprint arXiv:1706.04599, 2017.
+
+\bibitem[{Kuppers et~al.(2020)Kuppers, Kronenberger, Shantia, and
+  Haselhoff}]{kuppers2020detcalib}
+Kuppers, F., Kronenberger, J., Shantia, A., and Haselhoff, A.,
+  \enquote{{Multivariate Confidence Calibration for Object Detection},}
+  \emph{2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition
+  Workshops (CVPRW)}, IEEE, 2020, pp. 1322--1330.
+\newblock \doi{10.1109/cvprw50498.2020.00171}.
+
+\bibitem[{Wang et~al.(2020)Wang, Shelhamer, Liu, Olshausen, and
+  Darrell}]{wang2021tent}
+Wang, D., Shelhamer, E., Liu, S., Olshausen, B., and Darrell, T.,
+  \enquote{{Tent: Fully Test-time Adaptation by Entropy Minimization},} arXiv
+  preprint arXiv:2006.10726, 2020.
+
+\bibitem[{Liang et~al.(2024)Liang, He, and Tan}]{liang2024ttasurvey}
+Liang, J., He, R., and Tan, T., \enquote{{A Comprehensive Survey on Test-Time
+  Adaptation Under Distribution Shifts},} \emph{International Journal of
+  Computer Vision}, Vol. 133, No.~1, 2024, pp. 31--64.
+\newblock \doi{10.1007/s11263-024-02181-w}.
+
+\bibitem[{Milan et~al.(2016)Milan, Leal-Taixe, Reid, Roth, and
+  Schindler}]{milan2016mot16}
+Milan, A., Leal-Taixe, L., Reid, I., Roth, S., and Schindler, K.,
+  \enquote{{MOT16: A Benchmark for Multi-Object Tracking},} arXiv preprint
+  arXiv:1603.00831, 2016.
+
+\bibitem[{Dendorfer et~al.(2021)Dendorfer, O\v{s}ep, Milan, Schindler, Cremers,
+  Reid, Roth, and Leal-Taix\'{e}}]{dendorfer2021motchallenge}
+Dendorfer, P., O\v{s}ep, A., Milan, A., Schindler, K., Cremers, D., Reid, I.,
+  Roth, S., and Leal-Taix\'{e}, L., \enquote{{MOTChallenge: A Benchmark for
+  Single-Camera Multiple Target Tracking},} \emph{International Journal of
+  Computer Vision}, Vol. 129, No.~4, 2021, pp. 845--881.
+\newblock \doi{10.1007/s11263-020-01393-0}.
+
+\bibitem[{Geiger et~al.(2012)Geiger, Lenz, and Urtasun}]{geiger2012kitti}
+Geiger, A., Lenz, P., and Urtasun, R., \enquote{{Are we ready for autonomous
+  driving? The KITTI vision benchmark suite},} \emph{2012 IEEE Conference on
+  Computer Vision and Pattern Recognition}, IEEE, 2012, pp. 3354--3361.
+\newblock \doi{10.1109/cvpr.2012.6248074}.
+
+\bibitem[{Sun et~al.(2022)Sun, Cao, Jiang, Yuan, Bai, Kitani, and
+  Luo}]{sun2022dancetrack}
+Sun, P., Cao, J., Jiang, Y., Yuan, Z., Bai, S., Kitani, K., and Luo, P.,
+  \enquote{{DanceTrack: Multi-Object Tracking in Uniform Appearance and Diverse
+  Motion},} \emph{2022 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, IEEE, 2022, pp. 20961--20970.
+\newblock \doi{10.1109/cvpr52688.2022.02032}.
+
+\bibitem[{Ge et~al.(2021)Ge, Liu, Wang, Li, and Sun}]{ge2021yolox}
+Ge, Z., Liu, S., Wang, F., Li, Z., and Sun, J., \enquote{{YOLOX: Exceeding YOLO
+  Series in 2021},} arXiv preprint arXiv:2107.08430, 2021.
+
+\bibitem[{Zhao et~al.(2024)Zhao, Lv, Xu, Wei, Wang, Dang, Liu, and
+  Chen}]{zhao2024rtdetr}
+Zhao, Y., Lv, W., Xu, S., Wei, J., Wang, G., Dang, Q., Liu, Y., and Chen, J.,
+  \enquote{{DETRs Beat YOLOs on Real-time Object Detection},} \emph{2024
+  IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, IEEE,
+  2024, pp. 16965--16974.
+\newblock \doi{10.1109/cvpr52733.2024.01605}.
+
+\bibitem[{Jocher et~al.(2023)Jocher, Qiu, and
+  Chaurasia}]{jocher2023ultralytics}
+Jocher, G., Qiu, J., and Chaurasia, A., \enquote{{Ultralytics YOLO},} Software,
+  \url{https://github.com/ultralytics/ultralytics}, version 8.3.200 used, 2023.
+
+\bibitem[{Reddy and Chatterji(1996)}]{reddy1996phasecorr}
+Reddy, B., and Chatterji, B., \enquote{{An FFT-based technique for translation,
+  rotation, and scale-invariant image registration},} \emph{IEEE Transactions
+  on Image Processing}, Vol.~5, No.~8, 1996, pp. 1266--1271.
+\newblock \doi{10.1109/83.506761}.
+
+\bibitem[{Gouda(2026)}]{gouda2026sceneadaptive}
+Gouda, A., \enquote{{Scene-Adaptive Detector Operating-Point Control for
+  Unmanned Aerial Vehicle Multi-Object Tracking},} Manuscript submitted to the
+  Journal of Aerospace Information Systems, 2026.
+
+\bibitem[{Tokmakov et~al.(2021)Tokmakov, Li, Burgard, and
+  Gaidon}]{tokmakov2021permatrack}
+Tokmakov, P., Li, J., Burgard, W., and Gaidon, A., \enquote{{Learning to Track
+  with Object Permanence},} \emph{2021 IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, IEEE, 2021, pp. 10840--10849.
+\newblock \doi{10.1109/iccv48922.2021.01068}.
+
+\bibitem[{Bernardin and Stiefelhagen(2008)}]{bernardin2008clear}
+Bernardin, K., and Stiefelhagen, R., \enquote{{Evaluating Multiple Object
+  Tracking Performance: The CLEAR MOT Metrics},} \emph{EURASIP Journal on Image
+  and Video Processing}, Vol. 2008, 2008, pp. 1--10.
+\newblock \doi{10.1155/2008/246309}.
+
+\bibitem[{Ristani et~al.(2016)Ristani, Solera, Zou, Cucchiara, and
+  Tomasi}]{ristani2016idf1}
+Ristani, E., Solera, F., Zou, R., Cucchiara, R., and Tomasi, C.,
+  \enquote{{Performance Measures and a Data Set for Multi-target, Multi-camera
+  Tracking},} \emph{Computer Vision -- ECCV 2016 Workshops}, Springer
+  International Publishing, 2016, pp. 17--35.
+\newblock \doi{10.1007/978-3-319-48881-3_2}.
+
+\bibitem[{Efron and Tibshirani(1993)}]{efron1993bootstrap}
+Efron, B., and Tibshirani, R.~J., \emph{{An Introduction to the Bootstrap}},
+  Springer US, 1993.
+\newblock \doi{10.1007/978-1-4899-4541-9}.
+
+\bibitem[{Li et~al.(2025)Li, Cao, Naseer, Zhu, Sun, Zhang, and
+  Khan}]{li2025lgmot}
+Li, Y., Cao, J., Naseer, M., Zhu, Y., Sun, J., Zhang, Y., and Khan, F.~S.,
+  \enquote{{Multi-Granularity Language-Guided Training for Multi-Object
+  Tracking},} \emph{IEEE Transactions on Circuits and Systems for Video
+  Technology}, Vol.~35, No.~11, 2025, pp. 11001--11012.
+\newblock \doi{10.1109/tcsvt.2025.3572810}.
+
+\bibitem[{Somers et~al.(2025)Somers, Standaert, Joos, Alahi, and
+  Vleeschouwer}]{somers2025cameltrack}
+Somers, V., Standaert, B., Joos, V., Alahi, A., and Vleeschouwer, C.~D.,
+  \enquote{{CAMELTrack: Context-Aware Multi-cue ExpLoitation for Online
+  Multi-Object Tracking},} arXiv preprint arXiv:2505.01257, 2025.
+
+\end{thebibliography}

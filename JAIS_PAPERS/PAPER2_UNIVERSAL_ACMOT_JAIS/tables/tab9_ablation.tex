@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Mechanism ablation on development data, one change at a time (HOTA, MOT17 val-half, emission floor 0.1, no image motion cue). Each row adds one mechanism to the previous row; the first row places the prior V6-TF rules inside the same framework. Values from the development record; no interval is claimed.}
+\label{tab:ablation}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llll}
+\hline
+Variant & ByteTrack (official) & OC-SORT & BoostTrack (online) \\
+\hline
+V6-TF emulated (always-noisy bands, IoU duplicate rule, rank scores) & 56.41 & 45.72 & 62.55 \\
+V7d: $\rho$ regime (100 frames), host-anchored clean regime, crowd-safe duplicates & 67.56 & 65.70 & 68.37 \\
++ regime from the whole stream & 67.70 & 66.07 & 68.47 \\
++ foreground track-consistent rescue (V7e) & 67.70 & 66.47 & 68.47 \\
++ interpretability check of the split (V7f, frozen) & 67.70 & 66.91 & 68.49 \\
+Host alone & 67.70 & 66.44 & 68.49 \\
+\hline
+\end{tabular}}
+\end{table}

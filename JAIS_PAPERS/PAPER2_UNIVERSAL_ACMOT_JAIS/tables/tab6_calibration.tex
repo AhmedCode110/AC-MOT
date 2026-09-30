@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\caption{Detector-score calibration shift (development hosts, MOT17 val-half). The transform is applied to every detection score before the host; the host keeps its published thresholds. Host = host alone on the transformed stream; paired bootstrap as in Table~\ref{tab:dev}. The significance rule was fixed in the analysis script before the intervals were computed (after the freeze; the pooled values were recorded before the freeze). Significant recovery in 7 of 14 conditions; significant degradation in 0.}
+\label{tab:calib}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllllllll}
+\hline
+Host & Transform & Host HOTA & + V7f HOTA & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 & W/T/L & Verdict \\
+\hline
+ByteTrack (official setting) & $s^3$ & 60.92 & 65.81 & {\bfseries\boldmath $+4.89$ [$+2.60$, $+13.69$]} & {\bfseries\boldmath $+15.70$ [$+8.18$, $+32.83$]} & {\bfseries\boldmath $+5.01$ [$+1.21$, $+17.47$]} & 7/0/0 & sig.\ recovery \\
+ByteTrack (official setting) & $0.5\,s$ & 0.00 & 66.17 & {\bfseries\boldmath $+66.17$ [$+49.32$, $+75.40$]} & {\bfseries\boldmath $+75.31$ [$+59.66$, $+85.13$]} & {\bfseries\boldmath $+77.20$ [$+59.16$, $+87.62$]} & 7/0/0 & sig.\ recovery \\
+ByteTrack (official setting) & temp.\ 2 & 65.84 & 66.95 & {\bfseries\boldmath $+1.11$ [$+0.35$, $+3.87$]} & {\bfseries\boldmath $+4.82$ [$+0.72$, $+15.77$]} & {\bfseries\boldmath $+1.40$ [$+0.42$, $+5.02$]} & 6/0/1 & sig.\ recovery \\
+ByteTrack (official setting) & temp.\ 0.5 & 67.30 & 67.29 & $-0.009$ [$-0.051$, $+0.005$] & $+0.01$ [$-0.03$, $+0.05$] & {\bfseries\boldmath $-0.016$ [$-0.067$, $-0.001$]} & 1/4/2 & no sig.\ change \\
+ByteTrack (ultralytics setting) & $s^3$ & 66.31 & 66.31 & $-0.01$ [$-0.38$, $+0.38$] & $-0.02$ [$-0.31$, $+0.16$] & $-0.05$ [$-0.40$, $+0.33$] & 3/0/4 & no sig.\ change \\
+ByteTrack (ultralytics setting) & $0.5\,s$ & 66.61 & 66.48 & $-0.14$ [$-0.66$, $+0.14$] & $+0.01$ [$-0.04$, $+0.11$] & $-0.17$ [$-0.66$, $+0.11$] & 2/3/2 & no sig.\ change \\
+ByteTrack (ultralytics setting) & temp.\ 2 & 63.97 & 63.97 & identical output & -- & -- & 0/7/0 & identical output \\
+ByteTrack (ultralytics setting) & temp.\ 0.5 & 66.53 & 66.52 & $-0.006$ [$-0.029$, $+0.001$] & $-0.002$ [$-0.015$, $+0.007$] & $+0.001$ [$-0.003$, $+0.012$] & 0/5/2 & no sig.\ change \\
+OC-SORT & $s^3$ & 58.34 & 66.60 & {\bfseries\boldmath $+8.26$ [$+5.86$, $+16.81$]} & {\bfseries\boldmath $+17.14$ [$+10.37$, $+33.96$]} & {\bfseries\boldmath $+9.32$ [$+5.97$, $+21.90$]} & 7/0/0 & sig.\ recovery \\
+OC-SORT & $0.5\,s$ & 0.00 & 66.72 & {\bfseries\boldmath $+66.72$ [$+50.32$, $+75.56$]} & {\bfseries\boldmath $+75.36$ [$+58.37$, $+85.25$]} & {\bfseries\boldmath $+78.02$ [$+60.24$, $+87.77$]} & 7/0/0 & sig.\ recovery \\
+OC-SORT & temp.\ 2 & 65.99 & 67.22 & {\bfseries\boldmath $+1.24$ [$+0.52$, $+3.42$]} & {\bfseries\boldmath $+2.06$ [$+0.86$, $+4.99$]} & {\bfseries\boldmath $+1.65$ [$+0.61$, $+4.26$]} & 6/0/1 & sig.\ recovery \\
+OC-SORT & temp.\ 0.5 & 66.61 & 67.06 & $+0.45$ [$-0.01$, $+0.97$] & $+0.95$ [$-0.32$, $+2.34$] & $+0.53$ [$-0.11$, $+1.25$] & 4/0/3 & no sig.\ change \\
+BoostTrack online & $s^3$ & 61.33 & 64.84 & {\bfseries\boldmath $+3.51$ [$+0.85$, $+13.28$]} & {\bfseries\boldmath $+9.66$ [$+2.18$, $+27.40$]} & {\bfseries\boldmath $+4.77$ [$+0.32$, $+19.29$]} & 7/0/0 & sig.\ recovery \\
+BoostTrack online & temp.\ 2 & 67.59 & 67.59 & identical output & -- & -- & 0/7/0 & identical output \\
+\hline
+\end{tabular}}
+\end{table}

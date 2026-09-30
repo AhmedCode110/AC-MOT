@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Runtime after the freeze on one fixed device (cloud virtual machine, Intel Xeon at 2.10 GHz, 4 vCPU, no graphics processor, PyTorch on the CPU with 4 threads), live YOLOv8n and ByteTrack on KITTI sequences 0001, 0009 and 0019, 2279 timed frames per arm, both arms on the same frames. Mean / 95th percentile in milliseconds per frame. The tracker is faster with V7f because fewer candidates reach it.}
+\label{tab:runtime}
+\small
+\begin{tabular}{lll}
+\hline
+Stage & Host alone & Host + V7f \\
+\hline
+Frame decode & 13.88 / 16.21 & 13.88 / 16.51 \\
+Detector (YOLOv8n, 736 px, fp32) & 41.91 / 58.41 & 42.17 / 59.43 \\
+V7f controller (motion cue, step, observe) & -- & 2.95 / 4.39 \\
+Tracker (ByteTrack) & 2.04 / 3.57 & 1.43 / 2.64 \\
+Detector + controller + tracker & 43.97 / 61.37 & 46.56 / 65.24 \\
+End to end & 57.85 / 76.35 & 60.44 / 80.78 \\
+Frames per second, end to end & 17.29 & 16.55 \\
+\hline
+\end{tabular}
+\end{table}

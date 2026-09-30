@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Detector transfer on KITTI tracking training (development data): COCO-pretrained RT-DETR-L and YOLOv8n with three hosts at their published or library-default operating points; official KITTI HOTA, car and pedestrian averaged. Same bootstrap as Table~\ref{tab:dev} over sequences. BoT-SORT cells exclude sequence 0020, where the unmodified host raised a numerical error on V7f-filtered input.}
+\label{tab:kitti}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllllll}
+\hline
+Detector & Host & Seq. & Host HOTA/MOTA/IDF1 (IDS) & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 & $\Delta$IDS \\
+\hline
+YOLOv8n & ByteTrack & 21 & 45.31/46.54/60.92 (561) & $+0.06$ [$-1.19$, $+1.24$] & $-1.87$ [$-6.25$, $+0.03$] & $+1.49$ [$-0.36$, $+3.27$] & $-271$ [$-407$, $-151$] \\
+YOLOv8n & BoT-SORT & 20 & 49.21/49.89/64.41 (422) & $-1.02$ [$-2.43$, $+0.25$] & {\bfseries\boldmath $-2.43$ [$-7.43$, $-0.14$]} & $+0.35$ [$-2.10$, $+2.27$] & $-227$ [$-343$, $-123$] \\
+YOLOv8n & OC-SORT & 21 & 36.27/33.99/50.46 (91) & {\bfseries\boldmath $+7.91$ [$+5.47$, $+9.98$]} & {\bfseries\boldmath $+9.40$ [$+1.10$, $+12.30$]} & {\bfseries\boldmath $+9.60$ [$+5.61$, $+12.16$]} & $+79$ [$+43$, $+125$] \\
+RT-DETR-L & ByteTrack & 21 & 50.73/47.27/64.98 (686) & {\bfseries\boldmath $+0.91$ [$+0.22$, $+1.55$]} & {\bfseries\boldmath $+5.98$ [$+1.16$, $+9.94$]} & {\bfseries\boldmath $+3.87$ [$+1.67$, $+5.06$]} & $-297$ [$-530$, $-122$] \\
+RT-DETR-L & BoT-SORT & 20 & 53.91/48.25/67.74 (476) & $+0.61$ [$-0.39$, $+1.61$] & {\bfseries\boldmath $+7.86$ [$+2.21$, $+13.44$]} & {\bfseries\boldmath $+3.10$ [$+1.00$, $+4.57$]} & $-226$ [$-369$, $-120$] \\
+RT-DETR-L & OC-SORT & 21 & 52.64/57.59/69.87 (214) & $+0.19$ [$-0.57$, $+1.19$] & $-0.57$ [$-4.36$, $+1.40$] & $+0.04$ [$-1.31$, $+1.78$] & $-4$ [$-31$, $+25$] \\
+\hline
+\end{tabular}}
+\end{table}
