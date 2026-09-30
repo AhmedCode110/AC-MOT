@@ -14,7 +14,7 @@ FIN = ROOT / "research/final"
 # --- MOT17 val-half development hosts; research/final/V7_STATISTICS.md and V7_MAIN_RESULTS.md (Table 1)
 # (host, variant, host HOTA/MOTA/IDF1, dHOTA (d, lo, hi), dMOTA, dIDF1); None = identical output
 MOT17_DEV = [
-    ("SparseTrack", "", (68.876, 77.849, 81.974), (0.055, -0.011, 0.254), (0.078, -0.027, 0.304), (0.156, -0.015, 0.696)),
+    ("SparseTrack", "", (68.876, 77.849, 81.974), (0.0551, -0.0112, 0.2537), (0.0779, -0.0266, 0.3037), (0.1555, -0.0153, 0.6960)),  # research/final/sparsetrack_v7f/results.json bootstrap
     ("BoostTrack", "online", (68.492, 75.502, 81.413), None, None, None),
     ("BoostTrack", "+ GBI", (71.725, 81.032, 84.163), None, None, None),
     ("ByteTrack", "floor 0.01", (67.698, 77.604, 79.471), (-0.014, -0.058, 0.009), (0.058, -0.148, 0.341), (-0.031, -0.135, 0.035)),

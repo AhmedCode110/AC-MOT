@@ -17,6 +17,9 @@ def ci(t, bold=True):
         return "0 (identical)"
     d, lo, hi = t
     k = 3 if any(0 < abs(x) < 0.01 for x in (d, lo, hi)) or max(abs(d), abs(lo), abs(hi)) < 0.1 else 2
+    # a value recorded with three decimals ending in 5 cannot be rounded to two decimals without bias
+    if any(abs(x * 1000 - round(x * 1000)) < 1e-9 and round(abs(x) * 1000) % 10 == 5 for x in (d, lo, hi)):
+        k = 3
     s = f"${d:+.{k}f}$ [${lo:+.{k}f}$, ${hi:+.{k}f}$]"   # math mode: typographic minus
     return r"{\boldmath " + s + "}" if bold and (lo > 0 or hi < 0) else s
 
