@@ -5,7 +5,7 @@
 | Template | AIAA `new-aiaa.cls` with `[journal]`: 10 pt, one column, double spaced, letter paper | done (`manuscript.tex`) |
 | Compiles | `pdflatex → bibtex → pdflatex ×2`, no errors, no overfull boxes | done (24 pages) |
 | Title | ≤ 12 words, no abbreviations | 12 words: "Calibration Versus Scene Switching of Detector Operating Points for Aerial Multi-Object Tracking" |
-| Abstract | one paragraph, 100–200 words, no references, no undefined abbreviations | 197 words, abbreviations spelled out |
+| Abstract | one paragraph, 100–200 words, no references, no undefined abbreviations | 199 words, abbreviations spelled out |
 | Nomenclature | symbols with definitions | done |
 | Abbreviations | defined at first use in the text (SCI, NMS, MOTA, IDF1, HOTA, FPS, IDS) | done |
 | Headings | Roman-numbered sections, lettered subsections (class default) | done |
