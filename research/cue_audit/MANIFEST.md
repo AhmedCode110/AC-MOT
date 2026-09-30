@@ -56,3 +56,25 @@ The per-configuration results of E24 and E26 exist on the Mac only as per-sequen
 (8 configurations). By instruction, no `.pkl` file and nothing else under `outputs/` was committed. The numbers
 reported for E24 and E26 in the registry therefore remain traceable to those pickles (Mac only) and to the text
 of the registry and Amendment 4, not to a committed summary file.
+
+## Additions of 2026-10-01 (provenance closure)
+
+Copied unchanged (`cp -p`, destination sha256 = source sha256):
+
+| Source (under the Mac repo) | Destination (`research/cue_audit/`) | Bytes | sha256 | Source modified | Experiment | Note |
+|---|---|---|---|---|---|---|
+| `outputs/analysis/v5_s2_cues.txt` | `v5_s2_cues_stdout.txt` | 7801 | `03d56aa12423802d062207db1f9ffc3f34157b135cb63011833cdb01f86a5d01` | 2026-09-27T08:03:28+03:00 | E33 | stdout of the run that wrote the truncated `s2_cue_utility.json` (same second); the only complete record of its values (3 decimals); ends with the `TypeError: int64` traceback that truncated the JSON |
+| `outputs/analysis/v5_s3_full.txt` | `v5_s3/v5_s3_full_stdout.txt` | 313 | `e12b9b00b4d37eb3aee022a696bc414b75686452f06660e355830674d57dde91` | 2026-09-27T08:05:32+03:00 | E34 | cue selected per target and outer fold |
+| `outputs/analysis/v5_s3b_full.txt` | `v5_s3b/v5_s3b_full_stdout.txt` | 657 | `dd03ee8389d331388c64ede8926d49ba343ea4010942c75de7aa7a98db66c10a` | 2026-09-27T08:10:02+03:00 | E35 | cue per fold and held-out outcome vs fixed parameters with intervals |
+
+Written from the stored results (read-only; see `extract_stats_summary.py`):
+
+| File | Bytes | sha256 | Content |
+|---|---|---|---|
+| `stats_summary_E24_E26.json` | 22542 | `9c7b41f473c77100ab4a3f21da5db6e8bf7cb63fd5529669dc97faba73b8c928` | pooled 7-sequence metrics, mean pixel cost, comparisons with the reference (a_v3 for E24, c_random for E26), checks; E25 check |
+| `stats_files_E24_E26.json` | 289349 | `b2cd1946585775596e07ca7c68621a941fe5d8ee987a51f76c62313c9668c4a6` | all 336 source pickles: path, sha256, bytes, stored fields, per-sequence scalars |
+| `extract_stats_summary.py` | 8477 | `da126c34b96017473aa05b054cd6426df3c466078296304de30a1440bd7924af` | the extraction script |
+| `FINAL_PROVENANCE_STATUS.md` | — | — | claim-by-claim status |
+
+The 336 E24/E26 pickles (`outputs/opt_{audit,cues}/stats/`) remain on the development Mac only; their sha256 values
+are listed in `stats_files_E24_E26.json`.
