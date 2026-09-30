@@ -17,7 +17,7 @@
 | Related manuscript | disclosed in cover letter | done |
 | Author block | names and affiliations | Ahmed Gouda Ismail, Mohamed S. Mohamed (Military Technical College), Tarek Ahmed Mahmoud (Egypt University of Informatics), as in the authors' ICMISI 2026 paper; cities to be confirmed by the authors |
 | AIAA membership footnote, funding, conflict-of-interest statement | journal forms | to be completed by the authors at submission |
-| Length | AIAA guideline (Rev. Aug. 2024, `JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`): regular article 7–10 published pages, 10,000–12,000 words; = 20–26 double-spaced 10-pt serif manuscript pages, all pages counted | 25 manuscript pages (within 20–26) |
+| Length | AIAA guideline (Rev. Aug. 2024, `JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`): regular article 7–10 published pages, 10,000–12,000 words; = 20–26 double-spaced 10-pt serif manuscript pages, all pages counted | 26 manuscript pages (within 20–26) |
 | Fees | AIAA: "The only potential fee associated with publication of journal articles is that required if publishing with an Open Access status" (voluntary APC $2,700; `refs/aiaa_rules/open_access.txt`) | no page or overlength charge; do not select Open Access to avoid any fee |
 
 Build: `python JAIS_PAPERS/refs/make_bib.py manuscript.tex references.bib` (only if citations change), then

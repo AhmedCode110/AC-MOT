@@ -1,4 +1,4 @@
-\begin{thebibliography}{37}
+\begin{thebibliography}{38}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -272,5 +272,13 @@ Pech-Pacheco, J., Cristobal, G., Chamorro-Martinez, J., and Fernandez-Valdivia,
   study},} \emph{Proceedings 15th International Conference on Pattern
   Recognition. ICPR-2000}, IEEE Comput. Soc, 2000, pp. 314--317.
 \newblock \doi{10.1109/icpr.2000.903548}.
+
+\bibitem[{Zhao et~al.(2024)Zhao, Lv, Xu, Wei, Wang, Dang, Liu, and
+  Chen}]{zhao2024rtdetr}
+Zhao, Y., Lv, W., Xu, S., Wei, J., Wang, G., Dang, Q., Liu, Y., and Chen, J.,
+  \enquote{{DETRs Beat YOLOs on Real-time Object Detection},} \emph{2024
+  IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, IEEE,
+  2024, pp. 16965--16974.
+\newblock \doi{10.1109/cvpr52733.2024.01605}.
 
 \end{thebibliography}
