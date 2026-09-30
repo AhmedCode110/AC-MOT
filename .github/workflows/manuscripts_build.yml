@@ -1,0 +1,77 @@
+name: Build Paper 1, SIVP and thesis (pdfTeX) with page/error report and Overleaf zips
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/manuscripts_build.yml"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: TeX Live (Ubuntu 24.04, pdfTeX 1.40.25 as in the committed PDFs)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq texlive-latex-extra texlive-publishers texlive-fonts-recommended \
+            texlive-fonts-extra texlive-science texlive-bibtex-extra texlive-luatex texlive-lang-arabic \
+            poppler-utils zip
+      - name: Build and check
+        run: |
+          set +e   # record every exit status instead of stopping at the first nonzero one
+          R=JAIS_PAPERS/BUILD_REPORT.md
+          {
+            echo "# Manuscript build report"
+            echo
+            echo "Commit $(git rev-parse --short HEAD), run ${GITHUB_RUN_ID}, $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+            echo "$(pdflatex --version | head -1); $(bibtex --version | head -1); $(lualatex --version | head -1)"
+            echo
+            echo "| Document | Recipe | Exit | LaTeX errors (lines starting with !) | Undefined refs/cites (final pass) | Overfull boxes | Pages |"
+            echo "|---|---|---|---|---|---|---|"
+          } > "$R"
+          check() { # name dir log pdf recipe exit
+            L="$2/$3"; P="$2/$4"
+            e=$(grep -c '^!' "$L" || true)
+            u=$(grep -c -E 'undefined on input line|There were undefined' "$L" || true)
+            o=$(grep -c 'Overfull' "$L" || true)
+            pg=$(pdfinfo "$P" 2>/dev/null | awk '/^Pages/{print $2}')
+            echo "| $1 | $5 | $6 | $e | $u | $o | ${pg:-no PDF} |" >> "$R"
+          }
+          paper() { # dir
+            (cd "$1" && pdflatex -interaction=nonstopmode manuscript.tex >/dev/null; bibtex manuscript >/dev/null; \
+             pdflatex -interaction=nonstopmode manuscript.tex >/dev/null; pdflatex -interaction=nonstopmode manuscript.tex >/dev/null)
+          }
+          paper JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS; x=$?
+          check "Paper 1" JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS manuscript.log manuscript.pdf "pdflatex, bibtex, pdflatex x2" $x
+          paper JAIS_PAPERS/PAPER2_SIVP_SPRINGER; x=$?
+          check "Paper 2 (SIVP)" JAIS_PAPERS/PAPER2_SIVP_SPRINGER manuscript.log manuscript.pdf "pdflatex, bibtex, pdflatex x2" $x
+          sh THESIS/build.sh; x=$?
+          check "Thesis" THESIS main.log main.pdf "THESIS/build.sh (lualatex Arabic pages; pdflatex, bibtex, pdflatex x2)" $x
+          [ -f THESIS/main.pdf ] && cp THESIS/main.pdf THESIS/THESIS_MSc.pdf
+          cat "$R"
+      - name: Overleaf zips (sources only)
+        run: |
+          O=$PWD/JAIS_PAPERS/overleaf
+          for P in PAPER1_SCENE_ADAPTIVE_JAIS PAPER2_SIVP_SPRINGER; do
+            rm -f "$O/$P.zip"
+            (cd JAIS_PAPERS/$P && zip -qr "$O/$P.zip" manuscript.tex references.bib *.cls *.bst figures tables \
+               -x "figures/scene_frames/*" -x "*.aux" -x "*.log")
+          done
+          rm -f "$O/THESIS_MSC.zip"
+          (cd THESIS && zip -qr "$O/THESIS_MSC.zip" main.tex references.bib frontmatter appendices chapters figures tables \
+             arabic/arabic_summary.tex arabic/arabic_summary.pdf arabic/fonts -x "*.aux" -x "*.log")
+          ls -la "$O"
+      - name: Commit PDFs, zips and report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add JAIS_PAPERS/BUILD_REPORT.md JAIS_PAPERS/overleaf/*.zip \
+            JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS/manuscript.pdf JAIS_PAPERS/PAPER1_SCENE_ADAPTIVE_JAIS/manuscript.bbl \
+            JAIS_PAPERS/PAPER2_SIVP_SPRINGER/manuscript.pdf JAIS_PAPERS/PAPER2_SIVP_SPRINGER/manuscript.bbl \
+            THESIS/THESIS_MSc.pdf THESIS/arabic/arabic_summary.pdf || true
+          git diff --cached --quiet && exit 0
+          git commit -m "pdfTeX build of Paper 1, SIVP and thesis after the cue-audit wording changes; Overleaf zips refreshed; build report (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done
