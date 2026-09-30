@@ -1,0 +1,8 @@
+repo_commit ed5cffb3fa3646038777695c1d52ad18fed1d941
+oc_sort_commit 8462e7e729a93ccd3bd995c0a79a890336cb3a0b
+boosttrack_commit fb5bfc3a8f067476565e753b3a73df4d757c9d03
+trackeval_commit 12c8791b303e0a0b50f753af204249e622d0281a
+python Python 3.12.3
+cpu AMD EPYC 7763 64-Core Processor x 4
+acmot_v7.py sha256 98d90fac222e35373a362ce4f279030ac87a82f909a261ff376324be74604bcb
+config sha256 c2b3a0f76594b3ff70b04868e5adc025e2c1c79e54e7958e51c1c76eeef6e5dd

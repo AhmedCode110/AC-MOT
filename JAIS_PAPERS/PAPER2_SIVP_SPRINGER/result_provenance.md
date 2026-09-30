@@ -25,3 +25,4 @@ All numbers enter the manuscript through `scripts/evidence.py` (tables: `scripts
 
 Not used: universal V1/V3/V4/V5-TF results; V6-TF results other than the SparseTrack/BoostTrack transfer; any legacy
 scene-adaptive (Paper 1) result; the unfinished aerial V7f run (no result exists).
+| Confidence-shift intervals: 7 of 14 conditions significant recovery, 0 significant degradation | | `research/final/paper2_calib_boot/calib_boot.json` (run 36587453420 on branch `paper2-v7f`, frozen V7f lock verified 10/10; replay identical to `V7_DEV_RESULTS.json`; 10,000 resamples, seed 42) |

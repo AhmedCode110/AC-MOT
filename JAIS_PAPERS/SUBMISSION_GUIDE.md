@@ -2,7 +2,7 @@
 
 | Paper | Journal | Folder | Fee |
 |---|---|---|---|
-| Scene-Adaptive Detector Operating-Point Control for Unmanned Aerial Vehicle Multi-Object Tracking | Journal of Aerospace Information Systems (AIAA) | `PAPER1_SCENE_ADAPTIVE_JAIS/` | none if Open Access is not selected (AIAA: the only fee is the voluntary Open Access charge) |
+| Calibration Versus Scene Switching of Detector Operating Points for Aerial Multi-Object Tracking | Journal of Aerospace Information Systems (AIAA) | `PAPER1_SCENE_ADAPTIVE_JAIS/` | none if Open Access is not selected (AIAA: the only fee is the voluntary Open Access charge) |
 | Training-Free Self-Calibrating Control Layer for Heterogeneous Multi-Object Trackers | Signal, Image and Video Processing (Springer) | `PAPER2_SIVP_SPRINGER/` | none on the subscription route; the APC applies only if Open Access is chosen |
 
 `PAPER2_UNIVERSAL_ACMOT_JAIS/` is the longer AIAA-format version of Paper 2; it is not submitted anywhere.

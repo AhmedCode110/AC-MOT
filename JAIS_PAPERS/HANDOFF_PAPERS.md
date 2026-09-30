@@ -26,7 +26,7 @@ Done:
 To do: fig1 system diagram (TikZ inside manuscript), fig7 scene examples (after aerial run), `manuscript.tex`,
 `references.bib`, `source_audit.md`, `result_provenance.md`, `submission_checklist.md`, `cover_letter.md`.
 
-Title (10 words, no abbreviations): "Scene-Adaptive Detector Operating-Point Control for Unmanned Aerial Vehicle Multi-Object Tracking".
+Title (12 words, no abbreviations): "Calibration Versus Scene Switching of Detector Operating Points for Aerial Multi-Object Tracking".
 
 Facts the manuscript must state (all from the evidence snapshot / freeze record):
 - Q (trial 24) vs matched static anchor 960/0.35/0.35 on test-dev: HOTA 33.84 vs 33.93, Δ −0.09 [−0.25, +0.06]; validation C0 36.08 vs C3 36.11. Gains come from the calibrated operating point + tuned tracker, not from switching. Q runs at the top resolution almost always (mean 957 px validation, 955 px UAVDT); its NMS is constant (0.35), only confidence moves (0.30–0.40).
