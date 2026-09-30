@@ -1,0 +1,232 @@
+{
+ "folds": [
+  {
+   "held_out": "uav0000086_00000_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "img_blur",
+     "threshold": 6.203033042456529,
+     "le": 0.4,
+     "gt": 0.3
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "img_blur",
+     "inner_gain": 0.08789564729533872,
+     "per_detector": {
+      "yolov8": 0.14578621759527502,
+      "rtdetr": 0.02993899928894877
+     },
+     "threshold": 6.203033042456529,
+     "le": 0.4,
+     "gt": 0.3
+    },
+    "assoc_offset": null
+   }
+  },
+  {
+   "held_out": "uav0000117_02622_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_count",
+     "threshold": 2.7593102699975924,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_count",
+     "inner_gain": 1.3065838854654126,
+     "per_detector": {
+      "yolov8": 1.837343260913856,
+      "rtdetr": 0.7751650471033306
+     },
+     "threshold": 2.7593102699975924,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": null
+   }
+  },
+  {
+   "held_out": "uav0000137_00458_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_gap",
+     "threshold": -0.3595920467047823,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_gap",
+     "inner_gain": 0.9128308349665413,
+     "per_detector": {
+      "yolov8": 0.26816746352393217,
+      "rtdetr": 1.5584966338593111
+     },
+     "threshold": -0.3595920467047823,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": null
+   }
+  },
+  {
+   "held_out": "uav0000182_00000_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_count",
+     "threshold": 2.7641385418319215,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": {
+     "feature": "img_motion",
+     "threshold": 0.0004179343335178728,
+     "le": 0.26,
+     "gt": 0.05
+    },
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_count",
+     "inner_gain": 1.1914922383998512,
+     "per_detector": {
+      "yolov8": 1.6755341609661347,
+      "rtdetr": 0.7068691446545134
+     },
+     "threshold": 2.7641385418319215,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": {
+     "cue": "img_motion",
+     "inner_gain": 0.2584372149589541,
+     "per_detector": {
+      "yolov8": 0.44583298150806383,
+      "rtdetr": 0.07095913091959655
+     },
+     "threshold": 0.0004179343335178728,
+     "le": 0.26,
+     "gt": 0.05
+    }
+   }
+  },
+  {
+   "held_out": "uav0000268_05773_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_count",
+     "threshold": 2.7643666637236586,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_count",
+     "inner_gain": 1.1791157490045312,
+     "per_detector": {
+      "yolov8": 1.5229209898986433,
+      "rtdetr": 0.8347790240299559
+     },
+     "threshold": 2.7643666637236586,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": null
+   }
+  },
+  {
+   "held_out": "uav0000305_00000_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_gap",
+     "threshold": -0.3746997677638228,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_gap",
+     "inner_gain": 1.079954829577084,
+     "per_detector": {
+      "yolov8": 0.3083084355730723,
+      "rtdetr": 1.852854095698959
+     },
+     "threshold": -0.3746997677638228,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": null
+   }
+  },
+  {
+   "held_out": "uav0000339_00001_v",
+   "spec": {
+    "fixed_sensitivity": {
+     "feature": "det_count",
+     "threshold": 2.700487703538593,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": 0.1,
+    "resolution": 736
+   },
+   "log": {
+    "sensitivity": {
+     "cue": "det_count",
+     "inner_gain": 1.0804013864875373,
+     "per_detector": {
+      "yolov8": 1.468181141808442,
+      "rtdetr": 0.6920758965528659
+     },
+     "threshold": 2.700487703538593,
+     "le": 0.3,
+     "gt": 0.4
+    },
+    "assoc_offset": null
+   }
+  }
+ ],
+ "final_spec": {
+  "fixed_sensitivity": {
+   "feature": "det_gap",
+   "threshold": -0.28906494026194074,
+   "le": 0.3,
+   "gt": 0.5
+  },
+  "assoc_offset": 0.1,
+  "resolution": 736
+ },
+ "final_log": {
+  "sensitivity": {
+   "cue": "det_gap",
+   "inner_gain": 1.0834605522536276,
+   "per_detector": {
+    "yolov8": 0.4413768588186504,
+    "rtdetr": 1.7264394411319748
+   },
+   "threshold": -0.28906494026194074,
+   "le": 0.3,
+   "gt": 0.5
+  },
+  "assoc_offset": null
+ }
+}

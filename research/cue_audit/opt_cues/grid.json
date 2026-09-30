@@ -1,0 +1,122 @@
+[
+ {
+  "id": "c_random",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "random"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_n_fb",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:n_fb"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_tiny",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:tiny"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_neg_log_area",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:neg_log_area"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_edges",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:edges"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_darkness",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:darkness"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_blurriness",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:blurriness"
+  },
+  "density_kwargs": {}
+ },
+ {
+  "id": "c_legacy_sci",
+  "base": "V1",
+  "selectable": false,
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4,
+   "res_policy": "cue:legacy_sci"
+  },
+  "density_kwargs": {}
+ }
+]
