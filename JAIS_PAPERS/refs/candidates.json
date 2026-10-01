@@ -447,5 +447,10 @@
   "key": "zheng2020diou",
   "title": "Distance-IoU Loss: Faster and Better Learning for Bounding Box Regression",
   "doi": "10.1609/aaai.v34i07.6999"
+ },
+ {
+  "key": "liu2023u2mot",
+  "title": "Uncertainty-aware Unsupervised Multi-Object Tracking",
+  "doi": "10.1109/iccv51070.2023.00917"
  }
 ]

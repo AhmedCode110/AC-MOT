@@ -265,6 +265,65 @@ t += r"""\hline
 """
 write("tab7_temporal.tex", t)
 
+# ---------------------------------------------------------------- Table 8: cross-pipeline consistency (HOTA, TrackEval)
+# Row 1: matched static anchor record (5,000 resamples, seed 42; per-sequence anchor values not archived).
+# Rows 2-3: post hoc re-scoring of the archived frozen outputs, research/transfer_legacy/rescore/ (commit 97853c6;
+# 10,000 resamples, seed 0); used only because every archived motmetrics number was reproduced exactly.
+RS = ROOT / "research/transfer_legacy/rescore"
+u2 = json.load(open(RS / "u2mot/u2mot_testdev_rescore.json"))
+st = json.load(open(RS / "sparsetrack/sparsetrack_val_half_rescore.json"))
+assert u2["reproduction_all_match"] is True
+assert all(x["all_match"] is True for x in st["reproduction"].values())
+assert u2["paired_controller_vs_baseline"]["bootstrap_resamples"] == 10000 and u2["paired_controller_vs_baseline"]["seed"] == 0
+uh = u2["paired_controller_vs_baseline"]["metrics"]["HOTA"]
+sh = st["pairs"]["adaptive_vs_static075"]["metrics"]["HOTA"]
+ah = json.load(open(EV / "MATCHED_STATIC_A0_TESTDEV.json"))["results_V1_minus_A0_pp"]["HOTA"]
+
+
+def dci(d, lo, hi):
+    return f"${d:+.2f}$", f"[${lo:+.2f}$, ${hi:+.2f}$]"
+
+
+def wtl3(x):
+    return f"{x['wins']}/{x['ties']}/{x['losses']}"
+
+
+L = r">{\raggedright\arraybackslash}p"
+t = r"""\begin{table}[t]
+\centering
+\caption{Cross-pipeline consistency: scene switching versus a static operating point. $\Delta$HOTA is adaptive minus static (TrackEval, percentage points) with its 95\% paired sequence bootstrap interval (row 1: 5,000 resamples, seed 42; rows 2--3: 10,000 resamples, seed 0); W/T/L counts the sequences won, tied, and lost by the adaptive system. Detectors, trackers, ground-truth filters, and policies differ between rows, so absolute accuracies are not comparable across rows.}
+\label{tab:crosspipe}
+\footnotesize
+\setlength\tabcolsep{3pt}
+\begin{tabular}{""" + L + "{1.6cm}" + L + "{1.75cm}" + L + "{1.9cm}" + L + "{2.0cm}ccc" + L + "{1.95cm}" + L + r"""{1.6cm}}
+\hline
+Pipeline & Dataset/split & Adaptive mechanism & Static comparator & $\Delta$HOTA & 95\% CI & W/T/L & Evidence status & Interpretation \\
+\hline
+"""
+d, c = dci(ah["delta"], ah["ci_low"], ah["ci_high"])
+t += (r"YOLOv8n + ByteTrack (this study) & VisDrone2019 test-dev, 17 sequences & Quality profile Q: index $\to$ confidence, NMS, resolution "
+      r"& Matched static anchor (conf.\ 0.35, NMS 0.35, 960 px, tuned tracker) & " + d + " & " + c + r" & n/a$^{a}$ "
+      r"& Held-out; Q frozen before test; anchor run post hoc & No measurable change \\" + "\n")
+d, c = dci(uh["delta"], *uh["ci95"])
+t += (r"YOLOX-X + U2MOT & VisDrone2019 test-dev, 17 sequences & Recalibrated index tiers $\to$ confidence, NMS, input size$^{b}$ "
+      r"& Author-calibrated static operating point (conf.\ 0.09, NMS 0.70, 1600$\times$896 px) & " + d + " & " + c + " & " + wtl3(uh) +
+      r" & Held-out; controller frozen before test; post hoc TrackEval HOTA rescore of the frozen outputs & No measurable change \\" + "\n")
+d, c = dci(sh["delta"], *sh["ci95"])
+t += (r"YOLOX + SparseTrack & MOT17 validation half, 7 sequences & Edge cue $\to$ NMS 0.70 or 0.80$^{c}$ "
+      r"& Static NMS 0.75 (named in the freeze record) & " + d + " & " + c + " & " + wtl3(sh) +
+      r" & In-sample validation; threshold selected on the same 7 sequences & Small in-sample gain; not held-out evidence \\" + "\n")
+t += r"""\hline
+\end{tabular}
+
+\smallskip
+\parbox{\textwidth}{\raggedright
+$^{a}$Per-sequence values of the matched static anchor were not archived.\\
+$^{b}$YOLOX-X checkpoint released by the U2MOT authors; tracker thresholds 0.5 and 0.1, matching threshold 0.8, buffer 15 frames in both runs. Index: cue weights of Q with the cue transforms of Eq.~\eqref{eq:heur}; boundaries 0.519 and 0.590 (terciles of the index on VisDrone validation, no labels). Operating points (confidence, NMS, input): (0.15, 0.70, 1280$\times$704), (0.12, 0.65, 1440$\times$800), (0.09, 0.60, 1600$\times$896); no record of how these values were chosen. Evaluation: pedestrian, car, van, truck, and bus merged class-agnostically, ignore regions removed by box center, overlap 0.5.\\
+$^{c}$YOLOX ablation checkpoint released with ByteTrack \cite{zhang2022bytetrack} (training data include the first half of each MOT17 training sequence), input 1440$\times$800, confidence 0.01; tracker unchanged. Every tenth frame, the fraction of Canny edge pixels of a quarter-scale image divided by 0.14 and capped at 1, averaged over the last seven analyses, sets NMS 0.80 above the selected threshold and 0.70 otherwise. HOTA with the standard MOT17 pedestrian preprocessing on the validation-half ground truth.}
+\end{table}
+"""
+write("tab8_crosspipeline.tex", t)
+
 # ---------------------------------------------------------------- per-sequence summary numbers used in the text
 v = defaultdict(dict)
 for r in rows("V1_PER_SEQUENCE_METRICS.csv"):

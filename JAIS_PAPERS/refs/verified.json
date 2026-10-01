@@ -5924,5 +5924,32 @@
   },
   "title_similarity": 1.0,
   "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "liu2023u2mot",
+  "query_title": "Uncertainty-aware Unsupervised Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/iccv51070.2023.00917",
+   "type": "proceedings-article",
+   "title": "Uncertainty-aware Unsupervised Multi-Object Tracking",
+   "authors": [
+    "Kai Liu",
+    "Sheng Jin",
+    "Zhihang Fu",
+    "Ze Chen",
+    "Rongxin Jiang",
+    "Jieping Ye"
+   ],
+   "container": "2023 IEEE/CVF International Conference on Computer Vision (ICCV)",
+   "volume": null,
+   "issue": null,
+   "pages": "9962-9971",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 IEEE/CVF International Conference on Computer Vision (ICCV)"
+  },
+  "title_similarity": 1.0,
+  "status": "DOI_RESOLVED"
  }
 ]
