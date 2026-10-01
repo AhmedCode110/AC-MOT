@@ -78,7 +78,12 @@ claim it is.
 
 ## 10. Page count and JAIS format
 
-BUILD_STATUS_PLACEHOLDER
+Official build (workflow `manuscripts_build.yml`, run 36845999624, commit 6a85d1a, pdfTeX 1.40.25, TeX Live 2023;
+report `JAIS_PAPERS/BUILD_REPORT.md`, PDF committed in 73ff93a): exit 0, 0 LaTeX errors, 0 undefined references or
+citations, 0 overfull boxes, **28 pages** (26 before the integration). Template `new-aiaa.cls` `[journal]`, 10 pt,
+one column, double spaced; Tables 1–8 numbered and cited; abstract 200 words; 42 references in citation order.
+The AIAA guideline recommends 20–26 double-spaced pages for a regular article; it is a recommendation, not a hard
+limit (`JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`), so 28 pages is 2 over the recommendation.
 
 Trim candidates (not applied; require the authors' approval), estimated in double-spaced pages:
 1. Introduction (844 words): drop the roadmap paragraph and merge the "last point shapes the reading" paragraph into
