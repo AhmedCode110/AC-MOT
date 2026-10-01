@@ -428,3 +428,11 @@ static point is the comparator; it does not show that switching beats the
 best static operating point in HOTA. All of this is in-sample validation.
 The earlier statement "static 0.70 → 0.75 adds +0.20 MOTA" was from
 motmetrics; in TrackEval HOTA the same change is −0.20.
+
+## 8. Erratum to the section 6 rules (rules themselves left as written)
+
+Rule 4 says the U2MOT author-calibrated static operating point (conf 0.09,
+NMS 0.70, 1600×896) "is also the controller's hard tier". That is wrong for
+the suppression threshold: the hard tier is (0.09, 0.60, 1600×896)
+(acmot_full_policy_calibrated.py, FROZEN_CONFIG.json). Confidence and input
+size coincide; NMS does not. The manuscript does not use the statement.

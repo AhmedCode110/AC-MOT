@@ -73,5 +73,5 @@ jobs:
             JAIS_PAPERS/PAPER2_SIVP_SPRINGER/manuscript.pdf JAIS_PAPERS/PAPER2_SIVP_SPRINGER/manuscript.bbl \
             THESIS/THESIS_MSc.pdf THESIS/arabic/arabic_summary.pdf || true
           git diff --cached --quiet && exit 0
-          git commit -m "pdfTeX build of Paper 1, SIVP and thesis after the cue-audit wording changes; Overleaf zips refreshed; build report (run ${GITHUB_RUN_ID})"
+          git commit -m "pdfTeX build of Paper 1, SIVP and thesis at $(git rev-parse --short HEAD); Overleaf zips refreshed; build report (run ${GITHUB_RUN_ID})"
           for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

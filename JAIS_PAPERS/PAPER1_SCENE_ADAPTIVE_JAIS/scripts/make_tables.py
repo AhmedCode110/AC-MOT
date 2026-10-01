@@ -277,6 +277,21 @@ assert all(x["all_match"] is True for x in st["reproduction"].values())
 assert u2["paired_controller_vs_baseline"]["bootstrap_resamples"] == 10000 and u2["paired_controller_vs_baseline"]["seed"] == 0
 uh = u2["paired_controller_vs_baseline"]["metrics"]["HOTA"]
 sh = st["pairs"]["adaptive_vs_static075"]["metrics"]["HOTA"]
+sd = st["pairs"]["adaptive_vs_static070"]["metrics"]["HOTA"]
+H070 = st["systems"]["static070"]["trackeval_overall"]["HOTA"]
+assert H070 == max(st["systems"][k]["trackeval_overall"]["HOTA"] for k in ("static070", "static075", "static080"))
+assert st["pairs"]["adaptive_vs_static070"]["bootstrap_resamples"] == 10000 and st["pairs"]["adaptive_vs_static070"]["seed"] == 0
+# Note b (U2MOT pipeline) transcribes the frozen controller and runtime, not the rescore JSON. Drive sources
+# (FINAL_U2MOT_ACMOT_FREEZE_2026-09-14): 05_VALIDATED_CONTROLLER_FREEZE/FROZEN_CONFIG.json (1WMdWrMPc-gJc4FdZNEh1TkwjOPcSiYKE)
+# and acmot_full_policy_calibrated.py (sha256 985491bb..., listed in that folder's SHA256SUMS.txt) for the boundaries and
+# operating points; 02_SCI_CALIBRATION/SCI_CALIBRATION.txt (1k0wiYVDJRONBL-PctxA7GqE5ubljzcDb) for the label-free terciles;
+# 07_CODE_SNAPSHOT/acmot_v1.py (1v44BZrDZRu4pg7MMc3L7_Q3lN_izUA2B) for the cue weights and transforms;
+# 01_A0_BASELINE/BASELINE_RUN_SUMMARY.txt (1x0QwAyBRtjHMzUIjQRojz8B-W2T-ioi6) and upstream u2mot tools/track.py::parse_benchmark
+# (commit 7411211) for the tracker settings; the evaluation filter is u2mot tools/utils/eval_visdrone.py at that commit.
+# Note c (SparseTrack pipeline): FROZEN_CONTROLLER_MANIFEST.json (1IhAmHmoHxKMRk1xcI14bgDN81rqz-_wo) and
+# frozen_adaptive_edge_v1_runner.py (1ybeR6-xMWcmhDYt1B8FbhKShhbT9MRQj) for the rule, threshold, confidence and tracker;
+# MOT20 EXPERIMENT_PROTOCOL.json (14unHmvv-hsiDT4CyBQyJEWNL-UxBLxQ5) for the input size and checkpoint provenance.
+# Both are summarized in research/transfer_legacy/U2MOT_SPARSETRACK_EVIDENCE_AUDIT.md.
 ah = json.load(open(EV / "MATCHED_STATIC_A0_TESTDEV.json"))["results_V1_minus_A0_pp"]["HOTA"]
 
 
@@ -311,7 +326,7 @@ t += (r"YOLOX-X + U2MOT & VisDrone2019 test-dev, 17 sequences & Recalibrated ind
 d, c = dci(sh["delta"], *sh["ci95"])
 t += (r"YOLOX + SparseTrack & MOT17 validation half, 7 sequences & Edge cue $\to$ NMS 0.70 or 0.80$^{c}$ "
       r"& Static NMS 0.75 (named in the freeze record) & " + d + " & " + c + " & " + wtl3(sh) +
-      r" & In-sample validation; threshold selected on the same 7 sequences & Small in-sample gain; not held-out evidence \\" + "\n")
+      r" & In-sample validation; threshold selected on the same 7 sequences & Small in-sample gain over NMS 0.75, none over default NMS 0.70$^{c}$; not held-out evidence \\" + "\n")
 t += r"""\hline
 \end{tabular}
 
@@ -319,7 +334,7 @@ t += r"""\hline
 \parbox{\textwidth}{\raggedright
 $^{a}$Per-sequence values of the matched static anchor were not archived.\\
 $^{b}$YOLOX-X checkpoint released by the U2MOT authors; tracker thresholds 0.5 and 0.1, matching threshold 0.8, buffer 15 frames in both runs. Index: cue weights of Q with the cue transforms of Eq.~\eqref{eq:heur}; boundaries 0.519 and 0.590 (terciles of the index on VisDrone validation, no labels). Operating points (confidence, NMS, input): (0.15, 0.70, 1280$\times$704), (0.12, 0.65, 1440$\times$800), (0.09, 0.60, 1600$\times$896); no record of how these values were chosen. Evaluation: pedestrian, car, van, truck, and bus merged class-agnostically, ignore regions removed by box center, overlap 0.5.\\
-$^{c}$YOLOX ablation checkpoint released with ByteTrack \cite{zhang2022bytetrack} (training data include the first half of each MOT17 training sequence), input 1440$\times$800, confidence 0.01; tracker unchanged. Every tenth frame, the fraction of Canny edge pixels of a quarter-scale image divided by 0.14 and capped at 1, averaged over the last seven analyses, sets NMS 0.80 above the selected threshold and 0.70 otherwise. HOTA with the standard MOT17 pedestrian preprocessing on the validation-half ground truth.}
+$^{c}$YOLOX ablation checkpoint released with ByteTrack \cite{zhang2022bytetrack} (training data include the first half of each MOT17 training sequence), input 1440$\times$800, confidence 0.01; tracker unchanged. Every tenth frame, the fraction of Canny edge pixels of a quarter-scale image divided by 0.14 and capped at 1, averaged over the last seven analyses, sets NMS 0.80 above the selected threshold and 0.70 otherwise. HOTA with the standard MOT17 pedestrian preprocessing on the validation-half ground truth. Against the default static NMS 0.70 (""" + f"{H070:.2f}" + r"""\% HOTA, highest of the static settings 0.70, 0.75, 0.80): $\Delta$HOTA """ + dci(sd["delta"], *sd["ci95"])[0] + " " + dci(sd["delta"], *sd["ci95"])[1] + ", W/T/L " + wtl3(sd) + r""".}
 \end{table}
 """
 write("tab8_crosspipeline.tex", t)
