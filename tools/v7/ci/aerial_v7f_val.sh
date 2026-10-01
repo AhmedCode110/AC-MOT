@@ -42,11 +42,18 @@ echo "$sha  $WORK/$f" | sha256sum -c -
 tar -xf "$WORK/$f" -C "$REPO"; rm -f "$WORK/$f"
 
 log "VisDrone2019-MOT-val annotations (official zip) + placeholder frame names"
+# VISDRONE_VAL_ZIP: path to your own copy of VisDrone2019-MOT-val.zip (e.g. on a mounted Google Drive in Colab);
+# if unset, the public Drive id is tried (it has hit the download quota in CI).
 z="$WORK/VisDrone2019-MOT-val.zip"; ok=0
-for t in 1 2 3 4; do
-  if "$REPO/.venv/bin/gdown" -q 1rqnKe9IgU_crMaxRoel9_nuUsMEBBVQu -O "$z"; then ok=1; break; fi
-  log "gdown attempt $t failed (Drive quota?); retry in 5 min"; sleep 300
-done
+if [ -n "${VISDRONE_VAL_ZIP:-}" ]; then
+  [ -s "$VISDRONE_VAL_ZIP" ] || { echo "VISDRONE_VAL_ZIP not found: $VISDRONE_VAL_ZIP"; exit 3; }
+  z="$VISDRONE_VAL_ZIP"; ok=1; KEEP_ZIP=1
+else
+  for t in 1 2 3 4; do
+    if "$REPO/.venv/bin/gdown" -q 1rqnKe9IgU_crMaxRoel9_nuUsMEBBVQu -O "$z"; then ok=1; break; fi
+    log "gdown attempt $t failed (Drive quota?); retry in 5 min"; sleep 300
+  done
+fi
 if [ "$ok" != 1 ] || [ ! -s "$z" ]; then
   echo "DOWNLOAD_FAILED: the official VisDrone2019-MOT-val zip could not be fetched from Google Drive (quota). No metric was computed." | tee "$OUT/STATUS.txt"
   exit 3
@@ -66,7 +73,7 @@ for i in z.infolist():
         dst.touch(); n += 1
 print(sys.argv[1], "annotations", a, "frame names", n)
 PY
-rm -f "$z"
+[ -z "${KEEP_ZIP:-}" ] && rm -f "$z"
 export ACMOT_VISDRONE_VAL="$WORK/VisDrone2019-MOT-val"
 
 log "run $SPLIT (NATIVE vs V7f), detectors: $DETS"
