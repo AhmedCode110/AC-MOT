@@ -3139,6 +3139,23 @@
     "event": null
    },
    {
+    "doi": "10.2514/1.i011365",
+    "type": "journal-article",
+    "title": "Artificial Intelligence for Real-Time Tolerance to Critical Flight Data Errors in Large Aircraft",
+    "authors": [
+     "Cynthia Koopman",
+     "David Zammit-Mangion"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "21",
+    "issue": "9",
+    "pages": "726-734",
+    "year": 2024,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
     "doi": "10.2514/1.i010021",
     "type": "journal-article",
     "title": "Real-Time Data Processing for the Airborne Detection of Hot Spots",
@@ -3154,23 +3171,6 @@
     "issue": "10",
     "pages": "444-451",
     "year": 2013,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
-    "doi": "10.2514/1.i011365",
-    "type": "journal-article",
-    "title": "Artificial Intelligence for Real-Time Tolerance to Critical Flight Data Errors in Large Aircraft",
-    "authors": [
-     "Cynthia Koopman",
-     "David Zammit-Mangion"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "21",
-    "issue": "9",
-    "pages": "726-734",
-    "year": 2024,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3212,24 +3212,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i011204",
-    "type": "journal-article",
-    "title": "Time Delay Mitigation in Aerial Telerobotic Operations Using Heterogeneous Stereo-Vision Systems",
-    "authors": [
-     "Nazmus Sakib",
-     "Kenneth C. Gahan",
-     "Craig A. Woolsey"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "20",
-    "issue": "9",
-    "pages": "526-545",
-    "year": 2023,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010127",
     "type": "journal-article",
     "title": "Scalable Open-Source Architecture for Real-Time Monitoring of Adaptive Wiring Panels",
@@ -3251,18 +3233,37 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i011378",
+    "doi": "10.2514/1.i011204",
     "type": "journal-article",
-    "title": "Development of Real-Time Unmanned Aerial Vehicle Urban Object Detection System with Federated Learning",
+    "title": "Time Delay Mitigation in Aerial Telerobotic Operations Using Heterogeneous Stereo-Vision Systems",
     "authors": [
-     "You-Ru Lu",
-     "Dengfeng Sun"
+     "Nazmus Sakib",
+     "Kenneth C. Gahan",
+     "Craig A. Woolsey"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": "21",
-    "issue": "7",
-    "pages": "547-553",
-    "year": 2024,
+    "volume": "20",
+    "issue": "9",
+    "pages": "526-545",
+    "year": 2023,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i010860",
+    "type": "journal-article",
+    "title": "Adaptive Real-Time Clustering Method for Dynamic Visual Tracking of Very Flexible Wings",
+    "authors": [
+     "Tigran Mkhoyan",
+     "Coen C. de Visser",
+     "Roeland De Breuker"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "18",
+    "issue": "2",
+    "pages": "58-79",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3303,9 +3304,9 @@
      "Jay P. Wilhelm"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": null,
-    "issue": null,
-    "pages": "1-8",
+    "volume": "23",
+    "issue": "10",
+    "pages": "1055-1062",
     "year": 2026,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
@@ -3384,24 +3385,6 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i011280",
-    "type": "journal-article",
-    "title": "Anomaly Detection for Agile Satellite Attitude Control System Using Hybrid Deep-Learning Technique",
-    "authors": [
-     "Moamen Ibrahim Mohamed",
-     "Khaled Mahmoud Badran",
-     "Ahmed Esmat Hussien"
-    ],
-    "container": "Journal of Aerospace Information Systems",
-    "volume": "20",
-    "issue": "12",
-    "pages": "890-904",
-    "year": 2023,
-    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.2514/1.i010959",
     "type": "journal-article",
     "title": "Multiclass Anomaly Detection in Flight Data Using Semi-Supervised Explainable Deep Learning Model",
@@ -3415,6 +3398,24 @@
     "issue": "2",
     "pages": "83-97",
     "year": 2022,
+    "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.2514/1.i011280",
+    "type": "journal-article",
+    "title": "Anomaly Detection for Agile Satellite Attitude Control System Using Hybrid Deep-Learning Technique",
+    "authors": [
+     "Moamen Ibrahim Mohamed",
+     "Khaled Mahmoud Badran",
+     "Ahmed Esmat Hussien"
+    ],
+    "container": "Journal of Aerospace Information Systems",
+    "volume": "20",
+    "issue": "12",
+    "pages": "890-904",
+    "year": 2023,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -3553,19 +3554,22 @@
     "event": null
    },
    {
-    "doi": "10.2514/1.i010531",
+    "doi": "10.2514/1.i010911",
     "type": "journal-article",
-    "title": "Distributed Observes for Cyberattack Detection and Isolation in Formation-Flying Unmanned Aerial Vehicles",
+    "title": "Detection and Tracking of Aircraft from Small Unmanned Aerial Systems",
     "authors": [
-     "Lebsework Negash",
-     "Sang-Hyeon Kim",
-     "Han-Lim Choi"
+     "Chester V. Dolph",
+     "Cyrus Minwalla",
+     "Louis J. Glaab",
+     "Michael J. Logan",
+     "B. Danette Allen",
+     "Khan M. Iftekharuddin"
     ],
     "container": "Journal of Aerospace Information Systems",
-    "volume": "14",
-    "issue": "10",
-    "pages": "551-565",
-    "year": 2017,
+    "volume": "18",
+    "issue": "11",
+    "pages": "838-851",
+    "year": 2021,
     "publisher": "American Institute of Aeronautics and Astronautics (AIAA)",
     "article_number": null,
     "event": null
@@ -4591,20 +4595,6 @@
   "query_title": "RF-DETR: Neural Architecture Search for Real-Time Detection Transformers",
   "candidates": [
    {
-    "doi": "10.1109/tgrs.2025.3560928/v1/review2",
-    "type": "peer-review",
-    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
-    "authors": [],
-    "container": "",
-    "volume": null,
-    "issue": null,
-    "pages": null,
-    "year": 2025,
-    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
-    "article_number": null,
-    "event": null
-   },
-   {
     "doi": "10.1109/tgrs.2025.3560928/v1/review1",
     "type": "peer-review",
     "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
@@ -4614,6 +4604,20 @@
     "issue": null,
     "pages": null,
     "year": 2024,
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "article_number": null,
+    "event": null
+   },
+   {
+    "doi": "10.1109/tgrs.2025.3560928/v1/review2",
+    "type": "peer-review",
+    "title": "Review for \"OWRT-DETR: A Novel Real-Time Transformer Network for Small-Object Detection in Open-Water Search and Rescue From UAV Aerial Imagery\"",
+    "authors": [],
+    "container": "",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "year": 2025,
     "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
     "article_number": null,
     "event": null
@@ -4901,18 +4905,18 @@
     "event": null
    },
    {
-    "doi": "10.21203/rs.3.rs-10916252/v1",
+    "doi": "10.2139/ssrn.7137418",
     "type": "posted-content",
-    "title": "One Vector Is All You Need for O(1) Self-Attention: The Ocean State",
+    "title": "Year 2026: Attention to AI Over-Reliance is All You Need in AI Education!",
     "authors": [
-     "SHUYUAN YU"
+     "Tee Hui Teo"
     ],
     "container": "",
     "volume": null,
     "issue": null,
     "pages": null,
     "year": 2026,
-    "publisher": "Springer Science and Business Media LLC",
+    "publisher": "Elsevier BV",
     "article_number": null,
     "event": null
    }
