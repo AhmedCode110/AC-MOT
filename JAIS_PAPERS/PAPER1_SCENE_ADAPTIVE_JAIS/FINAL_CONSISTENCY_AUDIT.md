@@ -1,6 +1,6 @@
 # Final consistency audit — Paper 1 (cross-pipeline integration)
 
-Manuscript state audited: commit 6a85d1a (manuscript.tex, tables/tab8_crosspipeline.tex).
+Manuscript state audited: commit 6a85d1a; re-checked after the approved trims at 4e747a6 (manuscript.tex, tables/tab8_crosspipeline.tex).
 Sources: `research/transfer_legacy/rescore/` (commit 97853c6, unchanged since; reproduction gates all true),
 `research/paper_split/evidence/legacy/MATCHED_STATIC_A0_TESTDEV.json`, and the Drive files listed in
 `result_provenance.md` and `research/transfer_legacy/U2MOT_SPARSETRACK_EVIDENCE_AUDIT.md`.
@@ -105,3 +105,18 @@ Items 1–4 together reach about 26 pages.
   baseline HOTA 69.17 here vs 68.88 there).
 - `research/transfer_legacy/rescore/` byte-identical to commit 97853c6; sanitized copies in
   `research/transfer_legacy/rescore_public/` with a sha256 manifest.
+
+## 11. After the approved trims 1–4 (commit 4e747a6)
+
+Applied: Introduction roadmap removed and the reading paragraph condensed; cue-audit subsection tightened with every
+number kept; Limitations "small validation set" and "statistical resolution" merged into "sample size", provenance
+item shortened; Table 8 notes b and c condensed with every setting kept. No number, interval or claim changed;
+limitations on the post hoc anchor, the custom VisDrone protocol, U2MOT recalibration and SparseTrack in-sample status
+are unchanged. `scripts/check_crosspipe_numbers.py`: 17/17 OK. Abstract 200 words.
+
+Official build run 36847293222 (commit 4e747a6, PDF in 0c78be4): exit 0, 0 errors, 0 undefined references, 0 overfull
+boxes, **28 pages** (last page now ~340 words instead of ~380; about 27.8 filled pages).
+
+Supplementary moves tested locally and not applied: removing Table 6 leaves 28 pages; removing Fig. 6 leaves 28 pages;
+removing both leaves 28 pages (last page ~84 words); reducing all figure widths from 0.95 to 0.80 of the text width
+leaves 28 pages. Because none of these reaches 26 pages, Table 6 and Fig. 6 were kept in the paper.

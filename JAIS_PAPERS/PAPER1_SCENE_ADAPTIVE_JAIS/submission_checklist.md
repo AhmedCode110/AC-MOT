@@ -3,7 +3,7 @@
 | Item | Requirement | Status |
 |---|---|---|
 | Template | AIAA `new-aiaa.cls` with `[journal]`: 10 pt, one column, double spaced, letter paper | done (`manuscript.tex`) |
-| Compiles | `pdflatex → bibtex → pdflatex ×2`, no errors, no overfull boxes | pdfTeX: 0 errors, 0 undefined references, 0 overfull boxes, 28 pages (local TeX Live 2023; official workflow run recorded in FINAL_CONSISTENCY_AUDIT.md) |
+| Compiles | `pdflatex → bibtex → pdflatex ×2`, no errors, no overfull boxes | pdfTeX: 0 errors, 0 undefined references, 0 overfull boxes, 28 pages (official run 36847293222 at 4e747a6) |
 | Title | ≤ 12 words, no abbreviations | 12 words: "Calibration Versus Scene Switching of Detector Operating Points for Aerial Multi-Object Tracking" |
 | Abstract | one paragraph, 100–200 words, no references, no undefined abbreviations | 200 words, abbreviations spelled out |
 | Nomenclature | symbols with definitions | done |
@@ -17,7 +17,7 @@
 | Related manuscript | disclosed in cover letter | done |
 | Author block | names and affiliations | Ahmed Gouda Ismail, Mohamed S. Mohamed (Military Technical College), Tarek Ahmed Mahmoud (Egypt University of Informatics), as in the authors' ICMISI 2026 paper; cities to be confirmed by the authors |
 | AIAA membership footnote, funding, conflict-of-interest statement | journal forms | to be completed by the authors at submission |
-| Length | AIAA guideline (Rev. Aug. 2024, `JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`): regular article 7–10 published pages, 10,000–12,000 words; = 20–26 double-spaced 10-pt serif manuscript pages, all pages counted | 28 manuscript pages: 2 over the recommended 20–26 (a recommendation, not a hard limit); trim candidates in FINAL_CONSISTENCY_AUDIT.md §10 |
+| Length | AIAA guideline (Rev. Aug. 2024, `JAIS_PAPERS/refs/aiaa_rules/limits_2024.txt`): regular article 7–10 published pages, 10,000–12,000 words; = 20–26 double-spaced 10-pt serif manuscript pages, all pages counted | 28 manuscript pages: 2 over the recommended 20–26 (a recommendation, not a hard limit); approved trims 1–4 applied; remaining options in FINAL_CONSISTENCY_AUDIT.md §11 |
 | Fees | AIAA: "The only potential fee associated with publication of journal articles is that required if publishing with an Open Access status" (voluntary APC $2,700; `refs/aiaa_rules/open_access.txt`) | no page or overlength charge; do not select Open Access to avoid any fee |
 
 Build: `python JAIS_PAPERS/refs/make_bib.py manuscript.tex references.bib` (only if citations change), then
