@@ -1,6 +1,9 @@
 name: Frozen V7f on VisDrone val-7 only (development split)
 on:
   workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/v7_aerial_val.yml"]
 permissions:
   contents: write
 jobs:
