@@ -1,4 +1,4 @@
-\begin{thebibliography}{38}
+\begin{thebibliography}{42}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -280,5 +280,29 @@ Zhao, Y., Lv, W., Xu, S., Wei, J., Wang, G., Dang, Q., Liu, Y., and Chen, J.,
   IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, IEEE,
   2024, pp. 16965--16974.
 \newblock \doi{10.1109/cvpr52733.2024.01605}.
+
+\bibitem[{Liu et~al.(2023)Liu, Jin, Fu, Chen, Jiang, and Ye}]{liu2023u2mot}
+Liu, K., Jin, S., Fu, Z., Chen, Z., Jiang, R., and Ye, J.,
+  \enquote{{Uncertainty-aware Unsupervised Multi-Object Tracking},} \emph{2023
+  IEEE/CVF International Conference on Computer Vision (ICCV)}, IEEE, 2023, pp.
+  9962--9971.
+\newblock \doi{10.1109/iccv51070.2023.00917}.
+
+\bibitem[{Ge et~al.(2021)Ge, Liu, Wang, Li, and Sun}]{ge2021yolox}
+Ge, Z., Liu, S., Wang, F., Li, Z., and Sun, J., \enquote{{YOLOX: Exceeding YOLO
+  Series in 2021},} arXiv preprint arXiv:2107.08430, 2021.
+
+\bibitem[{Liu et~al.(2025)Liu, Wang, Wang, Liu, and Bai}]{liu2025sparsetrack}
+Liu, Z., Wang, X., Wang, C., Liu, W., and Bai, X., \enquote{{SparseTrack:
+  Multi-Object Tracking by Performing Scene Decomposition Based on
+  Pseudo-Depth},} \emph{IEEE Transactions on Circuits and Systems for Video
+  Technology}, Vol.~35, No.~5, 2025, pp. 4870--4882.
+\newblock \doi{10.1109/tcsvt.2024.3524670}.
+
+\bibitem[{Milan et~al.(2016)Milan, Leal-Taixe, Reid, Roth, and
+  Schindler}]{milan2016mot16}
+Milan, A., Leal-Taixe, L., Reid, I., Roth, S., and Schindler, K.,
+  \enquote{{MOT16: A Benchmark for Multi-Object Tracking},} arXiv preprint
+  arXiv:1603.00831, 2016.
 
 \end{thebibliography}
