@@ -120,3 +120,10 @@ boxes, **28 pages** (last page now ~340 words instead of ~380; about 27.8 filled
 Supplementary moves tested locally and not applied: removing Table 6 leaves 28 pages; removing Fig. 6 leaves 28 pages;
 removing both leaves 28 pages (last page ~84 words); reducing all figure widths from 0.95 to 0.80 of the text width
 leaves 28 pages. Because none of these reaches 26 pages, Table 6 and Fig. 6 were kept in the paper.
+
+## 12. U2MOT comparator vs hard tier (Table 8 note b)
+
+Note b now states that the comparator is the separate configuration released by the U2MOT authors, not the
+controller's third operating point: same confidence (0.09) and input (1600×896), different NMS (0.70 vs 0.60).
+Sources: BASELINE_RUN_SUMMARY.txt (comparator), acmot_full_policy_calibrated.py / FROZEN_CONFIG.json (tiers).
+No number changed; check script 17/17 OK.
