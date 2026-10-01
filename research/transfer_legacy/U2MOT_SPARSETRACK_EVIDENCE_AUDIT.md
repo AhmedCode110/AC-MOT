@@ -348,3 +348,35 @@ MOT20_PRE_ACQUISITION_STATUS.json `1y_I6CACSCIdw3Osfo7tDkGB6-BIAKJOA`.
 Upstream U2MOT code checked: `tools/track.py` (parse_benchmark, lines
 344–404; tracker built in image_track at line 196 after the override) and
 `tools/utils/eval_visdrone.py` at commit 7411211.
+
+## 6. Interpretation rules, fixed before the re-scoring is run
+
+Written on 2026-10-01, before any output of
+`tools/legacy_rescore/rescore_legacy_pipelines.py` exists for the real data.
+
+1. Primary metric HOTA (as in Paper 1); MOTA and IDF1 secondary. Every
+   comparison is reported as Δ, 95 % sequence-bootstrap CI (10 000
+   resamples, seed 0), win/tie/loss, and leave-one-out range.
+2. A row is used only if its reproduction check matches the archived
+   numbers. If the U2MOT controller row does not reproduce, the archived
+   controller numbers are reported as not reproducible and the row is not
+   used.
+3. CI of ΔHOTA includes 0 → "no measurable change in aggregate accuracy".
+   CI excludes 0 → the direction and size are reported as measured, for that
+   pipeline only, without generalisation.
+4. U2MOT comparator wording: "the author-calibrated static operating point
+   of U2MOT" (conf 0.09, NMS 0.70, 1600×896, which is also the controller's
+   hard tier), not "a matched static anchor"; the controller is described
+   as a separately recalibrated controller of the same design family, never
+   as the Paper 1 controller transferred unchanged. ΔMOTA from the archive
+   is −0.11 (exact counts), not −0.13.
+5. SparseTrack: primary pair Adaptive Edge V1 vs static NMS 0.75 (named in
+   the frozen manifest). Reported as a supporting validation experiment
+   (in-sample threshold), not as held-out or external evidence, until the
+   MOT17 test or MOT20 result exists. The static 0.70 → 0.75 change is
+   descriptive (different run batches).
+6. No test-dev speed claim for U2MOT until a matched test-dev timing exists;
+   the +25.8 % applies to validation only.
+7. Response to the "one detector + one tracker" comment: the concern is
+   reduced, not resolved, because the same qualitative outcome recurs in
+   other pipelines while the policies are not identical.

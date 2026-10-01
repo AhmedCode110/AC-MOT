@@ -153,6 +153,7 @@ def test_sparsetrack_reproduction_and_pairs(tmp_path):
     args.gt_root = gt_root
     args.run = [f"{k}={v}" for k, v in runs.items()]
     args.pair = ["adaptive:static075", "static075:static075"]
+    args.archived = []
     args.out_dir, args.bootstrap, args.seed = tmp_path / "out", 300, 0
     rep = rescore.run_sparsetrack(args, trackeval)
 

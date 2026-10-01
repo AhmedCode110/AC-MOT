@@ -67,7 +67,8 @@ P=/content/drive/MyDrive/AC-MOT-SparseTrack-NEW
 cd /content/AC-MOT
 python tools/legacy_rescore/rescore_legacy_pipelines.py --trackeval-dir /content/TrackEval \
   sparsetrack --gt-root "$P/data/MOT17/train" \
-    --run static070="<track_results of the S1 static NMS 0.70 run>" \
+    --run static070="$P/runs/S1_RUNTIME_20260916T125449Z/track_results" \
+    --archived static070="$P/runs/S1_RUNTIME_20260916T125449Z/S1_RUNTIME_METRICS_NUMPY2_COMPAT.csv" \
     --run static075="$P/adaptive/STEP7K_H_STATIC075_20260917T093716Z/STATIC_075/NMS_075/track_results" \
     --run static080="$P/sensitivity/STEP7B_NMS_FULLVAL/NMS_080/track_results" \
     --run adaptive="$P/adaptive/STEP7K_E_FIX2_MATCHED_DETERMINISTIC_20260917T090646Z/ADAPTIVE_EDGE_V1/NMS_070/track_results" \

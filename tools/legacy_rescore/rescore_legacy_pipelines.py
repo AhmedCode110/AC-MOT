@@ -385,8 +385,8 @@ def sparsetrack_trackeval(trackeval, gt_root, runs, seqs, workdir):
     return metrics, per_seq
 
 
-def read_archived_metrics_csv(run_dir):
-    p = Path(run_dir) / "metrics.csv"
+def read_archived_metrics_csv(p):
+    p = Path(p)
     if not p.is_file():
         return None
     return pd.read_csv(p).set_index("sequence")
@@ -398,6 +398,7 @@ def run_sparsetrack(args, trackeval):
     for spec in args.run:
         name, path = spec.split("=", 1)
         runs[name] = Path(path)
+    archived = dict(spec.split("=", 1) for spec in (args.archived or []))
     for name, d in runs.items():
         missing = [s for s in seqs if not (d / f"{s}.txt").is_file()]
         if missing:
@@ -426,7 +427,8 @@ def run_sparsetrack(args, trackeval):
             "trackeval_overall": te_headline(te_combine(metrics, per_seq[name], seqs)),
         }
         write_per_sequence_csv(out_dir / f"sparsetrack_{name}_per_sequence.csv", per_seq[name], summ, seqs, metrics)
-        arch = read_archived_metrics_csv(d.parent)
+        arch_path = Path(archived.get(name, d.parent / "metrics.csv"))
+        arch = read_archived_metrics_csv(arch_path)
         if arch is not None:
             rows = {}
             for s in seqs + ["OVERALL"]:
@@ -440,7 +442,7 @@ def run_sparsetrack(args, trackeval):
                     "fn": [int(r["num_misses"]), int(a["num_misses"]), int(r["num_misses"]) == int(a["num_misses"])],
                 }
             report["reproduction"][name] = {
-                "archived_file": str(d.parent / "metrics.csv"),
+                "archived_file": str(arch_path),
                 "all_match": all(v[2] for row in rows.values() for v in row.values()),
                 "rows": rows,
             }
@@ -467,6 +469,8 @@ def main(argv=None):
     s = sub.add_parser("sparsetrack")
     s.add_argument("--gt-root", required=True, help="MOT17/train (contains <seq>/gt/gt_val_half.txt)")
     s.add_argument("--run", action="append", required=True, help="name=path/to/track_results (repeatable)")
+    s.add_argument("--archived", action="append", default=[],
+                   help="name=path to the archived per-sequence metrics CSV (default: metrics.csv next to the run)")
     s.add_argument("--pair", action="append", default=[], help="a:b paired comparison a minus b (repeatable)")
     s.add_argument("--out-dir", required=True)
     args = p.parse_args(argv)
