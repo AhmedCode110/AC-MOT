@@ -61,10 +61,15 @@ file-CMC on test-dev for both systems.
 | hard | otherwise | 0.09 | 0.60 | (896, 1600) |
 
 SCI: `SceneComplexityV1(analysis_interval=10, smoothing_window=7)` with the
-V1 weights unchanged (SCI_CALIBRATION.txt). The tracker is not adapted.
+weights of `SceneComplexityV1` in 07_CODE_SNAPSHOT/acmot_v1.py
+(crowd 0.1295, tiny 0.2217, edge 0.4337, night 0.0536, blur 0.1615 — the
+weights of research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json,
+trial 24), applied to fixed cue transforms (crowd = count/30, tiny = share of
+boxes < 32², edge = Canny density/0.14, night = gray mean < 80, blur =
+Laplacian variance < 180), unchanged per SCI_CALIBRATION.txt. The tracker is not adapted.
 
 What was transferred and what was not:
-- transferred unchanged: the V1 SCI cues and weights;
+- transferred unchanged: the cue weights listed above and the fixed cue transforms;
 - recalibrated on U2MOT validation: the two SCI boundaries (unsupervised
   q33/q67 of the validation SCI with actions disabled; no GT, MOTA, IDF1 or
   IDS used — SCI_CALIBRATION.txt). The V1 boundaries were 0.1353 / 0.2873;
@@ -287,13 +292,10 @@ Claims the files do **not** support:
 - any official VisDrone or MOTChallenge number for these two pipelines.
 - a test-dev speed-up for U2MOT.
 
-Claim the files support, with the caveats above: across three different
-detector–tracker pipelines, scene-driven switching added no measurable
-accuracy over a well-calibrated static operating point (Paper 1's YOLOv8n +
-ByteTrack: −0.09 HOTA vs the matched static; U2MOT test-dev: −0.11 MOTA vs
-the author-calibrated static; SparseTrack val: +0.04 MOTA vs static 0.75,
-CI includes zero), while calibrating the static operating point itself
-moved accuracy (SparseTrack: +0.20 MOTA from NMS 0.70 to 0.75, descriptive).
+Superseded by the re-scoring (section 7). Before re-scoring this paragraph
+said that switching added no measurable accuracy across the three pipelines;
+that is not true for SparseTrack in HOTA against static NMS 0.75 and must not
+be used.
 
 ## 4. Work that would make these rows fully usable (no tuning involved)
 
@@ -380,3 +382,49 @@ Written on 2026-10-01, before any output of
 7. Response to the "one detector + one tracker" comment: the concern is
    reduced, not resolved, because the same qualitative outcome recurs in
    other pipelines while the policies are not identical.
+
+## 7. Re-scoring results (research/transfer_legacy/rescore/, commit 97853c6)
+
+Reproduction gate: passed for all systems (U2MOT baseline and controller;
+SparseTrack static 0.70, 0.75, 0.80, adaptive). Values below are TrackEval;
+Δ = first − second, 95 % sequence-bootstrap CI, W/T/L per sequence.
+
+U2MOT, VisDrone2019-MOT-test-dev, 17 sequences (held-out; post-hoc TrackEval
+HOTA of frozen outputs; U2MOT class/ignore filtering):
+
+| | HOTA | DetA | AssA | MOTA | IDF1 |
+|---|---|---|---|---|---|
+| author-calibrated static | 55.00 | 48.51 | 63.28 | 53.82 | 69.78 |
+| controller | 54.94 | 48.28 | 63.39 | 53.73 | 69.85 |
+| Δ | −0.06 [−0.31, +0.22], 9/0/8 | −0.23 [−0.57, +0.07] | +0.11 [−0.25, +0.51] | −0.09 [−0.68, +0.45] | +0.07 [−0.30, +0.46] |
+
+motmetrics (U2MOT protocol, exact): baseline MOTA 53.873, IDF1 69.775;
+controller 53.767, 69.849.
+
+SparseTrack, MOT17 val_half, 7 sequences (development; adaptive threshold
+chosen on these sequences; official TrackEval MOT17 preprocessing):
+
+| | HOTA | DetA | AssA | MOTA | IDF1 |
+|---|---|---|---|---|---|
+| static 0.70 (SparseTrack default) | 69.17 | 66.71 | 72.20 | 77.87 | 82.10 |
+| static 0.75 | 68.96 | 66.57 | 71.93 | 77.94 | 81.97 |
+| static 0.80 | 68.92 | 66.63 | 71.78 | 78.06 | 81.93 |
+| Adaptive Edge V1 | 69.10 | 66.75 | 72.04 | 78.12 | 82.01 |
+
+| pair | ΔHOTA | ΔMOTA |
+|---|---|---|
+| adaptive − static 0.75 | +0.13 [+0.02, +0.24], 6/0/1 | +0.18 [+0.08, +0.28] |
+| adaptive − static 0.70 | −0.07 [−0.54, +0.19], 4/0/3 | +0.25 [+0.09, +0.35], 7/0/0 |
+| static 0.75 − static 0.70 | −0.20 [−0.62, +0.01], 2/0/5 | +0.07 [−0.13, +0.19] |
+| static 0.80 − static 0.70 | −0.25 [−0.52, +0.19], 2/0/5 | +0.19 [+0.07, +0.35] |
+
+Reading. In HOTA the best static operating point of the sweep is the
+default NMS 0.70, not 0.75; static 0.75 was the comparator named in the
+frozen manifest because it was chosen by MOTA. Against static 0.75 the
+adaptive rule gains +0.13 HOTA (CI excludes 0); against the HOTA-best static
+0.70 it is −0.07 (CI includes 0). In MOTA the adaptive rule is above every
+static setting. So the SparseTrack gain depends on the metric and on which
+static point is the comparator; it does not show that switching beats the
+best static operating point in HOTA. All of this is in-sample validation.
+The earlier statement "static 0.70 → 0.75 adds +0.20 MOTA" was from
+motmetrics; in TrackEval HOTA the same change is −0.20.
