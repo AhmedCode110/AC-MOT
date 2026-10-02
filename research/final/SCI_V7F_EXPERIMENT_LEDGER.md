@@ -121,3 +121,49 @@ Reading: with these three levels, even a GT-informed allocation at matched compu
 HOTA point over the static operating point; at the SCI's own level counts it gains nothing. The headroom
 for scene-dependent allocation between 640 and 832 px is small relative to the resolution of a 7-sequence
 test, so a failure of a causal cue rule here says little about cues and much about headroom.
+
+## 2. General-SCI cycle (started after E-SCI-1 was archived)
+
+Rule for this cycle: no cue, weight, threshold, smoothing constant or compute profile is kept because it
+existed historically; each retained choice needs a documented reason (prior evidence, a declared
+engineering constraint, an ablation, a stability/transfer test or a measured accuracy–compute curve).
+Development data: val-7 only (row P6). No protected split is opened.
+
+### D-SCI-2 — cue audit at 640 / 736 / 832 px (`tools/sci_v7/cue_audit.py`)
+Target per 30-frame segment: benefit of more compute b = q(832) − q(640) (MOTA numerator of the static
+runs). 13 causal candidate cues: image (edges, darkness, blur, global motion, motion unreliability),
+canonical detections in the score layer's own bands (primary density per megapixel, relative size,
+ambiguous share), tracks (density, relative size, churn) and a label-free probe (new primary candidates
+revealed by one extra pass at the next level). Within-sequence Spearman over 14 (detector, sequence)
+cells, V7f layer (`dev_local_5a8502f/cue_audit_V7f_3levels.json`):
+
+| cue | mean ρ | cells +/− | YOLOv8n | RT-DETR-L |
+|---|---|---|---|---|
+| img_edges | −0.02 | 7/7 | +0.22 | −0.26 |
+| img_motion_unrel | +0.21 | 10/3 | +0.16 | +0.25 |
+| det_density | +0.15 | 10/4 | +0.21 | +0.09 |
+| det_small | −0.10 | 6/8 | −0.06 | −0.15 |
+| trk_density | +0.07 | 7/7 | +0.24 | −0.10 |
+| probe_up | −0.01 | 5/4 | −0.07 | +0.12 |
+| others | |ρ| ≤ 0.07 | split | | |
+
+No cue reaches |ρ| = 0.3, and the sign of most cues changes between detectors. The NATIVE layer gives the
+same picture (`cue_audit_NATIVE_3levels.json`). This repeats the E24–E26 audit under V7f, with
+score-free and probe cues added.
+
+### D-SCI-3 — is the compute benefit a property of the scene?
+Spearman of the segment benefit b between two runs that see the same frames:
+
+| pair | within-sequence mean ρ (cells +/−) | pooled ρ |
+|---|---|---|
+| same detector, V7f vs NATIVE layer (YOLOv8n) | +0.56 (6/1) | +0.64 |
+| same detector, V7f vs NATIVE layer (RT-DETR-L) | +0.54 (7/0) | +0.55 |
+| same layer, YOLOv8n vs RT-DETR-L (V7f) | +0.10 (5/2) | +0.01 |
+| same layer, YOLOv8n vs RT-DETR-L (NATIVE) | −0.15 (3/4) | −0.06 |
+| 640→736 benefit vs 736→832 benefit (four cells) | −0.17 … −0.01 | −0.21 … +0.07 |
+
+The benefit of more compute is reproducible for one detector (it survives a change of score layer) but
+does not transfer between detectors: where extra resolution pays off is a property of the
+(scene, detector) pair, not of the scene. A detector-independent scene index therefore has no stable
+target to predict at these levels; this, together with the small oracle headroom (D-SCI-1), explains
+E-SCI-1 structurally.
