@@ -1,0 +1,110 @@
+name: G2 S3 - tile refinement and high-resolution full-frame caches (val-7, CPU runners)
+on:
+  workflow_dispatch:
+  push:
+    branches: [sci-v7f-general-layer-dev]
+    paths: [".github/workflows/g2_tiles.yml"]
+permissions:
+  contents: write
+env:
+  ZIP_SHA: e53571990dfc79229e0a8ae10264bc4fa604a027c44b06e3a097417e4fa55705
+  YOLO_SHA: f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36
+  RTDETR_SHA: 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        seq: [uav0000086_00000_v, uav0000117_02622_v, uav0000137_00458_v, uav0000182_00000_v,
+              uav0000268_05773_v, uav0000305_00000_v, uav0000339_00001_v]
+        part: ["yolov8 --tile-res 736 --full-res 1088 1216 1344", "rtdetr --tile-res 736",
+               "rtdetr --full-res 1088", "rtdetr --full-res 1216", "rtdetr --full-res 1344"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
+      - name: Frames + environment
+        run: |
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip "*${{ matrix.seq }}*" -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' "$GITHUB_WORKSPACE/research/final/env/repo_venv.txt" > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          curl -fsSL -o ~/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+          curl -fsSL -o ~/rtdetr-l.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/rtdetr-l.pt
+          echo "$YOLO_SHA  $HOME/yolov8n.pt" | sha256sum -c -
+          echo "$RTDETR_SHA  $HOME/rtdetr-l.pt" | sha256sum -c -
+      - name: Build
+        run: |
+          set -- ${{ matrix.part }}; DET=$1; shift
+          W=$([ "$DET" = yolov8 ] && echo ~/yolov8n.pt || echo ~/rtdetr-l.pt)
+          PYTHONPATH=$PWD ~/venv/bin/python tools/g2/build_tile_cache.py --weights $W --det $DET --dataset "$DATA" \
+            --out ~/g2c --seqs ${{ matrix.seq }} "$@" 2>&1 | grep -v -i warn
+      - uses: actions/upload-artifact@v4
+        with: {name: "g2c-${{ strategy.job-index }}", path: ~/g2c, retention-days: 30}
+
+  latency:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {det: yolov8, weights: yolov8n.pt}
+          - {det: rtdetr, weights: rtdetr-l.pt}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
+      - name: Measure (one host per detector)
+        run: |
+          set -e
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip "*uav0000086_00000_v*" -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)")
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' research/final/env/repo_venv.txt > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          curl -fsSL -o ~/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+          curl -fsSL -o ~/rtdetr-l.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/rtdetr-l.pt
+          echo "$YOLO_SHA  $HOME/yolov8n.pt" | sha256sum -c -
+          echo "$RTDETR_SHA  $HOME/rtdetr-l.pt" | sha256sum -c -
+          mkdir -p ~/lat
+          PYTHONPATH=$PWD ~/venv/bin/python tools/g2/latency.py --weights ~/${{ matrix.weights }} --det ${{ matrix.det }} \
+            --dataset "$D" --seq uav0000086_00000_v --frames 65 \
+            --full 512 576 640 704 736 768 832 896 960 1088 1216 1344 --tile 736 --out ~/lat/latency_${{ matrix.det }}.json 2>&1 | grep -v -i warn
+          lscpu | sed -n 's/^Model name: *//p' > ~/lat/host_${{ matrix.det }}.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: "g2lat-${{ matrix.det }}", path: ~/lat, retention-days: 30}
+
+  merge:
+    needs: [build, latency]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {path: ~/art}
+      - name: Merge, release, record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          mkdir -p ~/g2c && for a in ~/art/g2c-*; do cp -r "$a"/* ~/g2c/; done
+          find ~/g2c -name '*.npz' | wc -l
+          test "$(find ~/g2c -name '*.npz' | wc -l)" = 56
+          O=research/final/g2/s3_cache; mkdir -p $O
+          cp ~/art/g2lat-*/* $O/
+          (cd ~ && tar -cf g2_s3_val7.tar g2c && sha256sum g2_s3_val7.tar) | tee $O/g2_s3_val7.tar.sha256
+          gh release view g2-s3-1 >/dev/null 2>&1 || gh release create g2-s3-1 --prerelease \
+            --title "G2 S3: tile refinement and high-resolution full-frame caches (val-7)" \
+            --notes "tools/g2/build_tile_cache.py; development split val-7 only" --target "${GITHUB_SHA}"
+          gh release upload g2-s3-1 ~/g2_s3_val7.tar --clobber
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f $O && git commit -m "G2 S3 caches: tiles and 1088-1344 px, latency on one host per detector (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 7; done
