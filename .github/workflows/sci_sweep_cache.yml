@@ -52,12 +52,12 @@ jobs:
       - name: Frames + environment
         run: |
           echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
-          mkdir -p ~/w && cd ~/w && unzip -q ~/val.zip && rm ~/val.zip
+          mkdir -p ~/w && unzip -q ~/val.zip -d ~/w && rm ~/val.zip
           D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
           python3 -m venv ~/venv
           ~/venv/bin/pip install -q --upgrade pip
           ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
-          grep -v -E '^(torch|torchvision)==' research/final/env/repo_venv.txt > ~/req.txt
+          grep -v -E '^(torch|torchvision)==' "$GITHUB_WORKSPACE/research/final/env/repo_venv.txt" > ~/req.txt
           ~/venv/bin/pip install -q -r ~/req.txt || true
           curl -fsSL -o ~/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
           curl -fsSL -o ~/rtdetr-l.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/rtdetr-l.pt
