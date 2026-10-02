@@ -77,3 +77,47 @@ Follow-up policy: no threshold or weight of the SCI rule is changed after this c
 structural follow-up may be run, declared in this ledger with its hypothesis before it is scored.
 
 ## 1. Runs
+
+### E-SCI-1 — pre-registered historical SCI + V7f (candidate C1 = 5a8502f)
+Development run in the container (4 vCPU, cached detections; no timing), results in
+`research/final/sci_v7f/dev_local_5a8502f/`. Authoritative cloud run of the same commit:
+`.github/workflows/sci_v7_val.yml` → `research/final/sci_v7f/C1_5a8502f/`.
+Reproduction check: `V7f+MEDIUM` and `NATIVE+MEDIUM` reproduce the V7 record (`tools/v7/dev.py`, 736 px)
+exactly (identical track files; GitHub run 36995662755 gives the same NATIVE / V7f table).
+
+Internal protocol, pooled 14 cells, Δ = B − A with 95% CI (10,000 resamples):
+
+| Comparison | ΔHOTA | ΔIDF1 | compute B / A |
+|---|---|---|---|
+| D − C (V7f+SCI − V7f+MEDIUM) | −0.17 [−0.56, +0.21] | −0.19 [−0.88, +0.60] | 0.979 / 1.000 (YOLOv8n), 1.012 / 1.000 (RT-DETR-L) |
+| B − A (NATIVE+SCI − NATIVE+MEDIUM) | −0.22 [−0.45, −0.01] | −0.27 [−0.71, +0.11] | 0.949, 1.026 |
+| D − PERM1 / PERM2 / PERM3 | −0.03 [−0.31, +0.24] / +0.04 [−0.25, +0.33] / +0.05 [−0.32, +0.48] | −0.33 / −0.06 / +0.08 (all CIs contain 0) | equal |
+| D − B (V7f gain under SCI switching) | +3.03 [+1.73, +4.62] | +4.62 [+2.50, +7.24] | equal |
+| C − A (V7f gain at fixed 736) | +2.98 [+1.76, +4.47] | +4.54 [+2.54, +6.85] | equal |
+
+SCI level use: YOLOv8n LOW/MEDIUM/HIGH 0.17/0.75/0.08, RT-DETR-L 0.08/0.80/0.12 (with V7f); the first
+30 frames of every sequence are LOW by construction (start level LOW, 30-frame dwell).
+Static curve with V7f (HOTA, internal): YOLOv8n 32.0 / 33.9 / 35.3 and RT-DETR-L 40.2 / 41.1 / 41.3 at
+640 / 736 / 832 px (compute 0.756 / 1.000 / 1.278). Catastrophic sequences (MOTA < 0): C 0, D 0.
+
+Outcome under the pre-registered rule: neither CASE 1 (no accuracy gain) nor CASE 2 (no compute saving:
+the rule sits at MEDIUM most of the time). D equals its budget-matched scene-blind controls (CASE 3),
+and SCI without V7f is slightly below fixed 736 px (B − A HOTA CI just below 0). V7f's host protection
+is unchanged under resolution switching (D − B ≈ C − A). Decision: historical SCI + V7f is NOT adopted;
+V7f at a fixed level stays the candidate. Archived unchanged.
+
+### D-SCI-1 — headroom diagnostic (GT oracle; run after E-SCI-1, before any new SCI design)
+`tools/sci_v7/oracle.py`: per-frame MOTA numerator (TP − FP − IDS) of the static runs at 640 / 736 / 832,
+summed over 30-frame segments; levels assigned by that GT benefit. Not a controller (uses labels,
+in-sample), only an upper bound on what any segment-level allocation could gain here.
+
+| Comparison (pooled) | ΔHOTA | ΔIDF1 |
+|---|---|---|
+| V7f+ORACLEM − V7f+MEDIUM (same compute as fixed 736: 0.999 / 0.998) | +0.47 [+0.005, +0.97] | +1.04 [+0.22, +1.97] |
+| V7f+ORACLE − V7f+SCI (same level counts as SCI) | −0.01 [−0.36, +0.38] | +0.03 [−0.58, +0.68] |
+| NATIVE+ORACLEM − NATIVE+MEDIUM | +0.14 [−0.73, +0.82] | +0.62 [−0.34, +1.57] |
+
+Reading: with these three levels, even a GT-informed allocation at matched compute gains about half a
+HOTA point over the static operating point; at the SCI's own level counts it gains nothing. The headroom
+for scene-dependent allocation between 640 and 832 px is small relative to the resolution of a 7-sequence
+test, so a failure of a causal cue rule here says little about cues and much about headroom.

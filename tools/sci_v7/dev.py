@@ -15,6 +15,8 @@ A system is '<layer>+<levels>':
   layer   NATIVE (host pass-through) or V7f (frozen record, tools/v7/systems.py)
   levels  SCI            scene layer (acmot_sci.SceneLayer)
           LOW|MEDIUM|HIGH one fixed level
+          ORACLE|ORACLEM GT-derived headroom diagnostics (tools/sci_v7/oracle.py),
+                         never a controller
           PERM<k>        budget-matched scene-blind control: the level
                          schedule of '<layer>+SCI' on the same sequence and
                          detector, cut into 30-frame segments whose order is
@@ -77,7 +79,7 @@ def parse(system):
     from tools.v7.systems import SYSTEMS
     if layer not in ("NATIVE", "V7f"):
         raise ValueError(layer)
-    if not (levels in ("SCI", "LOW", "MEDIUM", "HIGH") or
+    if not (levels in ("SCI", "LOW", "MEDIUM", "HIGH", "ORACLE", "ORACLEM") or
             (levels.startswith("PERM") and levels[4:].isdigit())):
         raise ValueError(levels)
     return layer, dict(SYSTEMS[layer]), levels
@@ -124,6 +126,9 @@ def track_sequence(system, det, seq, trace=False):
         src = LevelSource(scene=SceneLayer())
     elif levels.startswith("PERM"):
         src = LevelSource(schedule=perm_schedule(layer, int(levels[4:]), det, seq))
+    elif levels.startswith("ORACLE"):     # GT-derived diagnostic schedule (tools/sci_v7/oracle.py)
+        src = LevelSource(schedule=json.loads(
+            (out_dir() / "oracle" / layer / det / f"{seq}.json").read_text())[levels])
     else:
         src = LevelSource(fixed=levels)
     pipe = SciV7Pipeline(
@@ -182,8 +187,8 @@ def _pool(fn, jobs):
 def run(systems, dets):
     _, seqs_of = _splits()
     seqs = seqs_of(SPLIT)
-    first = [s for s in systems if not parse(s)[2].startswith("PERM")]
-    perm = [s for s in systems if parse(s)[2].startswith("PERM")]
+    first = [s for s in systems if not parse(s)[2].startswith(("PERM", "ORACLE"))]
+    perm = [s for s in systems if parse(s)[2].startswith(("PERM", "ORACLE"))]
     for group in (first, perm):          # PERM reads the SCI schedule
         _pool(run_one, [(sy, d, s) for sy in group for d in dets for s in seqs])
 
