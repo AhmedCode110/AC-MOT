@@ -39,7 +39,12 @@ curl -fL --retry 3 -o "$WORK/SHA256SUMS" "$REL/SHA256SUMS"
 f=acmot_detcache_val_native.tar; sha=$(grep " $f" "$WORK/SHA256SUMS" | cut -c1-64)
 curl -fL --retry 3 -o "$WORK/$f" "$REL/$f"
 echo "$sha  $WORK/$f" | sha256sum -c -
-tar -xf "$WORK/$f" -C "$REPO"; rm -f "$WORK/$f"
+# the release tar was made on macOS: drop the AppleDouble "._*" entries, which GNU tar would otherwise
+# extract as fake ".npz" files that the detection-cache reader then fails to load
+tar -xf "$WORK/$f" -C "$REPO" --exclude='._*' 2>/dev/null; rm -f "$WORK/$f"
+find "$REPO/outputs" -name '._*' -delete
+test "$(find "$REPO/outputs/det_cache_val_native" -name '._*' | wc -l)" = 0
+test "$(ls "$REPO/outputs/det_cache_val_native/yolov8"/*.npz | wc -l)" = 7
 
 log "VisDrone2019-MOT-val annotations (official zip) + placeholder frame names"
 # VISDRONE_VAL_ZIP: path to your own copy of VisDrone2019-MOT-val.zip (e.g. on a mounted Google Drive in Colab);
