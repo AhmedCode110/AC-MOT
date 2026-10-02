@@ -25,6 +25,7 @@ jobs:
         res: ["640", "736", "832"]
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/cache/restore@v4
         with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
       - name: Frames + environment
@@ -127,6 +128,8 @@ jobs:
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 7; done
 
   runtime:
+    # runtime results of this workflow come from run 37009596192; a push re-runs only build + evaluate
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     strategy:
