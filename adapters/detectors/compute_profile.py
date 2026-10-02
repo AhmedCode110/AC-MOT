@@ -32,9 +32,9 @@ class ComputeProfileAdapter:
         self.cost = cost or (lambda r: float(r) ** 2)
 
     @classmethod
-    def from_config(cls, detector: str, supported=None, path=PROFILES):
+    def from_config(cls, detector: str, supported=None, path=PROFILES, key="resolution"):
         cfg = json.loads(Path(path).read_text())
-        return cls(cfg["detectors"][detector]["resolution"], supported)
+        return cls(cfg["detectors"][detector][key], supported)
 
     def resolution(self, level: str) -> int:
         return self.profile[level]

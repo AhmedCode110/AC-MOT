@@ -48,7 +48,14 @@ SPLIT = "val7"
 DETS = ["yolov8", "rtdetr"]
 SEGMENT = 30
 CODE = ["acmot_sci.py", "acmot_sci_v7.py", "acmot_v7.py", "adapters/detectors/compute_profile.py",
-        "configs/sci_v7_profiles.json", "tools/v7/systems.py", "tools/sci_v7/dev.py"]
+        "configs/sci_v7_profiles.json", "tools/v7/systems.py", "tools/sci_v7/dev.py",
+        "tools/sci_v7/sweep_cache.py"]
+# Detection source and level profile (defaults = the E-SCI-1 setting):
+#   SCI_CACHE=native  V7-record cache (640/736/832)
+#   SCI_CACHE=sweep   resolution-sweep cache under SCI_SWEEP_ROOT
+#   SCI_PROFILE=<key> level profile key in configs/sci_v7_profiles.json
+CACHE = os.environ.get("SCI_CACHE", "native")
+PROFILE = os.environ.get("SCI_PROFILE", "resolution")
 
 
 def guard(split):
@@ -80,13 +87,26 @@ def parse(system):
     if layer not in ("NATIVE", "V7f"):
         raise ValueError(layer)
     if not (levels in ("SCI", "LOW", "MEDIUM", "HIGH", "ORACLE", "ORACLEM") or
-            (levels.startswith("PERM") and levels[4:].isdigit())):
+            (levels.startswith("PERM") and levels[4:].isdigit()) or
+            (levels.startswith("R") and levels[1:].isdigit())):
         raise ValueError(levels)
     return layer, dict(SYSTEMS[layer]), levels
 
 
 def out_dir():
-    return ROOT / "outputs/sci_v7" / SPLIT
+    if CACHE == "native" and PROFILE == "resolution":
+        return ROOT / "outputs/sci_v7" / SPLIT
+    return ROOT / "outputs/sci_v7" / f"{SPLIT}__{CACHE}__{PROFILE}"
+
+
+def open_cache(det, seq):
+    SPLITS, _ = _splits()
+    nat = SPLITS[SPLIT]["native"]
+    if CACHE == "sweep":
+        from tools.sci_v7.sweep_cache import SweepCache
+        return SweepCache(os.environ["SCI_SWEEP_ROOT"], det, seq, f"{nat}/visual_cues/{seq}.npz")
+    from tools.run_policy_validation import CachedDetector
+    return CachedDetector(f"{nat}/{det}/{seq}.npz")
 
 
 def _path(system, det, seq, suffix=".pkl"):
@@ -115,13 +135,15 @@ def track_sequence(system, det, seq, trace=False):
     from adapters.detectors.compute_profile import ComputeProfileAdapter
     from adapters.trackers.bytetrack import ByteTrackAdapter
     from adapters.types import Detection
-    from tools.run_policy_validation import CachedDetector
     from tools.v7.systems import HOST_BYTETRACK as h
     layer, spec, levels = parse(system)
-    SPLITS, _ = _splits()
-    sp = SPLITS[SPLIT]
-    cd = CachedDetector(f"{sp['native']}/{det}/{seq}.npz")
-    adapter = ComputeProfileAdapter.from_config(det, supported=set(cd.by_res))
+    cd = open_cache(det, seq)
+    if levels.startswith("R") and levels[1:].isdigit():      # one fixed native resolution
+        r = int(levels[1:])
+        adapter = ComputeProfileAdapter({"LOW": r, "MEDIUM": r, "HIGH": r}, supported=set(cd.by_res))
+        levels = "MEDIUM"
+    else:
+        adapter = ComputeProfileAdapter.from_config(det, supported=set(cd.by_res), key=PROFILE)
     if levels == "SCI":
         src = LevelSource(scene=SceneLayer())
     elif levels.startswith("PERM"):
