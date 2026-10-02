@@ -1,0 +1,8 @@
+{
+ "about": "Detector-native settings of the generic compute levels used by the SCI + V7f layer. Resolutions are the three levels of the historical hand-designed AC-MOT controller (core.Controller: 640 / 736 / 832 px) and the levels cached for both detectors (outputs/det_cache_*_native: det_640, det_736, det_832). The reference operating point of the V7f record is 736 px (tools/v7/dev.py).",
+ "reference_resolution": 736,
+ "detectors": {
+  "yolov8": {"resolution": {"LOW": 640, "MEDIUM": 736, "HIGH": 832}},
+  "rtdetr": {"resolution": {"LOW": 640, "MEDIUM": 736, "HIGH": 832}}
+ }
+}
