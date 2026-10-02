@@ -189,3 +189,42 @@ Decision rules:
    such, not as compute adaptation.
 4. Any retained index is frozen (normalization bounds, weights, α) before the FCOS transfer (transfer lock
    first, no refit).
+
+### P-GSCI-2 outcome (`research/final/g2/gsci/p_gsci2_V7f.json`, `.md`)
+Weights fitted on the development pool (label-free): scene crowd .306, tiny .104, edges .142, dark .251,
+blur .197 (historical: .316 / .316 / .211 / .105 / .053); response `probe_up` .781, `det_ambig` .219;
+G: S .224, R .147, S·R .215, T .413.
+
+Target B (benefit of compute, q(960) − q(512)):
+
+| index | mean ρ YOLOv8n | mean ρ RT-DETR-L | mean ρ (14 cells) | cells with that sign | retained |
+|---|---|---|---|---|---|
+| H | +0.133 | −0.024 | +0.055 | 9/14 | no |
+| O | +0.086 | −0.046 | +0.020 | 8/14 | no |
+| G | +0.002 | +0.012 | +0.007 | 10/14 | no |
+| R (attribution) | +0.023 | +0.158 | +0.091 | 10/14 | no |
+| S·R (attribution) | +0.043 | +0.191 | +0.117 | 9/14 | no |
+G − O −0.013 [−0.328, +0.248]; O − H −0.034 [−0.122, +0.040].
+
+Target D (difficulty at 736 px, −Σq / Σn_GT):
+
+| index | mean ρ YOLOv8n | mean ρ RT-DETR-L | mean ρ (14 cells) | cells with that sign | retained |
+|---|---|---|---|---|---|
+| H | −0.134 | +0.225 | +0.045 | 7/14 | no |
+| O | −0.127 | +0.108 | −0.009 | 7/14 | no |
+| G | +0.152 | +0.297 | +0.224 | 11/14 | yes |
+| R (attribution) | +0.279 | +0.149 | +0.214 | 11/14 | yes |
+| S·R (attribution) | +0.125 | +0.274 | +0.199 | 9/14 | no |
+G − O +0.234 [−0.109, +0.641]; O − H −0.055 [−0.180, +0.068]; G − H +0.179 [−0.156, +0.547].
+
+Decisions by the pre-registered rules:
+- B: no index retained. Neither the objective weights nor the scene-response form locate the segments where
+  more compute pays off; with the S1/S2 gate failures, no G controller is run (rule 3).
+- D: G is retained as a difficulty index; the scene-only indices H and O are not (their sign differs between
+  the two detectors). The ordering G > O and O > H is not supported (CIs include 0). R alone matches G
+  (+0.214 vs +0.224), so the retained signal comes from the detector-response group; a separate contribution
+  of the S·R term is not established on this data.
+- Frozen for transfer (rule 4): `configs/g2_gsci_frozen.json` (sha256 d5b6daf75268d9723386d6c76a6eaa6831886cf05e8cd040819df77304375755; normalization bounds,
+  medians, group weights, composite bounds and G weights), `tools/g2/gsci_audit.py` (sha256 64e90dbb06db26d3445b431fb02df3c64e8d695d40dca7cf5684b3bc01177c77);
+  `indices(rows, frozen)` applies them without refit (test: the frozen parameters reproduce the development
+  indices exactly). Its FCOS test is a difficulty-index transfer, run only after the FCOS transfer lock.

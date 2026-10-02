@@ -29,3 +29,18 @@ def test_pca_weights_sum_to_one_and_index_in_unit_range():
     idx, w = sdc(X)
     assert abs(w.sum() - 1) < 1e-12
     assert idx.min() >= 0 and idx.max() <= 1
+
+
+def test_frozen_parameters_reproduce_the_development_indices():
+    import json
+    from pathlib import Path
+    from tools.g2.gsci_audit import indices
+    rows = json.loads((Path(__file__).resolve().parents[1] / "research/final/sci_v7f/general_sci/cue_audit_V7f_512_960.json").read_text())["rows"]
+    fit, _, params = indices(rows)
+    params = json.loads(json.dumps(params))
+    again, _, _ = indices(rows, params)
+    for k in fit:
+        assert np.allclose(fit[k], again[k], rtol=0, atol=1e-12)
+    shifted = [dict(r, img_edges=r["img_edges"] * 2) for r in rows]
+    moved, _, _ = indices(shifted, params)
+    assert not np.allclose(moved["G"], fit["G"])

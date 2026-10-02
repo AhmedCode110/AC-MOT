@@ -17,7 +17,7 @@ Indices per segment row of the wide-span cue audit:
 Targets: B = q(960) - q(512) (benefit of compute, from the audit rows) and
 D = -sum q(736) / sum n_GT (difficulty at the operating point), q = TP-FP-IDS.
 
-  python tools/g2/gsci_audit.py <audit rows json> [--json out]
+  python tools/g2/gsci_audit.py <audit rows json> [--json out] [--freeze params.json]
 """
 from __future__ import annotations
 
@@ -41,8 +41,9 @@ TRACKER = ["trk_churn"]
 SEG = 30
 
 
-def minmax(X):
-    lo, hi = X.min(0), X.max(0)
+def minmax(X, lo=None, hi=None):
+    lo = X.min(0) if lo is None else np.asarray(lo, float)
+    hi = X.max(0) if hi is None else np.asarray(hi, float)
     return (X - lo) / np.where(hi > lo, hi - lo, 1.0)
 
 
@@ -75,24 +76,46 @@ def sdc(X):
     return X @ w, w
 
 
-def matrix(rows, cues):
+def matrix(rows, cues, frozen=None):
     X = np.array([[r[c] for c in cues] for r in rows], float)
-    med = np.nanmedian(X, 0)
-    X = np.where(np.isnan(X), med, X)
-    return minmax(X)
+    if frozen is None:
+        med = np.nanmedian(X, 0)
+        X = np.where(np.isnan(X), med, X)
+        return minmax(X), dict(median=med.tolist(), lo=X.min(0).tolist(), hi=X.max(0).tolist())
+    X = np.where(np.isnan(X), frozen["median"], X)
+    return minmax(X, frozen["lo"], frozen["hi"]), frozen
 
 
-def indices(rows):
-    XS, XR, XT = matrix(rows, SCENE), matrix(rows, RESPONSE), matrix(rows, TRACKER)
+def _weighted(X, w):
+    if w is None:
+        return sdc(X)
+    w = np.asarray(w, float)
+    return X @ w, w
+
+
+def indices(rows, frozen=None):
+    """Indices for the rows. Without `frozen` every bound and weight is fitted
+    on the rows (development); with it they are taken as stored (transfer)."""
+    f = frozen or {}
+    XS, nS = matrix(rows, SCENE, f.get("norm_scene"))
+    XR, nR = matrix(rows, RESPONSE, f.get("norm_response"))
+    XT, nT = matrix(rows, TRACKER, f.get("norm_tracker"))
     H = XS @ (HIST_W / HIST_W.sum())
-    O, wS = sdc(XS)
-    R, wR = sdc(XR)
-    T, wT = sdc(XT)
-    S, R, T = (minmax(v[:, None])[:, 0] for v in (O, R, T))
-    G, wG = sdc(np.column_stack([S, R, S * R, T]))
+    O, wS = _weighted(XS, f.get("w_scene"))
+    R, wR = _weighted(XR, f.get("w_response"))
+    T, wT = _weighted(XT, f.get("w_tracker"))
+    comp = np.column_stack([O, R, T])
+    clo = comp.min(0) if frozen is None else np.asarray(f["composite_lo"])
+    chi = comp.max(0) if frozen is None else np.asarray(f["composite_hi"])
+    S, R, T = minmax(comp, clo, chi).T
+    G, wG = _weighted(np.column_stack([S, R, S * R, T]), f.get("w_G"))
     weights = dict(scene=dict(zip(SCENE, wS)), response=dict(zip(RESPONSE, wR)), tracker=dict(zip(TRACKER, wT)),
                    G=dict(zip(["S", "R", "SxR", "T"], wG)), historical=dict(zip(SCENE, HIST_W / HIST_W.sum())))
-    return dict(H=H, O=O, G=G, R=R, SxR=S * R), weights
+    params = dict(alpha=ALPHA, cum_var=CUM_VAR, scene=SCENE, response=RESPONSE, tracker=TRACKER,
+                  norm_scene=nS, norm_response=nR, norm_tracker=nT,
+                  w_scene=list(map(float, wS)), w_response=list(map(float, wR)), w_tracker=list(map(float, wT)),
+                  composite_lo=list(map(float, clo)), composite_hi=list(map(float, chi)), w_G=list(map(float, wG)))
+    return dict(H=H, O=O, G=G, R=R, SxR=S * R), weights, params
 
 
 def difficulty(rows):
@@ -165,9 +188,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("rows")
     ap.add_argument("--json")
+    ap.add_argument("--freeze", help="write the fitted bounds and weights (the frozen index)")
     a = ap.parse_args()
     rows = json.loads(Path(a.rows).read_text())["rows"]
-    idx, weights = indices(rows)
+    idx, weights, params = indices(rows)
+    if a.freeze:
+        Path(a.freeze).write_text(json.dumps(params, indent=1) + "\n")
     targets = dict(B=np.array([r["benefit"] for r in rows], float), D=difficulty(rows))
     res = dict(weights=weights, targets={})
     for tname, y in targets.items():
