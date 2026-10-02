@@ -121,6 +121,11 @@ detector-specific operating-point finding).
   frame and one tile call, normalized by the full-frame 736 px call.
 - Scene-blind control: round-robin refinement (one tile per frame, cycling).
 - Gate: unchanged (pre-registered in §0), oracle against the concave envelope of all static S3 profiles.
+- Budgets (added before the S3 caches and latencies exist): normalized cost 0.6, 1.0, 1.5, 2.0, 3.0, 4.0,
+  those inside the range of the S3 static costs of each detector; anchor = nearest efficient static
+  profile, as in S1 and S2. All static profiles are re-run on the S3 cost axis
+  (`configs/g2_compute_cost_s3.json`) so that every point of the envelope comes from the same host
+  measurement.
 
 ### Unit of adaptation: persistent regime (one profile per sequence) — oracle gate
 `tools/g2/oracle_stream.py`: GT-assisted choice of one static profile per sequence (stream-level compute
