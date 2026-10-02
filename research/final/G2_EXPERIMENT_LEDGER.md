@@ -138,3 +138,54 @@ calibration) at matched mean cost, assembled from the existing static runs.
 Gate not met at any budget (no pooled CI above 0; cost ratios ≤ 1.23). **Persistent-regime allocation
 rejected** for S1 and S2. Together with the segment-level results, neither the 30-frame segment nor the
 whole stream is a unit at which these knobs have usable headroom on this data.
+
+## P-GSCI-2 — objective-weight scene index and scene-response index (pre-registration, written and committed before any value is computed)
+Reference metric: Sensors 2026, 26(9), 2886, "A Scene Detection Complexity Metric for Infrared Small Target
+Detection" (SDC). Indicators are min–max normalized and oriented so that larger = harder;
+SDC = Σ_j w_j x_j with w_j = α w_j^E + (1 − α) w_j^P, entropy weights w_j^E = (1 − e_j) / Σ_k (1 − e_k),
+e_j = −(1 / ln m) Σ_i p_ij ln p_ij, p_ij = x_ij / Σ_i x_ij; PCA weights w_j^P = c_j / Σ_k c_k,
+c_j = Σ_{p ≤ k} θ_p |u_jp| over the first k components reaching 85 % cumulative variance; α = 0.6. In the
+paper the weights are computed once offline, α was chosen by the correlation with the detection performance
+of seven detectors, four of the six indicators need the target location, and the index is used to evaluate
+scene difficulty, not to adapt computation.
+
+Data: the 184 segment rows of `research/final/sci_v7f/general_sci/cue_audit_V7f_512_960.json` (val-7,
+YOLOv8n and RT-DETR-L, V7f + ByteTrack, cues from the 736 px reference run, history f0−10 … f0−1 and the
+image of f0). No new detector or tracker run. Code: `tools/g2/gsci_audit.py`.
+
+Indicator groups (orientation fixed a priori, larger = harder / more compute wanted):
+- scene S: `trk_density` (crowd), `trk_small` (tiny), `img_edges`, `img_dark`, `img_blur` — the five
+  dimensions of the historical SCI, all positive as in the historical rule;
+- detector response R: `probe_up` (boxes gained at the higher setting on frame f0−1; a detector pass that a
+  controller would pay for), `det_ambig` (share of passed candidates in the ambiguous band);
+- tracker instability T: `trk_churn`.
+
+Normalization: min–max over the development pool (both detectors; label-free), as in SDC. A missing value
+(2 rows for `trk_small`, 2 for `trk_churn`) takes the pool median of its indicator.
+
+Indices:
+- H — historical weights crowd .30, tiny .30, edges .20, dark .10, blur .05 (rescaled to sum 1) on S;
+- O — SDC-style weights (entropy + PCA, α = 0.6) on S;
+- G (proposed) — S, R, T are the SDC-style indices of their groups, each re-normalized to [0, 1] over the
+  pool; G = SDC-style weighted sum of [S, R, S·R, T]. The coefficients of R, S·R and T are the objective
+  weights of these columns, not chosen by hand; no sigmoid (rank statistics are invariant to it);
+- R alone and S·R alone are reported for attribution only.
+
+Targets per 30-frame segment:
+- B (benefit of compute; the controller target) = q(960 px) − q(512 px), as in P-GSCI-1;
+- D (difficulty at the operating point; the SDC target) = −Σ q(736 px) / Σ n_GT over the segment,
+  q = TP − FP − IDS.
+
+Decision rules:
+1. An index is retained for a target by the P-GSCI-1 rule: same sign in both detectors, |mean
+   within-sequence Spearman ρ| ≥ 0.10 in each, that sign in ≥ 10 of the 14 (detector, sequence) cells.
+   The expected sign is positive.
+2. The ordering G > O > H is supported only where the paired difference of the mean within-sequence ρ
+   (bootstrap over the 7 sequences, both detectors resampled together, 10,000 resamples, seed 42) has a
+   95 % CI lower bound > 0, separately for G − O and O − H.
+3. An index retained for B can drive compute only in an adaptation space whose GT oracle passed the gate.
+   S1 and S2 failed (pooled oracle bounds +0.78 and +0.82 HOTA), so no G controller run is made in S1 or S2
+   whatever this outcome. An index retained for D is a difficulty measure (the SDC use) and is reported as
+   such, not as compute adaptation.
+4. Any retained index is frozen (normalization bounds, weights, α) before the FCOS transfer (transfer lock
+   first, no refit).
