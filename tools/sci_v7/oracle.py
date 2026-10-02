@@ -141,7 +141,7 @@ def build(layer):
     prof = json.loads((ROOT / "configs/sci_v7_profiles.json").read_text())
     _, seqs_of = dev._splits()
     for det in os.environ.get("V7_DETS", "yolov8,rtdetr").split(","):
-        r = prof["detectors"][det]["resolution"]
+        r = prof["detectors"][det][dev.PROFILE]
         ratio = (r["HIGH"] ** 2 - r["MEDIUM"] ** 2) / (r["MEDIUM"] ** 2 - r["LOW"] ** 2)
         for seq in seqs_of(dev.SPLIT):
             q = {lv: frame_quality(f"{layer}+{lv}", det, seq) for lv in ("LOW", "MEDIUM", "HIGH")}

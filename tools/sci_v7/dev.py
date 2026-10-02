@@ -49,7 +49,7 @@ DETS = ["yolov8", "rtdetr"]
 SEGMENT = 30
 CODE = ["acmot_sci.py", "acmot_sci_v7.py", "acmot_v7.py", "adapters/detectors/compute_profile.py",
         "configs/sci_v7_profiles.json", "tools/v7/systems.py", "tools/sci_v7/dev.py",
-        "tools/sci_v7/sweep_cache.py"]
+        "tools/sci_v7/sweep_cache.py", "tools/sci_v7/hosts.py"]
 # Detection source and level profile (defaults = the E-SCI-1 setting):
 #   SCI_CACHE=native  V7-record cache (640/736/832)
 #   SCI_CACHE=sweep   resolution-sweep cache under SCI_SWEEP_ROOT
@@ -82,7 +82,8 @@ def code_sha():
 
 
 def parse(system):
-    layer, levels = system.split("+")
+    """'<layer>+<levels>[@<host>]' -> (layer, V7Spec overrides, levels); host via host_of()."""
+    layer, levels = system.split("@")[0].split("+")
     from tools.v7.systems import SYSTEMS
     if layer not in ("NATIVE", "V7f"):
         raise ValueError(layer)
@@ -91,6 +92,14 @@ def parse(system):
             (levels.startswith("R") and levels[1:].isdigit())):
         raise ValueError(levels)
     return layer, dict(SYSTEMS[layer]), levels
+
+
+def host_of(system):
+    from tools.sci_v7.hosts import HOSTS
+    h = system.split("@")[1] if "@" in system else "bytetrack"
+    if h not in HOSTS:
+        raise ValueError(h)
+    return h
 
 
 def out_dir():
@@ -117,8 +126,8 @@ def load(system, det, seq):
     return pickle.load(open(_path(system, det, seq), "rb"))
 
 
-def perm_schedule(layer, seed, det, seq):
-    src = [a["level"] for a in load(f"{layer}+SCI", det, seq)["audit"]]
+def perm_schedule(layer, seed, det, seq, host=""):
+    src = [a["level"] for a in load(f"{layer}+SCI" + host, det, seq)["audit"]]
     segs = [src[i:i + SEGMENT] for i in range(0, len(src), SEGMENT)]
     rng = np.random.default_rng([seed, zlib.crc32(seq.encode()), zlib.crc32(det.encode())])
     out = [lv for k in rng.permutation(len(segs)) for lv in segs[k]]
@@ -127,16 +136,18 @@ def perm_schedule(layer, seed, det, seq):
 
 
 def track_sequence(system, det, seq, trace=False):
-    """Scene layer + adapter + frozen V7f + ByteTrack on one cached sequence."""
+    """Scene layer + adapter + frozen V7f + tracker host on one cached sequence."""
     os.chdir(ROOT)
     from acmot_sci import SceneLayer
     from acmot_sci_v7 import LevelSource, SciV7Pipeline
     from acmot_v7 import HostContract, V7Layer, spec_from_dict
     from adapters.detectors.compute_profile import ComputeProfileAdapter
-    from adapters.trackers.bytetrack import ByteTrackAdapter
     from adapters.types import Detection
-    from tools.v7.systems import HOST_BYTETRACK as h
+    from tools.sci_v7.hosts import make_host
     layer, spec, levels = parse(system)
+    host = host_of(system)
+    tracker, h, needs_image = make_host(host)
+    sfx = "" if host == "bytetrack" else "@" + host
     cd = open_cache(det, seq)
     if levels.startswith("R") and levels[1:].isdigit():      # one fixed native resolution
         r = int(levels[1:])
@@ -147,7 +158,7 @@ def track_sequence(system, det, seq, trace=False):
     if levels == "SCI":
         src = LevelSource(scene=SceneLayer())
     elif levels.startswith("PERM"):
-        src = LevelSource(schedule=perm_schedule(layer, int(levels[4:]), det, seq))
+        src = LevelSource(schedule=perm_schedule(layer, int(levels[4:]), det, seq, sfx))
     elif levels.startswith("ORACLE"):     # GT-derived diagnostic schedule (tools/sci_v7/oracle.py)
         src = LevelSource(schedule=json.loads(
             (out_dir() / "oracle" / layer / det / f"{seq}.json").read_text())[levels])
@@ -156,18 +167,24 @@ def track_sequence(system, det, seq, trace=False):
     pipe = SciV7Pipeline(
         levels=src, adapter=adapter,
         layer=V7Layer(spec_from_dict(dict(spec, name=layer)), HostContract(**h)),
-        tracker=ByteTrackAdapter(high=h["assoc"], low=h["low"], new=h["birth"], buffer=30,
-                                 match=h["match"], fuse=True),
+        tracker=tracker,
         make_detection=lambda d, v: Detection(x1=d.x1, y1=d.y1, x2=d.x2, y2=d.y2,
                                               confidence=v, class_id=d.class_id),
         record_trace=trace)
     lines, audit = [], []
+    if needs_image:                       # a host that reads pixels (BoT-SORT camera-motion compensation)
+        import cv2
+        SPLITS, _ = _splits()
+        frames = sorted((Path(SPLITS[SPLIT]["data"]) / "sequences" / seq).glob("*.jpg"))
+        if len(frames) != cd.frames or frames[0].stat().st_size == 0:
+            raise SystemExit(f"{seq}: host '{host}' needs the real frames")
     for i in range(1, cd.frames + 1):
         cd.frame = i
         vis = cd.visual_dict(i)
         tracks, a = pipe.step(dict(edges=vis["edges"], brightness=vis["brightness"], blur=vis["blur"]),
                               lambda r: cd.detect(None, 0.0, None, r), cd.shape,
-                              motion=vis.get("motion"))
+                              motion=vis.get("motion"),
+                              image=cv2.imread(str(frames[i - 1])) if needs_image else None)
         for t in tracks:
             lines.append(f"{i},{t.track_id},{t.x1:.3f},{t.y1:.3f},{t.x2 - t.x1:.3f},"
                          f"{t.y2 - t.y1:.3f},{t.confidence:.6f},{t.class_id},-1,-1\n")
