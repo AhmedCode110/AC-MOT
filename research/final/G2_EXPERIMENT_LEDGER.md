@@ -109,3 +109,15 @@ a static run does not transfer to a segment of a mixed schedule (call phases and
 the tracker), so the segment oracle is below the envelope at higher budgets. Gate: neither criterion met for
 both detectors at any budget. **S2 rejected as an adaptive space** (its static result is kept as a
 detector-specific operating-point finding).
+
+### S3 — crop refinement: pre-registration (written before the S3 caches exist)
+- Capability: crop refinement, available to any detector that accepts an image
+  (`adapters/detectors/tiling.py`). Fixed 2 × 2 tile grid, overlap 0.2 (SAHI default), each tile at the
+  shared 736 px reference input; a tile box joins the canonical detections only if it has no same-class
+  IoU ≥ 0.5 partner among the full-frame boxes or the tile boxes already kept (0.5 = V7f's duplicate IoU).
+- Profiles: full frame at 512 … 1344 px (adds 1088 / 1216 / 1344 so that matched-compute static
+  baselines exist at the cost of refinement); full frame at 736 px plus one tile (4 choices) or all four.
+- Cost: measured detector latency of each call on one host per detector (`tools/g2/latency.py`), full
+  frame and one tile call, normalized by the full-frame 736 px call.
+- Scene-blind control: round-robin refinement (one tile per frame, cycling).
+- Gate: unchanged (pre-registered in §0), oracle against the concave envelope of all static S3 profiles.
