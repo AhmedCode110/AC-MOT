@@ -20,7 +20,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.sci_v7.build_sweep_cache import NATIVE_NMS, VAL7, make_detector  # noqa: E402
+from tools.g2.detectors import NATIVE_NMS, make_detector  # noqa: E402
+from tools.sci_v7.build_sweep_cache import VAL7  # noqa: E402
 
 
 def main():

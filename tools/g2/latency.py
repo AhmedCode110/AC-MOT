@@ -35,7 +35,7 @@ def main():
     import cv2
     import torch
     from adapters.detectors.tiling import tile_boxes
-    from tools.sci_v7.build_sweep_cache import NATIVE_NMS, make_detector
+    from tools.g2.detectors import NATIVE_NMS, make_detector
     det = make_detector(a.weights)
     nms = NATIVE_NMS[a.det]
     imgs = [cv2.imread(str(p)) for p in sorted((Path(a.dataset) / "sequences" / a.seq).glob("*.jpg"))[:a.frames]]
