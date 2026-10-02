@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{Held-out results (percent for HOTA, MOTA, IDF1; counts for IDS, FN, FP; processing frames per second on one NVIDIA Tesla T4, each system measured in its own session). No entry is marked as best because the profiles target different trade-offs.}
+\label{tab:main}
+\small
+\begin{tabular}{lrrrrrrr}
+\hline
+System & HOTA & MOTA & IDF1 & IDS & FN & FP & FPS \\
+\hline
+\multicolumn{8}{l}{\textit{VisDrone2019-MOT test-dev (17 sequences, 6,635 frames)}}\\
+Static default & 28.43 & 19.73 & 32.72 & 1235 & 155051 & 16308 & 36.53 \\
+Hand-designed controller & 32.70 & 23.24 & 39.52 & 1061 & 138967 & 25025 & 41.96 \\
+Quality profile Q & 33.84 & 26.95 & 41.55 & 1184 & 136858 & 19029 & 38.98 \\
+Balanced profile B & 31.22 & 23.79 & 37.87 & 919 & 149307 & 13632 & 46.02 \\
+Matched static anchor & 33.93 & 27.00 & 41.77 & 1197 & 136391 & 19374 & 43.23$^{a}$ \\
+\multicolumn{8}{l}{\textit{UAVDT test (20 sequences, 16,592 frames), no tuning on UAVDT}}\\
+Static default & 24.08 & 13.84 & 27.89 & 558 & 270189 & 22974 & 65.01 \\
+Quality profile Q & 28.39 & 17.40 & 34.45 & 321 & 258376 & 22896 & 58.35 \\
+Balanced profile B & 26.93 & 16.12 & 32.01 & 308 & 266894 & 18758 & 61.46 \\
+\hline
+\multicolumn{8}{l}{$^{a}$Run after the freeze for attribution only; frames per second measured in a separate T4 session.}\\
+\hline
+\end{tabular}
+\end{table}

@@ -1,0 +1,94 @@
+
+== resolution values [640, 736, 832]
+  img_edges        cv_gain -0.283  (yolo -0.551, rtdetr -0.015)  null95 +0.069  folds 7/7 
+  img_brightness   cv_gain -1.634  (yolo -1.740, rtdetr -1.528)  null95 +0.066  folds 7/7 
+  img_blur         cv_gain -0.522  (yolo -0.938, rtdetr -0.105)  null95 +0.096  folds 7/7 
+  img_motion       cv_gain -0.056  (yolo -0.283, rtdetr +0.171)  null95 +0.099  folds 7/7 
+  img_motion_resp  cv_gain +0.318  (yolo +0.239, rtdetr +0.397)  null95 +0.111  folds 7/7 SIGNAL
+  det_count        cv_gain -0.272  (yolo -0.080, rtdetr -0.464)  null95 +0.082  folds 7/7 
+  det_activity     cv_gain +0.202  (yolo -0.133, rtdetr +0.538)  null95 +0.020  folds 7/7 
+  det_log_area     cv_gain +0.073  (yolo -0.256, rtdetr +0.403)  null95 +0.215  folds 7/7 
+  det_crowd        cv_gain +0.024  (yolo -0.295, rtdetr +0.343)  null95 +0.001  folds 7/7 
+  det_overlap      cv_gain -0.082  (yolo -0.236, rtdetr +0.073)  null95 +0.044  folds 7/7 
+  det_gap          cv_gain -0.196  (yolo -0.160, rtdetr -0.231)  null95 +0.139  folds 7/7 
+  trk_count        cv_gain -0.125  (yolo -0.416, rtdetr +0.166)  null95 +0.046  folds 7/7 
+  trk_survival     cv_gain +0.133  (yolo +0.059, rtdetr +0.206)  null95 +0.029  folds 7/7 SIGNAL
+  trk_birth        cv_gain -0.553  (yolo -0.408, rtdetr -0.699)  null95 +0.003  folds 7/7 
+  trk_persist      cv_gain +0.099  (yolo +0.000, rtdetr +0.197)  null95 +0.053  folds 7/7 
+  trk_match        cv_gain +0.156  (yolo +0.015, rtdetr +0.298)  null95 +0.000  folds 7/7 SIGNAL
+
+== sensitivity values [0.3, 0.4, 0.5, 0.6]
+  img_edges        cv_gain -0.374  (yolo -0.360, rtdetr -0.387)  null95 +0.050  folds 6/7 
+  img_brightness   cv_gain -0.073  (yolo -0.090, rtdetr -0.055)  null95 +0.000  folds 7/7 
+  img_blur         cv_gain -0.980  (yolo -0.652, rtdetr -1.310)  null95 +0.085  folds 6/7 
+  img_motion       cv_gain -0.220  (yolo -0.332, rtdetr -0.108)  null95 +0.010  folds 7/7 
+  img_motion_resp  cv_gain -0.735  (yolo +0.307, rtdetr -1.778)  null95 +0.000  folds 6/7 
+  det_count        cv_gain +0.537  (yolo +0.638, rtdetr +0.436)  null95 +0.070  folds 7/7 SIGNAL
+  det_activity     cv_gain +0.067  (yolo +0.244, rtdetr -0.110)  null95 +0.005  folds 7/7 
+  det_log_area     cv_gain +0.000  (yolo +0.000, rtdetr +0.000)  null95 +0.001  folds 0/7 
+  det_crowd        cv_gain -0.709  (yolo +0.196, rtdetr -1.615)  null95 +0.004  folds 7/7 
+  det_overlap      cv_gain -0.494  (yolo +0.071, rtdetr -1.060)  null95 +0.000  folds 2/7 
+  det_gap          cv_gain +0.667  (yolo +0.508, rtdetr +0.826)  null95 +0.010  folds 7/7 SIGNAL
+  trk_count        cv_gain -0.548  (yolo +0.083, rtdetr -1.181)  null95 +0.002  folds 2/7 
+  trk_survival     cv_gain -0.494  (yolo -0.016, rtdetr -0.973)  null95 +0.000  folds 6/7 
+  trk_birth        cv_gain -0.597  (yolo -0.087, rtdetr -1.106)  null95 +0.002  folds 6/7 
+  trk_persist      cv_gain -0.584  (yolo +0.235, rtdetr -1.405)  null95 +0.047  folds 1/7 
+  trk_match        cv_gain -0.358  (yolo -0.240, rtdetr -0.476)  null95 +0.000  folds 1/7 
+
+== gate_tau values [0.5, 0.75, 1.0, 1.25, 1.5]
+  img_edges        cv_gain -0.891  (yolo -1.815, rtdetr +0.033)  null95 -0.055  folds 7/7 
+  img_brightness   cv_gain -0.403  (yolo -0.117, rtdetr -0.688)  null95 -0.094  folds 7/7 
+  img_blur         cv_gain -1.013  (yolo -1.647, rtdetr -0.378)  null95 -0.049  folds 7/7 
+  img_motion       cv_gain -0.655  (yolo -1.447, rtdetr +0.136)  null95 -0.074  folds 7/7 
+  img_motion_resp  cv_gain -1.512  (yolo -2.273, rtdetr -0.751)  null95 -0.020  folds 7/7 
+  det_count        cv_gain -1.171  (yolo -1.091, rtdetr -1.251)  null95 -0.110  folds 7/7 
+  det_activity     cv_gain +0.032  (yolo -0.360, rtdetr +0.424)  null95 -0.022  folds 7/7 
+  det_log_area     cv_gain -1.126  (yolo -1.588, rtdetr -0.663)  null95 -0.084  folds 7/7 
+  det_crowd        cv_gain -0.242  (yolo -0.175, rtdetr -0.310)  null95 -0.072  folds 7/7 
+  det_overlap      cv_gain -0.326  (yolo -0.141, rtdetr -0.510)  null95 -0.096  folds 7/7 
+  det_gap          cv_gain -1.409  (yolo -1.207, rtdetr -1.611)  null95 -0.077  folds 7/7 
+  trk_count        cv_gain -0.976  (yolo -1.062, rtdetr -0.890)  null95 -0.079  folds 7/7 
+  trk_survival     cv_gain +0.179  (yolo +0.205, rtdetr +0.154)  null95 -0.011  folds 7/7 SIGNAL
+  trk_birth        cv_gain -0.895  (yolo -1.290, rtdetr -0.500)  null95 -0.003  folds 7/7 
+  trk_persist      cv_gain -0.822  (yolo -1.177, rtdetr -0.467)  null95 -0.088  folds 7/7 
+  trk_match        cv_gain -0.673  (yolo -0.809, rtdetr -0.537)  null95 -0.128  folds 7/7 
+
+== assoc_offset values [0.0, 0.05, 0.1, 0.18, 0.26]
+  img_edges        cv_gain -0.236  (yolo -0.053, rtdetr -0.418)  null95 -0.038  folds 7/7 
+  img_brightness   cv_gain -0.074  (yolo -0.050, rtdetr -0.098)  null95 -0.060  folds 7/7 
+  img_blur         cv_gain -0.792  (yolo -0.874, rtdetr -0.710)  null95 -0.093  folds 6/7 
+  img_motion       cv_gain +0.174  (yolo +0.253, rtdetr +0.095)  null95 -0.071  folds 7/7 SIGNAL
+  img_motion_resp  cv_gain -0.541  (yolo -0.213, rtdetr -0.870)  null95 -0.064  folds 7/7 
+  det_count        cv_gain +0.260  (yolo +0.469, rtdetr +0.050)  null95 -0.071  folds 7/7 SIGNAL
+  det_activity     cv_gain -0.540  (yolo -0.541, rtdetr -0.539)  null95 -0.051  folds 6/7 
+  det_log_area     cv_gain -0.675  (yolo -0.766, rtdetr -0.584)  null95 -0.071  folds 1/7 
+  det_crowd        cv_gain -0.587  (yolo -0.053, rtdetr -1.120)  null95 -0.067  folds 2/7 
+  det_overlap      cv_gain -0.618  (yolo -0.656, rtdetr -0.581)  null95 -0.129  folds 3/7 
+  det_gap          cv_gain +0.276  (yolo +0.502, rtdetr +0.050)  null95 -0.079  folds 7/7 SIGNAL
+  trk_count        cv_gain -0.300  (yolo +0.049, rtdetr -0.649)  null95 -0.063  folds 6/7 
+  trk_survival     cv_gain -0.462  (yolo -0.342, rtdetr -0.582)  null95 -0.131  folds 1/7 
+  trk_birth        cv_gain -0.634  (yolo -0.829, rtdetr -0.439)  null95 -0.123  folds 3/7 
+  trk_persist      cv_gain -0.528  (yolo -0.428, rtdetr -0.628)  null95 -0.102  folds 1/7 
+  trk_match        cv_gain -0.611  (yolo -0.594, rtdetr -0.628)  null95 -0.128  folds 1/7 
+Traceback (most recent call last):
+  File "/Users/ahmedgouda/Desktop/Universal-ACMOT/tools/v5_s2_cues.py", line 121, in <module>
+    main(sys.argv[1:] or [t for t in TARGETS if t != "retention"])
+  File "/Users/ahmedgouda/Desktop/Universal-ACMOT/tools/v5_s2_cues.py", line 117, in main
+    json.dump(report, open("outputs/v5/s2_cue_utility.json", "w"), indent=1)
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py", line 179, in dump
+    for chunk in iterable:
+                 ^^^^^^^^
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "/Users/ahmedgouda/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type int64 is not JSON serializable

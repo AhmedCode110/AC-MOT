@@ -1,0 +1,20 @@
+{
+ "source_bootstrap": "Drive MATCHED_A0_20260918T211242Z/MATCHED_A0_V1_PAIRED_BOOTSTRAP_95CI.json (id 1S-9UCrsbYFxZY3tTyPk4xrFC9Eku9O2n)",
+ "source_system_summary": "Drive MATCHED_A0_20260918T211242Z/MATCHED_STATIC_A0_POSTHOC/system_summary.json (id 1J1LTq8rLpKE4ZWpB3ougZS_yb_eLwxum)",
+ "comparison": "Frozen V1 vs Matched Static A0",
+ "classification": "post-hoc matched held-out statistical characterization",
+ "paired_unit": "sequence", "sequence_count": 17, "resamples": 5000, "seed": 42,
+ "observed_A0": {"MOTA": 0.2699917214692997, "HOTA": 0.3392857279103428, "IDF1": 0.4177425074518148, "IDS": 1197, "FN": 136391, "FP": 19374},
+ "observed_V1": {"MOTA": 0.2694847777354033, "HOTA": 0.33835058630489423, "IDF1": 0.41545937046563247, "IDS": 1184, "FN": 136858, "FP": 19029},
+ "results_V1_minus_A0_pp": {
+  "MOTA": {"delta": -0.050694373389637004, "ci_low": -0.24530712360588997, "ci_high": 0.16366239715012276},
+  "HOTA": {"delta": -0.09351416054485528, "ci_low": -0.24913707075043212, "ci_high": 0.05604735603179701},
+  "IDF1": {"delta": -0.22831369861823214, "ci_low": -0.5030379323124348, "ci_high": 0.0156406237570683},
+  "IDS_reduction": {"delta": 13.0, "ci_low": -23.0, "ci_high": 46.0}
+ },
+ "A0_system": {"adaptive_threshold": false, "adaptive_resolution": false, "tracker_profile": "tuned", "backend": "pytorch_fp16",
+  "frames": 6635, "processing_fps": 43.22697589187628, "processing_p95_ms": 35.76110629994671, "mean_imgsz": 960.0, "mean_conf": 0.35, "mean_nms_iou": 0.35,
+  "stage_profile_ms": {"analysis_controller_mean": 0.004559021100628097, "detector_mean": 19.51584646812429, "detector_p95": 29.67743660008182, "tracker_mean": 3.5630661356450064, "tracker_p95": 6.460903299966949},
+  "jpeg_decode_mean_ms": 22.5338401707603, "serialized_dataset_playback_fps": 21.897390173582348},
+ "note": "Run on 2026-09-18 after the 2026-09-12 freeze; FPS measured in a separate T4 session."
+}

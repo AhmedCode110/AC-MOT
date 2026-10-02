@@ -1,0 +1,19 @@
+{
+ "policy": "configs/universal_acmot_policy_v7.json",
+ "system": "V7f",
+ "status": "FROZEN at tag universal-acmot-v7-freeze (commit = the tagged commit)",
+ "parent_commit": "b68e050196449116c21dc350e344b0e85f062838",
+ "file_sha256": {
+  "acmot_v7.py": "98d90fac222e35373a362ce4f279030ac87a82f909a261ff376324be74604bcb",
+  "online_calibration.py": "cc03302526ea589ce4f7fc183ae2de267323321a24d860af65183ded6ce17dcb",
+  "configs/universal_acmot_policy_v7.json": "c2b3a0f76594b3ff70b04868e5adc025e2c1c79e54e7958e51c1c76eeef6e5dd",
+  "tools/v7/systems.py": "4dd099cc91f76eb2eb39c0fd9191694b797cd8f4e036f9e7391dee9c7cc79edd",
+  "tools/v7/dev.py": "7cb587f9ecc8c2074745d51b2a173a1227c58f09413bc7e86b2cdb13674602fd",
+  "tools/v7/external/boosttrack_v7.py": "cea90707022b7adaae2bfe6ce3e67d33c4bfbc656481fd1fc24aa6e2ab053f08",
+  "tools/v7/external/sparsetrack_v7.py": "ae15f6004ffe593fb12e24c63469dc778da961626efdd56833bf09ec8038c60a",
+  "tools/v7/external/mot17_bytetrack_v7.py": "094d706627adca281c65a3f82d655cef4726f7ca8b3fb73c90c6f017daca882f",
+  "tools/v7/kitti/kitti_eval.py": "00565d4936d1e334e6fdb136a6dc3bd9085cd461bad1f9de206079880a865cf4",
+  "tools/v7/bootstrap.py": "2d7b0dc5933cf9dbe57fc59fe2cb5faaa7523f2b055223fa6c525eed2474b51a"
+ },
+ "v6_lock_untouched": true
+}

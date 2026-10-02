@@ -123,10 +123,30 @@ class V7Spec:
     # Candidates entering the stream statistics: "full" (all emitted) |
     # "host" (only candidates the host can use: score >= host.low).
     domain: str = "full"
+    # Logits entering the pooled window: "post" (after this frame's
+    # duplicate handling; V6 identity) | "raw" (every emitted candidate:
+    # the statistics no longer depend on the regime-dependent duplicate
+    # rule, which removes the regime -> duplicates -> statistics loop).
+    pool: str = "post"
     # Regime: "rho" (clean iff confident share of the foreground >= 1/2) |
     # "noisy" (always V6-like) | "clean" (always host-anchored).
     regime: str = "rho"
-    # Frames of per-frame rho values whose median decides the regime.
+    # Reference set of rho: "fg" (confident share of the whole foreground
+    # >= t1) | "host" (confident share of the foreground the HOST would
+    # admit, >= max(t1, min(host.assoc, host.birth))): intervention is needed
+    # only when the host's own operating point lets a mostly-ambiguous
+    # foreground in; a host whose threshold already sits above t2 is clean.
+    # The low tail below the host threshold (where emission floors act) no
+    # longer enters rho.
+    rho_ref: str = "fg"
+    # Interpretability check of the nested split: the bands are read as
+    # background | ambiguous | confident only when the class below t1 holds
+    # at least as many pooled candidates as the foreground; otherwise the
+    # frame's rho counts as clean evidence (1.0).
+    bg_check: bool = False
+    # Frames of per-frame rho values whose median decides the regime
+    # (0 = every non-cold frame of the stream so far: the regime is a property
+    # of the detector x scene stream, not of the last few seconds).
     rho_frames: int = 1
     # Clean regime: "proj" = clip(host, t1, t2) | "upper" = min(host, t2)
     # (the host is only prevented from rejecting the confident class) |
@@ -143,6 +163,21 @@ class V7Spec:
     # Frame 1 (no history): "host" (native pass-through) | "none" (V6: no
     # candidate admitted).
     cold: str = "host"
+    # Duplicate rule in cold frames when dup_regime == "noisy": "clean" (the
+    # dup_clean rule, V7c/V7d) | "noisy" (the dup rule; with no track context
+    # yet, "track" removes every weaker overlapping candidate). Frame 1 has
+    # no statistics, so it cannot know whether the stream is clean.
+    cold_dup: str = "clean"
+    # "none" | "track": in clean/cold frames, hand a sub-low candidate that
+    # continues an uncovered track of frame t-1 (IoU >= dup_iou) to the
+    # host's low stage (its score is raised to just above host.low).
+    rescue: str = "none"
+    # "fg": foreground candidates (score >= t1) the host cannot use (score
+    # <= host.low, its lowest usable stage) are raised to just above
+    # host.low | "low": candidates <= host.low are raised to just above host.low |
+    # "assoc": candidates in (host.low, min(assoc, birth)) are raised to
+    # just above min(assoc, birth) (first-stage association).
+    rescue_band: str = "low"
     motion: bool = True
     # "always" | "noisy" (clean-regime and cold frames keep the host's own
     # IoU-match tolerance: the host is trusted there).
@@ -172,7 +207,7 @@ class V7Layer:
     def reset(self):
         s = self.spec
         self.window = deque(maxlen=int(s.window))     # pooled logits, frames < t
-        self.rho_hist = deque(maxlen=max(1, int(s.rho_frames)))
+        self.rho_hist = deque(maxlen=max(1, int(s.rho_frames)) if int(s.rho_frames) > 0 else None)
         self.motion_hist = RobustHistory(s.hist, s.warmup)
         self.prev_tracks = np.zeros((0, 4))
         self.prev_ids = np.zeros(0, int)
@@ -264,8 +299,21 @@ class V7Layer:
         if th is None:
             return None
         t1, t2, _ = th
-        n_fg = int((H >= t1).sum())
-        rho = float((H >= t2).sum() / n_fg) if n_fg else 0.0
+        lo = t1
+        if self.spec.rho_ref == "host":
+            # the part of the foreground the host itself would admit
+            lo = max(t1, float(logit(min(self.host.assoc, self.host.birth))))
+        n_fg = int((H >= lo).sum())
+        rho = float((H >= max(t2, lo)).sum() / n_fg) if n_fg else 1.0
+        if self.spec.bg_check and int((H < t1).sum()) < int((H >= t1).sum()):
+            # no background mode in the pooled stream (e.g. an emission floor
+            # above the background scores): the first split falls inside the
+            # objects, the bands are not background|ambiguous|confident and
+            # give no evidence against the host -> counted as clean evidence
+            rho = 1.0
+            self._no_bg = True
+        else:
+            self._no_bg = False
         return float(t1), float(t2), rho
 
     def _ecdf(self, scores):
@@ -313,13 +361,20 @@ class V7Layer:
                 tdisc = -np.inf                      # host's own low stage
             else:
                 regime = "noisy"
-                ta = t2 if s.noisy_primary == "t2" else t1
-                tb = ta
+                if s.noisy_primary == "proj":
+                    # host-relative: the host's own operating point projected
+                    # onto the stream's ambiguous band [t1, t2]
+                    ta, tb = float(np.clip(A, t1, t2)), float(np.clip(B, t1, t2))
+                else:
+                    ta = t2 if s.noisy_primary == "t2" else t1
+                    tb = ta
                 tdisc = t1 if s.noisy_ext == "otsu" else -np.inf
 
         L_in = logit(scores)
         cls = None if classes is None else np.asarray(classes).reshape(-1)
-        if s.dup_regime == "noisy" and regime != "noisy":
+        if s.dup_regime == "noisy" and regime == "cold" and s.cold_dup == "noisy":
+            keep = self._duplicates(boxes, scores, cls)
+        elif s.dup_regime == "noisy" and regime != "noisy":
             keep = self._duplicates(boxes, scores, cls, rule=s.dup_clean)
         elif s.dup_scope == "primary":
             prim = np.where(L_in >= min(ta, tb))[0]
@@ -337,12 +392,68 @@ class V7Layer:
             u = self._ecdf(scores[passed])
             out = np.where(Lp >= ta, 0.5 + 0.5 * u, 0.1 + 0.4 * u)
             assoc, birth = 0.5, 0.5
+            if tb > ta:          # birth above association (host-relative bands)
+                birth = float(0.5 + 0.5 * self._ecdf(np.array([sigmoid(tb)]))[0])
         else:
             out = scores[passed]
             assoc, birth = float(sigmoid(ta)), float(sigmoid(tb))
+        n_rescued = 0
+        if (s.rescue == "track" and (regime != "noisy" or s.rescue_band == "fg")
+                and len(self.prev_tracks) and len(passed)):
+            # Track-consistent rescue: a candidate the host would ignore (score
+            # below its lowest stage) that continues an existing track of frame
+            # t-1 not covered by any usable candidate is handed to the host's
+            # low stage. Births are unaffected (the score stays below every
+            # birth/association threshold of the host).
+            if s.rescue_band == "fg":
+                # foreground candidates (raw score >= t1 of frames < t) that the
+                # host cannot see at the operating point passed this frame: a
+                # two-stage host sees everything above host.low; a single-stage
+                # host (host.low >= its association/birth threshold) sees only
+                # what reaches its passed association threshold.
+                single = h.low >= min(h.assoc, h.birth)
+                floor_pass = min(assoc, birth) if single else h.low
+                lo_fg = sigmoid(bands[0]) if bands is not None else np.inf
+                if single and s.bg_check and bands is not None and getattr(self, "_no_bg", False):
+                    # no background mode: every emitted candidate is object-like.
+                    # Only for a host WITHOUT a low stage: a two-stage host's own
+                    # designed low bound (host.low) is respected.
+                    lo_fg = 0.0
+                o = np.asarray(out, np.float64)
+                usable = passed[o > floor_pass]
+                low_c = passed[(scores[passed] >= lo_fg) & (o <= floor_pass)]
+            elif s.rescue_band == "assoc":
+                # candidates between the host's lowest stage and its association
+                # threshold (a single-stage host never uses them)
+                lim = min(h.assoc, h.birth)
+                usable = passed[scores[passed] >= lim]
+                low_c = passed[(scores[passed] > h.low) & (scores[passed] < lim)]
+            else:
+                usable = passed[scores[passed] > h.low]
+                low_c = passed[scores[passed] <= h.low]
+            if len(low_c):
+                cov = iou_matrix(boxes[usable], self.prev_tracks).max(0) >= s.dup_iou if len(usable) \
+                    else np.zeros(len(self.prev_tracks), bool)
+                P = iou_matrix(boxes[low_c], self.prev_tracks)
+                take = {}
+                for j in np.where(~cov)[0]:
+                    c = np.where(P[:, j] >= s.dup_iou)[0]
+                    if len(c):
+                        k = int(low_c[c[np.argmax(scores[low_c[c]])]])
+                        take[k] = True
+                if take:
+                    idx = np.array(sorted(take), int)
+                    pos = np.searchsorted(passed, idx)
+                    out = np.array(out, np.float64)
+                    out[pos] = (min(h.assoc, h.birth) + 1e-3 if s.rescue_band == "assoc"
+                                else floor_pass + 1e-3 if s.rescue_band == "fg"
+                                else h.low + 1e-3)
+                    n_rescued = len(idx)
+                    # candidates below the host's lowest stage that were not
+                    # rescued are irrelevant to the host either way
         log.update(n_in=int(len(scores)), n_dup=int(len(scores) - len(keep)),
                    n_pass=int(len(passed)), n_primary=int((Lp >= ta).sum()),
-                   assoc=assoc, birth=birth)
+                   assoc=assoc, birth=birth, n_rescued=n_rescued)
 
         match = h.match
         if s.motion:
@@ -354,7 +465,7 @@ class V7Layer:
         log["match"] = match
 
         # frame-t observations affect frames > t only
-        self.window.append(L_all)
+        self.window.append(L_in if s.pool == "raw" else L_all)
         if s.dup == "ctx" or s.dup_clean == "ctx":
             self.pair_hist.append(getattr(self, "_pair_ev", (0, 0)))
             self._pair_ev = (0, 0)

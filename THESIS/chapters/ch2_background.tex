@@ -1,0 +1,150 @@
+\chapter{Background and Literature Review}\label{ch:background}
+
+This chapter reviews the field in which the thesis is placed. Sections~\ref{sec:bg-evolution}--\ref{sec:bg-datasets} extend the survey published in \cite{ismail2026realtime}: they trace the evolution of object detection and tracking, state the technical problem, and review detectors, trackers, and datasets from a deployment perspective. Sections~\ref{sec:bg-confidence}--\ref{sec:bg-aerial} review the work closest to the two controllers of this thesis: detector confidence and its calibration, adaptive inference and adaptive tracker thresholds, and aerial tracking. Section~\ref{sec:bg-gap} states the gap that the thesis addresses. Evaluation metrics are defined formally in Chapter~\ref{ch:method}.
+
+\section{Evolution of Object Detection and Tracking}\label{sec:bg-evolution}
+Object detection and tracking have evolved through three technological phases \cite{li2025motreview}. Before 2012, detectors relied on hand-engineered features such as the histogram of oriented gradients \cite{dalal2005hog} and scale-invariant keypoints \cite{lowe2004sift}, combined with sliding windows and shallow classifiers. The second phase began when convolutional neural networks (CNNs) trained on large labelled datasets \cite{krizhevsky2017alexnet,russakovsky2015imagenet} outperformed hand-crafted features; region-based detectors \cite{girshick2014rcnn,ren2017fasterrcnn} and single-stage detectors \cite{redmon2016yolo,liu2016ssd} pushed the accuracy--speed frontier, and deep residual networks \cite{he2016resnet} became standard backbones. The third phase, beginning around 2020, introduced attention-based models \cite{vaswani2017attention,dosovitskiy2021vit}. The detection transformer (DETR) \cite{carion2020detr} removed anchors and NMS, and transformer-based trackers \cite{sun2020transtrack,meinhardt2022trackformer,zeng2022motr} integrated detection and association in one network.
+
+Throughout these phases, multi-object tracking has been dominated by tracking by detection, whose trackers consume the output of an independent detector \cite{bewley2016sort,zhang2022bytetrack}. This thesis works within that paradigm, because it is the one in which detectors and trackers are combined and exchanged independently, and therefore the one in which their operating points must be reconciled.
+
+\section{Applications and Technical Challenges}\label{sec:bg-challenges}
+
+\subsection{Applications}
+Real-time detection and tracking are required wherever a system must perceive its environment continuously. Surveillance and security systems detect abnormal behavior and track people and vehicles in live streams. Driver assistance and autonomous driving rely on real-time detection of pedestrians, vehicles, and obstacles \cite{geiger2012kitti}. UAVs apply detection and tracking in traffic monitoring, inspection, search, and defense \cite{zhu2022visdrone,bakirci2025lowpower}, and the aerospace literature has studied airborne target tracking \cite{miller2015multitarget,desai2017uavfeature}, onboard deep detection \cite{lu2024uavdetection,choi2022docking}, and vision-based guidance \cite{parsons2019refueling}. Industrial robots use tracking for pick-and-place, assembly, and navigation.
+
+\subsection{Detection and tracking challenges}
+In crowded scenes, individual objects are hard to separate, and occlusion causes missed detections and identity switches. Fast motion, deformation, and long-term disappearance require motion models and appearance cues that remain reliable over many frames. Small objects, common in aerial footage, produce few pixels and low detector confidence \cite{cheng2023smallobject}. Illumination changes, blur, and weather reduce the detector's recall and change the distribution of its confidence scores \cite{chae2024radar}. Multi-object tracking therefore faces three coupled problems: detecting the objects, associating detections across frames, and keeping identities through occlusion \cite{li2025motreview}.
+
+\subsection{Real-time constraints}
+Real-time performance is limited by three factors \cite{bakirci2025lowpower}. The first is the accuracy--speed trade-off: more accurate models generally need more computation and longer inference. The second is the hardware, which ranges from data-center graphics processors to low-power embedded processors on board a vehicle or an aircraft. The third is the deployment context: bandwidth, power supply, and the need for onboard rather than remote processing. For a tracking pipeline these constraints act mainly through the detector, whose input resolution sets most of the cost; the tracker itself is usually inexpensive. A controller that changes the detector's resolution therefore changes the cost of the pipeline, which is why Chapter~\ref{ch:scene} imposes an explicit throughput constraint.
+
+\section{Formal Problem Definition}\label{sec:bg-problem}
+Let a video be a sequence of frames $\{I_t\}_{t=1}^{T}$. A detector estimates, for each frame, a set of candidates
+\begin{equation}
+\mathcal{D}_t = \{(\mathbf{b}_{t,i}, c_{t,i}, s_{t,i})\}_{i=1}^{n_t},
+\label{eq:bg-dets}
+\end{equation}
+where $\mathbf{b}_{t,i}$ is a bounding box, $c_{t,i}$ a class label, and $s_{t,i}\in(0,1)$ a confidence score. Multi-object tracking associates detections across time into trajectories $\mathcal{T}=\{\tau_j\}$, each a sequence of boxes $\tau_j = \{\mathbf{b}^{j}_t\}_{t=t_s}^{t_e}$ between a start frame $t_s$ and an end frame $t_e$. An online tracker solves, frame by frame, an assignment problem
+\begin{equation}
+\pi_t^{*} = \arg\min_{\pi_t} \sum_{(i,j)\in\pi_t} C\left(\mathbf{b}_{t,i}, \tau_j\right),
+\label{eq:bg-assign}
+\end{equation}
+where $\pi_t$ is a one-to-one matching between the detections of frame $t$ and the existing tracks, and $C$ is a cost based on predicted motion, appearance, or learned embeddings. The Hungarian method \cite{kuhn1955hungarian} solves this assignment exactly, and a Kalman filter \cite{kalman1960} is the usual motion predictor.
+
+Two families of thresholds enter this formulation and are the subject of this thesis. The detector keeps only candidates whose score exceeds its confidence threshold and suppresses candidates that overlap a higher-scoring candidate by more than its NMS threshold. The tracker then admits detections to association and to track birth only above its own score thresholds. The quality of $\mathcal{T}$ therefore depends not only on the detector and the tracker, but on whether their thresholds fit the score distribution that the detector actually produces.
+
+\section{Object Detectors}\label{sec:bg-detectors}
+Object detectors are broadly divided into two-stage and single-stage architectures, with transformer-based detectors forming a third group. Table~\ref{tab:bg-detectors} summarizes the detectors discussed in this section.
+
+\subsection{Two-stage detectors}
+The region-based CNN family first proposes candidate regions and then classifies and refines them \cite{girshick2014rcnn}. Faster R-CNN introduced a region proposal network that shares convolutional features with the detection head, which made the proposals nearly free and improved both speed and accuracy \cite{ren2017fasterrcnn}. Mask R-CNN added a parallel branch that predicts a segmentation mask for each detection \cite{he2017maskrcnn}. Two-stage detectors are accurate, particularly for small objects and cluttered scenes, but they are generally slower than single-stage detectors.
+
+\subsection{Single-stage detectors}
+Single-stage detectors predict boxes and class probabilities in one pass over the image. The YOLO family treats detection as a regression problem over a grid \cite{redmon2016yolo}; successive versions improved the backbone, the neck, and the training recipe \cite{redmon2018yolov3,bochkovskiy2020yolov4}, and the recent generations distributed as software libraries offer a range of model sizes from very small to large. The Single Shot MultiBox Detector (SSD) predicts boxes from feature maps at several scales \cite{liu2016ssd}. RetinaNet introduced the focal loss to address the imbalance between foreground and background during the training of dense detectors, reaching the accuracy of two-stage detectors with single-stage speed \cite{lin2017focal}. EfficientDet combined a bidirectional feature pyramid with compound scaling of resolution, depth, and width \cite{tan2020efficientdet}. Feature pyramid networks \cite{lin2017fpn} are the standard architectural response to scale variation in all of these detectors.
+
+\subsection{Transformer-based detectors}
+DETR formulates detection as set prediction with a transformer encoder--decoder, which removes anchors and NMS and makes the pipeline end to end \cite{carion2020detr}. The original DETR converges slowly and is expensive. Real-time transformer detectors such as RT-DETR \cite{zhao2024rtdetr} and RF-DETR \cite{robinson2025rfdetr} keep the set-prediction formulation while reducing latency to the range of single-stage detectors.
+
+\begin{table}[tbp]
+\centering
+\caption{Detector families discussed in this thesis. The last column indicates whether the detector's output depends on a confidence threshold and an NMS threshold chosen by the user, which is the operating point controlled in Chapter~\ref{ch:scene}.}
+\label{tab:bg-detectors}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{0.8cm}>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{2.5cm}}
+\toprule
+Detector & Year & Architecture & Key idea & User thresholds \\
+\midrule
+R-CNN \cite{girshick2014rcnn} & 2014 & two-stage & CNN features on region proposals & confidence, NMS \\
+Faster R-CNN \cite{ren2017fasterrcnn} & 2017 & two-stage & shared region proposal network & confidence, NMS \\
+Mask R-CNN \cite{he2017maskrcnn} & 2017 & two-stage & parallel mask branch & confidence, NMS \\
+YOLO \cite{redmon2016yolo} & 2016 & single-stage & grid regression of boxes and classes & confidence, NMS \\
+SSD \cite{liu2016ssd} & 2016 & single-stage & multi-scale default boxes & confidence, NMS \\
+RetinaNet \cite{lin2017focal} & 2017 & single-stage & focal loss for class imbalance & confidence, NMS \\
+YOLOX \cite{ge2021yolox} & 2021 & single-stage & anchor-free, decoupled head & confidence, NMS \\
+EfficientDet \cite{tan2020efficientdet} & 2020 & single-stage & bidirectional pyramid, compound scaling & confidence, NMS \\
+DETR \cite{carion2020detr} & 2020 & transformer & set prediction, no NMS & confidence \\
+RT-DETR \cite{zhao2024rtdetr} & 2024 & transformer & real-time hybrid encoder & confidence \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Deployment perspective}
+For deployment, the detector's accuracy on a benchmark is only one consideration. Its latency on the target processor, its memory, and its behavior on the target data matter as much \cite{bakirci2025lowpower}. Two properties are central to this thesis. First, the cost of a detector grows steeply with its input resolution, so the resolution is the most effective lever on throughput. Second, the confidence scores of different detectors are not on a common scale: the same object may receive 0.9 from one detector and 0.4 from another, and scores also shift with the scene \cite{kuppers2020detcalib}. The published comparison of detectors in \cite{ismail2026realtime} shows that recent YOLO generations and compact transformer detectors are the most practical choices for real-time deployment; this thesis uses the small YOLOv8n and the transformer RT-DETR-L as live detectors and the published YOLOX-X detections of MOT17 as a fixed detection source.
+
+\section{Multi-Object Tracking Paradigms}\label{sec:bg-paradigms}
+
+\subsection{Tracking by detection}
+In tracking by detection, a detector is applied independently to every frame and an online tracker associates the detections over time using motion and appearance cues \cite{bewley2016sort,wojke2017deepsort}. The paradigm benefits directly from advances in detectors and remains modular: any detector can feed any tracker. It is the paradigm used throughout this thesis.
+
+\subsection{Joint detection and tracking}
+Joint detection and tracking approaches integrate detection and association in one network. JDE learns detection and appearance embeddings in a shared model \cite{wang2020jde}; FairMOT treats detection and re-identification as equally important tasks with an anchor-free design \cite{zhang2021fairmot}; CenterTrack predicts object centers and their displacements between frames \cite{zhou2020centertrack}. These methods reduce the cost of a separate appearance model, but they couple the detector and the tracker, so that neither can be exchanged independently.
+
+\subsection{Transformer-based tracking}
+Transformer-based trackers treat tracking as set prediction over time. TransTrack propagates queries between frames \cite{sun2020transtrack}; TrackFormer separates object queries for new objects from track queries for existing ones \cite{meinhardt2022trackformer}; MOTR carries track queries across frames and updates them by attention, without hand-crafted association \cite{zeng2022motr}; MOTIP predicts identities directly \cite{gao2025motip}. These methods are conceptually elegant and fully differentiable, but they remain computationally expensive, and their thresholds are internal to the network.
+
+\subsection{Graph-based association}
+Graph neural networks represent objects as nodes and their relations as edges, which supports association in crowded and dynamic scenes \cite{li2025motreview}. They are a developing direction and are not used in this thesis.
+
+\section{Tracking-by-Detection Trackers}\label{sec:bg-trackers}
+This section reviews the trackers that are used or discussed in the thesis, with attention to how each one uses detector scores. Table~\ref{tab:bg-trackers} summarizes them.
+
+\subsection{Motion-based trackers}
+SORT combines a constant-velocity Kalman filter with Hungarian assignment on box overlap \cite{bewley2016sort}. It is simple and fast, but it relies on motion alone, so occlusion and irregular motion cause many identity switches. The IOU tracker shows how far pure overlap association can go at high frame rates \cite{bochinski2017iou}. ByteTrack introduced a second association stage: detections above a high threshold are associated first, and the tracks that remain unmatched are then associated with low-confidence detections, which recovers partially occluded objects that other trackers discard \cite{zhang2022bytetrack}. OC-SORT refines the Kalman filter with observation-centric re-update and a velocity-direction consistency term, which improves robustness to occlusion and non-linear motion \cite{cao2023ocsort}; it uses a single confidence threshold. Buffered IoU matching enlarges the boxes during association to handle irregular motion \cite{yang2023cbiou}.
+
+\subsection{Motion and appearance trackers}
+DeepSORT adds deep appearance embeddings to SORT and combines the Kalman prediction with cosine distance between embeddings, which reduces identity switches \cite{wojke2017deepsort}. BoT-SORT adds camera-motion compensation, an improved Kalman state, and re-identification features to the ByteTrack association \cite{aharon2022botsort}. StrongSORT revisits DeepSORT with an exponential moving average of appearance features, camera-motion compensation by the enhanced correlation coefficient \cite{evangelidis2008ecc}, and other refinements \cite{du2023strongsort}. Deep OC-SORT adds adaptive appearance re-identification to OC-SORT \cite{maggiolino2023deepocsort}. SMILEtrack learns similarity for occlusion-aware association \cite{wang2024smiletrack}.
+
+\subsection{Recent trackers evaluated in this thesis}
+Several recent trackers are evaluated with the control layer of Chapter~\ref{ch:layer}. Hybrid-SORT uses weak cues, such as confidence state and height, alongside strong cues \cite{yang2024hybridsort}. SparseTrack decomposes crowded scenes by pseudo-depth before association \cite{liu2025sparsetrack}. BoostTrack boosts the confidence of likely true detections and augments the similarity measure \cite{stanojevic2024boosttrack}. PD-SORT adds pseudo-depth cues to the motion model to handle occlusion \cite{wang2025pdsort}. C-TWiX learns association from box coordinates with a transformer \cite{miah2025twix}. TOPICTrack runs parallel association paths selected by motion level \cite{cao2025topictrack}. TrackTrack focuses association on tracks and uses two detection views with different thresholds \cite{shim2025tracktrack}.
+
+\begin{table}[tbp]
+\centering
+\caption{Tracking-by-detection trackers discussed in this thesis, and how they use detector scores. A single-stage tracker discards every detection below one threshold; a two-stage tracker has a second, lower threshold for recovering tracks. The distinction determines the behavior of the control layer (Chapter~\ref{ch:layer}).}
+\label{tab:bg-trackers}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{0.8cm}>{\raggedright\arraybackslash}p{5.2cm}>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{2.6cm}}
+\toprule
+Tracker & Year & Main cues & Score stages & Used in \\
+\midrule
+SORT \cite{bewley2016sort} & 2016 & Kalman motion, IoU & single & background \\
+DeepSORT \cite{wojke2017deepsort} & 2017 & motion, appearance & single & background \\
+ByteTrack \cite{zhang2022bytetrack} & 2022 & motion, IoU, low-score recovery & two-stage & Ch.~\ref{ch:scene}, Ch.~\ref{ch:layer} \\
+BoT-SORT \cite{aharon2022botsort} & 2022 & motion, camera motion, ReID & two-stage & Ch.~\ref{ch:layer} \\
+OC-SORT \cite{cao2023ocsort} & 2023 & observation-centric motion & single & Ch.~\ref{ch:layer} \\
+StrongSORT \cite{du2023strongsort} & 2023 & motion, appearance, ECC & single & background \\
+Hybrid-SORT \cite{yang2024hybridsort} & 2024 & strong and weak cues & two-stage & Ch.~\ref{ch:layer} \\
+BoostTrack \cite{stanojevic2024boosttrack} & 2024 & confidence boost, similarity & two-stage & Ch.~\ref{ch:layer} \\
+SparseTrack \cite{liu2025sparsetrack} & 2025 & pseudo-depth decomposition & two-stage & Ch.~\ref{ch:layer} \\
+PD-SORT \cite{wang2025pdsort} & 2025 & pseudo-depth motion & single & Ch.~\ref{ch:layer} \\
+C-TWiX \cite{miah2025twix} & 2025 & learned coordinate association & single & Ch.~\ref{ch:layer} \\
+TOPICTrack \cite{cao2025topictrack} & 2025 & parallel association paths & two-stage & Ch.~\ref{ch:layer} \\
+TrackTrack \cite{shim2025tracktrack} & 2025 & track-focused, two views & two-view & Ch.~\ref{ch:layer} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{What the trackers have in common}
+All of these trackers read detector scores through fixed thresholds that their authors tuned for one detector, usually YOLOX \cite{ge2021yolox} on MOT17. The published comparison in \cite{ismail2026realtime} shows the steady progress of tracking accuracy from motion-only methods to trackers that combine motion, appearance, and low-score association, and the high cost of transformer-based trackers. It does not, and no leaderboard does, show how a tracker behaves when its detector changes. That question is the subject of Chapter~\ref{ch:layer}.
+
+\section{Datasets}\label{sec:bg-datasets}
+Detection models are commonly trained on COCO, which contains more than 330,000 images with annotations for 80 object categories \cite{lin2014coco}; the detectors used in this thesis are pretrained on COCO and are not fine-tuned. ImageNet provides the large-scale classification data on which most backbones are pretrained \cite{russakovsky2015imagenet}. For tracking, the MOTChallenge benchmarks MOT16 and MOT17 \cite{milan2016mot16,dendorfer2021motchallenge} contain pedestrian sequences from static and moving cameras, and MOT20 contains very crowded scenes \cite{dendorfer2020mot20}. KITTI provides driving sequences with car and pedestrian tracks recorded with synchronized camera, LiDAR, and positioning sensors \cite{geiger2012kitti}. DanceTrack contains dancers with uniform appearance and diverse motion, which makes association by appearance difficult \cite{sun2022dancetrack}. For aerial tracking, VisDrone2019 provides drone video captured at different altitudes, viewpoints, and illumination \cite{zhu2022visdrone}, and UAVDT provides vehicle tracking from UAVs under varied weather, altitude, and camera views \cite{du2018uavdt}. The splits of these datasets used in this thesis are described in Chapter~\ref{ch:method}.
+
+\section{Detector Confidence and Calibration}\label{sec:bg-confidence}
+A classifier is calibrated when its confidence equals its probability of being correct. Modern neural networks are often poorly calibrated \cite{guo2017calibration}, and object detectors are no exception: their confidence depends on the position and size of the box as well as on the class, and it shifts with the data \cite{kuppers2020detcalib}. Detectors of different families \cite{redmon2016yolo,ren2017fasterrcnn,carion2020detr,zhao2024rtdetr} produce different score distributions, and soft suppression changes the score of overlapping boxes \cite{bodla2017softnms}. Calibration methods fit a mapping from scores to probabilities on labelled data. That is not possible in the situation studied in Chapter~\ref{ch:layer}, where a detector is exchanged in a deployed pipeline without labels; test-time adaptation methods adapt a model to unlabelled data \cite{wang2021tent}, but they change the model's weights, whereas this thesis keeps both the detector and the tracker frozen.
+
+Classical image thresholding offers a different tool. Otsu's method chooses the threshold that maximizes the between-class variance of a histogram \cite{otsu1979}; it needs no labels and adapts to the shape of the distribution. Chapter~\ref{ch:layer} applies it to the stream of detector logits.
+
+\section{Adaptive Inference and Adaptive Thresholds}\label{sec:bg-adaptive}
+Adapting inference to the content is an established idea. Dynamic neural networks adapt their depth, width, or resolution to the input \cite{han2022dynamic}, and video analytics systems adapt configurations such as resolution and frame rate to the content and to the available resources \cite{jiang2018chameleon}. These systems learn the adaptation policy or profile many configurations online. Hyperparameter search frameworks such as Optuna with the tree-structured Parzen estimator \cite{akiba2019optuna} are commonly used to select fixed configurations offline; Chapter~\ref{ch:scene} uses them in that role, on validation data only.
+
+Closest to this thesis, several trackers adapt their own confidence thresholds. An adaptive confidence threshold for ByteTrack is derived from the detections of each frame \cite{ma2023adaptivebytetrack}; AdapTrack applies adaptive thresholding to the matching step \cite{shim2024adaptrack}; and ACT sets high and low thresholds per frame from the first quartile of the confidence scores and the number of candidates \cite{act2026adaptive}. These methods are designed into one tracker and use statistics of the current frame. The control layer of Chapter~\ref{ch:layer} differs in four respects: its statistics come only from past frames; it decides per stream whether to intervene at all and otherwise preserves the tracker's operating point; it acts through a declared host contract on heterogeneous published trackers without modifying them; and it is evaluated as one frozen policy under confidence shift and on external systems.
+
+\section{Aerial Multi-Object Tracking}\label{sec:bg-aerial}
+The VisDrone \cite{zhu2022visdrone} and UAVDT \cite{du2018uavdt} benchmarks established large annotated drone video collections and documented the characteristic difficulties of the domain: small objects, high density, changing altitude and viewpoint, and illumination changes. Surveys of deep learning for drone-based detection and tracking \cite{wu2022uavsurvey} and of computer vision for UAVs \cite{kanellakis2017uavvision} summarize the resulting methods. Trackers specialized for moving aerial platforms model camera motion explicitly \cite{liu2022uavmot}. Small-object detection, the central difficulty of aerial footage, is surveyed in \cite{cheng2023smallobject}; multi-scale feature pyramids \cite{lin2017fpn} are the standard architectural response, and the input resolution remains the simplest operational lever. Recent datasets extend aerial tracking to language-guided and multi-modal settings \cite{ismail2026realtime}, and future directions include foundation models for zero-shot tracking \cite{awais2025foundation} and multi-sensor fusion for adverse weather \cite{chae2024radar}.
+
+\section{Research Gap}\label{sec:bg-gap}
+The review points to a gap between how tracking methods are developed and how they are deployed. Detectors and trackers are developed and benchmarked with fixed operating points tuned for one detector and one kind of scene. In deployment, scenes change within a video, and detectors are exchanged more often than trackers are retuned. Adaptive-inference systems learn or profile a policy per model, and adaptive-threshold trackers adapt one tracker to the current frame. What is missing is (i) a training-free way to control the detector operating point in changing aerial scenes, evaluated against the matched static alternative so that the value of adaptation can be separated from the value of calibration, and (ii) a training-free, tracker-agnostic way to keep published trackers operating when the detector's confidence scale changes, which is evaluated on trackers that were not seen during its design and which does no harm when nothing needs to be changed. Chapters~\ref{ch:scene} and~\ref{ch:layer} address these two points.

@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\caption{External systems evaluated once with the frozen layer. Reproduction class against the authors' reported number (EXACT: $|\Delta\mathrm{HOTA}|\le0.2$; CLOSE: $\le1.0$ with a documented, untuned cause). TOPICTrack failed reproduction and is excluded from the analysis.}
+\label{tab:external}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllccc}
+\hline
+System & Data & Reference / reproduced HOTA & Class & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 \\
+\hline
+\multicolumn{7}{l}{\textit{Predeclared before the runs}}\\
+PD-SORT & MOT17 val-half & 68.01 / 68.01 & EXACT (released output) & {\boldmath $+0.61$ [$+0.27$, $+1.65$]} & {\boldmath $+1.13$ [$+0.27$, $+3.03$]} & {\boldmath $+0.82$ [$+0.43$, $+1.94$]} \\
+Hybrid-SORT & MOT17 val-half & 67.1 / 66.70 & CLOSE & 0 (identical) & 0 (identical) & 0 (identical) \\
+\multicolumn{7}{l}{\textit{Post-freeze, protocol registered before the runs}}\\
+C-TWiX & MOT17 val-half & 77.8 / 77.55 & CLOSE & $-0.05$ [$-0.46$, $+0.40$] & $+0.24$ [$-0.58$, $+1.12$] & $+0.18$ [$-0.47$, $+1.14$] \\
+C-TWiX (car) & KITTI MOTS val & 89.3 / 89.27 & EXACT & {\boldmath $-1.52$ [$-4.05$, $-0.13$]} & {\boldmath $-2.11$ [$-5.89$, $-0.17$]} & {\boldmath $-1.21$ [$-3.32$, $-0.10$]} \\
+C-TWiX (pedestrian) & KITTI MOTS val & 71.4 / 70.77 & CLOSE & $-0.10$ [$-2.16$, $+0.03$] & $-0.31$ [$-4.86$, $+0.10$] & $-0.01$ [$-1.90$, $+0.08$] \\
+C-TWiX & DanceTrack val & 60.4 / 59.62 & CLOSE & $-1.00$ [$-2.62$, $+0.65$] & $+0.13$ [$-0.39$, $+0.47$] & $-1.55$ [$-3.76$, $+0.52$] \\
+TOPICTrack & MOT17 val-half & 69.6 / 67.54 & FAILED & \multicolumn{3}{c}{not analyzed} \\
+TrackTrack & DanceTrack val & 63.3 / 62.96 & CLOSE & {\boldmath $-0.013$ [$-0.032$, $-0.001$]} & {\boldmath $-0.073$ [$-0.208$, $-0.004$]} & $+0.009$ [$-0.001$, $+0.028$] \\
+\botrule
+\end{tabular}}
+\end{table*}

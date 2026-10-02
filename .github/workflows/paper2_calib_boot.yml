@@ -1,0 +1,29 @@
+name: Paper 2 - calibration-shift bootstrap (frozen V7f, analysis only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [paper2-v7f]
+    paths: [".github/workflows/paper2_calib_boot.yml", "tools/v7/ci/calib_boot.sh", "tools/v7/ci/calib_collect.py"]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL && df -h /
+      - name: System packages
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq pkg-config g++ unzip
+      - name: Run
+        run: bash tools/v7/ci/calib_boot.sh
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/paper2_calib_boot || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Calibration-shift bootstrap for frozen V7f, 14 conditions (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin paper2-v7f && git push origin HEAD:paper2-v7f && break; sleep 5; done

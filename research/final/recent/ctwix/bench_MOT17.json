@@ -1,0 +1,1 @@
+{"kind": "mot", "gt_folder": "/home/runner/acmot_work/acmot_external/TWiX/src/evaluation/TrackEval/data/gt/mot_challenge/MOT17-val_half", "seqmap": "/home/runner/acmot_work/acmot_external/TWiX/src/evaluation/TrackEval/data/gt/mot_challenge/seqmaps/MOT17-val_half.txt", "benchmark": "MOT17", "split": "val_half"}

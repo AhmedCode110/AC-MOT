@@ -1,0 +1,13 @@
+total 2201948
+-rw-r--r-- 1 runner runner 317604675 Aug 24  2023 mot17_sbs_S50.pth
+-rw-r--r-- 1 runner runner 336553343 Aug 24  2023 mot20_sbs_S50.pth
+-rw-r--r-- 1 runner runner 792835795 Aug 24  2023 topictrack_ablation.pth.tar
+-rw-r--r-- 1 runner runner 792835731 Aug 24  2023 topictrack_mot17.pth.tar
+-rw-r--r-- 1 runner runner  14159980 Sep 28 20:48 twix_results.zip
+-rw-r--r-- 1 runner runner    776012 Sep 28 20:48 twix_weights.zip
+eb2e83afe774c85f20b735a7fabc423659c022387187eba449419c18dd6b4fa9  mot17_sbs_S50.pth
+d57c0bee3b1048aad8619d12f5d10277c8136a78141de09b68e1352e41b4059b  mot20_sbs_S50.pth
+26cb8d2808664e5068a4c812d53becbc948b47fd6eacf2b45db049ab40c48b1a  topictrack_ablation.pth.tar
+e3945f3523fde1e107708aacd64dab0670c34e371d136e54587cac7a50d3cfba  topictrack_mot17.pth.tar
+255ac5f0df1130451e0d04ef879840d8bb7db07e600e31930e9015c586d2ce53  twix_results.zip
+843fad6fedc81ba2d6b455b032be43713da78e60ac70b4f85fbe8d11281854fc  twix_weights.zip

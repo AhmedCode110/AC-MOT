@@ -1,0 +1,3 @@
+repo_commit 1b5bc7996ea7311f3ca26edb55b63f0ba311a742
+cpu AMD EPYC 9V45 96-Core Processor x 4
+split val7 (development, row P6); conf16 and test-dev not run

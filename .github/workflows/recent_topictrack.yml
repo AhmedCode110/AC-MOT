@@ -1,0 +1,62 @@
+name: TOPICTrack + frozen V7f (MOT17 val-half)
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/recent_topictrack.yml", "tools/v7/recent/topictrack_seq.sh"]
+permissions:
+  contents: write
+jobs:
+  seq:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        seq: [MOT17-02-FRCNN, MOT17-04-FRCNN, MOT17-05-FRCNN, MOT17-09-FRCNN, MOT17-10-FRCNN, MOT17-11-FRCNN, MOT17-13-FRCNN]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run
+        run: bash tools/v7/recent/topictrack_seq.sh ${{ matrix.seq }} $HOME/out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tt-${{ matrix.seq }}
+          path: ~/out
+  evaluate:
+    needs: seq
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: ~/arts
+      - name: Evaluate
+        run: |
+          set -euo pipefail
+          OUT=research/final/recent/topictrack; mkdir -p $OUT
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q numpy==2.2.6 scipy
+          git clone -q https://github.com/JonathonLuiten/TrackEval.git ~/TrackEval && git -C ~/TrackEval checkout -q 12c8791
+          git clone -q https://github.com/holmescao/TOPICTrack.git ~/TOPICTrack && git -C ~/TOPICTrack checkout -q e7b260f
+          R=~/runs/MOT17-val; mkdir -p $R
+          for d in ~/arts/tt-*/MOT17-val/*; do n=$(basename $d); [ -d $d ] || continue; mkdir -p $R/$n/data; cp $d/data/*.txt $R/$n/data/; cp $d/audit_*.json $R/$n/ 2>/dev/null || true; done
+          cat ~/arts/tt-*/MOT17-val/det_cache_*.sha256 > $OUT/det_cache.sha256 || true
+          G=~/TOPICTrack/results/gt
+          echo "{\"kind\": \"mot\", \"gt_folder\": \"$G/MOT17-val\", \"seqmap\": \"$G/seqmaps/MOT17-val.txt\", \"benchmark\": \"MOT17\", \"split\": \"val\"}" > $OUT/bench_MOT17.json
+          export ACMOT_TRACKEVAL=~/TrackEval
+          for s in "" _post; do
+            ~/venv/bin/python tools/v7/recent/te_eval.py table $OUT/bench_MOT17.json $R TT_BASELINE$s TT_V7f$s --out $OUT/table_MOT17$s.json | tee $OUT/table_MOT17$s.txt
+            ~/venv/bin/python tools/v7/recent/te_eval.py boot $OUT/bench_MOT17.json $R TT_BASELINE$s TT_V7f$s --out $OUT/boot_MOT17$s.json | tee $OUT/boot_MOT17$s.txt
+          done
+          tar -czf $OUT/tracks_MOT17.tar.gz -C $R .
+          echo "repo_commit $(git rev-parse HEAD)" > $OUT/environment.txt
+          echo "runner $(lscpu | sed -n 's/^Model name: *//p') x $(nproc); detector and ReID on CPU fp32" >> $OUT/environment.txt
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/recent/topictrack || true
+          git diff --cached --quiet && exit 0
+          git commit -m "TOPICTrack + frozen V7f: MOT17 val-half results (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

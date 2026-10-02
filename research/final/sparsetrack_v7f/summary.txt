@@ -1,0 +1,7 @@
+ST_replay_baseline       HOTA 68.876 MOTA 77.849 IDF1 81.974 IDS 124
+ST7_BASELINE_ci          HOTA 68.876 MOTA 77.849 IDF1 81.974 IDS 124
+ST7_V7f                  HOTA 68.931 MOTA 77.927 IDF1 82.130 IDS 131
+delta HOTA: +0.055 [-0.011, +0.254]
+delta MOTA: +0.078 [-0.027, +0.304]
+delta IDF1: +0.156 [-0.015, +0.696]
+baseline identical to reference: 1 / 14

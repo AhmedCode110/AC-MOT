@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Host contracts: the operating point each published tracker declares, as used by the layer. $\tau$ is the tracker's own published threshold, which differs between trackers and, for TrackTrack, between sequences.}
+\label{tab:contracts}
+\small
+\begin{tabular}{p{3.4cm}cccccp{3.6cm}}
+\hline
+Tracker (setting) & Type & assoc & birth & low & match & Decision mapped to \\
+\hline
+ByteTrack (official MOT17) & two-stage & 0.6 & 0.7 & 0.1 & 0.8 & thresholds, candidates, scores \\
+ByteTrack (library default) & two-stage & 0.25 & 0.25 & 0.1 & 0.8 & same \\
+SparseTrack & two-stage & $\tau$ & $\tau+0.1$ & 0.1 & published & same \\
+BoostTrack & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate & same \\
+Hybrid-SORT & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate & same \\
+OC-SORT & single-stage & 0.6 & 0.6 & 0.6 & 0.7 & same \\
+PD-SORT & single-stage & $\tau$ & $\tau$ & $\tau$ & $1-$IoU gate & same \\
+C-TWiX (MOT17 / KITTI / DanceTrack) & single-stage & 0.5 & 0.7 / 0.5 / 0.9 & 0.5 & not mapped & candidates, scores, two score thresholds \\
+TrackTrack & two-view & $\tau_{\mathrm{det}}$ & $\tau_{\mathrm{init}}$ & 0.1 & not mapped & candidates in both views, two thresholds \\
+\hline
+\end{tabular}
+\end{table}

@@ -206,6 +206,250 @@ Reading (HYPOTHESIS, not established): the motion-conditioned tolerance may help
 compensation (ultralytics ByteTrack on drone video) and slightly hurt hosts
 that already compensate (SparseTrack GMC, BoostTrack ECC). This is CONFOUNDED (host and dataset change together; the val-7 YOLO effect is −0.64 HOTA, development-40 ≈ 0, MOT17 gaps 0.12–0.21 HOTA) and untested by bootstrap. V7c vs V7d differences are within noise until tested. OPEN.
 
+## Cloud continuation (environment C1, see V7_CLOUD_RUNS.md)
+Labelled evaluation is BLOCKED in C1: the network policy denies the official
+MOT17 (motchallenge.net) and VisDrone/UAVDT (Google Drive) downloads. The
+entries below are label-free (no metric, no accept/reject), except where
+stated. Code: batch-1 commit on `universal-adapters-v1-y0zkeh`.
+
+### E12-LF — ID churn, label-free part (DIAGNOSTIC)
+Question: where do V7c/V7d create more track identities than V6EMU?
+Tool: `tools/v7/diag_churn.py` on `dev.py track` outputs (ByteTrack host,
+native caches). "ids" = distinct track ids = births; "short" = ids living
+< 5 frames; cold = frames without valid bands (here only frame 1 of each
+sequence); regchg = regime changes (the first cold→regime change of every
+sequence included); ajump = |Δassoc| > 0.05. Full table:
+`research/final/V7_E12_CHURN.json`.
+
+| Split / det | System | ids | short | births in cold frames | births clean | births noisy | regchg | ajump |
+|---|---|---|---|---|---|---|---|---|
+| val-7 YOLO | V6EMU | 481 | 72 | 0 | 0 | 481 | 7 | 0 |
+| val-7 YOLO | V7c | 542 | 97 | 102 | 80 | 360 | 20 | 30 |
+| val-7 YOLO | V7c@pool=raw | 641 | 110 | 102 | 71 | 468 | 14 | 22 |
+| val-7 RT-DETR | V6EMU | 454 | 53 | 0 | 0 | 454 | 7 | 0 |
+| val-7 RT-DETR | V7c | 648 | 166 | 294 | 26 | 328 | 8 | 7 |
+| val-7 Faster R-CNN | V6EMU | 742 | 124 | 0 | 0 | 742 | 7 | 0 |
+| val-7 Faster R-CNN | V7c | 895 | 203 | 245 | 68 | 582 | 12 | 11 |
+| dev-40 YOLO | V6EMU | 4447 | 551 | 0 | 0 | 4447 | 40 | 0 |
+| dev-40 YOLO | V7c | 4657 | 605 | 596 | 339 | 3722 | 94 | 94 |
+| dev-40 RT-DETR | V6EMU | 3816 | 280 | 0 | 0 | 3816 | 40 | 0 |
+| dev-40 RT-DETR | V7c | 5317 | 1011 | 1861 | 598 | 2858 | 90 | 84 |
+| dev-40 RT-DETR | V7c@pool=raw | 5626 | 922 | 1861 | 317 | 3448 | 62 | 58 |
+
+Findings (label-free, to be confirmed with per-frame IDS attribution):
+- **H1, cold-frame admission.** Frame 1 (host-native thresholds, no
+  statistics yet) births 42–47 tracks per RT-DETR sequence and ~15 per YOLO
+  sequence. On dev-40 RT-DETR these 1861 cold births exceed the whole
+  surplus of V7c over V6EMU (+1501 ids), and short-lived ids triple
+  (1011 vs 280). Frame-1 false tracks are the leading candidate for the
+  extra ID switches (a false track that overlaps a later true object can
+  take its match, then lose it).
+- **H2, regime/threshold oscillation.** V7c changes regime ~2.3 times per
+  dev-40 sequence (V6EMU: only the cold→noisy start) with a matching number
+  of association-threshold jumps. Births near a change are few on val-7
+  (YOLO 16 of 542), so oscillation is a secondary candidate.
+- **E13 (pool=raw) label-free effect.** Pooling every emitted candidate
+  removes 25–35% of the regime changes (the feedback loop O3 is real), but
+  the host outputs more boxes (dev-40 RT-DETR 21.1 vs 18.7 per frame) and
+  more ids in noisy frames: the raw pool contains the duplicates, which
+  moves t1/t2 down. Quality effect UNKNOWN until labels are available.
+- V7d vs V7c: +1–2% ids everywhere (host tolerance kept in clean frames);
+  no label-free separation.
+
+Label-free check of H1 (`@cold=none`: nothing admitted in cold frames):
+| Split / det | V6EMU ids / short | V7c ids / short | V7c@cold=none ids / short |
+|---|---|---|---|
+| val-7 YOLO | 481 / 72 | 542 / 97 | 518 / 82 |
+| val-7 RT-DETR | 454 / 53 | 648 / 166 | 481 / 57 |
+| val-7 Faster R-CNN | 742 / 124 | 895 / 203 | 793 / 139 |
+| dev-40 YOLO | 4447 / 551 | 4657 / 605 | 4574 / 579 |
+| dev-40 RT-DETR | 3816 / 280 | 5317 / 1011 | 4282 / 381 |
+Removing frame-1 admission removes most of the short-lived surplus
+(RT-DETR dev-40: 1011 → 381 vs V6 280). Consistent with H1; the quality
+trade-off (frame-1 recall on clean hosts, MOT17) is UNKNOWN until labels.
+
+### STRESS-LF — label-free calibration / floor stress (DIAGNOSTIC)
+Tool: `tools/v7/diag_stress.py` (val-7; `<base>@<mod>` vs `<base>` on the
+same candidates). regime = share of frames with the same regime; outR/outP
+= share of base/stressed output boxes reproduced (IoU ≥ 0.9); ids = ratio
+of track ids. Full table: `research/final/V7_STRESS_LABELFREE.json`.
+
+| det | mod | NATIVE outR/outP (ids) | V6EMU outR/outP (ids) | V7c regime, outR/outP (ids) |
+|---|---|---|---|---|
+| YOLO | temp2 | 0.90/0.53 (1.96) | 1.00/1.00 (1.00) | 1.00, 0.97/0.84 (1.30) |
+| YOLO | pow3 | 0.26/0.94 (0.24) | 0.94/0.74 (1.38) | 0.96, 0.73/0.72 (1.25) |
+| YOLO | floor 0.1 | 1.00/1.00 (1.00) | 0.45/0.94 (0.48) | 0.74, 0.52/0.93 (0.60) |
+| YOLO | floor 0.2 | 0.89/0.98 (1.04) | 0.32/0.94 (0.38) | 0.55, 0.38/0.87 (0.64) |
+| RT-DETR | temp2 | 0.89/0.53 (2.49) | 1.00/1.00 (1.00) | 1.00, 0.99/0.91 (1.70) |
+| RT-DETR | scale05 | 0.35/0.93 (0.20) | 0.95/0.58 (1.97) | 0.97, 0.87/0.59 (1.42) |
+| RT-DETR | floor 0.1 | 1.00/1.00 (1.00) | 0.68/0.96 (0.65) | 0.68, 0.72/0.87 (0.93) |
+| RT-DETR | floor 0.2 | 0.90/0.97 (1.04) | 0.49/0.95 (0.49) | 0.59, 0.54/0.76 (1.05) |
+
+Findings:
+- V6EMU is exactly invariant to logit temperature (Otsu + rank remap), as
+  the unit test predicts; V7c is not, because cold and clean frames use the
+  host's raw-scale thresholds (RT-DETR temp2: +70% ids, mostly frame 1 →
+  again H1).
+- The emission floor is V7's largest label-free instability: at floor 0.2
+  the regime agrees in only 55–59% of the frames and < 55% of the output
+  boxes survive. The full-stream pooled statistics (t1, t2, ρ) move with
+  the floor (D2/D6). NATIVE is floor-robust above its own low stage.
+- Quality under stress is UNKNOWN until labels; these numbers only say how
+  much the output moves.
+
+Predeclared labelled tests (run as soon as the annotations are available;
+decision by paired bootstrap, `tools/v7/bootstrap.py`, then the selection
+priority of the continue prompt):
+- E12a `V7c@cold=none`, `V7d@cold=none` vs V7c/V7d on val-7 (YOLO,
+  RT-DETR, Faster R-CNN) and dev-40, plus SparseTrack/BoostTrack (cold
+  frames cost the first frame of each MOT17 sequence there). Label-free
+  tracks already produced in C1.
+- E12c per-frame ID-switch attribution (`diag_churn.py`, labelled mode):
+  share of the V7c−V6EMU IDS surplus in frames ≤ 30 after a cold frame,
+  within 2 frames of a regime change, clean vs noisy frames.
+- E13 `V7c@pool=raw`, `V7d@pool=raw` (tracks already produced).
+
+## Labelled fallback evidence (cloud C1) — E15–E19
+All numbers below are EXACT evaluations of the stated configuration (see
+`V7_FALLBACK_VALIDATION.md`), cloud CPU, TrackEval @12c8791. Development
+data only (MOT17 val-half and KITTI training are contaminated for V7).
+MOT17 cells: two emission floors of the same published YOLOX-X detector
+(st = SparseTrack's published stream, floor 0.01; bt = BoostTrack's
+published stream, floor 0.1). Hosts: ByteTrack official MOT17 setting
+("official"), ultralytics ByteTrack default ("ultra"), OC-SORT official
+("OC"), BoostTrack (pixel-free, exact). No image motion cue on MOT17 (frames
+unreachable): the V7 motion rule is inactive there.
+
+### E15 — identity and floor stress on MOT17 hosts (NATIVE, V6EMU, V7c/V7d)
+- NATIVE = BASELINE exactly on every host and floor (tier-a identity);
+  BoostTrack BASELINE pixel-free = the Mac reference tracks byte for byte.
+- V6EMU collapses at floor 0.1 (ByteTrack 56.4 vs 67.7 HOTA; OC 45.7 vs
+  66.4) — labelled confirmation of D2/D6.
+- V7c = V7d here (no motion cue). Floor 0.01: parity (±0.02 HOTA). Floor
+  0.1: −0.14 (ByteTrack official), −0.75 (OC-SORT), −0.12 (BoostTrack).
+- Cause (per sequence): false noisy calls — mid-stream in MOT17-10 (a 54-frame
+  confidence dip under camera motion) and at the start of MOT17-02/11/13.
+- `cold=none` (E12a labelled): −0.3 to −0.5 HOTA on every MOT17 host →
+  REJECTED (frame-1 admission is not the fix on clean streams).
+- `pool=raw` (E13 labelled): within ±0.1 HOTA everywhere → not adopted
+  (no evidence of benefit; KITTI YOLO +0.17 HOTA but −IDF1).
+- `cold_dup=noisy`: within ±0.06 HOTA → not adopted.
+
+### E16 — regime from the whole stream (rho_frames = 0, "cumulative")
+Hypothesis: the regime is a property of the detector × scene stream; a
+100-frame median reacts to transient confidence dips (MOT17-10) and flips.
+Result: removes the mid-stream flips — ByteTrack floor 0.1 back to ≥ baseline
+(67.702 vs 67.698), OC floor 0.1 −0.37 (from −0.75), BoostTrack −0.03 (from
+−0.12). Remaining losses: start-of-sequence false noisy calls. ADOPTED.
+`rho_ref=host` gave no further gain once cumulative → not adopted.
+
+### E17 — track-consistent rescue (host-relative low stage)
+- `rescue_band=low` (sub-host.low continuations to ByteTrack's low stage):
+  FP +700–1000, −0.4/−0.5 HOTA → REJECTED.
+- `scores=ecdf` in clean frames: ByteTrack −0.2/−1.6 HOTA → REJECTED.
+- `rescue_band=assoc` (band (host.low, assoc) of OC with a misdeclared
+  low=0.1): OC +0.25 HOTA / +1.1 MOTA; ByteTrack −0.04 → redesigned.
+- **`rescue_band=fg`** (ADOPTED in V7e): a FOREGROUND candidate (≥ t1)
+  continuing an uncovered track of t−1 that the host cannot see at the
+  operating point passed this frame is handed to the host's lowest stage.
+  Host contract made honest: OC-SORT has no low stage → low = det_thresh =
+  0.6 (documented property: use_byte=False). Two-stage hosts: no-op by
+  construction. In noisy frames it hands the extension band to a
+  single-stage host (the V6 bands' intended semantics "may continue, may not
+  start").
+
+### E18 — interpretability of the nested split (bg_check, V7f)
+Diagnosis (MOT17-11 start, floor 0.1): ~10 candidates per frame, all objects;
+no background mode → first Otsu split falls inside the objects (t1 ≈ 0.6),
+second at 0.93 → ρ 0.13–0.17 → false noisy regime.
+Rule: the bands are read as background | ambiguous | confident only when the
+class below t1 holds at least as many pooled candidates as the foreground;
+otherwise the frame's ρ counts as clean evidence. For a host without a low
+stage every emitted candidate of such a stream may continue an uncovered
+track. Parameter-free.
+
+| Cell | BASELINE HOTA/MOTA/IDF1 (IDS) | V7f HOTA/MOTA/IDF1 (IDS) | ΔHOTA 95% CI (10k paired, seed 42) |
+|---|---|---|---|
+| ByteTrack official, floor 0.01 | 67.698/77.604/79.471 (214) | 67.684/77.662/79.440 (218) | −0.014 [−0.058, +0.009] |
+| ByteTrack official, floor 0.1 | 67.698/77.604/79.471 (214) | identical | 0 |
+| ByteTrack ultralytics, floor 0.01 | 66.000/74.756/76.417 (424) | identical | 0 |
+| ByteTrack ultralytics, floor 0.1 | 66.000/74.756/76.417 (424) | identical | 0 |
+| OC-SORT, floor 0.01 | 66.428/74.672/78.052 (211) | **67.041/75.940/78.708 (203)** | **+0.613 [+0.363, +1.241]**; MOTA +1.27 [+0.17, +3.01] |
+| OC-SORT, floor 0.1 | 66.443/74.669/78.046 (213) | **66.907/75.931/78.333 (199)** | **+0.464 [+0.266, +1.086]**; MOTA +1.26 [+0.37, +3.34]; IDF1 +0.29 [+0.00, +0.84] |
+| BoostTrack online / GBI | 68.492 / 71.725 | identical (declared two-stage: its own boosting is its low stage) | 0 |
+
+KITTI tracking training (21 seq, ultralytics hosts, native YOLOv8n cache,
+official KITTI HOTA car/ped averaged):
+| Host | NATIVE | V6EMU | V7d | V7e | V7f |
+|---|---|---|---|---|---|
+| ByteTrack (0.25/0.25/0.1) | 45.31/46.54/60.92 (561) | 44.82/43.77/62.01 (241) | 45.17/44.75/61.99 (315) | 45.40/44.64/62.40 (285) | 45.37/44.67/62.40 (290) |
+| OC-SORT (0.6, IoU 0.3) | 36.27/33.99/50.46 (91) | 40.20/38.43/55.74 (149) | 41.14/40.18/56.41 (166) | 44.15/43.33/60.00 (169) | **44.18/43.39/60.05 (170)** |
+(HOTA_avg/MOTA_avg/IDF1_avg (IDS)). KITTI ByteTrack: V7 trades MOTA (−1.9,
+FN +1500 car) for IDF1 (+1.5) and IDS (−48%); HOTA neutral. OC-SORT whose
+fixed 0.6 threshold is miscalibrated for YOLOv8n: +7.9 HOTA.
+
+### STRESS-L — labelled calibration / floor stress on MOT17 (floor-0.01 stream)
+`<system>@t:<transform>` / `@floor=f` applied to the published detections
+before the layer; NATIVE = the host on the same stressed stream.
+HOTA / MOTA / IDF1:
+
+| Host | Stress | NATIVE | V7f |
+|---|---|---|---|
+| ByteTrack official | temp2 | 65.84 / 72.77 / 77.21 | **66.95 / 77.59 / 78.61** |
+| ByteTrack official | temp05 | 67.30 / 77.78 / 78.59 | 67.29 / 77.78 / 78.58 |
+| ByteTrack official | pow3 | 60.92 / 60.26 / 71.56 | **65.81 / 75.96 / 76.57** |
+| ByteTrack official | scale05 | 0 / 0 / 0 (nothing reaches 0.6) | **66.17 / 75.32 / 77.20** |
+| ByteTrack official | floor 0.05 / 0.2 | 67.70 / 67.41 | 67.70 / 67.41 (identical) |
+| ByteTrack ultralytics | temp2 | 63.97 / 68.09 / 73.48 | identical |
+| ByteTrack ultralytics | temp05 | 66.53 / 76.72 / 77.08 | 66.53 / 76.72 / 77.08 |
+| ByteTrack ultralytics | pow3 | 66.31 / 76.19 / 77.18 | 66.31 / 76.17 / 77.14 |
+| ByteTrack ultralytics | scale05 | 66.61 / 75.83 / 77.47 | 66.48 / 75.84 / 77.30 |
+| ByteTrack ultralytics | floor 0.05 / 0.2 | 66.00 / 66.08 | identical |
+| OC-SORT | temp2 | 65.99 / 73.30 / 77.66 | **67.22 / 75.35 / 79.31** |
+| OC-SORT | temp05 | 66.61 / 75.14 / 77.88 | **67.06 / 76.10 / 78.41** |
+| OC-SORT | pow3 | 58.34 / 58.38 / 69.00 | **66.60 / 75.53 / 78.32** |
+| OC-SORT | scale05 | 0 / 0 / 0 | **66.72 / 75.36 / 78.02** |
+| OC-SORT | floor 0.05 | 66.43 / 74.67 / 78.05 | **67.26 / 76.06 / 79.06** |
+| OC-SORT | floor 0.2 | 66.43 / 74.67 / 78.05 | **66.67 / 75.78 / 77.94** |
+
+Reading: V7f restores hosts whose fixed operating point no longer matches a
+recalibrated detector (scale05 / pow3: from 0 or ~60 back to ~66 HOTA) and is
+identical to the host where nothing is wrong; worst cell −0.14 HOTA
+(ultralytics host, scale05). Development evidence only.
+
+### E19 — E11 on KITTI: motion rule vs camera-motion compensation (YOLOv8n)
+The ultralytics BoT-SORT Kalman update raised a Cholesky error on sequence
+0020 with V7-filtered inputs (host numerical failure; NATIVE runs). E11 is
+reported on the 20 other sequences for EVERY system (`V7_EXCLUDE=0020`).
+
+| Host (CMC?) | NATIVE | V7f (motion in noisy frames) | V7f motion always | V7f motion off |
+|---|---|---|---|---|
+| ByteTrack (no CMC) | 45.22/45.78/60.63 (531) | 45.03/44.12/62.17 (275) | 45.05/43.97/62.22 (268) | 44.95/44.17/61.94 (293) |
+| BoT-SORT (CMC) | 49.21/49.89/64.41 (422) | 48.20/47.46/64.76 (195) | 48.17/47.44/64.83 (189) | 48.32/47.47/64.90 (195) |
+| OC-SORT (no CMC, 21 seq) | 36.27/33.99/50.46 (91) | 44.18/43.39/60.05 (170) | 44.29/43.46/60.14 (174) | 44.08/43.21/60.01 (168) |
+
+Reading: the motion rule's sign follows the E10 hypothesis (helps a host
+without CMC by +0.08–0.11 HOTA, costs a CMC host 0.12) but every effect is
+≤ 0.12 HOTA, i.e. within noise → no `cmc` capability flag is introduced;
+V7f keeps motion_regime=noisy. Separate finding: on KITTI YOLOv8n the
+noisy-regime birth restriction costs the two-stage hosts MOTA (ByteTrack
+−1.7, BoT-SORT −2.4) while it strongly helps the single-stage host.
+
+### E20 — rejected: host-relative noisy band (noisy_primary=proj)
+Primary = clip(host, t1, t2) in noisy frames. KITTI YOLOv8n ByteTrack HOTA
++1.4 vs native but MOTA still −2.1; VisDrone RT-DETR label-free: 26.9 output
+boxes per frame (native 28.8, V7f 14.9) — the RT-DETR explosion that made the
+native host catastrophic (Mac: val-7 MOTA −6.2, 5 catastrophic sequences) is
+no longer controlled → REJECTED.
+
+### DECISION — freeze V7f (2026-09-28)
+V7f = V7d + rho_frames 0 + rescue fg + bg_check. Development matrix and CIs:
+`V7_STATISTICS.md`. Positive or neutral on 11/14 host×stream cells, significant
+gains on single-stage hosts and on the noisy detector (RT-DETR-L), full
+recovery under score recalibration; known regression: KITTI YOLOv8n with the
+two-stage hosts (MOTA −1.9 / −2.4). External systems predeclared in
+`V7_EXTERNAL_SELECTION.md` in the freeze commit.
+
 ## Open issues found by the adversarial audit (2026-09-28)
 - **O1 — provenance.** All E0–E10 numbers come from an uncommitted, evolving working tree (first commit d56bba0 came after them), and the runner cached results without a code hash. From d56bba0+1 on, `tools/v7/dev.py` stamps every result with sha256(acmot_v7.py) + the resolved spec and recomputes on mismatch. Before relying on any E-number, re-run NATIVE, V6EMU, V7c, V7d (val-7, development-40, Faster R-CNN, SparseTrack, BoostTrack) from committed code.
 - **O2 — NATIVE vs the V6 record's "tracker default".** V7 `NATIVE` = native caches (YOLO NMS 0.7, RT-DETR no NMS, Faster R-CNN 0.5) + ultralytics ByteTrack 0.25/0.1/0.25, match 0.8, fuse on, no layer. The V6 paper's `static_default` used the NMS-0.45 caches: YOLO val-7 17.04/31.72/33.65 (IDS 359) vs 18.40/31.62/33.62 (IDS 320); Faster R-CNN MOTA −11.29 vs −9.56; RT-DETR identical. D8 and the catastrophic counts in E8 use V7 NATIVE.

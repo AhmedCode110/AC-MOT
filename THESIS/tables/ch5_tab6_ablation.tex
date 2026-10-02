@@ -1,0 +1,25 @@
+\begin{table}[tbp]
+\centering
+\caption{Design steps from the prior always-intervening design to the frozen policy (development data, HOTA \%), and variants tested and rejected.}
+\label{tab:ch5-ablation}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{4.8cm}>{\raggedright\arraybackslash}p{6.9cm}}
+\hline
+Step & Change & Effect \\
+\hline
+V6 emulated inside V7 & always-noisy bands, overlap deduplication, rank remap & ByteTrack (0.1) 56.41 vs host 67.70; OC-SORT (0.1) 45.72 vs 66.44 \\
+V7a--V7d & regime statistic, host-anchored clean regime, crowd-safe duplicates & SparseTrack 64.72 to 68.93 (host 68.88); BoostTrack 62.61 to 68.37 (host 68.49) \\
++ whole-stream regime & regime from all past frames & ByteTrack (0.1) 67.561 to 67.702; OC-SORT (0.1) 65.697 to 66.071 \\
++ continuation rescue & foreground track-consistent rescue & OC-SORT (0.01) 66.405 to 66.619; OC-SORT (0.1) 66.071 to 66.469 \\
++ interpretability check = V7f & no background mode gives no evidence against the host & ByteTrack/BoostTrack (0.1) identical to host; OC-SORT 67.041 (0.01), 66.907 (0.1) \\
+\hline
+\multicolumn{2}{l}{\textit{Rejected variant}} & \textit{Evidence} \\
+\multicolumn{2}{>{\raggedright\arraybackslash}p{8.0cm}}{no candidates at frame 1} & -0.3 to -0.5 HOTA on every MOT17 host \\
+\multicolumn{2}{>{\raggedright\arraybackslash}p{8.0cm}}{rescue below a two-stage host's low stage} & FP +700 to +1000, -0.4 to -0.5 HOTA \\
+\multicolumn{2}{>{\raggedright\arraybackslash}p{8.0cm}}{rank-remapped scores in clean frames} & ByteTrack -0.2 / -1.6 HOTA \\
+\multicolumn{2}{>{\raggedright\arraybackslash}p{8.0cm}}{host-clipped noisy primary band} & KITTI YOLOv8n ByteTrack +1.4 HOTA but uncontrolled false tracks on a noisy aerial stream (26.9 vs 14.9 boxes/frame) \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\end{table}

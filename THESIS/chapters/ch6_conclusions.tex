@@ -1,0 +1,63 @@
+\chapter{Conclusions and Future Work}\label{ch:conclusions}
+
+This thesis studied training-free, causal control of the operating points of multi-object tracking pipelines. It reviewed real-time detection and tracking, established a common evaluation methodology, and presented two controllers: a scene-adaptive controller of the detector operating point for UAV video, and a self-calibrating layer that adapts a frozen tracker to the score stream of a frozen detector. This chapter compares the two approaches, answers the research questions, states the limitations of the thesis as a whole, and outlines future work.
+
+\section{Comparison of the Two Controllers}\label{sec:c-compare}
+Table~\ref{tab:c-compare} places the two controllers side by side. They share their principles, namely no learned weights, causal operation, a frozen configuration, and paired statistics, but they differ in what they observe, what they change, and what their evidence shows.
+
+\begin{table}[tbp]
+\centering
+\caption{The two controllers of the thesis.}
+\label{tab:c-compare}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}p{5.6cm}}
+\toprule
+ & Scene-adaptive controller (Chapter~\ref{ch:scene}) & Self-calibrating layer (Chapter~\ref{ch:layer}) \\
+\midrule
+Observes & five image and detection cues, ranked against a calibration set & the stream of detector scores of the previous ten frames \\
+Changes & detector confidence, suppression, and resolution & candidates passed to the tracker, their scores, the tracker's thresholds and matching tolerance \\
+Calibration & label-free calibration set from one detector; parameters selected on validation data & none beyond the tracker's declared host contract \\
+Pipelines & one detector (YOLOv8n) and one tracker (ByteTrack) & nine published trackers, four sources of detections \\
+Data & VisDrone2019, UAVDT & MOT17, KITTI, DanceTrack \\
+Main gain & $+5.41$ HOTA over the static default on held-out data & recovery from confidence shift; $+0.61$ HOTA on single-stage trackers \\
+Main finding & gain equals that of the matched static operating point & self-limiting: no change on well-matched two-stage pipelines \\
+Main failure & more identity switches than the hand-designed controller & false noisy decisions in a short sequence ($-1.52$ HOTA) \\
+Cost & 38.98 FPS end to end on a T4, decoding excluded & 2.95 ms per frame on a four-core processor \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+The two studies are complementary. The first showed that the largest accessible gain in a fixed pipeline is to calibrate its operating point on representative data, and that switching adds little once the operating point is right. The second showed that the operating point can be kept right without labels when the detector changes, provided that the controller reads the detector's scores rather than the image, acts on the tracker rather than on the detector, and restrains itself when the pipeline already fits.
+
+\section{Answers to the Research Questions}\label{sec:c-answers}
+
+\paragraph{RQ1.} A training-free scene-adaptive controller, selected on seven validation sequences and frozen before testing, improved held-out HOTA on VisDrone2019 test-dev from 28.43 to 33.84 percent over a static default and from 32.70 to 33.84 percent over a hand-designed controller, and it transferred to UAVDT without retuning (24.08 to 28.39 percent). The improvement did not come from adaptation. A matched static operating point reached 33.93 percent on test-dev, and the difference of $-0.09$ points had an interval that includes zero. The validation search had converged to a near-static controller at the top of the accuracy--resolution curve, where switching cannot help. Scene-driven switching did add accuracy for the hand-designed controller, whose resolution range lies on the steep part of that curve, which suggests that switching pays off when the throughput budget does not admit the best static operating point.
+
+\paragraph{RQ2.} A training-free layer that self-calibrates from the detector's score stream kept published trackers operating under detector confidence shift: when the detector scores were halved, it restored two trackers from 0 to 66.17 and 66.72 HOTA. With a noisy detector on KITTI it raised the MOTA of two two-stage trackers by 5.98 and 7.86 points. It raised the HOTA of the single-stage OC-SORT and of the predeclared external PD-SORT by 0.61 points, with intervals above zero, by supplying the continuation stage that these trackers lack. On five trackers with a low-score stage and well-matched detections it changed HOTA by at most 0.06 points or not at all, which is the intended self-limiting behavior. On the post-freeze external systems the evidence is mixed and small: C-TWiX lost 1.52 HOTA on KITTI cars, concentrated in one short sequence with false noisy decisions, and TrackTrack changed by a significant but negligible $-0.013$ points. The layer therefore does what it was designed to do on the failure modes it targets, and it does not improve every tracker. Its contribution is self-limiting robustness rather than a universal gain: one frozen layer transfers across heterogeneous trackers, stays transparent where no intervention is needed, and acts in the specific mismatch regimes it was designed for, namely a shifted or noisy confidence scale and a tracker without a continuation stage.
+
+\section{Limitations}\label{sec:c-limits}
+The limitations of each study are stated in Sections~\ref{sec:ch4-limits} and~\ref{sec:ch5-limits}. Four limitations apply to the thesis as a whole.
+\begin{enumerate}
+\item \emph{No common benchmark for the two controllers.} The scene-adaptive controller was evaluated on aerial data, and the self-calibrating layer on ground-level data. The aerial evaluation planned for the frozen layer could not be completed because the benchmark data could not be downloaded in the evaluation environment, so the thesis makes no aerial claim for the layer and no direct comparison of the two controllers on the same data.
+\item \emph{Hardware.} Throughput was measured on a Tesla T4 and on a general-purpose processor. No embedded flight computer was tested, and no flight test was performed.
+\item \emph{Detector fine-tuning.} All detectors were COCO-pretrained or released by the tracker authors; no detector was fine-tuned on aerial data, which bounds the absolute accuracy of Chapter~\ref{ch:scene}.
+\item \emph{Statistical resolution.} With 7 to 25 sequences per evaluation cell, differences of a few tenths of a HOTA point are generally not resolved, and most of the layer's gains come from development cells rather than from external systems.
+\end{enumerate}
+
+\section{Future Work}\label{sec:c-future}
+The results suggest the following directions.
+\begin{enumerate}
+\item \emph{Cold-start protection.} The largest external failure of the layer came from noisy decisions made with little history in a short sequence. Requiring a minimum amount of history before a noisy decision is a natural remedy; it must be declared and evaluated on new external data, not tuned on the failure case.
+\item \emph{Aerial evaluation of the layer.} Evaluating the frozen layer on VisDrone and UAVDT, with the same detectors and trackers as Chapter~\ref{ch:scene}, would test it where scene and confidence changes occur together, and would allow a direct comparison with the scene-adaptive controller.
+\item \emph{Combining the two controllers.} The two controllers act on different parts of the pipeline and could run together: a calibrated detector operating point for throughput and recall, and the score-driven layer for robustness to detector changes. Whether their effects add up is an open question.
+\item \emph{Constrained hardware.} Chapter~\ref{ch:scene} indicates that scene-driven switching is most useful when the throughput budget does not admit the best static operating point. Embedded processors are that regime, and they are the natural setting in which to revisit adaptive resolution.
+\item \emph{Broader detector shifts.} The confidence-shift experiments used monotone transforms of fixed detections and two live detectors. Quantized, pruned, and domain-shifted detectors would test the layer's premise more directly.
+\item \emph{Adaptive-threshold baselines.} A head-to-head comparison of the layer with per-frame adaptive-threshold trackers \cite{ma2023adaptivebytetrack,shim2024adaptrack,act2026adaptive} and with simpler score normalizations (quantile or percentile thresholds), declared before being run, would show how much of the layer's behavior requires the regime decision and the host contract.
+\item \emph{Official VisDrone evaluation and a second pipeline.} Chapter~\ref{ch:scene} used a class-agnostic research protocol and one detector--tracker pair. Re-scoring the saved tracker outputs with the official VisDrone protocol, and repeating the attribution with a second detector or tracker, would test whether the calibration-versus-switching conclusion depends on that pair.
+\item \emph{Other tracker families.} End-to-end trackers that predict identities directly \cite{zeng2022motr,gao2025motip} expose different thresholds; extending the host contract to them would test how far the layer's design generalizes.
+\end{enumerate}
+
+\section{Concluding Remarks}\label{sec:c-final}
+Tracking pipelines are built from components that were tuned separately, and their operating points are the place where those components meet. This thesis found that calibrating that meeting point matters more than adapting it frame by frame, and that it can be kept calibrated without labels when a component changes. Both findings were obtained with configurations frozen before testing and with the failures reported alongside the gains, which is the standard the thesis set for itself.

@@ -1,0 +1,17 @@
+total 686520
+-rw-r--r-- 1 runner runner 314975615 Aug 27  2024 tt_dance_sbs_S50.pth
+-rw-r--r-- 1 runner runner  38467455 Aug 27  2024 tt_dance_val.json
+-rw-r--r-- 1 runner runner   6380912 Jun 14  2025 tt_dance_val_0.80.pickle
+-rw-r--r-- 1 runner runner   7728092 Jun 14  2025 tt_dance_val_0.95.pickle
+-rw-r--r-- 1 runner runner 315614591 Aug 27  2024 tt_mot17_half_sbs_S50.pth
+-rw-r--r-- 1 runner runner   9116508 Aug 27  2024 tt_mot17_val.json
+-rw-r--r-- 1 runner runner   2775734 Jun 14  2025 tt_mot17_val_0.95.pickle
+-rw-r--r-- 1 runner runner   7923320 Sep 28 21:30 tt_paper.pdf
+3cdd4cbb8c450d6aa3a995f7f538bc0ef2e026cc872506b8842e0e5b71d6d40b  tt_dance_sbs_S50.pth
+a329a88546a8c42130760ca72c3c4c927c0badaa3799abb155008adf54013126  tt_dance_val.json
+a692fea4fce8850d0cbdede4b94643db461e1814effbdf149c98c1108fcdc2e4  tt_dance_val_0.80.pickle
+e6b92e7617c99f300f1c55c2ce8d617230e7560a0c84466baebd82943a0844d9  tt_dance_val_0.95.pickle
+2b384780aa63f9189674483668e9fb0a98e9286d98ce7c35edaf1e515a768e17  tt_mot17_half_sbs_S50.pth
+eebcbb978ab620e1e48cf51bbb2f3013fb2cbc15eacc4f14a2bb223dc3385849  tt_mot17_val.json
+ea8591ffe8ade9f2ee0baf359c33298d1396e5f8d60e467fa7233d67157aeef9  tt_mot17_val_0.95.pickle
+342f3d71c3702eb8ccd4f327bb723841a3f5a4391a3e740200e6614c8b595527  tt_paper.pdf

@@ -1,0 +1,28 @@
+{
+ "testdev_Q_vs_default": [
+  17,
+  0,
+  0
+ ],
+ "testdev_Q_vs_heuristic": [
+  13,
+  0,
+  4
+ ],
+ "uavdt_Q_vs_default": [
+  15,
+  2,
+  3
+ ],
+ "uavdt_B_vs_default": [
+  11,
+  3,
+  6
+ ],
+ "testdev_frames": 6635,
+ "uavdt_zero_hota_all": [
+  "M0208",
+  "M0701",
+  "M1004"
+ ]
+}

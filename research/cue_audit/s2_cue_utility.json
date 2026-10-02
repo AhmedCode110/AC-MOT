@@ -1,0 +1,10 @@
+{
+ "resolution": {
+  "img_edges": {
+   "cv_gain": -0.28316432426021465,
+   "per_detector": {
+    "yolov8": -0.5513153019636903,
+    "rtdetr": -0.014830414213468982
+   },
+   "null_p95": 0.06853021407815917,
+   "folds_better": 

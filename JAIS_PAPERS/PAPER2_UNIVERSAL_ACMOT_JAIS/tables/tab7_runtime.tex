@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Per-frame time on a 4-vCPU Intel Xeon (2.10 GHz, no graphics processor), live YOLOv8n (736 pixels) and ByteTrack on three KITTI sequences (2,279 timed frames per arm), mean / 95th percentile in milliseconds.}
+\label{tab:runtime}
+\small
+\begin{tabular}{lcc}
+\hline
+Stage & Host alone & Host + V7f \\
+\hline
+Frame decode & 13.88 / 16.21 & 13.88 / 16.51 \\
+Detector (YOLOv8n, 736 px) & 41.91 / 58.41 & 42.17 / 59.43 \\
+AC-MOT controller & -- & 2.95 / 4.39 \\
+Tracker (ByteTrack) & 2.04 / 3.57 & 1.43 / 2.64 \\
+End to end & 57.85 / 76.35 & 60.44 / 80.78 \\
+\hline
+\end{tabular}
+\end{table}

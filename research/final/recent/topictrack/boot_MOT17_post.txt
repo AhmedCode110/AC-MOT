@@ -1,0 +1,5 @@
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+pedestrian W/T/L [2, 1, 4]
+  dHOTA -0.016 [-0.031, +0.008]
+  dMOTA -0.026 [-0.048, +0.032]
+  dIDF1 -0.011 [-0.023, +0.008]

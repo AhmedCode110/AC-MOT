@@ -1,0 +1,104 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ---------------------------------------------------------------------------
+% Thesis data
+% ---------------------------------------------------------------------------
+\newcommand{\ThesisTitle}{Training-Free Adaptive Control of Detector and Tracker Operating Points for Multi-Object Tracking}
+\newcommand{\ThesisAuthor}{Ahmed Gouda Ismail}
+\newcommand{\ThesisDegree}{Master of Science}
+\newcommand{\ThesisField}{Computer Engineering}
+\newcommand{\ThesisDepartment}{Computer Engineering and Artificial Intelligence Department}
+\newcommand{\ThesisInstitution}{Military Technical College}
+\newcommand{\ThesisCity}{Cairo, Egypt}
+\newcommand{\ThesisYear}{2026}
+\newcommand{\SupervisorOne}{Mohamed S. Mohamed}
+\newcommand{\SupervisorOneAffil}{Computer Engineering and Artificial Intelligence Department, Military Technical College}
+\newcommand{\SupervisorTwo}{Tarek Ahmed Mahmoud}
+\newcommand{\SupervisorTwoAffil}{Computer Engineering Department, Egypt University of Informatics}
+\newcommand{\PaperOneStatus}{submitted}
+\newcommand{\PaperTwoStatus}{submitted}
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.5cm,bottom=2.5cm,headheight=15pt]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{rotating}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt}
+\usepackage[labelfont=bf,font=small]{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pdfpages}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{fancyhdr}
+\usepackage[nottoc]{tocbibind}
+\usepackage{emptypage}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={\ThesisTitle},pdfauthor={\ThesisAuthor}}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\thepage}}
+
+% Tables and figures are numbered within chapters.
+\numberwithin{equation}{chapter}
+
+\begin{document}
+
+\pagenumbering{roman}
+\pagestyle{plain}
+\input{frontmatter/titlepage}
+\input{frontmatter/approval}
+\input{frontmatter/declaration}
+\input{frontmatter/acknowledgments}
+\input{frontmatter/abstract}
+
+\cleardoublepage
+\tableofcontents
+\listoffigures
+\listoftables
+\input{frontmatter/abbreviations}
+\input{frontmatter/symbols}
+\input{frontmatter/publications}
+
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\input{chapters/ch1_introduction}
+\input{chapters/ch2_background}
+\input{chapters/ch3_methodology}
+\input{chapters/ch4_scene_adaptive}
+\input{chapters/ch5_self_calibrating}
+\input{chapters/ch6_conclusions}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\appendix
+\input{appendices/appA_reproducibility}
+
+% Arabic summary and Arabic title page (source: arabic/arabic_summary.tex, built with LuaLaTeX)
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Arabic Summary}
+\includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{arabic/arabic_summary.pdf}
+
+\end{document}

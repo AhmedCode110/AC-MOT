@@ -1,0 +1,8 @@
+done MOT17-02
+done MOT17-04
+done MOT17-05
+done MOT17-09
+done MOT17-10
+done MOT17-11
+done MOT17-13
+wrote /home/runner/acmot_work/acmot_external/runs/ctwix/MOT17-val_half/CT_BASELINE/data

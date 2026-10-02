@@ -1,0 +1,70 @@
+% Arabic summary and Arabic title page of the thesis. Build with LuaLaTeX:
+%   lualatex arabic_summary.tex
+% The resulting arabic_summary.pdf is included at the end of main.tex.
+\documentclass[12pt,a4paper]{article}
+\usepackage[bidi=basic,layout=tabular]{babel}
+\babelprovide[import,main]{english}
+\babelprovide[import]{arabic}
+\babelfont{rm}{Latin Modern Roman}
+\directlua{luaotfload.add_fallback("arabicfallback", {"lmroman10-regular:mode=node;"})}
+\babelfont[arabic]{rm}[Path=fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,Scale=1.05,RawFeature={fallback=arabicfallback}]{NotoNaskhArabic}
+\usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\pagestyle{empty}
+\setlength{\emergencystretch}{3em}
+% Arabic front data
+\newcommand{\ArabicTitle}{التحكم التكيفي دون تدريب في نقاط تشغيل الكاشف والمتتبع لتتبع الأجسام المتعددة}
+\newcommand{\ArabicAuthor}{أحمد جودة إسماعيل}
+\newcommand{\ArabicSupervisorOne}{محمد س. محمد}
+\newcommand{\ArabicSupervisorTwo}{طارق أحمد محمود}
+\newcommand{\ArabicDegree}{رسالة مقدمة استكمالاً لمتطلبات الحصول على درجة ماجستير العلوم في هندسة الحاسبات}
+\newcommand{\ArabicDepartment}{قسم هندسة الحاسبات والذكاء الاصطناعي}
+\newcommand{\ArabicInstitution}{الكلية الفنية العسكرية}
+\newcommand{\ArabicCity}{القاهرة، مصر}
+
+
+\begin{document}
+\begin{otherlanguage}{arabic}
+\section*{\LARGE الملخص}
+\thispagestyle{empty}
+
+يُعدّ تتبع الأجسام المتعددة بالاعتماد على الكشف الأسلوبَ السائد للحصول على هويات ثابتة للأجسام في الفيديو؛ إذ يقترح الكاشف في كل إطار صناديق مصحوبة بدرجات ثقة، ثم يربط المتتبع هذه الصناديق عبر الزمن. ويتحكم في هذه المنظومة عدد قليل من معاملات نقطة التشغيل، هي عتبة الثقة وعتبة الإخماد ودقة الإدخال في الكاشف، وعتبات الربط وبدء المسارات في المتتبع. وعادةً ما تُضبط هذه المعاملات مرة واحدة لكاشف واحد ونوع واحد من المشاهد، مع أن المشهد يتغير داخل الفيديو الواحد، ومع أن الكاشف يُستبدل أو يُعاد تدريبه أو يُضغط أكثر مما يُعاد ضبط المتتبع. تدرس هذه الرسالة ما إذا كان التحكم السببي في نقاط التشغيل، دون تدريب ودون بيانات معنونة، يجعل منظومات التتبع أدق وأكثر متانة، وتقيس بعناية متى يفيد هذا التحكم ومتى لا يفيد.
+
+تبدأ الرسالة بمراجعة للكشف والتتبع في الزمن الحقيقي ونماذجهما ومقاييس تقييمهما وقواعد بياناتهما، ثم تقدم متحكمَين يشتركان في المبادئ نفسها: لا أوزان متعلَّمة، ولا بيانات معنونة أثناء التشغيل، وتجميد الإعداد قبل أي تقييم على بيانات محجوزة، واستخدام إحصاء البوتستراب المزدوج في كل مقارنة.
+
+المتحكم الأول متكيف مع المشهد في فيديو الطائرات دون طيار؛ إذ يجمع خمس إشارات منخفضة التكلفة، هي كثافة الكشوف ونسبة الأجسام الصغيرة وشدة الحواف والإضاءة المنخفضة والضبابية، بعد ترتيبها مقابل مجموعة معايرة غير معنونة، في مؤشر لتعقيد المشهد يضبط عتبة الثقة وعتبة الإخماد ودقة الإدخال كل عشرة إطارات. وعلى سبعة عشر تسلسلاً محجوزاً من \foreignlanguage{english}{VisDrone2019} رفع المتحكم المختار على بيانات التحقق دقةَ التتبع \foreignlanguage{english}{HOTA} من \foreignlanguage{english}{28.43} إلى \foreignlanguage{english}{33.84} في المائة مقارنة بالإعداد الثابت الافتراضي، وانتقل إلى قاعدة \foreignlanguage{english}{UAVDT} دون إعادة ضبط (من \foreignlanguage{english}{24.08} إلى \foreignlanguage{english}{28.39} في المائة). غير أن نقطة تشغيل ثابتة مطابقة بلغت \foreignlanguage{english}{33.93} في المائة، مما يبيّن أن المكسب ناتج عن معايرة نقطة التشغيل على بيانات جوية تمثيلية لا عن التبديل من إطار إلى آخر.
+
+أما المتحكم الثاني فيعالج ما لا يستطيع الأول ملاحظته، وهو تغير مقياس الثقة في الكاشف. وهو طبقة تقع بين كاشف مجمَّد ومتتبع مجمَّد، تعاير نفسها ذاتياً من تيار درجات الكاشف باستخدام عتبات أوتسو المتداخلة، وتقرر ما إذا كان التيار نظيفاً أم مشوشاً، فتحافظ على نقطة تشغيل المتتبع في التيارات النظيفة، وتغيّر في غيرها المرشحين الذين يصلون إلى المتتبع ودرجاتهم وعتباته عبر عقد تشغيل معلن. وقد قُيّم إعداد واحد مجمَّد على تسعة متتبعات منشورة وأربعة مصادر للكشوف وثلاث قواعد بيانات؛ فرفع \foreignlanguage{english}{HOTA} بمقدار \foreignlanguage{english}{0.61} نقطة لمتتبعَين أحاديي المرحلة أحدهما خارجي معلن مسبقاً، وأعاد متتبعات انخفضت إلى الصفر عند تنصيف درجات الكاشف إلى نحو 66، ولم يغيّر \foreignlanguage{english}{HOTA} بأكثر من \foreignlanguage{english}{0.06} نقطة في خمسة متتبعات ذات مرحلة للدرجات المنخفضة وكشوف متوافقة. وتدهورت خلية تقييم خارجية واحدة تدهوراً معنوياً (\foreignlanguage{english}{1.52} نقطة) بسبب قرارات تشويش خاطئة في تسلسل قصير. وتبلغ تكلفة الطبقة \foreignlanguage{english}{2.95} مللي ثانية لكل إطار على معالج رباعي الأنوية.
+
+وتُظهر الدراستان معاً أن نقطة تشغيل منظومة التتبع ينبغي معايرتها قبل إضافة أي تكيف، وأن التكيف ينبغي الحكم عليه مقارنةً بنقطة تشغيل ثابتة مطابقة، وأن طبقة تعتمد على درجات الكاشف وتحدّ من تدخلها ذاتياً يمكنها إبقاء المتتبعات المنشورة عاملة عند تغير الكاشف، دون ادعاء تحسين كل متتبع.
+
+\vspace{0.5cm}
+\noindent\textbf{الكلمات المفتاحية:} تتبع الأجسام المتعددة، التتبع بالاعتماد على الكشف، نقطة تشغيل الكاشف، معايرة الثقة، التحكم دون تدريب، الطائرات دون طيار، عتبات أوتسو.
+
+\clearpage
+\thispagestyle{empty}
+\begin{center}
+{\large \ArabicInstitution\par}
+{\normalsize \ArabicDepartment\par}
+\vspace{2.5cm}
+{\LARGE\bfseries \ArabicTitle\par}
+\vspace{2cm}
+{\normalsize إعداد\par}
+\vspace{0.3cm}
+{\Large \ArabicAuthor\par}
+\vspace{2cm}
+{\normalsize \ArabicDegree\par}
+\vspace{2cm}
+{\normalsize إشراف\par}
+\vspace{0.4cm}
+{\large \ArabicSupervisorOne\par}
+\vspace{0.3cm}
+{\large \ArabicSupervisorTwo\par}
+\vfill
+{\normalsize \ArabicCity\par}
+{\normalsize \foreignlanguage{english}{2026}\par}
+\end{center}
+\end{otherlanguage}
+
+\end{document}

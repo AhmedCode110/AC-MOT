@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Temporal settings of the hand-designed controller on VisDrone2019-MOT validation: HOTA (\%) / processing FPS for smoothing window $W$ (analyses) and analysis stride $K$ (frames). The selected setting is $W=7$, $K=10$.}
+\label{tab:temporal}
+\small
+\begin{tabular}{rccccc}
+\hline
+$W$ \textbackslash{} $K$ & 1 & 5 & 10 & 15 & 20 \\
+\hline
+1 & 32.98 / 34.3 & 33.07 / 45.3 & 33.02 / 45.9 & 33.00 / 47.3 & 33.05 / 47.9 \\
+3 & 32.98 / 37.0 & 33.07 / 46.8 & 32.98 / 47.8 & 32.99 / 48.9 & 32.98 / 48.1 \\
+5 & 33.01 / 36.1 & 33.07 / 45.7 & 33.02 / 48.1 & 32.98 / 48.7 & 32.82 / 49.0 \\
+7 & 32.99 / 36.0 & 33.06 / 45.8 & \textbf{33.06 / 43.9} & 33.00 / 48.5 & 32.74 / 49.8 \\
+9 & 32.89 / 37.3 & 33.12 / 47.8 & 33.02 / 48.3 & 32.93 / 43.5 & 32.82 / 45.1 \\
+\hline
+\end{tabular}
+\end{table}

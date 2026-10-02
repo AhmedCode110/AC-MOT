@@ -1,0 +1,291 @@
+\documentclass[journal]{new-aiaa}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\setlength\LTleft{0pt}
+\setlength{\emergencystretch}{3em}
+
+\title{Training-Free Self-Calibrating Control Layer for Heterogeneous Multi-Object Trackers}
+
+\author{Ahmed Gouda Ismail\footnote{Computer Engineering and Artificial Intelligence Department; corresponding author, a7medgouda1@gmail.com.} and Mohamed S. Mohamed\footnote{Computer Engineering and Artificial Intelligence Department, mohamedms@mtc.edu.eg.}}
+\affil{Military Technical College, Cairo, Egypt}
+\author{Tarek Ahmed Mahmoud\footnote{Computer Engineering Department, tarek.mohamed@eui.edu.eg.}}
+\affil{Egypt University of Informatics, Cairo, Egypt}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Tracking pipelines in aerospace vision systems are assembled from detectors and trackers developed separately, and a detector change silently shifts the confidence scale on which every tracker threshold depends. This paper presents a control layer placed between a frozen detector and a frozen tracker that recalibrates itself online from the detector's own score stream, decides per frame which candidates the tracker receives, and adjusts the tracker's thresholds. The layer needs no training or dataset-specific labelled calibration, is causal, and reads only the tracker's declared operating point. One configuration was frozen and applied unchanged to published trackers, detectors, and datasets. On single-stage trackers it raised higher order tracking accuracy by 0.61 points on a predeclared held-out tracker and on a development tracker, with intervals above zero. Under detector confidence rescaling it restored trackers that had collapsed to zero accuracy to about 66 percent, and with a noisy detector it raised multi-object tracking accuracy of two trackers by 6.0 and 7.9 points. On five two-stage trackers with well-matched detections it left accuracy unchanged or within 0.06 points; one external cell degraded significantly (1.52 points). The layer costs 2.95 milliseconds per frame on a four-core processor.
+\end{abstract}
+
+\section*{Nomenclature}
+{\renewcommand\arraystretch{1.0}
+\noindent\begin{longtable}{@{}l @{\quad=\quad} l@{}}
+$a, b, \ell$ & tracker's declared association, track-birth, and lowest usable score thresholds \\
+$m_0$ & tracker's declared matching tolerance, one minus its minimum overlap \\
+$m_t$ & matching tolerance passed to the tracker at frame $t$ \\
+$r_t$ & ratio of image motion at frame $t$ to the median of past motion \\
+$s_i$ & detector confidence score of candidate $i$ \\
+$t_1, t_2$ & background/foreground and ambiguous/confident thresholds on the logit scale \\
+$W$ & number of past frames pooled for the score statistics \\
+$z_i$ & logit of $s_i$, $\log\left(s_i/(1-s_i)\right)$ \\
+$\rho_t$ & confident share of the foreground at frame $t$ \\
+$\bar\rho_t$ & median of $\rho$ over all past non-cold frames of the stream \\
+$\Delta$ & paired difference, tracker with the layer minus tracker alone \\
+\end{longtable}}
+\addtocounter{table}{-1}
+
+\section{Introduction}
+\lettrine{M}{ulti-object} tracking is a standard component of airborne and space-borne perception: unmanned aerial vehicles track ground targets and traffic \cite{miller2015multitarget,desai2017uavfeature}, onboard detectors feed real-time situational awareness \cite{lu2024uavdetection,choi2022docking}, and vision-based guidance relies on stable object identities \cite{parsons2019refueling}. Almost every practical tracker follows the tracking-by-detection pattern: a detector proposes scored boxes, and an online tracker associates them over time with thresholds on those scores \cite{bewley2016sort,zhang2022bytetrack,cao2023ocsort}. In an engineered system the two components are rarely developed together. A detector is replaced by a faster or more accurate model, retrained for a new sensor, or quantized for a flight processor, while the tracker keeps the thresholds its authors tuned for another detector. The confidence scale of the new detector is generally different \cite{kuppers2020detcalib}, and nothing in the pipeline notices.
+
+The consequences are large and silent. In the experiments of this paper, rescaling the confidence of a published detector by one half drives two well-known trackers from about 67 to 0 higher order tracking accuracy (HOTA) \cite{luiten2021hota}, because no detection reaches their fixed thresholds; a cubic reshaping of the same scores costs them about 7 and 8 points. Retuning every tracker for every detector requires labelled data from the deployment domain, which is exactly what an operational system lacks.
+
+This paper studies a control layer that removes that dependence without retraining or retuning. The layer sits between a frozen detector and a frozen tracker. At every frame it estimates, from the recent stream of detector scores alone, how the scores separate into background, ambiguous, and confident candidates; decides whether the stream is clean enough to leave the tracker alone; and, when it is not, selects which candidates reach the tracker, remaps their scores, and moves the tracker's association and birth thresholds. It also supplies a track-continuation stage to trackers that lack one. The layer reads the tracker's declared operating point, called its host contract, but contains no detector, tracker, dataset, or sequence names.
+
+A companion manuscript studies an earlier, scene-driven design in which image cues set the detector's operating point for one detector and one tracker. That design needs a calibration of its cues for each detector and cannot see the detector's score calibration; the present layer was developed to address both limitations (Sec.~\ref{sec:scene}). The two manuscripts share no results.
+
+The contributions are as follows:
+\begin{enumerate}
+\item A training-free, causal control layer that self-calibrates from the detector's score stream through nested Otsu thresholds \cite{otsu1979}, estimates a clean or noisy regime for the whole stream, and intervenes only when the evidence supports it (Secs.~\ref{sec:arch}--\ref{sec:regimes}).
+\item A host contract that makes the layer applicable to heterogeneous published trackers, including single-stage, two-stage, coordinate-only, and two-view trackers, with a precise statement of what the layer may change in each (Sec.~\ref{sec:contract}).
+\item A development and freeze protocol that separates the trackers visible during design from predeclared and post-freeze external systems, with registered reproduction criteria and paired bootstrap statistics (Sec.~\ref{sec:protocol}).
+\item An evaluation of one frozen configuration on nine published trackers (a tenth failed reproduction), four sources of detections, and three datasets, which identifies the conditions in which the layer helps (single-stage trackers, shifted or noisy detector scores), in which it is transparent (well-matched two-stage trackers), and in which it fails (Secs.~\ref{sec:detector}--\ref{sec:failures}).
+\end{enumerate}
+
+The layer was designed to be detector- and tracker-agnostic and is evaluated on a heterogeneous set of published systems. The paper does not claim that it improves every tracker: on clean, well-matched pipelines it is designed to do nothing, and it does nothing.
+
+\section{Related Work}\label{sec:related}
+
+\subsection{Tracking by detection}
+SORT combines a Kalman filter \cite{kalman1960} with Hungarian assignment \cite{kuhn1955hungarian} on box overlap \cite{bewley2016sort}; DeepSORT and StrongSORT add appearance \cite{wojke2017deepsort,du2023strongsort}. ByteTrack introduced a second association stage for low-confidence detections \cite{zhang2022bytetrack}, and many later trackers inherit it, including BoT-SORT \cite{aharon2022botsort}, SparseTrack \cite{liu2025sparsetrack}, BoostTrack \cite{stanojevic2024boosttrack}, and Hybrid-SORT \cite{yang2024hybridsort}. Observation-centric trackers such as OC-SORT \cite{cao2023ocsort}, Deep OC-SORT \cite{maggiolino2023deepocsort}, and PD-SORT \cite{wang2025pdsort} use a single confidence threshold. Recent designs learn association from coordinates (C-TWiX \cite{miah2025twix}), run parallel association paths (TOPICTrack \cite{cao2025topictrack}), or focus association on tracks with two detection views (TrackTrack \cite{shim2025tracktrack}); end-to-end trackers predict identities directly \cite{zeng2022motr,gao2025motip}. All of these read detector scores through fixed thresholds tuned for one detector, usually YOLOX \cite{ge2021yolox}.
+
+\subsection{Detector confidence}
+Detector confidence is not calibrated across models and conditions \cite{kuppers2020detcalib}. Detectors differ in architecture \cite{redmon2016yolo,ren2017fasterrcnn,carion2020detr,zhao2024rtdetr} and in the resulting score distributions. Soft suppression changes the score of overlapping boxes \cite{bodla2017softnms}, and score thresholds of trackers therefore transfer poorly between detectors. The layer studied here does not recalibrate a detector with labels; it reads the shape of the score distribution online.
+
+\subsection{Adaptive inference}
+Dynamic networks adapt computation to the input \cite{han2022dynamic}, and video analytics systems adapt configurations to content and resources \cite{jiang2018chameleon}. These approaches learn or profile a policy per model. The present layer instead fixes one training-free policy and makes the tracker's declared operating point its only model-specific input.
+
+\subsection{Evaluation}
+Results are reported with HOTA \cite{luiten2021hota}, the multi-object tracking accuracy (MOTA) \cite{bernardin2008clear}, and the identity F1 score (IDF1) \cite{ristani2016idf1}, following MOTChallenge practice \cite{dendorfer2021motchallenge,milan2016mot16}, on MOT17, KITTI tracking \cite{geiger2012kitti}, and DanceTrack \cite{sun2022dancetrack}. Uncertainty is quantified by a paired bootstrap over sequences \cite{efron1993bootstrap}.
+
+\section{Limitations of Scene-Driven Adaptation}\label{sec:scene}
+A natural way to adapt a tracking pipeline is to read the scene, for example its density, blur, or illumination, and set the detector's operating point accordingly \cite{jiang2018chameleon}. Such scene-driven control has three structural limitations for heterogeneous pipelines. First, its cue scale and its mapping to thresholds are defined for one detector: the same scene produces different score distributions under different detectors, so a threshold chosen from scene cues is only valid for the detector it was calibrated with. Second, it cannot observe the failure mode that matters most when components are exchanged, namely a shift of the detector's confidence scale, because that shift leaves the image unchanged. Third, it acts on the detector, whereas the thresholds that fail are the tracker's. The layer of this paper therefore reads the detector's scores rather than the image, and it acts on the tracker's input and thresholds rather than on the detector.
+
+\section{Problem Formulation}\label{sec:problem}
+At frame $t$ a frozen detector emits candidates $\{(\mathbf{x}_i, s_i, c_i)\}$ with boxes $\mathbf{x}_i$, scores $s_i\in(0,1)$, and class labels $c_i$, down to an emission floor. A frozen tracker declares a host contract $(a, b, \ell, m_0)$: the score threshold of its first association, the lowest score from which a new track can start, the lowest score any of its association stages uses, and its matching tolerance. A single-stage tracker has $\ell=\min(a,b)$; a two-stage tracker has $\ell<\min(a,b)$. The layer $\mathcal{L}$ outputs, per frame, the subset of candidates passed to the tracker, the scores passed with them, and the thresholds $(a_t, b_t)$ and tolerance $m_t$ the tracker uses at that frame:
+\begin{equation}
+\left(K_t, \tilde s_{K_t}, a_t, b_t, m_t\right) = \mathcal{L}\left(\{z_i\}_{<t}, \{(\mathbf{x}_i, s_i, c_i)\}_t, \mathcal{T}_{t-1}, g_t;\; a,b,\ell,m_0\right),
+\label{eq:layer}
+\end{equation}
+where $\{z_i\}_{<t}$ are the logits of earlier frames, $\mathcal{T}_{t-1}$ are the tracker's output tracks of the previous frame, and $g_t$ is an optional scalar image-motion cue of frame $t$. The layer is causal: statistics use frames before $t$ only, and frame-$t$ data enter its state after the decision.
+
+The requirements are that (i) the layer needs no training or dataset-specific labelled calibration, (ii) one frozen configuration is used for every tracker, detector, and dataset, (iii) the output is unchanged when the tracker's operating point already fits the stream, and (iv) the cost per frame is small relative to the detector.
+
+\section{Universal Control Architecture}\label{sec:arch}
+Figure~\ref{fig:arch} shows the layer. It has four parts: stream statistics, a regime estimate, a regime-dependent candidate policy, and a track-continuation rescue. The configuration of every part is frozen (Sec.~\ref{sec:protocol}).
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=10mm, minimum width=22mm, inner sep=3pt},
+  arr/.style={-{Stealth[length=2.2mm]}, thick}, lab/.style={font=\scriptsize}]
+\node[box] (det) at (0,0) {Frozen\\detector};
+\node[box] (pol) at (4.2,0) {Candidate policy\\(clean or noisy)};
+\node[box] (res) at (8.4,0) {Continuation\\rescue};
+\node[box] (trk) at (12.6,0) {Frozen\\tracker};
+\node[box] (stat) at (0,-2.4) {Stream statistics:\\nested Otsu on logits\\of frames $t-W..t-1$};
+\node[box] (reg) at (4.2,-2.4) {Regime estimate\\clean if $\bar\rho_t \ge \tfrac12$};
+\node[box] (hc) at (10.5,-2.4) {Host contract\\$(a, b, \ell, m_0)$};
+\draw[arr] (det) -- node[lab, above]{candidates} (pol);
+\draw[arr] (pol) -- (res);
+\draw[arr] (res) -- node[lab, above]{$K_t$, scores} (trk);
+\draw[arr] (det) -- (stat);
+\draw[arr] (stat) -- node[lab, above]{$t_1, t_2, \rho$} (reg);
+\draw[arr] (reg) -- (pol);
+\draw[arr] (hc.north) ++(-0.6,0) |- ++(0,0.5) -| (res.south);
+\draw[arr] (hc.north) ++(0.6,0) |- ++(0,0.5) -| node[lab, pos=0.75, right]{$a_t, b_t, m_t$} (trk.south);
+\draw[arr] (trk.north) -- ++(0,0.5) -| node[lab, pos=0.25, above]{tracks of frame $t-1$} (res.north);
+\end{tikzpicture}
+\caption{Self-calibrating control layer between a frozen detector and a frozen tracker. Statistics use earlier frames only; the host contract is the tracker's published operating point; the tracker receives the selected candidates, their scores, and its thresholds for the frame.}
+\label{fig:arch}
+\end{figure}
+
+\section{Causal Self-Calibration}\label{sec:calib}
+The layer pools the logits of all candidates of the previous $W=10$ frames and splits them twice with the exact Otsu threshold \cite{otsu1979}: the first split $t_1$ separates background from foreground, and a second split of the foreground, $t_2$, separates ambiguous from confident candidates. The confident share of the foreground,
+\begin{equation}
+\rho_t = \frac{\left|\{i: z_i \ge t_2\}\right|}{\left|\{i: z_i \ge t_1\}\right|},
+\label{eq:rho}
+\end{equation}
+summarizes how cleanly the detector separates objects from clutter. Working on logits makes the splits invariant to affine transforms of the logit, such as a change of temperature; the host's thresholds are compared on the same scale.
+
+The bands are interpretable only if the stream has a background mode. When the class below $t_1$ holds fewer pooled candidates than the foreground, which happens when a detector emits few low-scoring candidates, the first split falls inside the objects and $\rho$ would falsely signal clutter. In that case the frame counts as clean evidence ($\rho_t=1$). This interpretability check was added after a development diagnosis in which sequence starts with about ten candidates per frame produced splits at $t_1\approx0.6$ and $t_2\approx0.93$ in probability terms and a false noisy call.
+
+\section{Intervention Regimes}\label{sec:regimes}
+
+\subsection{Regime estimate}
+The stream is clean at frame $t$ if the median $\bar\rho_t$ of $\rho$ over all past non-cold frames is at least one half; otherwise it is noisy. The regime is thus a property of the detector and scene stream rather than of a single frame, so that a transient confidence dip, for example under fast camera motion, does not flip it. Before the first valid split (the first frame of a stream), the regime is cold.
+
+\subsection{Cold and clean regimes: self-limiting}
+In the cold and clean regimes the tracker's own thresholds are kept, and they are lowered only as far as $t_2$ when the tracker would otherwise reject the confident class: $a_t=\min(a, \sigma(t_2))$ and likewise for $b_t$, where $\sigma$ is the logistic function. Scores are passed unchanged, and only cross-class duplicates, that is, one box proposed with two class labels, are removed. On a stream whose confident class lies above the tracker's thresholds, the tracker therefore receives exactly its native input.
+
+\subsection{Noisy regime: banded intervention}
+In the noisy regime the candidates are banded: the primary band $z\ge t_2$ may start and continue tracks, the extension band $t_1\le z<t_2$ may continue tracks but not start them, and candidates below $t_1$ are discarded. Scores are remapped through their empirical distribution in the stream, primary candidates to $[0.5,1)$ and extension candidates to $[0.1,0.5)$, and the tracker's association and birth thresholds are set to 0.5, so that extension candidates can reach only a tracker's low stage. Duplicates are resolved with track context: a weaker candidate overlapping a stronger one (overlap above one half) is removed unless a different track of the previous frame claims it, which keeps occluded people in crowds.
+
+\subsection{Continuation rescue}
+A foreground candidate ($z\ge t_1$; every emitted candidate when the stream has no background mode) that continues an existing track of frame $t-1$ with overlap at least one half, where no usable candidate covers that track and the tracker could not see the candidate at the operating point passed this frame, is passed to the tracker with its score raised just above the lowest threshold the tracker uses at that frame. For a two-stage tracker this band is empty by construction because $\ell$ already admits such candidates; for a single-stage tracker it supplies the continuation stage the tracker lacks.
+
+\subsection{Motion rule}
+In noisy frames only, and only when an image-motion cue is available, the matching tolerance widens with the ratio $r_t$ of the current global image motion (phase correlation on a quarter-resolution frame \cite{reddy1996phasecorr}) to its past median:
+\begin{equation}
+m_t=\min\left(0.95,\; 1-\frac{1-m_0}{\max(1,r_t)}\right).
+\label{eq:motion}
+\end{equation}
+
+\section{Host Contract and Adapters}\label{sec:contract}
+Table~\ref{tab:contracts} lists the contracts used. Each value is a documented property of the published tracker configuration, not a fitted quantity. An adapter per tracker family maps the layer's decision onto the tracker's interface: the selected candidates and their scores replace the detector output of the frame, and the thresholds and tolerance replace the tracker's own for that frame. Where a tracker has no overlap gate (C-TWiX) or two detection views (TrackTrack), the adapter maps only what the tracker exposes; in TrackTrack's second view a detection that matches a candidate at overlap 0.97 or more, the tracker's own rule, follows that candidate. Post-processing that the authors apply after tracking (interpolation, offline linking) is kept unchanged and evaluated as in the original papers.
+
+\input{tables/tab1_contracts.tex}
+
+\section{Complexity}\label{sec:complexity}
+Per frame the layer sorts the pooled logits of at most $W$ frames for the two Otsu splits, computes candidate overlaps with the candidates and with the previous frame's tracks, and, when the motion cue is used, computes one phase correlation on a quarter-resolution image. With $n$ candidates per frame and $k$ tracks, the cost is $O(Wn\log(Wn) + n^2 + nk)$ plus the fixed image cost. The state is a ring buffer of $W$ frames of logits and a history of 100 motion ratios.
+
+\section{Development and Freeze Protocol}\label{sec:protocol}
+
+\subsection{Design history}
+The layer evolved from an earlier design of the same research program that always intervened: it banded the stream with the same thresholds, removed every overlapping duplicate, and remapped scores in every frame. That design helped with miscalibrated and noisy detectors but hurt strong published trackers: on MOT17 it cost SparseTrack 4.15 HOTA points ($[-5.54,-1.66]$) and BoostTrack 5.89 points ($[-7.76,-2.87]$), because overlap-based duplicate removal deleted occluded people in crowds and its self-calibrated thresholds were stricter than the trackers' own (false positives fell by 1,630 and 1,351, false negatives rose by 4,955 and 6,167). Figure~\ref{fig:v6} shows that failure and the result of the frozen layer on the same trackers. The regime estimate, the self-limiting clean regime, track-context duplicates, the whole-stream regime, the interpretability check, and the continuation rescue were each introduced to remove a diagnosed failure (Table~\ref{tab:ablation}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig2_v6_to_v7.pdf}
+\caption{The design problem: the prior always-intervening design degraded strong published trackers on MOT17 (difference in white); the frozen layer leaves them at their own accuracy.}
+\label{fig:v6}
+\end{figure}
+
+\input{tables/tab6_ablation.tex}
+
+\subsection{Freeze and evaluation roles}
+The final configuration was frozen before any external evaluation, recorded in a version-control tag, and protected by a lock file of cryptographic hashes of the layer, its configuration, and the evaluation runners; every post-freeze run verified the lock before running. Sixty-one automated tests check causality, state reset, pass-through on clean streams, independence from names, invariance to affine score transforms where designed, and lock integrity. Table~\ref{tab:data} lists the evaluation cells and their roles. Development cells (MOT17 with four trackers, KITTI with three trackers and two detectors, score-transform stress tests) were visible during design, so their gains are measured but not held out. The predeclared external systems (PD-SORT, Hybrid-SORT) were selected and declared before they were run, and run once. The post-freeze external systems (C-TWiX, TrackTrack, TOPICTrack) were selected under a protocol registered before any run, which fixed the host contracts, the reproduction criteria, and predictions of the layer's effect; a system entered the analysis only if its baseline reproduced the authors' number (EXACT: within 0.2 HOTA; CLOSE: within 1.0 with a documented, untuned cause).
+
+\input{tables/tab2_data.tex}
+
+\subsection{Statistics}
+All comparisons are paired: both arms use the same detections and the same environment. Differences are pooled over sequences and their 95\% intervals come from a percentile bootstrap over sequences with 10,000 resamples and seed 42 \cite{efron1993bootstrap}. A difference is called significant only when its interval excludes zero. Per-sequence wins, ties ($|\Delta\mathrm{HOTA}|<0.01$), and losses are reported as a distribution-free complement. Evaluation uses TrackEval (commit 12c8791) with the official ground truth of each benchmark.
+
+\section{Tracker Transfer}\label{sec:tracker}
+Table~\ref{tab:mot17} gives the development trackers on MOT17 val-half with the published YOLOX-X detections, and Fig.~\ref{fig:forest} summarizes every cell of the paper.
+
+\input{tables/tab3_mot17.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/fig3_forest.pdf}
+\caption{Every evaluated cell: difference in HOTA (tracker with the frozen layer minus tracker alone) with 95\% paired-bootstrap interval. Blue: interval above zero; red: below zero; gray: includes zero or identical output.}
+\label{fig:forest}
+\end{figure}
+
+The two-stage trackers with well-matched detections were left unchanged. BoostTrack (online and with interpolation) and ByteTrack at floor 0.1 produced identical output; ByteTrack at floor 0.01 changed by $-0.014$ ($[-0.058,+0.009]$); SparseTrack changed by $+0.055$ ($[-0.011,+0.254]$). This is the intended self-limiting behavior, and it is the result the prior design could not achieve (Fig.~\ref{fig:v6}).
+
+The single-stage OC-SORT improved at both emission floors: HOTA $+0.61$ ($[+0.36,+1.24]$) and $+0.46$ ($[+0.27,+1.09]$), MOTA $+1.27$ and $+1.26$, with gains on 7 of 7 sequences in both settings (Fig.~\ref{fig:perseq}). The mechanism is the continuation rescue: OC-SORT discards every detection below its single threshold, and the layer hands it the foreground candidates that continue an unmatched track.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig4_per_sequence.pdf}
+\caption{Per-sequence HOTA differences on MOT17 val-half for development and predeclared trackers.}
+\label{fig:perseq}
+\end{figure}
+
+\section{Detector Transfer}\label{sec:detector}
+
+\subsection{A different detector and dataset}
+On KITTI tracking training, three trackers were run with two detectors other than the MOT17 detector (Table~\ref{tab:kitti}). With the noisy RT-DETR-L stream \cite{zhao2024rtdetr}, the two-stage trackers gained substantially in MOTA and IDF1: ByteTrack $+5.98$ MOTA ($[+1.16,+9.94]$) and $+3.87$ IDF1, BoT-SORT $+7.86$ MOTA ($[+2.21,+13.44]$) and $+3.10$ IDF1, with HOTA $+0.91$ ($[+0.22,+1.55]$) for ByteTrack. With YOLOv8n, the single-stage OC-SORT gained 7.91 HOTA ($[+5.47,+9.98]$), while ByteTrack and BoT-SORT lost MOTA ($-1.87$ and $-2.43$, the latter significant) while their identity switches fell by about half; this regression is analyzed in Sec.~\ref{sec:failures}.
+
+\input{tables/tab4_kitti.tex}
+
+\subsection{Detector confidence shift}
+To isolate the calibration problem, the published MOT17 detections were transformed before the tracker by four monotone maps: cubing ($s^3$), halving ($0.5s$), and logit temperatures 2 and 0.5 (Fig.~\ref{fig:shift}). The trackers kept their published thresholds. Halving the scores drove ByteTrack (official setting) and OC-SORT to 0 HOTA because no detection reached their thresholds; with the layer they reached 66.17 and 66.72. Cubing reduced them to 60.92 and 58.34; with the layer they reached 65.81 and 66.60, and BoostTrack went from 61.33 to 64.84. Under the temperatures the layer gained up to 1.23 points or left the output unchanged. The ByteTrack library setting, whose low thresholds already admit the shifted scores, was unchanged within 0.14 points in all four transforms. These cells are development evidence and are reported as observed values without intervals.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig5_calibration_shift.pdf}
+\caption{Detector confidence shift on MOT17 val-half: HOTA of each published tracker with its published thresholds, alone and with the frozen layer, after four monotone transforms of the detector scores.}
+\label{fig:shift}
+\end{figure}
+
+\section{Post-Freeze External Evaluation}\label{sec:external}
+Table~\ref{tab:external} gives every external system evaluated with the frozen layer.
+
+\input{tables/tab5_external.tex}
+
+\subsection{Predeclared systems}
+PD-SORT \cite{wang2025pdsort} was reproduced identically to the authors' released output. With the layer, HOTA rose by 0.61 ($[+0.27,+1.65]$), MOTA by 1.13 ($[+0.27,+3.03]$), and IDF1 by 0.82 ($[+0.43,+1.94]$), with HOTA higher on 7 of 7 sequences (Fig.~\ref{fig:perseq}). False negatives fell by 1,291 and false positives rose by 681. PD-SORT is single-stage, and the gain follows the same mechanism as for OC-SORT; unlike OC-SORT, PD-SORT was not seen during design. Hybrid-SORT \cite{yang2024hybridsort}, a two-stage tracker, produced identical output, as predicted.
+
+\subsection{Recent systems after the freeze}
+C-TWiX \cite{miah2025twix} was reproduced on three datasets (Table~\ref{tab:external}). On MOT17 the layer changed HOTA by $-0.05$ ($[-0.46,+0.40]$) with MOTA $+0.24$ and IDF1 $+0.18$; on KITTI pedestrians by $-0.10$ ($[-2.16,+0.03]$); on DanceTrack by $-1.00$ ($[-2.62,+0.65]$) with an IDF1 loss of 1.55 whose interval includes zero. On KITTI cars it lost 1.52 HOTA ($[-4.05,-0.13]$), the one significant external degradation of the paper (Sec.~\ref{sec:failures}). TrackTrack \cite{shim2025tracktrack} was reproduced within 0.34 HOTA on DanceTrack; the layer changed its HOTA by $-0.013$ ($[-0.032,-0.001]$), a significant but negligible difference, with 21 of 25 sequences tied. TOPICTrack \cite{cao2025topictrack} failed the registered reproduction criterion (67.54 against 69.6 HOTA) and is excluded; the frozen layer's effect on it ($-0.016$, interval including zero) is recorded but not analyzed.
+
+\section{Cross-Dataset Analysis}\label{sec:cross}
+Across MOT17, KITTI, and DanceTrack, the direction of the effect is predicted by two properties of the pipeline rather than by the dataset: whether the tracker has a continuation stage and whether the detector's score distribution matches the tracker's thresholds. The regime estimate makes this visible (Fig.~\ref{fig:regimes}a): on the post-freeze streams, 99.7\% of MOT17 frames and 99.9\% of DanceTrack frames were classified clean, and the layer left those pipelines at or near their native output. KITTI had the largest noisy share (2.8\% of frames), concentrated in short sequences.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig6_regimes_failure.pdf}
+\caption{(a) Share of frames in each regime on the post-freeze streams. (b) C-TWiX on KITTI cars: per-sequence HOTA difference (bars) and share of frames classified noisy (triangles); the loss concentrates in sequence 0014.}
+\label{fig:regimes}
+\end{figure}
+
+\section{Robustness Analysis}\label{sec:robust}
+Three kinds of robustness were measured. Score transforms (Sec.~\ref{sec:detector}) test calibration shift with the detections fixed; the worst cell was $-0.14$ HOTA. Emission floors test how much of the low-score tail the detector emits: on MOT17 the two-stage trackers were unchanged at floors 0.01 and 0.1, and OC-SORT improved at both. Detector changes test both at once: RT-DETR-L on KITTI produced the largest MOTA and IDF1 gains for two-stage trackers, and YOLOv8n produced the regression analyzed next. The emission floor is also the design's largest label-free sensitivity: in development diagnostics of an earlier variant on aerial video, raising the floor to 0.2 changed the regime of 41--45\% of frames, because the pooled statistics move with the floor.
+
+\section{Ablation}\label{sec:ablation}
+Table~\ref{tab:ablation} traces the design from the always-intervening layer to the frozen configuration on development data. Emulating the prior design inside the new framework reduced ByteTrack at floor 0.1 from 67.70 to 56.41 HOTA and OC-SORT from 66.44 to 45.72. The regime estimate with the self-limiting clean regime and crowd-safe duplicates restored SparseTrack from 64.72 to 68.93 and BoostTrack from 62.61 to 68.37. Estimating the regime from the whole stream removed mid-stream flips, the continuation rescue added 0.2--0.4 points for OC-SORT, and the interpretability check returned ByteTrack and BoostTrack to identical-to-host output while raising OC-SORT to 67.04 and 66.91. Four variants were rejected on evidence: admitting nothing at the first frame, rescuing below a two-stage tracker's low stage, remapping scores in clean frames, and clipping the noisy primary band to the host threshold, which helped one KITTI cell but let a noisy aerial stream produce 26.9 instead of 14.9 boxes per frame.
+
+\section{Statistical Analysis}\label{sec:stats}
+Of the 16 cells in Fig.~\ref{fig:forest} with an interval, 7 exclude zero in HOTA: 5 above zero (OC-SORT twice on MOT17, OC-SORT with YOLOv8n and ByteTrack with RT-DETR-L on KITTI, and PD-SORT) and 2 below (C-TWiX on KITTI cars, $-1.52$, and TrackTrack, $-0.013$). Four further cells produced identical output. In MOTA, significant gains occurred for OC-SORT on MOT17 and with YOLOv8n, PD-SORT, and ByteTrack and BoT-SORT with RT-DETR-L, and significant losses for BoT-SORT with YOLOv8n, C-TWiX on KITTI cars, and TrackTrack ($-0.073$). The external evidence is therefore mixed in sign and small in magnitude except for the single-stage PD-SORT, whose gain is the only external improvement with every interval above zero. With 7, 9, or 25 sequences per cell, the intervals are wide, and differences below a few tenths of a point in HOTA are not resolved except when the output is nearly identical.
+
+\section{Runtime}\label{sec:runtime}
+Table~\ref{tab:runtime} and Fig.~\ref{fig:runtime} give the cost on a four-core Intel Xeon processor without a graphics processor, with a live YOLOv8n detector and ByteTrack on three KITTI sequences. The layer took 2.95 ms per frame on average (4.39 ms at the 95th percentile), including the phase-correlation motion cue. End-to-end time rose from 57.85 to 60.44 ms per frame (4.5\%), and the tracker became faster (2.04 to 1.43 ms) because it received fewer candidates. On this processor the full pipeline ran at 16.55 frames per second, below real time, because the detector dominates; no throughput is claimed for other hardware.
+
+\input{tables/tab7_runtime.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\textwidth]{figures/fig7_runtime.pdf}
+\caption{Mean per-frame time by stage without and with the layer.}
+\label{fig:runtime}
+\end{figure}
+
+\section{Failure Cases}\label{sec:failures}
+
+\subsection{False noisy calls in short streams}
+The significant external loss, C-TWiX on KITTI cars ($-1.52$ HOTA), is concentrated in one sequence: in sequence 0014 the layer classified 45 of 106 frames as noisy and HOTA fell by 17.09 points, while six of the other eight sequences changed by less than 0.4 points (Fig.~\ref{fig:regimes}b). In this short sequence the whole-stream median of $\rho$ had little history to stabilize it, and the noisy regime's band restrictions most likely removed detections that the coordinate-based association relies on; the mechanism was not isolated further. The same sequence accounts for the pedestrian loss (8.50 points). A cold-start protection that requires a minimum amount of history before a noisy call is a natural remedy, but it was not part of the frozen configuration and is left to future work.
+
+\subsection{Under-confident detectors with low-threshold trackers}
+With YOLOv8n on KITTI, whose scores are low but mostly correct, the stream is classified noisy ($\rho\approx0.45$), and the noisy regime's rule that only the primary band may start tracks removes true births for ByteTrack and BoT-SORT. MOTA fell by 1.87 and 2.43 while identity switches fell by 271 and 227. A host-relative band that fixed this cell let false tracks through on a noisy aerial stream and was rejected (Table~\ref{tab:ablation}).
+
+\subsection{Coordinate-only association on DanceTrack}
+C-TWiX on DanceTrack lost 1.00 HOTA with an interval including zero, with two sequences losing more than 10 points and one gaining 9.37. The regime was clean on essentially every frame, so the effect comes from the clean-regime operations (cross-class duplicate removal, threshold lowering to $t_2$, and the continuation rescue) acting on a tracker that learns association from coordinates; which of them causes the loss was not isolated.
+
+\section{Limitations}\label{sec:limits}
+\begin{enumerate}
+\item The strongest evidence is development evidence. Only PD-SORT, Hybrid-SORT, C-TWiX, and TrackTrack are external, and only PD-SORT improved.
+\item The external systems were evaluated on validation splits with the authors' released detections; no test-server result is reported.
+\item The motion rule could not be evaluated on the external systems, whose adapters had no image cue.
+\item The aerial evaluation planned for the frozen layer could not be completed because the benchmark data could not be downloaded in the evaluation environment; the paper therefore makes no aerial claim for the frozen layer.
+\item Runtime was measured on one general-purpose processor without a graphics processor; no embedded or flight hardware was tested.
+\item Reproductions on processors instead of graphics processors differ from the authors' numbers by up to 0.8 HOTA; all comparisons are paired within one environment.
+\end{enumerate}
+
+\section{Conclusions}\label{sec:conclusions}
+This paper presented a training-free control layer that self-calibrates from a detector's score stream, estimates whether the stream is clean or noisy, and adapts a frozen tracker's input and thresholds through a declared host contract. One frozen configuration was evaluated on nine published trackers, four sources of detections, and three datasets, with development and external evidence kept separate. The layer improved single-stage trackers, including a predeclared external one by 0.61 HOTA points; it restored trackers whose thresholds no longer matched a shifted detector confidence scale; and it raised the multi-object tracking accuracy of two-stage trackers with a noisy detector by 6 to 8 points. On well-matched two-stage pipelines it left the output unchanged, which removed the degradation of the prior design. It failed on a short stream with few candidates, where false noisy calls cost one external tracker 1.52 HOTA points, and on an under-confident detector with low-threshold trackers. For aerospace pipelines in which detectors are exchanged more often than trackers are retuned, the layer provides a way to keep published trackers operating without labelled recalibration, together with an explicit record of where it should not be expected to help.
+
+\section*{Acknowledgments}
+The authors thank the authors of the evaluated trackers for releasing their code, weights, and detections, and the maintainers of MOT17, KITTI, DanceTrack, and TrackEval.
+
+\bibliography{references}
+
+\end{document}
