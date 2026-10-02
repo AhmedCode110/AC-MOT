@@ -236,3 +236,23 @@ hypothesis for future work, not a result.
 detector; unseen detectors get the shared profile without calibration) → frozen V7f → host contract.
 Behaviourally identical to V7f at 736 px; the compute slot stays in the architecture as an interface
 whose scene policy was not supported by evidence. Lock: `research/GENERAL_ACMOT_G1_LOCK.json`.
+
+Freeze: tag `general-acmot-g1-freeze` → 751c602 (published by workflow run 37009594004 after verifying
+`research/GENERAL_ACMOT_G1_LOCK.json` and `research/V7_POLICY_LOCK.json` at that commit).
+
+## 4. G1 transfer and host tests (frozen G1; nothing changed after the freeze)
+
+### T-G1-OCSORT — OC-SORT host (official args), val-7, container (`sci_v7f/G1_transfer_local/`)
+| | internal ΔHOTA | internal ΔIDF1 | internal ΔMOTA | official ΔHOTA | official ΔMOTA |
+|---|---|---|---|---|---|
+| YOLOv8n | +14.86 [+12.32, +19.50] | +20.18 | +10.23 | | +4.16 [−1.47, +8.50] |
+| RT-DETR-L | +6.76 [+2.88, +11.82] | +9.75 | +2.46 [−1.87, +7.11] | +3.75 [+0.38, +8.42] | −4.11 [−15.39, +3.65] |
+| pooled | +9.73 [+6.37, +13.76] | +14.28 [+9.31, +19.62] | +6.34 [+2.63, +9.62] | +6.97 [+3.68, +10.45] | +0.03 [−6.04, +4.79] |
+
+OC-SORT's single 0.6 threshold leaves it at 10% (YOLOv8n) and 28% (RT-DETR-L) recall on this data; G1
+lowers its effective operating point from the stream's own score bands, which raises recall and HOTA on
+14/14 cells. Failure: under the official protocol (class-aware, ignored regions dropped) the host alone has
+no sequence with MOTA < 0, G1 has 4 (YOLOv8n uav0000182 −6.4; RT-DETR-L uav0000182 −9.6, uav0000268 −2.1,
+uav0000305 −32.7). Under the internal protocol neither has one. With ByteTrack (C1, official protocol)
+V7f reduces the catastrophic sequences from 7 to 4 and makes the remaining ones less negative
+(e.g. RT-DETR-L uav0000305 −77.4 → −50.2).
