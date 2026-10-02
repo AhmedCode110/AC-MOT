@@ -57,6 +57,11 @@ def frame_quality(system, det, seq):
     return q, cost
 
 
+def _item(p):
+    m = dev.STATIC.match(p)
+    return [f"R{m.group(1)}" + (f"T{m.group(2)}" if m.group(2) else ""), int(m.group(3))]
+
+
 def frontier(layer, det, profiles):
     pts = {}
     for p in profiles:
@@ -112,10 +117,8 @@ def build(layer, space, targets, profiles):
                 sel = allocate(Q, C, stat_cost)
                 items = []
                 for k, (lo, hi) in enumerate(segs):
-                    m = dev.STATIC.match(sel[k])
-                    items += [[f"R{m.group(1)}", int(m.group(2))]] * (hi - lo)
-                m = dev.STATIC.match(a)
-                old[f"STAT{tag}"] = [[f"R{m.group(1)}", int(m.group(2))]] * N
+                    items += [_item(sel[k])] * (hi - lo)
+                old[f"STAT{tag}"] = [_item(a)] * N
                 old[f"ORB{tag}"] = items
             f.write_text(json.dumps(old))
     out = dev.out_dir() / "schedules" / f"oracle_{layer}_{space}.json"

@@ -39,9 +39,10 @@ from tools.sci_v7.dev import guard  # noqa: E402  (val-7 only; refuses protected
 SPLIT = "val7"
 guard(os.environ.get("V7_SPLIT", SPLIT))
 DETS = ["yolov8", "rtdetr"]
-CODE = ["acmot_g2.py", "acmot_v7.py", "tools/g2/dev.py", "tools/g2/controllers.py", "configs/g2_compute_cost.json",
-        "tools/sci_v7/sweep_cache.py", "tools/sci_v7/hosts.py", "tools/v7/systems.py"]
-STATIC = re.compile(r"^R(\d+)K(\d+)$")
+CODE = ["acmot_g2.py", "acmot_v7.py", "tools/g2/dev.py", "tools/g2/controllers.py",
+        "tools/sci_v7/sweep_cache.py", "tools/sci_v7/hosts.py", "tools/v7/systems.py", "adapters/detectors/tiling.py"]
+STATIC = re.compile(r"^R(\d+)(?:T(\d+))?K(\d+)$")
+COST_FILE = os.environ.get("G2_COST", "configs/g2_compute_cost.json")
 
 
 def code_sha():
@@ -53,8 +54,19 @@ def code_sha():
 
 
 def costs(det):
-    c = json.loads((ROOT / "configs/g2_compute_cost.json").read_text())["normalized_cost"][det]
-    return {f"R{k}": float(v) for k, v in c.items()}
+    cfg = json.loads((ROOT / COST_FILE).read_text())
+    c = {f"R{k}": float(v) for k, v in cfg["normalized_cost"][det].items()}
+    tile = cfg.get("tile_cost", {}).get(det)
+    return c, tile
+
+
+def profile_cost(profile, base, tile):
+    """'R<px>' or 'R<px>T<mask>': full-frame call plus one call per tile."""
+    m = re.match(r"^R(\d+)(?:T(\d+))?$", profile)
+    n_tiles = bin(int(m.group(2))).count("1") if m.group(2) else 0
+    if n_tiles and tile is None:
+        raise ValueError("no tile cost for this detector")
+    return base[f"R{m.group(1)}"] + n_tiles * (tile or 0.0)
 
 
 def parse(system):
@@ -86,22 +98,60 @@ def _splits():
 
 
 def open_cache(det, seq):
+    """Sweep cache (full-frame settings) plus, if present, the tile cache
+    <SCI_SWEEP_ROOT>/<det>/tiles736/<seq>.npz (frame -> rows N x 8)."""
     from tools.sci_v7.sweep_cache import SweepCache
     SPLITS, _ = _splits()
-    return SweepCache(os.environ["SCI_SWEEP_ROOT"], det, seq,
-                      f"{SPLITS[SPLIT]['native']}/visual_cues/{seq}.npz")
+    cd = SweepCache(os.environ["SCI_SWEEP_ROOT"], det, seq, f"{SPLITS[SPLIT]['native']}/visual_cues/{seq}.npz")
+    f = Path(os.environ["SCI_SWEEP_ROOT"]) / det / "tiles736" / f"{seq}.npz"
+    cd.tiles = {}
+    if f.exists():
+        a = np.load(f)["det"]
+        cd.tiles = {int(k): a[a[:, 0] == k] for k in np.unique(a[:, 0])}
+    return cd
 
 
 def make_controller(comp, layer, det, seq, n_frames, cost):
     from acmot_g2 import Schedule, StaticSchedule
     m = STATIC.match(comp)
     if m:
-        return StaticSchedule(f"R{m.group(1)}", int(m.group(2)))
+        return StaticSchedule(f"R{m.group(1)}" + (f"T{m.group(2)}" if m.group(2) else ""), int(m.group(3)))
     if comp.startswith("SCHED:"):
         f = out_dir() / "schedules" / layer / det / f"{seq}.json"
         return Schedule(json.loads(f.read_text())[comp[6:]])
     from tools.g2 import controllers
     return controllers.make(comp[5:], cost=cost, n_frames=n_frames)
+
+
+class _CostTable(dict):
+    """profile -> normalized cost; validates that the cache holds the setting."""
+    def __init__(self, base, tile, supported):
+        super().__init__({p: c for p, c in base.items() if int(p[1:]) in supported})
+        self.base, self.tile, self.supported = base, tile, supported
+
+    def __missing__(self, profile):
+        m = re.match(r"^R(\d+)(?:T(\d+))?$", profile)
+        if not m or int(m.group(1)) not in self.supported:
+            raise KeyError(profile)
+        v = profile_cost(profile, self.base, self.tile)
+        self[profile] = v
+        return v
+
+
+def _detect(cd, profile):
+    """Full-frame detections at the profile's setting, plus the tiles of its mask."""
+    from adapters.detectors.tiling import merge
+    from adapters.types import Detection
+    m = re.match(r"^R(\d+)(?:T(\d+))?$", profile)
+    full = cd.detect(None, 0.0, None, int(m.group(1)))
+    if not m.group(2):
+        return full
+    mask = int(m.group(2))
+    t = cd.tiles.get(cd.frame, np.zeros((0, 8)))
+    t = t[[bool(mask >> int(k) & 1) for k in t[:, 7]]] if len(t) else t
+    b = np.array([[d.x1, d.y1, d.x2, d.y2, d.confidence, d.class_id] for d in full]).reshape(-1, 6)
+    out = merge(b, t[:, 1:7] if len(t) else np.zeros((0, 6)))
+    return [Detection(float(r[0]), float(r[1]), float(r[2]), float(r[3]), float(r[4]), int(r[5])) for r in out]
 
 
 def track_sequence(system, det, seq, trace=False):
@@ -113,9 +163,10 @@ def track_sequence(system, det, seq, trace=False):
     layer, spec, comp, host = parse(system)
     tracker, h, needs_image = make_host(host)
     cd = open_cache(det, seq)
-    cost = {p: c for p, c in costs(det).items() if int(p[1:]) in cd.by_res}
+    base, tile = costs(det)
+    cost = _CostTable(base, tile, set(cd.by_res))
     ctrl = make_controller(comp, layer, det, seq, cd.frames, cost)
-    pipe = G2Pipeline(controller=ctrl, detector=lambda p: cd.detect(None, 0.0, None, int(p[1:])), cost=cost,
+    pipe = G2Pipeline(controller=ctrl, detector=lambda p: _detect(cd, p), cost=cost,
                       layer=V7Layer(spec_from_dict(dict(spec, name=layer)), HostContract(**h)), tracker=tracker,
                       make_detection=lambda d, v: Detection(d.x1, d.y1, d.x2, d.y2, v, d.class_id),
                       record_trace=trace)
@@ -144,7 +195,8 @@ def track_sequence(system, det, seq, trace=False):
 def run_one(job):
     system, det, seq = job
     dest = _path(system, det, seq)
-    stamp = dict(code_sha=code_sha(), system=system, sweep=os.environ.get("SCI_SWEEP_ROOT"))
+    stamp = dict(code_sha=code_sha(), system=system, sweep=os.environ.get("SCI_SWEEP_ROOT"),
+                 cost=hashlib.sha256((ROOT / COST_FILE).read_bytes()).hexdigest())
     if system.split("+", 1)[1].startswith("SCHED:"):
         layer = system.split("+")[0]
         stamp["schedule_sha"] = hashlib.sha256((out_dir() / "schedules" / layer / det / f"{seq}.json")
