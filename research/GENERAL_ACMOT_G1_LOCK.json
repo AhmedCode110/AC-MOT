@@ -1,0 +1,25 @@
+{
+ "name": "General AC-MOT G1",
+ "status": "FROZEN development candidate (tag general-acmot-g1-freeze = the commit that adds this file)",
+ "parent_commit": "25b5ea8945b648f9250baa99e5743beac0f5116c",
+ "config": "configs/general_acmot_g1.json",
+ "system": "V7f+MEDIUM (tools/sci_v7/dev.py)",
+ "v7_lock": "research/V7_POLICY_LOCK.json (10 files, unchanged)",
+ "file_sha256": {
+  "acmot_sci.py": "5df1ab07c3ea366199221e64edc7779bae3520401ba96063d7af21e0aeda92d4",
+  "acmot_sci_v7.py": "e9fe53810d1de7a7a3e84533b9e83aef5a6fae03eda77edf02d5b3e4ec321685",
+  "acmot_v7.py": "98d90fac222e35373a362ce4f279030ac87a82f909a261ff376324be74604bcb",
+  "online_calibration.py": "cc03302526ea589ce4f7fc183ae2de267323321a24d860af65183ded6ce17dcb",
+  "adapters/detectors/compute_profile.py": "911507189e0f52f406f6e09d1eb301196019eb13454577bd0af5d877ba6fb8fa",
+  "configs/sci_v7_profiles.json": "37f8ab35f5287dc36362986939e9e779b21a91146d84f9ed693cf712ed626964",
+  "configs/general_acmot_g1.json": "f27f1edf970ba0e142684fbf246900194a36088cefb89e27bb6bcffe343ac78b",
+  "configs/universal_acmot_policy_v7.json": "c2b3a0f76594b3ff70b04868e5adc025e2c1c79e54e7958e51c1c76eeef6e5dd",
+  "tools/v7/systems.py": "4dd099cc91f76eb2eb39c0fd9191694b797cd8f4e036f9e7391dee9c7cc79edd",
+  "tools/sci_v7/dev.py": "4bcda09f2290d281977a11f5223f496144b9cba57035aabfb2f00eb94371766f",
+  "tools/sci_v7/hosts.py": "e2cca56b76a0e617a4db32018b32b541bc436130c9fed325e4140ee9becd215a",
+  "tools/sci_v7/sweep_cache.py": "6e1cc8710855643635fc251679dc395e6d5cad4f4051b6109e70548b43d2809e",
+  "adapters/trackers/bytetrack.py": "87eb7a1b73371abc7754462f5e5c8f6a184bb9cadc2329b8a1fa8d9371914881",
+  "adapters/trackers/botsort.py": "18bdc4cec15bf8d505b2ab721fc5003c8d175660f0aca6be0a4e9db3ef79283a"
+ },
+ "rule": "No file listed here may change for any G1 result. A change is a new candidate with a new lock."
+}

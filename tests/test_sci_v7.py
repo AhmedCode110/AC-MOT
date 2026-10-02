@@ -206,3 +206,10 @@ def test_fixed_level_reproduces_v7_record_if_present():
     if not (a.exists() and b.exists()):
         pytest.skip("val-7 outputs not present")
     assert pickle.load(open(a, "rb"))["tracks_txt"] == pickle.load(open(b, "rb"))["tracks_txt"]
+
+
+def test_g1_lock_unchanged():
+    lock = json.loads((ROOT / "research/GENERAL_ACMOT_G1_LOCK.json").read_text())
+    bad = [f for f, h in lock["file_sha256"].items()
+           if hashlib.sha256((ROOT / f).read_bytes()).hexdigest() != h]
+    assert not bad, bad
