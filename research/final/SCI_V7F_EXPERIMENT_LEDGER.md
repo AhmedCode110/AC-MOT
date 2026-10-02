@@ -100,10 +100,19 @@ SCI level use: YOLOv8n LOW/MEDIUM/HIGH 0.17/0.75/0.08, RT-DETR-L 0.08/0.80/0.12 
 Static curve with V7f (HOTA, internal): YOLOv8n 32.0 / 33.9 / 35.3 and RT-DETR-L 40.2 / 41.1 / 41.3 at
 640 / 736 / 832 px (compute 0.756 / 1.000 / 1.278). Catastrophic sequences (MOTA < 0): C 0, D 0.
 
+Authoritative cloud run (GitHub Actions run 36998503435, AMD EPYC 7763 × 4, no GPU; candidate worktree
+5a8502f, code sha256 5db5deb5…8181; policy lock 10/10; 21 tests passed, 1 skipped (needs local outputs)):
+every internal-protocol number above is reproduced exactly (`research/final/sci_v7f/C1_5a8502f/`).
+Official-compatible protocol, pooled cells (`bootstrap_official.txt`): D − C HOTA −0.26 [−0.59, +0.04],
+IDF1 −0.40 [−0.93, +0.16], MOTA −0.77 [−1.51, −0.20]; D − PERM1/2/3 HOTA −0.07 / −0.19 / −0.18 (all CIs
+contain 0); C − A HOTA +2.29 [+1.19, +3.59]; V7f+HIGH − V7f+MEDIUM HOTA +0.96 [+0.60, +1.42] at 1.278×
+compute; V7f+LOW − V7f+MEDIUM HOTA −1.27 [−1.80, −0.82] at 0.756× compute.
+
 Outcome under the pre-registered rule: neither CASE 1 (no accuracy gain) nor CASE 2 (no compute saving:
 the rule sits at MEDIUM most of the time). D equals its budget-matched scene-blind controls (CASE 3),
 and SCI without V7f is slightly below fixed 736 px (B − A HOTA CI just below 0). V7f's host protection
-is unchanged under resolution switching (D − B ≈ C − A). Decision: historical SCI + V7f is NOT adopted;
+is unchanged under resolution switching (D − B ≈ C − A). Under the official protocol the combination is
+slightly worse than fixed 736 px on MOTA (CASE 4 on that metric). Decision: historical SCI + V7f is NOT adopted;
 V7f at a fixed level stays the candidate. Archived unchanged.
 
 ### D-SCI-1 — headroom diagnostic (GT oracle; run after E-SCI-1, before any new SCI design)
