@@ -28,9 +28,20 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-NATIVE_NMS = {"yolov8": 0.7, "rtdetr": None, "fasterrcnn": 0.5}
+NATIVE_NMS = {"yolov8": 0.7, "rtdetr": None, "fasterrcnn": 0.5, "retinanet": None}
 VAL7 = ["uav0000086_00000_v", "uav0000117_02622_v", "uav0000137_00458_v", "uav0000182_00000_v",
         "uav0000268_05773_v", "uav0000305_00000_v", "uav0000339_00001_v"]
+
+
+def make_detector(weights):
+    """Detector adapter for a weights file. adapters/detectors/factory.py is
+    part of the V6 policy lock, so detectors added in this cycle are created
+    here."""
+    if "retinanet" in Path(weights).name.lower():
+        from adapters.detectors.retinanet import RetinaNetAdapter
+        return RetinaNetAdapter(weights)
+    from adapters.detectors.factory import create_detector
+    return create_detector(weights, family="auto")
 
 
 def main():
@@ -47,9 +58,8 @@ def main():
         raise SystemExit("val-7 sequences only")
     import cv2
     import torch
-    from adapters.detectors.factory import create_detector
     torch.set_num_threads(max(1, torch.get_num_threads()))
-    det = create_detector(a.weights, family="auto")
+    det = make_detector(a.weights)
     nms = NATIVE_NMS[a.det]
     for seq in a.seqs:
         frames = sorted((Path(a.dataset) / "sequences" / seq).glob("*.jpg"))

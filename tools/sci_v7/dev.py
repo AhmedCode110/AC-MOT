@@ -88,6 +88,7 @@ def parse(system):
     if layer not in ("NATIVE", "V7f"):
         raise ValueError(layer)
     if not (levels in ("SCI", "LOW", "MEDIUM", "HIGH", "ORACLE", "ORACLEM") or
+            (levels.startswith("ORACLEB") and levels[7:].isdigit()) or
             (levels.startswith("PERM") and levels[4:].isdigit()) or
             (levels.startswith("R") and levels[1:].isdigit())):
         raise ValueError(levels)
@@ -135,6 +136,17 @@ def perm_schedule(layer, seed, det, seq, host=""):
     return out
 
 
+class _ResolutionSchedule:
+    """Diagnostic adapter: the schedule already holds native resolutions."""
+    def __init__(self, supported):
+        self.supported = supported
+
+    def resolution(self, level):
+        if int(level) not in self.supported:
+            raise ValueError(level)
+        return int(level)
+
+
 def track_sequence(system, det, seq, trace=False):
     """Scene layer + adapter + frozen V7f + tracker host on one cached sequence."""
     os.chdir(ROOT)
@@ -160,8 +172,10 @@ def track_sequence(system, det, seq, trace=False):
     elif levels.startswith("PERM"):
         src = LevelSource(schedule=perm_schedule(layer, int(levels[4:]), det, seq, sfx))
     elif levels.startswith("ORACLE"):     # GT-derived diagnostic schedule (tools/sci_v7/oracle.py)
-        src = LevelSource(schedule=json.loads(
-            (out_dir() / "oracle" / layer / det / f"{seq}.json").read_text())[levels])
+        sched = json.loads((out_dir() / "oracle" / layer / det / f"{seq}.json").read_text())[levels]
+        if levels.startswith("ORACLEB"):  # schedule of native resolutions
+            adapter = _ResolutionSchedule(set(cd.by_res))
+        src = LevelSource(schedule=sched)
     else:
         src = LevelSource(fixed=levels)
     pipe = SciV7Pipeline(

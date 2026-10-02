@@ -43,6 +43,8 @@ class LevelSource:
             raise ValueError("give exactly one of scene / fixed / schedule")
         if self.fixed is not None and self.fixed not in LEVELS:
             raise ValueError(self.fixed)
+        if self.schedule is not None:
+            self.schedule = list(self.schedule)
 
     def decide(self, frame, image_stats):
         if self.scene is not None:

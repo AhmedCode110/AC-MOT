@@ -176,3 +176,63 @@ does not transfer between detectors: where extra resolution pays off is a proper
 (scene, detector) pair, not of the scene. A detector-independent scene index therefore has no stable
 target to predict at these levels; this, together with the small oracle headroom (D-SCI-1), explains
 E-SCI-1 structurally.
+
+### Pre-registration P-GSCI-1 (written before the wide-range cue audit was run)
+Cue selection rule for a General SCI, applied to the wide span (target b = q(960) − q(512), cues from the
+736 px reference run, sweep cache): a cue is retained only if its within-sequence Spearman ρ with b has the
+same sign in both detectors, |mean ρ| ≥ 0.10 in each detector, and that sign in at least 10 of the 14
+(detector, sequence) cells. Retained cues enter with equal weight after a causal per-stream ECDF rank
+(no constants); if no cue is retained, the General SCI is a constant compute request (a static operating
+point) and the scene-awareness clause is recorded as unsupported.
+
+### D-SCI-4 — resolution sweep (512–960 px), one device
+Sweep cache built on GitHub-hosted CPU runners (run 36999160296; release `sci-v7f-sweep-1`, tar sha256
+dfa22765…905b). At 640 / 736 / 832 px it reproduces the V7-record cache (built on Mac/MPS) box for box:
+100% of boxes with score ≥ 0.25 have an IoU ≥ 0.9 same-class partner, mean |score difference| ≈ 1e-6.
+
+Static curves, V7f layer, internal protocol HOTA (compute = r²/736²):
+
+| px | 512 | 576 | 640 | 704 | 736 | 768 | 832 | 896 | 960 |
+|---|---|---|---|---|---|---|---|---|---|
+| compute | 0.48 | 0.61 | 0.76 | 0.92 | 1.00 | 1.09 | 1.28 | 1.48 | 1.70 |
+| YOLOv8n | 27.9 | 30.0 | 32.0 | 33.5 | 33.9 | 34.0 | 35.3 | 36.2 | 38.0 |
+| RT-DETR-L | 39.0 | 39.9 | 40.2 | 40.7 | 41.1 | 41.4 | 41.3 | 41.6 | 41.9 |
+| YOLOv8n NATIVE | 26.1 | 27.9 | 30.7 | 31.5 | 31.7 | 32.9 | 33.4 | 34.3 | 35.7 |
+| RT-DETR-L NATIVE | 34.9 | 35.0 | 35.9 | 36.3 | 36.8 | 37.2 | 37.1 | 37.8 | 38.0 |
+
+V7f is above the host alone at every compute level for both detectors (YOLOv8n +1.8 to +2.3, RT-DETR-L
++3.9 to +4.4 HOTA) and has no catastrophic sequence at any level for RT-DETR-L. The value of compute is
+detector-specific: +10.1 HOTA from 512 to 960 px for YOLOv8n, +2.9 for RT-DETR-L. Measured mean detector
+latency on one CPU host for YOLOv8n (`sweep/sweep_summary.txt`): 35.8 ms at 512 px to 100.9 ms at 960 px;
+the RT-DETR-L jobs ran on two CPU models, so its latency curve is not used for decisions.
+
+GT-oracle frontier over all nine resolutions (`tools/sci_v7/oracle.py budget`, Lagrangian allocation of
+one resolution per 30-frame segment; in-sample, optimistic):
+
+| budget (mean compute) | oracle − static at about the same compute (pooled HOTA) | IDF1 | MOTA |
+|---|---|---|---|
+| 0.58 vs 576 px (0.61) | +0.23 [−0.29, +1.08] | +1.00 [+0.15, +2.20] | +2.18 [+0.77, +3.81] |
+| 0.96 vs 736 px (1.00) | +0.60 [−0.12, +1.56] | +1.64 [+0.69, +2.84] | +4.59 [+3.35, +6.28] |
+| 1.23 vs 896 px (1.48) | +0.35 [−0.32, +1.08] | +1.00 [+0.14, +1.95] | +3.53 [+1.21, +5.41] |
+
+The oracle optimises the MOTA numerator on the same frames, hence its MOTA gain; on HOTA, even a
+GT-informed allocation is within about half a point of the static curve at every budget.
+
+### P-GSCI-1 outcome
+Wide-span cue audit (`general_sci/cue_audit_V7f_512_960.json`, `..._NATIVE_...`): no cue satisfies the
+rule (same sign in both detectors, |mean ρ| ≥ 0.10 each, ≥ 10/14 cells). Closest: `probe_down`
+(YOLOv8n −0.08, RT-DETR-L −0.16, 3+/7−) and `img_motion` (−0.26 vs +0.04). Selected cue set: none.
+By the pre-registered consequence the General SCI is a constant compute request, and the
+scene-awareness clause is recorded as **not supported** on this data.
+
+Stream-level observation (not a controller, not tested as one): the score layer's own primary-band
+count per frame rises with resolution for YOLOv8n (6.3 → 12.5 objects per frame from 512 to 960 px) and is
+flat for RT-DETR-L (≈ 13), matching the shapes of their accuracy curves; per sequence it does not predict
+the gain (Spearman 0.04 and −0.18). A label-free compute calibration per detector is therefore a
+hypothesis for future work, not a result.
+
+## 3. Candidate G1 (frozen development candidate)
+`configs/general_acmot_g1.json`: constant compute request MEDIUM → adapter profile (736 px for every
+detector; unseen detectors get the shared profile without calibration) → frozen V7f → host contract.
+Behaviourally identical to V7f at 736 px; the compute slot stays in the architecture as an interface
+whose scene policy was not supported by evidence. Lock: `research/GENERAL_ACMOT_G1_LOCK.json`.

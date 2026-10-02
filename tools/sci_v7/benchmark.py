@@ -11,8 +11,8 @@ sequential, one device. Stages per frame (milliseconds):
   tracker   ByteTrack update
 On CUDA every stage boundary is synchronized (torch.cuda.synchronize).
 
-Arms: 'fixed:<res>' (no scene layer, V7f at a fixed resolution) and
-'sci:<profile key>' (scene layer + V7f). The first --warmup frames of every
+Arms: 'native:<res>' (host alone), 'fixed:<res>' (V7f at a fixed
+resolution = G1 at that setting) and 'sci:<profile key>' (scene layer + V7f). The first --warmup frames of every
 sequence are excluded.
 
   python tools/sci_v7/benchmark.py --weights yolov8n.pt --det yolov8 \
@@ -52,7 +52,8 @@ def run_arm(arm, frames, det, det_name, warmup, torch):
     kind, arg = arm.split(":")
     scene = SceneLayer() if kind == "sci" else None
     adapter = ComputeProfileAdapter.from_config(det_name, key=arg) if kind == "sci" else None
-    layer = V7Layer(spec_from_dict(dict(SYSTEMS["V7f"], name="V7f")), HostContract(**H))
+    layer = None if kind == "native" else V7Layer(spec_from_dict(dict(SYSTEMS["V7f"], name="V7f")),
+                                                  HostContract(**H))
     tr = ByteTrackAdapter(high=H["assoc"], low=H["low"], new=H["birth"], buffer=30, match=H["match"], fuse=True)
     nms = NATIVE_NMS[det_name]
     rec = []
@@ -64,25 +65,30 @@ def run_arm(arm, frames, det, det_name, warmup, torch):
             st = analyze_visual(img)
             t2 = time.perf_counter()
             res = adapter.resolution(scene.decide(i, st).level)
-        else:
+        else:                              # 'fixed:<px>' (V7f) or 'native:<px>' (host alone)
             t2 = time.perf_counter()
             res = int(arg)
         t3 = time.perf_counter()
         raw = det.detect(img, confidence=0.01, suppression=nms, resolution=res)
         _sync(torch)
         t4 = time.perf_counter()
-        m = layer.image_motion(img)
-        b = np.array([[d.x1, d.y1, d.x2, d.y2] for d in raw]).reshape(-1, 4)
-        s = np.array([d.confidence for d in raw])
-        dec = layer.step(b, s, m, classes=[d.class_id for d in raw])
-        dets = [Detection(raw[k].x1, raw[k].y1, raw[k].x2, raw[k].y2, float(v), raw[k].class_id)
-                for k, v in zip(dec.keep, dec.scores)]
-        tr.set_association_tolerance(dec.match)
+        if layer is not None:
+            m = layer.image_motion(img)
+            b = np.array([[d.x1, d.y1, d.x2, d.y2] for d in raw]).reshape(-1, 4)
+            s = np.array([d.confidence for d in raw])
+            dec = layer.step(b, s, m, classes=[d.class_id for d in raw])
+            dets = [Detection(raw[k].x1, raw[k].y1, raw[k].x2, raw[k].y2, float(v), raw[k].class_id)
+                    for k, v in zip(dec.keep, dec.scores)]
+            tr.set_association_tolerance(dec.match)
+            assoc, birth = dec.assoc, dec.birth
+        else:
+            dets, assoc, birth = raw, H["assoc"], H["birth"]
         t5 = time.perf_counter()
-        tracks = tr.update(dets, img.shape[:2], association_threshold=dec.assoc, birth_threshold=dec.birth)
+        tracks = tr.update(dets, img.shape[:2], association_threshold=assoc, birth_threshold=birth)
         t6 = time.perf_counter()
         boxes = [[t.x1, t.y1, t.x2, t.y2] for t in tracks]
-        layer.observe(boxes, [t.track_id for t in tracks])
+        if layer is not None:
+            layer.observe(boxes, [t.track_id for t in tracks])
         t7 = time.perf_counter()
         if scene is not None:
             scene.observe(boxes)
@@ -117,8 +123,8 @@ def main():
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     import torch
-    from adapters.detectors.factory import create_detector
-    det = create_detector(a.weights, family="auto")
+    from tools.sci_v7.build_sweep_cache import make_detector
+    det = make_detector(a.weights)
     dev = str(getattr(det, "device", "cpu"))
     hw = dict(cpu=platform.processor() or platform.machine(), os=platform.platform(), torch=torch.__version__,
               threads=torch.get_num_threads(), cuda=torch.cuda.is_available(),

@@ -155,6 +155,59 @@ def build(layer):
             print(layer, det, seq, c)
 
 
+
+
+# ---- budget frontier over every cached resolution --------------------------
+def budget_schedule(Q, n, costs, budget):
+    """Q[s][r]: segment quality at resolution r; n[s]: frames of segment s;
+    costs[r]: per-frame cost. Lagrangian allocation (exact on the convex hull)
+    of one resolution per segment with mean per-frame cost <= budget."""
+    res = sorted(costs)
+
+    def pick(lam):
+        return [max(res, key=lambda r: Q[s][r] - lam * n[s] * costs[r]) for s in range(len(n))]
+
+    def mean_cost(p):
+        return sum(n[s] * costs[p[s]] for s in range(len(n))) / sum(n)
+    lo, hi = 0.0, 1e6
+    if mean_cost(pick(0.0)) <= budget:
+        return pick(0.0)
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        if mean_cost(pick(mid)) > budget:
+            lo = mid
+        else:
+            hi = mid
+    return pick(hi)
+
+
+def build_budget(layer, budgets, resolutions, ref=736):
+    _, seqs_of = dev._splits()
+    costs = {r: (r / ref) ** 2 for r in resolutions}
+    for det in os.environ.get("V7_DETS", "yolov8,rtdetr").split(","):
+        for seq in seqs_of(dev.SPLIT):
+            q = {r: frame_quality(f"{layer}+R{r}", det, seq) for r in resolutions}
+            N = len(q[resolutions[0]])
+            segs = segments(N)
+            Q = [{r: float(q[r][a:b].sum()) for r in resolutions} for a, b in segs]
+            n = [b - a for a, b in segs]
+            out = {}
+            for B in budgets:
+                p = budget_schedule(Q, n, costs, B)
+                out[f"ORACLEB{int(round(100 * B))}"] = [p[k] for k, (a, b) in enumerate(segs) for _ in range(a, b)]
+            d = dev.out_dir() / "oracle" / layer / det
+            d.mkdir(parents=True, exist_ok=True)
+            f = d / f"{seq}.json"
+            old = json.loads(f.read_text()) if f.exists() else {}
+            old.update(out)
+            f.write_text(json.dumps(old))
+            print(layer, det, seq, {k: round(float(np.mean([costs[r] for r in v])), 3) for k, v in out.items()})
+
+
 if __name__ == "__main__":
-    for layer in sys.argv[1:]:
-        build(layer)
+    if sys.argv[1] == "budget":       # oracle.py budget <layer> <B1,B2,..> <r1,r2,..>
+        build_budget(sys.argv[2], [float(x) for x in sys.argv[3].split(",")],
+                     [int(x) for x in sys.argv[4].split(",")])
+    else:
+        for layer in sys.argv[1:]:
+            build(layer)

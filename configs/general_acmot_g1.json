@@ -1,0 +1,31 @@
+{
+ "name": "General AC-MOT G1 (development candidate)",
+ "status": "frozen development candidate; evaluated on development data only; no protected split opened",
+ "architecture": [
+  "frame",
+  "compute layer (generic request LOW/MEDIUM/HIGH; acmot_sci_v7.LevelSource)",
+  "detector adapter (adapters/detectors/compute_profile.py, profile configs/sci_v7_profiles.json)",
+  "frozen detector",
+  "canonical detections",
+  "frozen V7f score self-calibration and host-preserving candidate policy (acmot_v7.py, research/V7_POLICY_LOCK.json)",
+  "tracker adapter / host contract (tools/sci_v7/hosts.py)",
+  "frozen tracker"
+ ],
+ "compute_policy": {
+  "type": "constant",
+  "level": "MEDIUM",
+  "evidence": "E-SCI-1 (historical SCI = budget-matched scene-blind controls, slightly below fixed 736 px on MOTA), D-SCI-1 and the 9-resolution oracle frontier (GT-oracle HOTA headroom at matched compute +0.6 [-0.1, +1.6]), D-SCI-2 / P-GSCI-1 (no causal cue passes the pre-registered selection rule), D-SCI-3 (the benefit of compute is detector-specific, not scene-specific). Under the pre-registered rule the General SCI reduces to a constant request."
+ },
+ "score_layer": {
+  "system": "V7f",
+  "spec": "tools/v7/systems.py SYSTEMS['V7f']",
+  "lock": "research/V7_POLICY_LOCK.json",
+  "freeze_tag": "universal-acmot-v7-freeze"
+ },
+ "hosts": {
+  "bytetrack": "ultralytics bytetrack.yaml 0.25/0.25/0.1, match 0.8",
+  "botsort": "same thresholds, sparse optical-flow GMC, no ReID",
+  "ocsort": "official args (noahcao/OC_SORT @ 8462e7e): 0.6, IoU 0.3"
+ },
+ "runner": "tools/sci_v7/dev.py, system 'V7f+MEDIUM[@host]' (= G1)"
+}

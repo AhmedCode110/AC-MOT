@@ -81,10 +81,8 @@ def _novel(A, B, a):
 
 def segment_table(layer, det, seq, levels, ref="MEDIUM", run_of=None, probe_res=None):
     """Rows (cue values, benefit) for every segment with history."""
-    from tools.run_policy_validation import CachedDetector
     run_of = run_of or (lambda lv: f"{layer}+{lv}")
-    SPLITS, _ = dev._splits()
-    cd = CachedDetector(f"{SPLITS[dev.SPLIT]['native']}/{det}/{seq}.npz")
+    cd = dev.open_cache(det, seq)
     H, W = cd.shape
     mp = H * W / 1e6
     lo, hi = levels[0], levels[-1]
@@ -146,9 +144,13 @@ def spearman(x, y):
 def audit(layer, levels, dets):
     _, seqs_of = dev._splits()
     prof = json.loads((ROOT / "configs/sci_v7_profiles.json").read_text())["detectors"]
+
+    def probe(d):
+        if all(lv.startswith("R") for lv in levels):
+            return int(levels[0][1:]), int(levels[-1][1:])
+        return prof[d]["resolution"]["LOW"], prof[d]["resolution"]["HIGH"]
     rows = [r for d in dets for s in seqs_of(dev.SPLIT)
-            for r in segment_table(layer, d, s, levels, probe_res=(prof[d]["resolution"]["LOW"],
-                                                                  prof[d]["resolution"]["HIGH"]))]
+            for r in segment_table(layer, d, s, levels, ref=levels[1], probe_res=probe(d))]
     out = dict(layer=layer, levels=levels, segments=len(rows), cues={})
     for c in CUES:
         per = {}
