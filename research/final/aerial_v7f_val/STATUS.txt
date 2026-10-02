@@ -1,1 +1,1 @@
-DOWNLOAD_FAILED: the official VisDrone2019-MOT-val zip could not be fetched from Google Drive (quota). No metric was computed.
+OK

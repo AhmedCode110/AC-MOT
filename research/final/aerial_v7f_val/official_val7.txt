@@ -1,0 +1,11 @@
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+OFFICIAL-COMPATIBLE VisDrone-MOT (class-aware, ignored regions dropped)
+system                             cat |     yolov8: MOTA  HOTA  IDF1   IDS     FP     FN    P    R |     rtdetr: MOTA  HOTA  IDF1   IDS     FP     FN    P    R
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+NATIVE                               7 |             10.0  28.9  29.3   336  11569  52769 62.2 26.5 |            -15.8  31.2  32.7  1286  42815  39088 43.3 45.6
+V7f                                  4 |             10.2  30.3  31.8   218  11642  52631 62.3 26.7 |              7.1  34.5  36.8   154  18282  48285 56.3 32.8
