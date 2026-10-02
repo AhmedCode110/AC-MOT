@@ -256,3 +256,31 @@ no sequence with MOTA < 0, G1 has 4 (YOLOv8n uav0000182 −6.4; RT-DETR-L uav000
 uav0000305 −32.7). Under the internal protocol neither has one. With ByteTrack (C1, official protocol)
 V7f reduces the catastrophic sequences from 7 to 4 and makes the remaining ones less negative
 (e.g. RT-DETR-L uav0000305 −77.4 → −50.2).
+
+### T-G1-RETINANET — unseen detector, locked before evaluation (`research/TRANSFER_LOCK_RETINANET_G1.json`)
+GitHub Actions run 37010048572 (AMD EPYC 7763 × 4, no GPU; G1 files verified identical to 751c602;
+22 tests passed, 1 skipped). Cache release `sci-v7f-unseen-1`. Results in `sci_v7f/G1_transfer/`.
+
+| host | protocol | ΔHOTA (G1 − host alone) | ΔIDF1 | ΔMOTA | catastrophic host → G1 |
+|---|---|---|---|---|---|
+| ByteTrack | internal | +4.01 [+2.25, +5.46] (6/1) | +5.81 [+2.96, +7.99] | +9.12 [+0.80, +22.02] | 3 → 3 (same sequences, all less negative) |
+| ByteTrack | official | +4.84 [+3.37, +6.11] (7/0) | +6.08 [+3.99, +7.45] | +7.73 [+0.58, +17.40] | 5 → 4 |
+| BoT-SORT | internal | +2.94 [+1.28, +4.54] (6/1) | +4.55 [+1.78, +6.82] | +11.00 [+1.78, +24.77] | |
+| BoT-SORT | official | +4.22 [+2.98, +5.30] (7/0) | +5.59 [+3.64, +7.07] | +9.56 [+1.44, +19.79] | |
+
+Compute curve with ByteTrack (internal ΔHOTA): 640 px +0.89 [−0.24, +2.24], 832 px +3.62 [+1.94, +5.14].
+Pre-declared predictions: P1 (ΔHOTA ≥ 0 with ByteTrack) met; P2 (no new catastrophic sequence) met.
+Sequence-level loss: uav0000305 HOTA 22.8 → 21.4 with ByteTrack. RetinaNet on its own is weak on this data
+(host-alone HOTA 27.9 vs 31.7 for YOLOv8n and 36.8 for RT-DETR-L at 736 px).
+
+### T-G1-BOTSORT — BoT-SORT host (ultralytics thresholds, sparse optical-flow GMC, real frames)
+| detector | internal ΔHOTA | internal ΔMOTA | official ΔHOTA | official ΔMOTA |
+|---|---|---|---|---|
+| YOLOv8n | +0.61 [−0.05, +1.54] | +0.94 [−1.03, +2.95] | +0.34 [−0.28, +1.15] | +0.43 [−2.28, +2.78] |
+| RT-DETR-L | +2.15 [+0.16, +4.50] | +34.88 [+17.88, +52.96] | +1.31 [−0.50, +3.55] | +28.56 [+13.77, +49.33] |
+| pooled (with RetinaNet) | +1.44 [+0.21, +2.68] | +15.61 [+7.15, +25.68] | +1.65 [+0.26, +3.12] | +12.85 [+5.72, +21.76] |
+
+With YOLOv8n, whose operating point already suits BoT-SORT, G1 changes little (ΔHOTA CI contains 0; IDS
+226 → 172); with RT-DETR-L it removes most of the host's false positives (FP 51,836 → 16,242) at a recall
+cost (FN 24,310 → 36,691). Official-protocol catastrophic sequences over the three detectors: 12 → 9.
+RetinaNet is contaminated for G2 (its metrics were seen during G2); see `G2_EXPERIMENT_LEDGER.md`.
