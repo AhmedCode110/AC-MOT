@@ -245,7 +245,7 @@ Freeze: tag `general-acmot-g1-freeze` → 751c602 (published by workflow run 370
 ### T-G1-OCSORT — OC-SORT host (official args), val-7, container (`sci_v7f/G1_transfer_local/`)
 | | internal ΔHOTA | internal ΔIDF1 | internal ΔMOTA | official ΔHOTA | official ΔMOTA |
 |---|---|---|---|---|---|
-| YOLOv8n | +14.86 [+12.32, +19.50] | +20.18 | +10.23 | | +4.16 [−1.47, +8.50] |
+| YOLOv8n | +14.86 [+12.32, +19.50] | +20.18 | +10.23 | +12.09 [+10.94, +14.23] | +4.16 [−1.47, +8.50] |
 | RT-DETR-L | +6.76 [+2.88, +11.82] | +9.75 | +2.46 [−1.87, +7.11] | +3.75 [+0.38, +8.42] | −4.11 [−15.39, +3.65] |
 | pooled | +9.73 [+6.37, +13.76] | +14.28 [+9.31, +19.62] | +6.34 [+2.63, +9.62] | +6.97 [+3.68, +10.45] | +0.03 [−6.04, +4.79] |
 
