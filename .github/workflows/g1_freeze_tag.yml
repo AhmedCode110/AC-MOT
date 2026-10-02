@@ -1,0 +1,43 @@
+name: Publish General AC-MOT G1 freeze tag
+on:
+  workflow_dispatch:
+  push:
+    branches: [sci-v7f-general-layer-dev]
+    paths: [".github/workflows/g1_freeze_tag.yml"]
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create or verify the annotated tag
+        env:
+          TAG: general-acmot-g1-freeze
+          SHA: 751c602212aed8c0c2c302594dcd42436e2296f0
+        run: |
+          set -euo pipefail
+          git cat-file -e "$SHA^{commit}"
+          for L in research/GENERAL_ACMOT_G1_LOCK.json research/V7_POLICY_LOCK.json; do
+            git show "$SHA:$L" > /tmp/lock.json
+            python3 - "$SHA" "$L" <<'PY'
+          import hashlib, json, subprocess, sys
+          sha, name = sys.argv[1], sys.argv[2]; lock = json.load(open("/tmp/lock.json"))
+          bad = [f for f, h in lock["file_sha256"].items()
+                 if hashlib.sha256(subprocess.check_output(["git", "show", f"{sha}:{f}"])).hexdigest() != h]
+          print(f"{name} at {sha[:7]}: {len(lock['file_sha256']) - len(bad)}/{len(lock['file_sha256'])} files match", bad or "")
+          sys.exit(1 if bad else 0)
+          PY
+          done
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+            git fetch -q origin "refs/tags/$TAG:refs/tags/$TAG"
+            test "$(git rev-parse "$TAG^{commit}")" = "$SHA" && echo "tag exists at $SHA; unchanged" && exit 0
+            echo "tag exists at a different commit; refusing to move it"; exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" "$SHA" -m "General AC-MOT G1 development candidate (research/GENERAL_ACMOT_G1_LOCK.json)"
+          git push origin "refs/tags/$TAG"
+          git ls-remote --tags origin "refs/tags/$TAG*"

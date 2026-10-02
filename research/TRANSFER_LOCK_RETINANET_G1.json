@@ -1,0 +1,47 @@
+{
+ "status": "LOCKED_BEFORE_EVALUATION",
+ "created": "2026-10-02",
+ "rule": "Transfer test of the FROZEN General AC-MOT G1 candidate to a detector family never used in the project. Nothing in G1 (research/GENERAL_ACMOT_G1_LOCK.json) or in V7f (research/V7_POLICY_LOCK.json) may change for this detector, before or after seeing results; the result is reported once, as obtained. Only the detector adapter (API translation) is new.",
+ "candidate": {
+  "name": "General AC-MOT G1",
+  "commit": "751c602212aed8c0c2c302594dcd42436e2296f0",
+  "lock": "research/GENERAL_ACMOT_G1_LOCK.json",
+  "system": "V7f+MEDIUM (= 736 px via the shared profile)"
+ },
+ "detector": {
+  "name": "RetinaNet ResNet50-FPN v2 (torchvision, COCO)",
+  "family": "one-stage, sigmoid focal loss",
+  "weights_url": "https://download.pytorch.org/models/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth",
+  "weights_sha256": "5905b1c544219215e544dbe319720397bc4e68de61a733a59350d7976645b769",
+  "adapter": "adapters/detectors/retinanet.py",
+  "adapter_sha256": "c306191cde581f0704eb88649c86418b13570e588c941797b0d7300c6869247b",
+  "cache_recipe": "tools/sci_v7/build_sweep_cache.py: score floor 0.01, detector-native NMS (0.5), detections_per_img 1000, longest side 640 / 736 / 832 px, COCO person/car/bus/truck",
+  "cache_tool_sha256": "945fad23bec7ad13d8c1c8048e66d65fb41be02e6fc52723743d01e11c97f861",
+  "profile": "shared profile (configs/sci_v7_profiles.json unseen_detector_rule): MEDIUM = 736 px; no per-detector calibration"
+ },
+ "data": "VisDrone2019-MOT-val, 7 sequences (development split, row P6). No other split.",
+ "hosts": {
+  "bytetrack": "ultralytics defaults 0.25/0.25/0.1, match 0.8 (GitHub Actions)",
+  "botsort": "same thresholds, sparse optical-flow GMC, no ReID, real frames (GitHub Actions)",
+  "ocsort": "official args (container, noahcao/OC_SORT @ 8462e7e)"
+ },
+ "arms": {
+  "main": [
+   "NATIVE+MEDIUM",
+   "V7f+MEDIUM"
+  ],
+  "compute curve (ByteTrack)": [
+   "NATIVE+R640",
+   "V7f+R640",
+   "NATIVE+R832",
+   "V7f+R832"
+  ]
+ },
+ "evaluation": "internal protocol (tools/seqstats.py; HOTA TrackEval 12c8791, motmetrics 1.4.0) primary; official-compatible protocol (tools/v6/eval_official.py) reported; paired sequence bootstrap of tools/v7/bootstrap.py (10,000 resamples, seed 42)",
+ "predictions": {
+  "P1": "With ByteTrack, G1 - NATIVE HOTA >= 0 (point estimate).",
+  "P2": "G1 adds no catastrophic sequence (MOTA < 0) relative to NATIVE for any host.",
+  "P3": "No prediction on the size of the gain: RetinaNet's score calibration was never seen."
+ },
+ "runner": "tools/sci_v7/dev.py with SCI_CACHE=sweep"
+}

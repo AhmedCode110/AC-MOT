@@ -120,6 +120,7 @@ def main():
     ap.add_argument("--seqs", nargs="+", required=True)
     ap.add_argument("--arms", nargs="+", required=True)
     ap.add_argument("--warmup", type=int, default=10)
+    ap.add_argument("--max-frames", type=int, default=0, help="first N frames per sequence (0 = all)")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     import torch
@@ -130,6 +131,8 @@ def main():
               threads=torch.get_num_threads(), cuda=torch.cuda.is_available(),
               gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None, device=dev)
     frames = {s: sorted((Path(a.dataset) / "sequences" / s).glob("*.jpg")) for s in a.seqs}
+    if a.max_frames:
+        frames = {s: f[:a.max_frames] for s, f in frames.items()}
     for fl in frames.values():          # warm page cache: decode timed under equal conditions
         for fp in fl:
             fp.read_bytes()
