@@ -121,3 +121,20 @@ detector-specific operating-point finding).
   frame and one tile call, normalized by the full-frame 736 px call.
 - Scene-blind control: round-robin refinement (one tile per frame, cycling).
 - Gate: unchanged (pre-registered in §0), oracle against the concave envelope of all static S3 profiles.
+
+### Unit of adaptation: persistent regime (one profile per sequence) — oracle gate
+`tools/g2/oracle_stream.py`: GT-assisted choice of one static profile per sequence (stream-level compute
+calibration) at matched mean cost, assembled from the existing static runs.
+
+| space | budget | ΔHOTA vs envelope (YOLOv8n / RT-DETR-L) | cost ratio | pooled oracle − anchor HOTA |
+|---|---|---|---|---|
+| S1 | 0.8 | +0.64 / +0.22 | 1.05 / 1.09 | +0.60 [−1.12, +2.31] |
+| S1 | 1.0 | +0.34 / +0.21 | 1.03 / 1.07 | +0.31 [−0.96, +1.69] |
+| S1 | 1.2 | −0.14 / +0.12 | 0.99 / 1.10 | +0.43 [−0.82, +2.05] |
+| S2 | 0.35 | +1.14 / +0.89 | 1.23 / 1.20 | +0.89 [−0.52, +2.58] |
+| S2 | 0.5 | +1.24 / +0.56 | 1.19 / 1.13 | +0.98 [−0.65, +2.72] |
+| S2 | 0.7 | −0.61 / +0.53 | 0.94 / 1.13 | −0.39 [−1.64, +0.88] |
+| S2 | 1.0 | −1.15 / −0.23 | 0.77 / 0.92 | +0.13 [−0.98, +1.64] |
+Gate not met at any budget (no pooled CI above 0; cost ratios ≤ 1.23). **Persistent-regime allocation
+rejected** for S1 and S2. Together with the segment-level results, neither the 30-frame segment nor the
+whole stream is a unit at which these knobs have usable headroom on this data.
