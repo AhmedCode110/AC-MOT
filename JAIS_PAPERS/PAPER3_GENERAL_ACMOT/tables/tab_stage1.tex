@@ -5,7 +5,7 @@
 \footnotesize
 \setlength\tabcolsep{3.5pt}
 \begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{p{4.6cm}rrrrrrr}
+\begin{tabular}{p{4.4cm}rrrrrrr}
 \toprule
 System & HOTA & MOTA & IDF1 & IDS & FP & FN & FPS \\
 \midrule
@@ -13,14 +13,18 @@ System & HOTA & MOTA & IDF1 & IDS & FP & FN & FPS \\
 Static operating point, default tracker & 28.43 & 19.73 & 32.72 & 1,235 & 16,308 & 155,051 & 36.53 \\
 Hand-designed SCI controller & 32.70 & 23.24 & 39.52 & 1,061 & 25,025 & 138,967 & 41.96 \\
 Calibrated SCI controller (AC-MOT) & 33.84 & 26.95 & 41.55 & 1,184 & 19,029 & 136,858 & 38.98 \\
-$\Delta$ AC-MOT $-$ static [95\% CI] & +5.41 [+4.13, +6.90] & +7.22 [+5.44, +9.29] & +8.82 [+6.90, +11.05] & \multicolumn{4}{l}{IDS reduction +51 [\ensuremath{-}114, +219]; W/T/L 17/0/0} \\
-$\Delta$ AC-MOT $-$ hand-designed [95\% CI] & +1.14 [+0.14, +2.27] & +3.71 [+2.39, +5.19] & +2.03 [+0.59, +3.77] & \multicolumn{4}{l}{IDS reduction \ensuremath{-}123 [\ensuremath{-}244, \ensuremath{-}14]; W/T/L 13/0/4} \\
+$\Delta$ AC-MOT $-$ static & +5.41 & +7.22 & +8.82 & \ensuremath{-}51 & +2,721 & \ensuremath{-}18,193 & -- \\
+\quad 95\% CI & [+4.13, +6.90] & [+5.44, +9.29] & [+6.90, +11.05] & & & & \\
+$\Delta$ AC-MOT $-$ hand-designed & +1.14 & +3.71 & +2.03 & +123 & \ensuremath{-}5,996 & \ensuremath{-}2,109 & -- \\
+\quad 95\% CI & [+0.14, +2.27] & [+2.39, +5.19] & [+0.59, +3.77] & & & & \\
 \midrule
 \multicolumn{8}{l}{\textit{UAVDT test, 20 sequences, frozen controller, no retuning}} \\
 Static operating point, default tracker & 24.08 & 13.84 & 27.89 & 558 & 22,974 & 270,189 & 65.01 \\
 Calibrated SCI controller (AC-MOT) & 28.39 & 17.40 & 34.45 & 321 & 22,896 & 258,376 & 58.35 \\
-$\Delta$ AC-MOT $-$ static [95\% CI] & +4.30 [+2.74, +5.71] & +3.56 [+1.45, +5.81] & +6.57 [+3.81, +8.82] & \multicolumn{4}{l}{IDS reduction +237 [+104, +377]; W/T/L 15/2/3} \\
+$\Delta$ AC-MOT $-$ static & +4.305 & +3.558 & +6.565 & \ensuremath{-}237 & \ensuremath{-}78 & \ensuremath{-}11,813 & -- \\
+\quad 95\% CI & [+2.740, +5.709] & [+1.452, +5.807] & [+3.808, +8.822] & & & & \\
 \botrule
 \end{tabular}
 \end{adjustbox}
+\par\smallskip\parbox{\linewidth}{\footnotesize Identity-switch reduction with 95\% CI: AC-MOT vs static +51 [\ensuremath{-}114, +219] (test-dev) and +237 [+104, +377] (UAVDT); AC-MOT vs hand-designed \ensuremath{-}123 [\ensuremath{-}244, \ensuremath{-}14] (negative: more switches). Sequences won/tied/lost on HOTA: 17/0/0 and 13/0/4 on test-dev, 15/2/3 on UAVDT. FP/FN/IDS differences are count differences without intervals.}
 \end{tableorg}

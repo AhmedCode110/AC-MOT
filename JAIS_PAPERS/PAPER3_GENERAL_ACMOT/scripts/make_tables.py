@@ -55,12 +55,13 @@ def table(label, caption, cols, header, rows, size="\\footnotesize", star=False,
          "\\setlength\\tabcolsep{3.5pt}", "\\begin{adjustbox}{max width=\\linewidth}",
          f"\\begin{{tabular}}{{{cols}}}", "\\toprule", header + " \\\\", "\\midrule"]
     for r in rows:
-        s.append(r if r.startswith("\\") else r + " \\\\")
+        raw = r.strip() == "\\midrule" or r.rstrip().endswith("\\\\")
+        s.append(r if raw else r + " \\\\")
     s.append("\\botrule")
     s.append("\\end{tabular}")
     s.append("\\end{adjustbox}")
     if notes:
-        s.append("\\par\\smallskip\\parbox{\\linewidth}{\\scriptsize " + notes + "}")
+        s.append("\\par\\smallskip\\parbox{\\linewidth}{\\footnotesize " + notes + "}")
     s.append(f"\\end{{{env}}}")
     return "\n".join(s) + "\n"
 
@@ -74,6 +75,12 @@ def pm(x, nd=2):
 
 
 # ============================================================================ Stage 1
+def _d(a, b, nd=0):
+    """Difference of two registered counts (computed in the table, both keys recorded as used)."""
+    USED.setdefault(_current, set()).update({a, b})
+    return E.num(R[a].value - R[b].value, nd, signed=True)
+
+
 def tab_stage1():
     global _current
     _current = "tab_stage1"
@@ -82,25 +89,29 @@ def tab_stage1():
                    ("q", "Calibrated SCI controller (AC-MOT)")]:
         rows.append(f"{lab} & {v(f's1.{k}.HOTA')} & {v(f's1.{k}.MOTA')} & {v(f's1.{k}.IDF1')} & {v(f's1.{k}.IDS')} & "
                     f"{v(f's1.{k}.FP')} & {v(f's1.{k}.FN')} & {v(f's1.{k}.FPS')}")
-    rows.append(f"$\\Delta$ AC-MOT $-$ static [95\\% CI] & {v('s1.qb.dHOTA', True)} & {v('s1.qb.dMOTA', True)} & "
-                f"{v('s1.qb.dIDF1', True)} & \\multicolumn{{4}}{{l}}{{IDS reduction {v('s1.qb.dIDS_reduction', True)}; "
-                f"W/T/L {v('s1.qb.wtl')}}}")
-    rows.append(f"$\\Delta$ AC-MOT $-$ hand-designed [95\\% CI] & {v('s1.qh.dHOTA', True)} & {v('s1.qh.dMOTA', True)} & "
-                f"{v('s1.qh.dIDF1', True)} & \\multicolumn{{4}}{{l}}{{IDS reduction {v('s1.qh.dIDS_reduction', True)}; "
-                f"W/T/L {v('s1.qh.wtl')}}}")
+    for comp, lab, other in [("qb", "AC-MOT $-$ static", "base"), ("qh", "AC-MOT $-$ hand-designed", "heur")]:
+        rows.append(f"$\\Delta$ {lab} & {v(f's1.{comp}.dHOTA')} & {v(f's1.{comp}.dMOTA')} & {v(f's1.{comp}.dIDF1')} & "
+                    f"{_d('s1.q.IDS', f's1.{other}.IDS')} & {_d('s1.q.FP', f's1.{other}.FP')} & "
+                    f"{_d('s1.q.FN', f's1.{other}.FN')} & --")
+        rows.append(f"\\quad 95\\% CI & {c(f's1.{comp}.dHOTA')} & {c(f's1.{comp}.dMOTA')} & {c(f's1.{comp}.dIDF1')} & "
+                    f"& & &")
     rows.append("\\midrule")
     rows.append(sec("UAVDT test, 20 sequences, frozen controller, no retuning", 8))
     for k, lab in [("base", "Static operating point, default tracker"), ("q", "Calibrated SCI controller (AC-MOT)")]:
         rows.append(f"{lab} & {v(f'uav.{k}.HOTA')} & {v(f'uav.{k}.MOTA')} & {v(f'uav.{k}.IDF1')} & {v(f'uav.{k}.IDS')} & "
                     f"{v(f'uav.{k}.FP')} & {v(f'uav.{k}.FN')} & {v(f'uav.{k}.FPS')}")
-    rows.append(f"$\\Delta$ AC-MOT $-$ static [95\\% CI] & {v('uav.qb.dHOTA', True)} & {v('uav.qb.dMOTA', True)} & "
-                f"{v('uav.qb.dIDF1', True)} & \\multicolumn{{4}}{{l}}{{IDS reduction {v('uav.qb.dIDS_reduction', True)}; "
-                f"W/T/L {v('uav.qb.wtl')}}}")
+    rows.append(f"$\\Delta$ AC-MOT $-$ static & {v('uav.qb.dHOTA')} & {v('uav.qb.dMOTA')} & {v('uav.qb.dIDF1')} & "
+                f"{_d('uav.q.IDS', 'uav.base.IDS')} & {_d('uav.q.FP', 'uav.base.FP')} & {_d('uav.q.FN', 'uav.base.FN')} & --")
+    rows.append(f"\\quad 95\\% CI & {c('uav.qb.dHOTA')} & {c('uav.qb.dMOTA')} & {c('uav.qb.dIDF1')} & & & &")
+    notes = (f"Identity-switch reduction with 95\\% CI: AC-MOT vs static {v('s1.qb.dIDS_reduction', True)} (test-dev) and "
+             f"{v('uav.qb.dIDS_reduction', True)} (UAVDT); AC-MOT vs hand-designed {v('s1.qh.dIDS_reduction', True)} "
+             f"(negative: more switches). Sequences won/tied/lost on HOTA: {v('s1.qb.wtl')} and {v('s1.qh.wtl')} on test-dev, "
+             f"{v('uav.qb.wtl')} on UAVDT. FP/FN/IDS differences are count differences without intervals.")
     cap = ("Stage 1: the scene-adaptive AC-MOT controller with YOLOv8n and ByteTrack. Custom class-agnostic protocol "
            "(TrackEval), not the official VisDrone toolkit. Intervals: paired sequence bootstrap, 5,000 resamples, "
            "seed 42. FPS is processing throughput on decoded frames on a Tesla T4, each system in its own session.")
-    write("tab_stage1.tex", table("tab:stage1", cap, "p{4.6cm}rrrrrrr",
-                                  "System & HOTA & MOTA & IDF1 & IDS & FP & FN & FPS", rows, star=True))
+    write("tab_stage1.tex", table("tab:stage1", cap, "p{4.4cm}rrrrrrr",
+                                  "System & HOTA & MOTA & IDF1 & IDS & FP & FN & FPS", rows, notes=notes))
 
 
 def tab_attribution():
@@ -110,22 +121,24 @@ def tab_attribution():
             f"Calibrated SCI controller (AC-MOT) & {v('s1.q.HOTA')} & {v('s1.q.MOTA')} & {v('s1.q.IDF1')} & {v('s1.q.IDS')}",
             f"Matched static point ({v('ms.a0.res')} px, conf {v('ms.a0.conf')}, NMS {v('ms.a0.nms')}) & {v('ms.a0.HOTA')} & "
             f"{v('ms.a0.MOTA')} & {v('ms.a0.IDF1')} & {v('ms.a0.IDS')}",
-            f"$\\Delta$ controller $-$ matched static [95\\% CI] & {v('ms.dHOTA', True)} & {v('ms.dMOTA', True)} & "
-            f"{v('ms.dIDF1', True)} & {v('ms.dIDS_reduction', True)}$^{{a}}$",
+            f"$\\Delta$ controller $-$ matched static & {v('ms.dHOTA')} & {v('ms.dMOTA')} & {v('ms.dIDF1')} & "
+            f"{v('ms.dIDS_reduction')}$^{{a}}$",
+            f"\\quad 95\\% CI & {c('ms.dHOTA')} & {c('ms.dMOTA')} & {c('ms.dIDF1')} & {c('ms.dIDS_reduction')}",
             "\\midrule",
-            sec("Validation (VisDrone2019-MOT val, 7 sequences): decomposition of the gain, HOTA", 5),
+            sec("Validation (VisDrone2019-MOT val, 7 sequences): decomposition of the gain", 5),
             f"Static 640 px, conf 0.25, default tracker & {v('val.static_default.HOTA')} & \\multicolumn{{3}}{{l}}{{reference}}",
             f"+ tuned tracker profile & {v('val.static_tuned.HOTA')} & \\multicolumn{{3}}{{l}}{{{v('val.d_tracker')}}}",
             f"+ calibrated static operating point (960 px, 0.35, 0.35) & {v('val.a0.HOTA')} & \\multicolumn{{3}}{{l}}{{{v('val.d_operating')}}}",
             f"+ scene switching (calibrated controller) & {v('val.q.HOTA')} & \\multicolumn{{3}}{{l}}{{{v('val.d_switch')}}}"]
-    notes = (f"$^{{a}}$ IDS reduction (positive = fewer switches for the controller). The calibrated controller ran at a mean "
-             f"input of {v('val.q.res')} px, mean confidence {v('val.q.conf')} and constant NMS {v('val.q.nms')} on "
-             f"validation; the matched static point was run on 2026-09-18, after the freeze, and is used only for attribution.")
+    notes = (f"$^{{a}}$ IDS reduction (positive = fewer switches for the controller). Validation rows: HOTA, with the "
+             f"step to the previous row in the second column. The calibrated controller ran at a mean input of "
+             f"{v('val.q.res')} px, mean confidence {v('val.q.conf')} and constant NMS {v('val.q.nms')} on validation; the "
+             f"matched static point was run on 2026-09-18, after the freeze, and is used only for attribution.")
     cap = ("Attribution of the Stage-1 gain. The matched static operating point reproduces the calibrated controller "
            "within the resolution of the test; on validation, almost all of the gain over the static default comes from the "
            "tracker profile and the calibrated operating point, not from frame-to-frame switching.")
-    write("tab_attribution.tex", table("tab:attribution", cap, "p{6.2cm}rrrr", "System & HOTA & MOTA & IDF1 & IDS",
-                                       rows, star=True, notes=notes))
+    write("tab_attribution.tex", table("tab:attribution", cap, "p{5.6cm}rrrr", "System & HOTA & MOTA & IDF1 & IDS",
+                                       rows, notes=notes))
 
 
 # ============================================================================ Score scales
@@ -253,7 +266,7 @@ def tab_constants():
     cap = ("Constants of the frozen V7f layer (\\texttt{acmot\\_v7.py} and \\texttt{configs/universal\\_acmot\\_policy\\_v7.json} "
            "at tag \\texttt{universal-acmot-v7-freeze}). No constant names a detector, tracker, dataset or sequence; none is "
            "fitted at deployment. The design constants were fixed during development, which used labelled development data.")
-    write("tab_constants.tex", table("tab:constants", cap, "p{4.6cm}lp{5.0cm}l", "Quantity & Value & Nature & Location",
+    write("tab_constants.tex", table("tab:constants", cap, "p{3.7cm}p{2.0cm}p{4.0cm}p{2.6cm}", "Quantity & Value & Nature & Location",
                                      rows, star=True))
 
 
@@ -273,7 +286,7 @@ def tab_protocol():
     cap = ("Evaluation settings and the role of each. `Development' data were visible while the corresponding system was "
            "designed; `external' systems were run once with the frozen policy. No result in this paper is a test-server or "
            "leaderboard submission.")
-    write("tab_protocol.tex", table("tab:protocol", cap, "p{2.9cm}p{1.8cm}p{2.0cm}p{2.4cm}p{2.6cm}p{2.3cm}",
+    write("tab_protocol.tex", table("tab:protocol", cap, "p{2.5cm}p{1.5cm}p{1.9cm}p{2.2cm}p{2.3cm}p{2.0cm}",
                                     "Data & System & Detector(s) & Tracker(s) & Role & Evaluation", rows, star=True))
 
 
@@ -382,7 +395,7 @@ def tab_central():
            "combination with a recorded result. HOTA, MOTA, IDF1 in points; $\\Delta$ = host + V7f $-$ host alone.")
     write("tab_central.tex", table("tab:central", cap, "lllrrlrrrlll",
                                    "Detector & Tracker & St. & Host & +V7f & $\\Delta$HOTA [95\\% CI] & $\\Delta$MOTA & "
-                                   "$\\Delta$IDF1 & $\\Delta$IDS & FP & FN & Prec. / Rec.", rows, size="\\scriptsize",
+                                   "$\\Delta$IDF1 & $\\Delta$IDS & FP & FN & Prec. / Rec.", rows, size="\\footnotesize",
                                    notes=notes, side=True))
     with open(OUT / "central_table.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(csvrows[0].keys()) + ["mean_latency_ms", "p95_latency_ms", "fps", "controller_ms"])

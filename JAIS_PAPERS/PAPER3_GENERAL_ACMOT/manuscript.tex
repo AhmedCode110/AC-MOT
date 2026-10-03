@@ -29,7 +29,7 @@
 \affil*[1]{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \orgaddress{\city{Cairo}, \country{Egypt}}}
 \affil[2]{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \orgaddress{\city{Cairo}, \country{Egypt}}}
 
-\abstract{Tracking-by-detection pipelines depend on the operating point at which detector outputs are handed to the tracker, and that operating point is normally tuned once for one detector and one tracker. We first built AC-MOT, a controller that sets the input resolution, confidence threshold and suppression of a fixed detector from a scene complexity index. On VisDrone2019-MOT test-dev it raised HOTA over a static default from \V{s1.base.HOTA} to \V{s1.q.HOTA} (\Vz{s1.qb.dHOTA}) and transferred to UAVDT without retuning (\V{uav.qb.dHOTA}). A post hoc matched-static analysis showed that one calibrated operating point reproduced the controller (\Vz{ms.dHOTA}): what made AC-MOT work, and what is worth generalizing, is operating-point calibration. Carrying that calibration to other detectors failed because raw confidence scores do not share a scale; with one raw threshold, four detectors produced between \V{raw.yolov8.cat} and \V{raw.fasterrcnn.cat} sequences with negative MOTA. We therefore moved operating-point control behind the detector. General AC-MOT combines detector and tracker adapters with V7f, a training-free, causal layer that recalibrates itself from the recent score stream with nested Otsu thresholds, decides whether the tracker's declared operating point already fits, and intervenes only when it does not. One frozen policy was evaluated with detections from six sources, nine published trackers and four datasets, with development and external evidence kept apart. It improved an unseen detector (RetinaNet, \Vz{rn.by.736.int.dHOTA} HOTA) and a predeclared external tracker (\Vz{ext.pd.dHOTA}), restored two trackers whose input scores were halved from zero to \V{cal.byoff.scale05.v7f} and \V{cal.oc.scale05.v7f} HOTA, left well-matched two-stage trackers unchanged, cost \V{rt.v7f.ctrl}~ms per frame on a CPU, and degraded one external setting significantly (\V{ctx.kcar.dHOTA}).}
+\abstract{Tracking-by-detection pipelines depend on the operating point at which detector outputs are handed to the tracker, and that operating point is usually tuned once for one detector and one tracker. We first built AC-MOT, which sets the resolution, confidence threshold and suppression of a fixed detector from a scene complexity index. On VisDrone2019-MOT test-dev it raised HOTA over a static default from \V{s1.base.HOTA} to \V{s1.q.HOTA} (\Vz{s1.qb.dHOTA}) and transferred to UAVDT without retuning (\V{uav.qb.dHOTA}). A matched static operating point reproduced the controller (\Vz{ms.dHOTA}): the mechanism worth generalizing was operating-point calibration. Carried across detectors through raw scores, that calibration failed; with one raw threshold, four detectors produced between \V{raw.yolov8.cat} and \V{raw.fasterrcnn.cat} sequences with negative MOTA. We therefore moved operating-point control behind the detector. General AC-MOT combines detector and tracker adapters with V7f, a training-free, causal layer that recalibrates itself from the recent score stream with nested Otsu thresholds, judges whether the tracker's declared operating point already fits, and intervenes only when it does not. One frozen policy was evaluated with detections from six sources, nine published trackers and four datasets, keeping development and external evidence apart. It improved an unseen detector (RetinaNet, \Vz{rn.by.736.int.dHOTA} HOTA) and a predeclared external tracker (\Vz{ext.pd.dHOTA}), restored two trackers whose scores were halved from zero to \V{cal.byoff.scale05.v7f} and \V{cal.oc.scale05.v7f} HOTA, left well-matched two-stage trackers unchanged, cost \V{rt.v7f.ctrl}~ms per frame on a CPU, and degraded one external setting significantly (\V{ctx.kcar.dHOTA}).}
 
 \keywords{Multi-object tracking, Tracking by detection, Detector confidence calibration, Operating-point control, Online self-calibration, Training-free adaptation, Aerial video}
 
@@ -65,18 +65,18 @@ Figure~\ref{fig:journey} summarizes the path. The contributions are:
 \begin{tikzpicture}[
   st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, text width=2.85cm, minimum height=1.55cm, inner sep=3pt, fill=white},
   ar/.style={-{Stealth[length=2mm]}, thick, color=black!70},
-  lab/.style={font=\scriptsize, align=center, text width=2.85cm, color=black!65}]
+  lab/.style={font=\footnotesize, align=center, text width=2.85cm, color=black!65}]
 \node[st] (a) at (0,0) {\textbf{AC-MOT}\\scene index sets the detector operating point};
 \node[st] (b) at (3.35,0) {\textbf{Attribution}\\a matched static point reproduces the gain};
-\node[st] (c) at (6.7,0) {\textbf{Transfer barrier}\\raw scores and scene indices are pipeline-specific};
+\node[st] (c) at (6.7,0) {\textbf{Transfer barrier}\\raw scores and scene\\indices are\\pipeline-specific};
 \node[st] (d) at (10.05,0) {\textbf{Self-calibration}\\score bands from the stream (prior design)};
-\node[st] (e) at (13.4,0) {\textbf{V7f / General AC-MOT}\\host-aware selective intervention};
+\node[st] (e) at (13.4,0) {\textbf{V7f /}\\\textbf{General AC-MOT}\\host-aware\\selective intervention};
 \foreach \x/\y in {a/b,b/c,c/d,d/e} \draw[ar] (\x) -- (\y);
-\node[lab, below=1mm of a] {+\V{s1.qb.dHOTA} HOTA on VisDrone test-dev};
+\node[lab, below=1mm of a] {\V{s1.qb.dHOTA} HOTA on\\VisDrone test-dev};
 \node[lab, below=1mm of b] {$\Delta$HOTA \V{ms.dHOTA}; operating-point calibration};
-\node[lab, below=1mm of c] {0--\V{raw.fasterrcnn.cat} catastrophic sequences at one raw threshold};
-\node[lab, below=1mm of d] {helps noisy streams, harms strong two-stage trackers};
-\node[lab, below=1mm of e] {one frozen policy across detectors and trackers};
+\node[lab, below=1mm of c] {0--\V{raw.fasterrcnn.cat} catastrophic\\sequences at one\\raw threshold};
+\node[lab, below=1mm of d] {helps noisy streams,\\harms strong\\two-stage trackers};
+\node[lab, below=1mm of e] {one frozen policy\\across detectors\\and trackers};
 \end{tikzpicture}
 \end{adjustbox}
 \caption{From AC-MOT to General AC-MOT. The scene-adaptive controller worked; attribution showed that its gain came from a calibrated operating point; transferring that calibration through raw scores or scene indices failed across detectors and pipelines; self-calibrated score bands fixed noisy detector streams but harmed well-matched trackers; the final layer self-calibrates and intervenes only when the tracker's declared operating point does not fit the stream.}
@@ -128,34 +128,35 @@ The frozen configuration (tag \texttt{general-acmot-g1-freeze}) also contains a 
 \centering
 \begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
-  bx/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=1.05cm, text width=2.05cm, inner sep=2pt, fill=white},
-  fz/.style={bx, fill=black!6},
-  pol/.style={bx, fill=blue!7, draw=blue!55!black},
+  bx/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=1.05cm, text width=2.3cm, inner sep=2pt, fill=white},
+  fz/.style={bx, fill=black!8},
+  pol/.style={bx, fill=blue!8, draw=blue!55!black},
   ar/.style={-{Stealth[length=2mm]}, thick, color=black!75},
   da/.style={-{Stealth[length=2mm]}, thick, dashed, color=black!55},
-  lab/.style={font=\scriptsize, color=black!65, align=center}]
+  lab/.style={font=\footnotesize, color=black!70, align=center}]
 \node[bx] (f) at (0,0) {Frame $t$};
-\node[bx] (dad) at (2.45,0) {Detector adapter};
-\node[fz] (det) at (4.9,0) {Detector (frozen)};
-\node[bx, text width=2.65cm] (can) at (7.35,0) {Canonical detections\\{\scriptsize $[x_1,y_1,x_2,y_2,s,c]$}};
-\node[pol] (cal) at (9.8,0) {V7f online self-calibration};
-\node[pol] (sel) at (12.25,0) {Host-aware selective intervention};
-\node[bx] (tad) at (12.25,-2.2) {Tracker adapter};
-\node[fz] (trk) at (9.8,-2.2) {Tracker (frozen)};
-\node[bx] (out) at (7.35,-2.2) {Tracks $t$};
-\node[bx, text width=2.35cm] (hc) at (14.75,-1.1) {Host contract\\{\scriptsize $(a,b,\ell,m_0)$}};
-\node[bx, text width=2.05cm, dashed] (cmp) at (2.45,1.75) {Compute request\\{\scriptsize constant, 736 px}};
-\draw[ar] (f) -- (dad); \draw[ar] (dad) -- (det); \draw[ar] (det) -- (can); \draw[ar] (can) -- (cal); \draw[ar] (cal) -- (sel);
-\draw[ar] (sel) -- node[lab, right]{candidates, scores,\\thresholds, tolerance} (tad);
-\draw[ar] (tad) -- (trk); \draw[ar] (trk) -- (out);
-\draw[ar] (hc) |- (sel);
+\node[bx] (dad) at (3.6,0) {Detector adapter};
+\node[fz] (det) at (7.2,0) {Detector (frozen)};
+\node[bx, text width=2.7cm] (can) at (11.3,0) {Canonical detections\\{\footnotesize $[x_1,y_1,x_2,y_2,s,c]$}};
+\node[pol, text width=2.9cm] (cal) at (11.3,-2.3) {V7f online\\self-calibration};
+\node[pol] (sel) at (7.2,-2.3) {Host-aware\\selective\\intervention};
+\node[bx] (tad) at (3.6,-2.3) {Tracker adapter};
+\node[fz] (trk) at (0,-2.3) {Tracker (frozen)};
+\node[bx] (out) at (0,-4.4) {Tracks $t$};
+\node[bx] (hc) at (7.2,-4.4) {Host contract\\{\footnotesize $(a,b,\ell,m_0)$}};
+\node[bx, dashed] (cmp) at (3.6,1.85) {Compute request\\{\footnotesize constant, 736 px}};
+\draw[ar] (f) -- (dad); \draw[ar] (dad) -- (det); \draw[ar] (det) -- (can);
+\draw[ar] (can) -- (cal);
+\draw[ar] (cal) -- node[lab, above]{bands,\\regime} (sel);
+\draw[ar] (sel) -- node[lab, above]{$P_t$,\\scores} node[lab, below]{$a_t,b_t,$\\$m_t$} (tad);
+\draw[ar] (tad) -- (trk);
+\draw[ar] (trk) -- (out);
+\draw[ar] (hc) -- (sel);
 \draw[da] (cmp) -- (dad);
-\draw[da] (out.south) -- ++(0,-0.55) -| node[lab, pos=0.25, below]{tracks of $t$ used from $t{+}1$ (continuation, duplicates)} (cal.south);
-\draw[decorate, decoration={brace, amplitude=5pt, mirror}] ($(dad.south west)+(0,-0.15)$) -- ($(can.south east)+(0,-0.15)$) node[midway, below=5pt, lab]{translation (implementation-specific adapters)};
-\draw[decorate, decoration={brace, amplitude=5pt}] ($(cal.north west)+(0,0.15)$) -- ($(sel.north east)+(0,0.15)$) node[midway, above=5pt, lab]{decision policy (no detector, tracker or dataset names)};
+\draw[da] (out.south) -- ++(0,-0.45) -| node[lab, pos=0.25, below]{tracks of frame $t$ are used from frame $t+1$ (continuation, duplicates)} (cal.south);
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Architecture of General AC-MOT. Adapters translate model-specific interfaces; the V7f policy decides from the score stream of previous frames, the tracker's declared host contract and the tracks of the previous frame. Detector and tracker are frozen. The compute request is constant in the frozen system.}
+\caption{Architecture of General AC-MOT. White boxes are translation (implementation-specific adapters) and data; blue boxes are the decision policy, which contains no detector, tracker or dataset names; grey boxes are the frozen models. The policy decides from the score stream of previous frames, the tracker's declared host contract and the tracks of the previous frame. The compute request is constant in the frozen system.}
 \label{fig:arch}
 \end{figure*}
 

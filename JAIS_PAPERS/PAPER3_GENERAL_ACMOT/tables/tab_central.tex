@@ -2,7 +2,7 @@
 \centering
 \caption{Central result: the host alone versus the host with the frozen layer, for every detector--tracker--dataset combination with a recorded result. HOTA, MOTA, IDF1 in points; $\Delta$ = host + V7f $-$ host alone.}
 \label{tab:central}
-\scriptsize
+\footnotesize
 \setlength\tabcolsep{3.5pt}
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lllrrlrrrlll}
@@ -43,5 +43,5 @@ released & TrackTrack & X & 62.961 & 62.948 & \ensuremath{-}0.013 [\ensuremath{-
 \botrule
 \end{tabular}
 \end{adjustbox}
-\par\smallskip\parbox{\linewidth}{\scriptsize Status: D development (data or host visible while V7f was designed), U unseen detector evaluated under a transfer lock on development sequences, P predeclared external system, X post-freeze external system. VisDrone rows use the frozen General AC-MOT configuration (V7f at 736 px) and the internal protocol; official-compatible values are in Tables~\ref{tab:visdrone_official} and~\ref{tab:retinanet}. KITTI: official KITTI HOTA script, car/pedestrian mean; BoT-SORT cells exclude sequence 0020 (host numerical failure); FP, FN, precision and recall are not reported as pooled values (n/r). MOT17 ByteTrack (official) and OC-SORT use the 0.01 score floor. Intervals: paired sequence bootstrap, 10,000 resamples, seed 42. Runtime is reported separately (Table~\ref{tab:runtime}) because it was measured on three configurations only.}
+\par\smallskip\parbox{\linewidth}{\footnotesize Status: D development (data or host visible while V7f was designed), U unseen detector evaluated under a transfer lock on development sequences, P predeclared external system, X post-freeze external system. VisDrone rows use the frozen General AC-MOT configuration (V7f at 736 px) and the internal protocol; official-compatible values are in Tables~\ref{tab:visdrone_official} and~\ref{tab:retinanet}. KITTI: official KITTI HOTA script, car/pedestrian mean; BoT-SORT cells exclude sequence 0020 (host numerical failure); FP, FN, precision and recall are not reported as pooled values (n/r). MOT17 ByteTrack (official) and OC-SORT use the 0.01 score floor. Intervals: paired sequence bootstrap, 10,000 resamples, seed 42. Runtime is reported separately (Table~\ref{tab:runtime}) because it was measured on three configurations only.}
 \end{sidewaystableorg}

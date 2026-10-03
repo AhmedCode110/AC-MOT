@@ -5,16 +5,17 @@
 \footnotesize
 \setlength\tabcolsep{3.5pt}
 \begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{p{6.2cm}rrrr}
+\begin{tabular}{p{5.6cm}rrrr}
 \toprule
 System & HOTA & MOTA & IDF1 & IDS \\
 \midrule
 \multicolumn{5}{l}{\textit{Held-out test-dev (post hoc attribution, 17 sequences)}} \\
 Calibrated SCI controller (AC-MOT) & 33.84 & 26.95 & 41.55 & 1,184 \\
 Matched static point (960 px, conf 0.35, NMS 0.35) & 33.93 & 27.00 & 41.77 & 1,197 \\
-$\Delta$ controller $-$ matched static [95\% CI] & \ensuremath{-}0.09 [\ensuremath{-}0.25, +0.06] & \ensuremath{-}0.05 [\ensuremath{-}0.25, +0.16] & \ensuremath{-}0.23 [\ensuremath{-}0.50, +0.02] & +13 [\ensuremath{-}23, +46]$^{a}$ \\
+$\Delta$ controller $-$ matched static & \ensuremath{-}0.09 & \ensuremath{-}0.05 & \ensuremath{-}0.23 & +13$^{a}$ \\
+\quad 95\% CI & [\ensuremath{-}0.25, +0.06] & [\ensuremath{-}0.25, +0.16] & [\ensuremath{-}0.50, +0.02] & [\ensuremath{-}23, +46] \\
 \midrule
-\multicolumn{5}{l}{\textit{Validation (VisDrone2019-MOT val, 7 sequences): decomposition of the gain, HOTA}} \\
+\multicolumn{5}{l}{\textit{Validation (VisDrone2019-MOT val, 7 sequences): decomposition of the gain}} \\
 Static 640 px, conf 0.25, default tracker & 29.84 & \multicolumn{3}{l}{reference} \\
 + tuned tracker profile & 30.86 & \multicolumn{3}{l}{+1.03} \\
 + calibrated static operating point (960 px, 0.35, 0.35) & 36.08 & \multicolumn{3}{l}{+5.21} \\
@@ -22,5 +23,5 @@ Static 640 px, conf 0.25, default tracker & 29.84 & \multicolumn{3}{l}{reference
 \botrule
 \end{tabular}
 \end{adjustbox}
-\par\smallskip\parbox{\linewidth}{\scriptsize $^{a}$ IDS reduction (positive = fewer switches for the controller). The calibrated controller ran at a mean input of 957 px, mean confidence 0.34 and constant NMS 0.35 on validation; the matched static point was run on 2026-09-18, after the freeze, and is used only for attribution.}
+\par\smallskip\parbox{\linewidth}{\footnotesize $^{a}$ IDS reduction (positive = fewer switches for the controller). Validation rows: HOTA, with the step to the previous row in the second column. The calibrated controller ran at a mean input of 957 px, mean confidence 0.34 and constant NMS 0.35 on validation; the matched static point was run on 2026-09-18, after the freeze, and is used only for attribution.}
 \end{tableorg}

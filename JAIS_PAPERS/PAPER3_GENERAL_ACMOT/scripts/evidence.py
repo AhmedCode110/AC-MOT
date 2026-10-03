@@ -208,9 +208,9 @@ def _stage1():
         put(f"uav.{s}.FPS", r["FPS"], f"{p}::{sysk}.FPS")
         put(f"uav.{s}.res", r["mean_imgsz"], f"{p}::{sysk}.mean_imgsz", nd=0)
     fr = EVL + "ACMOT_FINAL_SCIENTIFIC_FREEZE_2026-09-12.md"
-    transcribed("uav.qb.dHOTA", 4.305, fr, "HOTA +4.305 pp CI [2.740,5.709]", nd=2, signed=True, ci=(2.740, 5.709))
-    transcribed("uav.qb.dMOTA", 3.558, fr, "MOTA +3.558 pp CI [1.452,5.807]", nd=2, signed=True, ci=(1.452, 5.807))
-    transcribed("uav.qb.dIDF1", 6.565, fr, "IDF1 +6.565 pp CI [3.808,8.822]", nd=2, signed=True, ci=(3.808, 8.822))
+    transcribed("uav.qb.dHOTA", 4.305, fr, "HOTA +4.305 pp CI [2.740,5.709]", nd=3, signed=True, ci=(2.740, 5.709))
+    transcribed("uav.qb.dMOTA", 3.558, fr, "MOTA +3.558 pp CI [1.452,5.807]", nd=3, signed=True, ci=(1.452, 5.807))
+    transcribed("uav.qb.dIDF1", 6.565, fr, "IDF1 +6.565 pp CI [3.808,8.822]", nd=3, signed=True, ci=(3.808, 8.822))
     transcribed("uav.qb.dIDS_reduction", 237, fr, "IDS reduction +237 CI [104,377]", nd=0, signed=True, ci=(104, 377))
     p = EVL + "UAVDT_PER_SEQUENCE.csv"
     us = {}
