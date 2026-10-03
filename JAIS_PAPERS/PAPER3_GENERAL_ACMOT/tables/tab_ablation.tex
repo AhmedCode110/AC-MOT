@@ -1,9 +1,10 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Mechanism ablation, one change at a time (HOTA). MOT17 val-half with published YOLOX-X detections at the 0.1 score floor, no image motion cue.}
 \label{tab:ablation}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{p{7.2cm}rrrr}
 \toprule
 Variant & ByteTrack (official) & OC-SORT & BoostTrack & KITTI OC-SORT \\
@@ -17,5 +18,6 @@ Self-calibration only: nested-Otsu bands always applied, IoU duplicate rule, ran
 Host alone (original driver) & 67.70 & 66.44 & 68.49 & 36.27 \\
 \botrule
 \end{tabular}
+\end{adjustbox}
 \par\smallskip\parbox{\linewidth}{\scriptsize Pass-through: on 7 of 7 MOT17 host/floor cells the pass-through output equals the host alone in every metric, and the SparseTrack and BoostTrack pass-through track files are byte-identical to the official replays (development ledger, E0). KITTI column: YOLOv8n + OC-SORT, KITTI HOTA. All rows are development evidence; no interval is claimed.}
-\end{table*}
+\end{tableorg}

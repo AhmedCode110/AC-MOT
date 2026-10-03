@@ -1,9 +1,10 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Detector-score calibration shift on MOT17 val-half (published YOLOX-X detections, development hosts). The detector scores are transformed before the tracker; the frozen V7f layer is not changed. HOTA of the host alone and with V7f; paired sequence bootstrap, 10,000 resamples, seed 42. 14 conditions: 7 significant recoveries, 0 significant degradations, 2 identical outputs.}
 \label{tab:calib}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{llrrlcl}
 \toprule
 Host & Transform & Host alone & + V7f & $\Delta$HOTA [95\% CI] & W/T/L & Verdict \\
@@ -11,17 +12,18 @@ Host & Transform & Host alone & + V7f & $\Delta$HOTA [95\% CI] & W/T/L & Verdict
 ByteTrack (official setting) & $s^3$ & 60.92 & 65.81 & +4.89 [+2.60, +13.69] & 7/0/0 & significant recovery \\
 ByteTrack (official setting) & $0.5\,s$ & 0.00 & 66.17 & +66.17 [+49.32, +75.40] & 7/0/0 & significant recovery \\
 ByteTrack (official setting) & logit $/2$ & 65.84 & 66.95 & +1.11 [+0.35, +3.87] & 6/0/1 & significant recovery \\
-ByteTrack (official setting) & logit $\times 2$ & 67.30 & 67.29 & \textminus{}0.01 [\textminus{}0.05, 0.00] & 1/4/2 & no significant change \\
-ByteTrack (library default) & $s^3$ & 66.31 & 66.31 & \textminus{}0.01 [\textminus{}0.38, +0.38] & 3/0/4 & no significant change \\
-ByteTrack (library default) & $0.5\,s$ & 66.61 & 66.48 & \textminus{}0.14 [\textminus{}0.66, +0.14] & 2/3/2 & no significant change \\
+ByteTrack (official setting) & logit $\times 2$ & 67.30 & 67.29 & \ensuremath{-}0.01 [\ensuremath{-}0.05, 0.00] & 1/4/2 & no significant change \\
+ByteTrack (library default) & $s^3$ & 66.31 & 66.31 & \ensuremath{-}0.01 [\ensuremath{-}0.38, +0.38] & 3/0/4 & no significant change \\
+ByteTrack (library default) & $0.5\,s$ & 66.61 & 66.48 & \ensuremath{-}0.14 [\ensuremath{-}0.66, +0.14] & 2/3/2 & no significant change \\
 ByteTrack (library default) & logit $/2$ & 63.97 & 63.97 & 0.00 [0.00, 0.00] & 0/7/0 & identical output \\
-ByteTrack (library default) & logit $\times 2$ & 66.53 & 66.52 & \textminus{}0.01 [\textminus{}0.03, 0.00] & 0/5/2 & no significant change \\
+ByteTrack (library default) & logit $\times 2$ & 66.53 & 66.52 & \ensuremath{-}0.01 [\ensuremath{-}0.03, 0.00] & 0/5/2 & no significant change \\
 OC-SORT & $s^3$ & 58.34 & 66.60 & +8.26 [+5.86, +16.81] & 7/0/0 & significant recovery \\
 OC-SORT & $0.5\,s$ & 0.00 & 66.72 & +66.72 [+50.32, +75.56] & 7/0/0 & significant recovery \\
 OC-SORT & logit $/2$ & 65.99 & 67.22 & +1.24 [+0.52, +3.42] & 6/0/1 & significant recovery \\
-OC-SORT & logit $\times 2$ & 66.61 & 67.06 & +0.45 [\textminus{}0.01, +0.97] & 4/0/3 & no significant change \\
+OC-SORT & logit $\times 2$ & 66.61 & 67.06 & +0.45 [\ensuremath{-}0.01, +0.97] & 4/0/3 & no significant change \\
 BoostTrack (online) & $s^3$ & 61.33 & 64.84 & +3.51 [+0.85, +13.28] & 7/0/0 & significant recovery \\
 BoostTrack (online) & logit $/2$ & 67.59 & 67.59 & 0.00 [0.00, 0.00] & 0/7/0 & identical output \\
 \botrule
 \end{tabular}
-\end{table*}
+\end{adjustbox}
+\end{tableorg}

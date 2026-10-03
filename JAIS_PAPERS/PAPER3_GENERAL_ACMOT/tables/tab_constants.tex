@@ -1,9 +1,10 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Constants of the frozen V7f layer (\texttt{acmot\_v7.py} and \texttt{configs/universal\_acmot\_policy\_v7.json} at tag \texttt{universal-acmot-v7-freeze}). No constant names a detector, tracker, dataset or sequence; none is fitted at deployment. The design constants were fixed during development, which used labelled development data.}
 \label{tab:constants}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{p{4.6cm}lp{5.0cm}l}
 \toprule
 Quantity & Value & Nature & Location \\
@@ -22,4 +23,5 @@ Clipping (ECDF / logit) & $10^{-6}$ / $10^{-9}$ & numerical & \texttt{\_ecdf}, \
 Host thresholds and matching tolerance & declared & host contract (Table~\ref{tab:contracts}) & host adapter \\
 \botrule
 \end{tabular}
-\end{table*}
+\end{adjustbox}
+\end{tableorg}

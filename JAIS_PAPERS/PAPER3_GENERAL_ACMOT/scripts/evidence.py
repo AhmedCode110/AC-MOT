@@ -77,7 +77,7 @@ def fixed_rows(path: str):
 
 
 # ----------------------------------------------------------------------------- formatting
-MINUS = "\\textminus{}"
+MINUS = "\\ensuremath{-}"
 
 
 def num(x, nd=2, signed=False):
@@ -271,6 +271,43 @@ def _stage1():
     put("val.heur.res", float(old["OLD-A3"]["mean_imgsz"]), p_old + "::OLD-A3.mean_imgsz", nd=0)
     put("val.heur.conf", float(old["OLD-A3"]["mean_conf"]), p_old + "::OLD-A3.mean_conf", nd=3)
     put("val.heur.nms", float(old["OLD-A3"]["mean_nms_iou"]), p_old + "::OLD-A3.mean_nms_iou", nd=3)
+
+    # Frozen Stage-1 controller and locked test protocol
+    p = EVL + "FROZEN_DEFENSIBLE_ACMOT_CONFIG.json"
+    fz = J(p)
+    put("cfg.window", fz["smoothing_window"], p + "::smoothing_window", nd=0)
+    put("cfg.stride", fz["analysis_stride"], p + "::analysis_stride", nd=0)
+    put("cfg.res", ", ".join(str(x) for x in fz["resolution_levels"]), p + "::resolution_levels")
+    put("cfg.nres_screened", len(fz["operating_ablation"]["resolution_candidates_screened"]),
+        p + "::operating_ablation.resolution_candidates_screened (count)", nd=0)
+    put("cfg.conf_lo", min(fz["supported_confidence_values"]), p + "::supported_confidence_values (min)")
+    put("cfg.conf_hi", max(fz["supported_confidence_values"]), p + "::supported_confidence_values (max)")
+    put("cfg.nms_lo", min(fz["supported_nms_values"]), p + "::supported_nms_values (min)")
+    put("cfg.nms_hi", max(fz["supported_nms_values"]), p + "::supported_nms_values (max)")
+    put("cfg.trials", fz["maximum_trial_budget"], p + "::maximum_trial_budget", nd=0)
+    put("cfg.trial", fz["selected_trial"], p + "::selected_trial", nd=0)
+    op = fz["optimized_parameters"]
+    for k in ("conf_easy", "conf_hard", "nms_easy", "nms_hard"):
+        put(f"cfg.{k}", op[k], f"{p}::optimized_parameters.{k}")
+    for k in ("crowd", "tiny", "edge", "night", "blur"):
+        put(f"cfg.w_{k}", op[f"weight_{k}"], f"{p}::optimized_parameters.weight_{k}")
+    put("cfg.th_mid", op["threshold_mid"], p + "::optimized_parameters.threshold_mid", nd=3)
+    put("cfg.th_high", op["threshold_high"], p + "::optimized_parameters.threshold_high", nd=3)
+    dl = "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md"
+    transcribed("cfg.nconf", 10, dl, "10 full confidence runs", nd=0)
+    transcribed("cfg.nnms", 11, dl, "11 full NMS runs", nd=0)
+    transcribed("cfg.ntemporal", 25, dl, "5 windows × 5 strides = 25 configurations", nd=0)
+    transcribed("cfg.tpe_seed", 42, dl, "TPESampler(seed=42)", nd=0)
+    transcribed("cfg.trk_default", "0.25 / 0.10 / 0.25 / 30 / 0.80", dl,
+                "track_high_thresh = 0.25\ntrack_low_thresh  = 0.10\nnew_track_thresh  = 0.25\ntrack_buffer       = 30\nmatch_thresh       = 0.80")
+    transcribed("cfg.trk_tuned", "0.18 / 0.04 / 0.20 / 45 / 0.86", dl,
+                "track_high_thresh = 0.18\ntrack_low_thresh  = 0.04\nnew_track_thresh  = 0.20\ntrack_buffer       = 45\nmatch_thresh       = 0.86")
+    transcribed("cfg.tiny", "32 x 32", dl, "box area < 32 × 32 pixels")
+    p = EVL + "FINAL_TEST_3WORKER_PROTOCOL.json"
+    pr = J(p)
+    put("s1.fpsgate", pr["minimum_processing_fps"], p + "::minimum_processing_fps", nd=0)
+    put("s1.trackeval", pr["pinned_trackeval_commit"][:7], p + "::pinned_trackeval_commit")
+    put("s1.freeze", pr["repository_commit_at_freeze"][:7], p + "::repository_commit_at_freeze")
 
     # Legacy controller placed on a second pipeline (U2MOT)
     p = "research/transfer_legacy/rescore/u2mot/u2mot_testdev_rescore.json"

@@ -1,9 +1,10 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Evaluation settings and the role of each. `Development' data were visible while the corresponding system was designed; `external' systems were run once with the frozen policy. No result in this paper is a test-server or leaderboard submission.}
 \label{tab:protocol}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{p{2.9cm}p{1.8cm}p{2.0cm}p{2.4cm}p{2.6cm}p{2.3cm}}
 \toprule
 Data & System & Detector(s) & Tracker(s) & Role & Evaluation \\
@@ -18,4 +19,5 @@ MOT17 val-half (7 seq.) & V7f & YOLOX-X (published) & PD-SORT, Hybrid-SORT & pre
 MOT17 val-half / KITTIMOTS val / DanceTrack val & V7f & released detections (incl. PermaTrack) & C-TWiX, TrackTrack & post-freeze external & TrackEval, internal \\
 \botrule
 \end{tabular}
-\end{table*}
+\end{adjustbox}
+\end{tableorg}

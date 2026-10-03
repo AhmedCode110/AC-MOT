@@ -1,25 +1,27 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Published trackers: number reported by the authors, our reproduction (host alone), and the reproduction with the frozen V7f layer (HOTA; reported number as HOTA / MOTA / IDF1 where available). The comparison measures what the layer adds to each published system, not a ranking between systems.}
 \label{tab:published}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{p{3.8cm}p{4.2cm}rrlc}
 \toprule
 System & Reported & Reproduction & + V7f & $\Delta$HOTA [95\% CI] & St. \\
 \midrule
-SparseTrack (TCSVT 2025) & 69.2 / 76.8 / 81.4 (paper, val) & 68.876 & 68.931 & +0.055 [\textminus{}0.011, +0.254] & D \\
+SparseTrack (TCSVT 2025) & 69.2 / 76.8 / 81.4 (paper, val) & 68.876 & 68.931 & +0.055 [\ensuremath{-}0.011, +0.254] & D \\
 BoostTrack (MVA 2024), online & 68.371 / 75.561 / 81.354 (authors' corrected) & 68.492 & 68.492 & 0 (identical) & D \\
-ByteTrack (ECCV 2022) & -- / 76.6 / 79.3 (own detector run) & 67.698 & 67.684 & \textminus{}0.014 [\textminus{}0.058, +0.009] & D \\
+ByteTrack (ECCV 2022) & -- / 76.6 / 79.3 (own detector run) & 67.698 & 67.684 & \ensuremath{-}0.014 [\ensuremath{-}0.058, +0.009] & D \\
 OC-SORT (CVPR 2023) & 66.5 / 74.9 / 77.7 (paper, val-half) & 66.428 & 67.041 & +0.613 [+0.363, +1.241] & D \\
 PD-SORT (TCE 2025) & 68.011 (authors' released output) & 68.011 & 68.624 & +0.613 [+0.268, +1.646] & P \\
 Hybrid-SORT (AAAI 2024) & 67.1 / 75.8 / 78.0 (README) & 66.698 & 66.698 & 0 (identical) & P \\
-C-TWiX (PR 2025), MOT17 & 77.8 (README) & 77.550 & 77.495 & \textminus{}0.055 [\textminus{}0.456, +0.398] & X \\
-C-TWiX, KITTIMOTS car & 89.3 (README) & 89.266 & 87.745 & \textminus{}1.521 [\textminus{}4.053, \textminus{}0.134] & X \\
-C-TWiX, DanceTrack & 60.4 (README) & 59.615 & 58.610 & \textminus{}1.005 [\textminus{}2.622, +0.646] & X \\
-TrackTrack (CVPR 2025), DanceTrack & 63.3 (paper, post-processed) & 62.961 & 62.948 & \textminus{}0.013 [\textminus{}0.032, \textminus{}0.001] & X \\
+C-TWiX (PR 2025), MOT17 & 77.8 (README) & 77.550 & 77.495 & \ensuremath{-}0.055 [\ensuremath{-}0.456, +0.398] & X \\
+C-TWiX, KITTIMOTS car & 89.3 (README) & 89.266 & 87.745 & \ensuremath{-}1.521 [\ensuremath{-}4.053, \ensuremath{-}0.134] & X \\
+C-TWiX, DanceTrack & 60.4 (README) & 59.615 & 58.610 & \ensuremath{-}1.005 [\ensuremath{-}2.622, +0.646] & X \\
+TrackTrack (CVPR 2025), DanceTrack & 63.3 (paper, post-processed) & 62.961 & 62.948 & \ensuremath{-}0.013 [\ensuremath{-}0.032, \ensuremath{-}0.001] & X \\
 TOPICTrack (TIP 2025), MOT17 & 69.6 (paper) & 67.538 & -- & reproduction failed; excluded & X \\
 \botrule
 \end{tabular}
+\end{adjustbox}
 \par\smallskip\parbox{\linewidth}{\scriptsize All values are validation-split evaluations with TrackEval in our environment, on the same split the published number refers to; none is a test-server number, and none is comparable with leaderboard results. VisDrone and UAVDT results in this paper use a custom or official-compatible protocol that differs from the published VisDrone/UAVDT benchmarks; they are not directly comparable with published tracker numbers on those benchmarks and are not compared here.}
-\end{table*}
+\end{tableorg}

@@ -1,9 +1,10 @@
-\begin{table*}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Runtime per frame (ms). Mean unless marked P95.}
 \label{tab:runtime}
 \footnotesize
 \setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{p{3.6cm}rlrrrrl}
 \toprule
 Configuration & Detector & Control layer & Tracker & Total & P95 total & FPS & Overhead \\
@@ -21,5 +22,6 @@ RetinaNet, host alone & 935.50 & 0.07 & 6.11 & 941.69 & 950.11 & 1.062 & -- \\
 RetinaNet, General AC-MOT & 934.16 & 13.14 & 4.97 & 952.27 & 971.14 & 1.050 & +1.1\% \\
 \botrule
 \end{tabular}
+\end{adjustbox}
 \par\smallskip\parbox{\linewidth}{\scriptsize End-to-end time in the first block includes frame reading; the overhead relative to the pipeline without reading is +5.9\%. The control-layer time includes its quarter-resolution phase-correlation motion cue. The tracker is faster with the layer because fewer candidates reach it. CPU measurements only; no GPU timing of V7f or General AC-MOT was available, and no FPS is converted to other hardware.}
-\end{table*}
+\end{tableorg}

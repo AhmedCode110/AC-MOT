@@ -1963,6 +1963,202 @@
   "source": "research/final/paper2_calib_boot/calib_boot.json::bootstrap.resamples",
   "kind": "parsed"
  },
+ "cfg.conf_easy": {
+  "value": 0.3,
+  "text": "0.30",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.conf_easy",
+  "kind": "parsed"
+ },
+ "cfg.conf_hard": {
+  "value": 0.4,
+  "text": "0.40",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.conf_hard",
+  "kind": "parsed"
+ },
+ "cfg.conf_hi": {
+  "value": 0.45,
+  "text": "0.45",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::supported_confidence_values (max)",
+  "kind": "parsed"
+ },
+ "cfg.conf_lo": {
+  "value": 0.25,
+  "text": "0.25",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::supported_confidence_values (min)",
+  "kind": "parsed"
+ },
+ "cfg.nconf": {
+  "value": 10,
+  "text": "10",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"10 full confidence runs\")",
+  "kind": "transcribed"
+ },
+ "cfg.nms_easy": {
+  "value": 0.35,
+  "text": "0.35",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.nms_easy",
+  "kind": "parsed"
+ },
+ "cfg.nms_hard": {
+  "value": 0.35,
+  "text": "0.35",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.nms_hard",
+  "kind": "parsed"
+ },
+ "cfg.nms_hi": {
+  "value": 0.7,
+  "text": "0.70",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::supported_nms_values (max)",
+  "kind": "parsed"
+ },
+ "cfg.nms_lo": {
+  "value": 0.3,
+  "text": "0.30",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::supported_nms_values (min)",
+  "kind": "parsed"
+ },
+ "cfg.nnms": {
+  "value": 11,
+  "text": "11",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"11 full NMS runs\")",
+  "kind": "transcribed"
+ },
+ "cfg.nres_screened": {
+  "value": 15,
+  "text": "15",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::operating_ablation.resolution_candidates_screened (count)",
+  "kind": "parsed"
+ },
+ "cfg.ntemporal": {
+  "value": 25,
+  "text": "25",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"5 windows \u00d7 5 strides = 25 configurations\")",
+  "kind": "transcribed"
+ },
+ "cfg.res": {
+  "value": "512, 928, 960",
+  "text": "512, 928, 960",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::resolution_levels",
+  "kind": "parsed"
+ },
+ "cfg.stride": {
+  "value": 10,
+  "text": "10",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::analysis_stride",
+  "kind": "parsed"
+ },
+ "cfg.th_high": {
+  "value": 0.28728676236279177,
+  "text": "0.287",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.threshold_high",
+  "kind": "parsed"
+ },
+ "cfg.th_mid": {
+  "value": 0.13534938199219218,
+  "text": "0.135",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.threshold_mid",
+  "kind": "parsed"
+ },
+ "cfg.tiny": {
+  "value": "32 x 32",
+  "text": "32 x 32",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"box area < 32 \u00d7 32 pixels\")",
+  "kind": "transcribed"
+ },
+ "cfg.tpe_seed": {
+  "value": 42,
+  "text": "42",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"TPESampler(seed=42)\")",
+  "kind": "transcribed"
+ },
+ "cfg.trial": {
+  "value": 24,
+  "text": "24",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::selected_trial",
+  "kind": "parsed"
+ },
+ "cfg.trials": {
+  "value": 50,
+  "text": "50",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::maximum_trial_budget",
+  "kind": "parsed"
+ },
+ "cfg.trk_default": {
+  "value": "0.25 / 0.10 / 0.25 / 30 / 0.80",
+  "text": "0.25 / 0.10 / 0.25 / 30 / 0.80",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"track_high_thresh = 0.25\ntrack_low_thresh  = 0.10\nnew_track_thresh  = 0.25\ntrack_buffer       = 30\nmatch_thresh       = 0.80\")",
+  "kind": "transcribed"
+ },
+ "cfg.trk_tuned": {
+  "value": "0.18 / 0.04 / 0.20 / 45 / 0.86",
+  "text": "0.18 / 0.04 / 0.20 / 45 / 0.86",
+  "ci": null,
+  "source": "README_ACMOT_COMPLETE_METHOD_AND_DECISION_LOG_2026-09-11.md (\"track_high_thresh = 0.18\ntrack_low_thresh  = 0.04\nnew_track_thresh  = 0.20\ntrack_buffer       = 45\nmatch_thresh       = 0.86\")",
+  "kind": "transcribed"
+ },
+ "cfg.w_blur": {
+  "value": 0.16148852461536325,
+  "text": "0.16",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.weight_blur",
+  "kind": "parsed"
+ },
+ "cfg.w_crowd": {
+  "value": 0.12949277455301997,
+  "text": "0.13",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.weight_crowd",
+  "kind": "parsed"
+ },
+ "cfg.w_edge": {
+  "value": 0.43371337893805056,
+  "text": "0.43",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.weight_edge",
+  "kind": "parsed"
+ },
+ "cfg.w_night": {
+  "value": 0.05355765312756694,
+  "text": "0.05",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.weight_night",
+  "kind": "parsed"
+ },
+ "cfg.w_tiny": {
+  "value": 0.22174766876599927,
+  "text": "0.22",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::optimized_parameters.weight_tiny",
+  "kind": "parsed"
+ },
+ "cfg.window": {
+  "value": 7,
+  "text": "7",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FROZEN_DEFENSIBLE_ACMOT_CONFIG.json::smoothing_window",
+  "kind": "parsed"
+ },
  "const.cap": {
   "value": "0.95",
   "text": "0.95",
@@ -9695,11 +9891,25 @@
   "source": "research/paper_split/evidence/legacy/FINAL_TEST_DONE.json::results.Baseline_Default.MOTA (x100)",
   "kind": "parsed"
  },
+ "s1.fpsgate": {
+  "value": 25.0,
+  "text": "25",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FINAL_TEST_3WORKER_PROTOCOL.json::minimum_processing_fps",
+  "kind": "parsed"
+ },
  "s1.frames": {
   "value": 6635,
   "text": "6,635",
   "ci": null,
   "source": "research/paper_split/evidence/legacy/V1_PER_SEQUENCE_METRICS.csv::frames",
+  "kind": "parsed"
+ },
+ "s1.freeze": {
+  "value": "a6c1fa4",
+  "text": "a6c1fa4",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FINAL_TEST_3WORKER_PROTOCOL.json::repository_commit_at_freeze",
   "kind": "parsed"
  },
  "s1.gpu": {
@@ -9942,6 +10152,13 @@
   "ci": null,
   "source": "research/paper_split/evidence/legacy/V1_PER_SEQUENCE_METRICS.csv::HOTA per sequence (computed)",
   "kind": "computed"
+ },
+ "s1.trackeval": {
+  "value": "12c8791",
+  "text": "12c8791",
+  "ci": null,
+  "source": "research/paper_split/evidence/legacy/FINAL_TEST_3WORKER_PROTOCOL.json::pinned_trackeval_commit",
+  "kind": "parsed"
  },
  "sw.compute": {
   "value": "0.48,0.61,0.76,0.92,1,1.09,1.28,1.48,1.7",

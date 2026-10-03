@@ -47,13 +47,18 @@ def write(name, body):
 
 
 def table(label, caption, cols, header, rows, size="\\footnotesize", star=False, notes=None, side=False):
-    env = "sidewaystable" if side else ("table*" if star else "table")
-    s = [f"\\begin{{{env}}}[!htbp]", "\\centering", f"\\caption{{{caption}}}", f"\\label{{{label}}}", size,
-         "\\setlength\\tabcolsep{3.5pt}", f"\\begin{{tabular}}{{{cols}}}", "\\toprule", header + " \\\\", "\\midrule"]
+    # The class wraps table/sidewaystable in threeparttable, which cannot hold a width-limited box;
+    # the original environments (saved by the class as tableorg/sidewaystableorg) are used instead.
+    env = "sidewaystableorg" if side else "tableorg"
+    s = [f"\\begin{{{env}}}" + ("" if side else "[!htbp]"), "\\centering", f"\\caption{{{caption}}}",
+         f"\\label{{{label}}}", size,
+         "\\setlength\\tabcolsep{3.5pt}", "\\begin{adjustbox}{max width=\\linewidth}",
+         f"\\begin{{tabular}}{{{cols}}}", "\\toprule", header + " \\\\", "\\midrule"]
     for r in rows:
         s.append(r if r.startswith("\\") else r + " \\\\")
     s.append("\\botrule")
     s.append("\\end{tabular}")
+    s.append("\\end{adjustbox}")
     if notes:
         s.append("\\par\\smallskip\\parbox{\\linewidth}{\\scriptsize " + notes + "}")
     s.append(f"\\end{{{env}}}")
