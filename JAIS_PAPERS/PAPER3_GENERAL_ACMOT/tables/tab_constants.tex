@@ -1,0 +1,27 @@
+\begin{tableorg}[!htbp]
+\centering
+\caption{Constants of the frozen V7f layer (\texttt{acmot\_v7.py} and \texttt{configs/universal\_acmot\_policy\_v7.json} at tag \texttt{universal-acmot-v7-freeze}). No constant names a detector, tracker, dataset or sequence; none is fitted at deployment. The design constants were fixed during development, which used labelled development data.}
+\label{tab:constants}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{p{3.7cm}p{2.0cm}p{4.0cm}p{2.6cm}}
+\toprule
+Quantity & Value & Nature & Location \\
+\midrule
+History window $W$ (frames) & 10 & structural; insensitivity checked in development (5/20) & config \texttt{window} \\
+Minimum pooled logits for valid bands & 3 & structural (Otsu needs a split) & \texttt{\_bands} \\
+Thresholds $t_1$, $t_2$ & data & online, nested exact Otsu & \texttt{nested\_otsu} \\
+Regime boundary & $\bar\rho_t \geq 0.5$ & design constant chosen on development data & \texttt{step} \\
+Overlap rule (duplicates, track claim, rescue) & IoU 0.5 & conventional correspondence threshold & config \texttt{dup\_iou} \\
+Rank remap (noisy regime) & $0.5+0.5u$ / $0.1+0.4u$ & structural (order-preserving, two ranges) & \texttt{step} \\
+ECDF reference: stride / samples & 10 / 20 & structural & \texttt{step} \\
+Motion history / warm-up & 100 / 5 & structural & config \texttt{hist}, \texttt{warmup} \\
+Matching-tolerance cap & 0.95 & safety bound & \texttt{step} \\
+Rescue margin above the host's lowest usable score & $10^{-3}$ & numerical margin & \texttt{step} \\
+Clipping (ECDF / logit) & $10^{-6}$ / $10^{-9}$ & numerical & \texttt{\_ecdf}, \texttt{logit} \\
+Host thresholds and matching tolerance & declared & host contract (Table~\ref{tab:contracts}) & host adapter \\
+\botrule
+\end{tabular}
+\end{adjustbox}
+\end{tableorg}

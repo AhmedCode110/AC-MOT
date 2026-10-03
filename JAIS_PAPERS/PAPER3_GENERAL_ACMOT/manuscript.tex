@@ -1,0 +1,490 @@
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{rotating}
+\usepackage{adjustbox}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,decorations.pathreplacing}
+\usepackage{url}
+\setlength{\emergencystretch}{3em}
+\raggedbottom
+
+\input{tables/numbers.tex}
+
+\newcommand{\Vz}[1]{\V{#1}~\CI{#1}}
+
+\begin{document}
+
+\title[Training-Free Operating-Point Control for Multi-Object Tracking]{From Scene Adaptation to Self-Calibration: Training-Free Operating-Point Control for Heterogeneous Detection--Tracking Pipelines}
+
+\author*[1]{\fnm{Ahmed Gouda} \sur{Ismail}}\email{a7medgouda1@gmail.com}
+\author[1]{\fnm{Mohamed S.} \sur{Mohamed}}\email{mohamedms@mtc.edu.eg}
+\author[2]{\fnm{Tarek Ahmed} \sur{Mahmoud}}\email{tarek.mohamed@eui.edu.eg}
+
+\affil*[1]{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+\affil[2]{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+
+\abstract{Tracking-by-detection pipelines depend on the operating point at which detector outputs are handed to the tracker, and that operating point is usually tuned once for one detector and one tracker. We first built AC-MOT, which sets the resolution, confidence threshold and suppression of a fixed detector from a scene complexity index. On VisDrone2019-MOT test-dev it raised HOTA over a static default from \V{s1.base.HOTA} to \V{s1.q.HOTA} (\Vz{s1.qb.dHOTA}) and transferred to UAVDT without retuning (\V{uav.qb.dHOTA}). A matched static operating point reproduced the controller (\Vz{ms.dHOTA}): the mechanism worth generalizing was operating-point calibration. Carried across detectors through raw scores, that calibration failed; with one raw threshold, four detectors produced between \V{raw.yolov8.cat} and \V{raw.fasterrcnn.cat} sequences with negative MOTA. We therefore moved operating-point control behind the detector. General AC-MOT combines detector and tracker adapters with V7f, a training-free, causal layer that recalibrates itself from the recent score stream with nested Otsu thresholds, judges whether the tracker's declared operating point already fits, and intervenes only when it does not. One frozen policy was evaluated with five detectors and released detection sets, nine published trackers and four datasets, keeping development and external evidence apart. It improved an unseen detector (RetinaNet, \Vz{rn.by.736.int.dHOTA} HOTA) and a predeclared external tracker (\Vz{ext.pd.dHOTA}), restored two trackers whose scores were halved from zero to \V{cal.byoff.scale05.v7f} and \V{cal.oc.scale05.v7f} HOTA, changed well-matched two-stage trackers by at most \V{mot.st.dHOTA} HOTA, cost \V{rt.v7f.ctrl}~ms per frame on a CPU, and degraded one external setting significantly (\V{ctx.kcar.dHOTA}).}
+
+\keywords{Multi-object tracking, Tracking by detection, Detector confidence calibration, Operating-point control, Online self-calibration, Training-free adaptation, Aerial video}
+
+\maketitle
+
+%==========================================================================================
+\section{Introduction}\label{sec:intro}
+%==========================================================================================
+Most practical multi-object trackers follow the tracking-by-detection paradigm: a detector scores candidate boxes in every frame, and a tracker links the boxes that pass its thresholds into trajectories~\cite{bewley2016sort,zhang2022bytetrack,cao2023ocsort}. Between the two components sits an \emph{operating point}: the input resolution and suppression of the detector, the score threshold above which a candidate is kept, and the thresholds at which the tracker associates candidates with existing tracks or starts new ones. The operating point is usually fixed once, for one detector, one tracker and one kind of scene. In aerial video the scenes change within a sequence, and in deployed systems the detector is often replaced, retrained or quantized while the tracker keeps the thresholds its authors chose for another detector.
+
+This work started from the first of these problems. We built AC-MOT, a scene-adaptive controller that computes a scene complexity index (SCI) from causal image and detection cues and maps it to the resolution, confidence threshold and suppression of a fixed YOLOv8n detector feeding ByteTrack. After validation-only calibration and a locked one-shot test, AC-MOT raised HOTA on VisDrone2019-MOT test-dev~\cite{zhu2022visdrone} from \V{s1.base.HOTA} to \V{s1.q.HOTA} over the static default, won on all \V{s1.nseq} sequences, and transferred to UAVDT~\cite{du2018uavdt} without retuning (Sect.~\ref{sec:res_stage1}).
+
+We then asked why it worked. A matched-static analysis, in which the controller was replaced by the single operating point it effectively used, reached the same held-out accuracy (\Vz{ms.dHOTA} HOTA). On validation, the gain over the static default decomposed into \V{val.d_tracker} points from the tracker profile, \V{val.d_operating} points from the calibrated detector operating point and \V{val.d_switch} points from scene switching (Sect.~\ref{sec:res_attribution}). The SCI had been the instrument that led the system to a much better operating point, but the mechanism that carried the gain, and the part worth generalizing, was \emph{operating-point calibration}.
+
+That raised the question this paper answers: \emph{can the control mechanism of AC-MOT become a general, self-calibrating layer instead of a set of settings tied to one detector and one tracker?} Two obstacles appeared as soon as we tried. First, raw detector scores are not on a common scale. Under the same raw threshold of 0.25, YOLOv8n, RT-DETR-L~\cite{zhao2024rtdetr}, Faster R-CNN~\cite{ren2017fasterrcnn} and RetinaNet~\cite{lin2017focal} produced between \V{raw.yolov8.cat} and \V{raw.fasterrcnn.cat} VisDrone sequences with negative MOTA, and halving the scores of one detector drove two published trackers to \V{cal.oc.scale05.native} HOTA (Sect.~\ref{sec:res_transfer}). Re-tuning a threshold per detector (``if the detector is X, use threshold A'') is exactly the per-system calibration that a general layer must avoid. Second, trackers differ: some have a second association stage for low-score detections, some start tracks at a different threshold than they associate, and a layer that rewrites the input of a well-matched tracker can harm it. An earlier training-free design of ours that always applied self-calibrated bands cost two strong published trackers \V{v6.sparse.dHOTA} and \V{v6.boost.dHOTA} HOTA (Sect.~\ref{sec:barrier}).
+
+We therefore moved operating-point control from before the detector to between the detector and the tracker, and split it into translation and decision. Detector and tracker adapters translate model-specific interfaces into a canonical form; they may be specific to an implementation, but they contain no decision. The decision policy, V7f, contains no detector, tracker, dataset or sequence names. It answers one question per frame: \emph{given the detections and scores this detector has just produced, how should they be interpreted for this detector and this tracker?} It recalibrates itself from the score stream of the previous frames with nested Otsu thresholds~\cite{otsu1979}, estimates whether the stream is clean or noisy, reads the operating point that the tracker declares through a \emph{host contract}, and intervenes only when the evidence says the tracker's own operating point does not fit. We call this \emph{host-aware selective intervention}, and the complete system General AC-MOT.
+
+Figure~\ref{fig:journey} summarizes the path. The contributions are:
+\begin{enumerate}
+\item An empirical attribution of the success of a scene-adaptive controller: a matched static operating point reproduces it on held-out data, which identifies operating-point calibration as the transferable mechanism (Sects.~\ref{sec:res_stage1}--\ref{sec:res_attribution}).
+\item Evidence that this mechanism does not transfer through raw scores or scene indices, and a separation of control into detector and tracker adapters (translation) and one policy without model names (decision) (Sects.~\ref{sec:res_transfer} and~\ref{sec:method}).
+\item V7f, a causal, training-free layer that self-calibrates detector scores online with nested Otsu thresholds and a regime estimate, without per-detector thresholds in the policy (Sect.~\ref{sec:method}).
+\item Host-aware selective intervention through a declared host contract, so that one policy can be attached to single-stage, two-stage, coordinate-only and two-view trackers without tracker-specific branches (Sect.~\ref{sec:host}).
+\item A frozen-transfer evaluation of one policy across detectors, trackers and datasets, with development, predeclared external, post-freeze external and locked unseen-detector evidence reported separately, and without retuning on any transfer target (Sects.~\ref{sec:res_dev}--\ref{sec:transfer}).
+\item An analysis of the boundaries of the approach, including the settings in which it degrades a tracker and the finding that, on the tested aerial data, dynamic allocation of detector compute has too little headroom to justify a scene controller (Sect.~\ref{sec:boundary}).
+\item A reproducibility record: frozen version tags, file-hash locks, transfer locks written before evaluation, fixed bootstrap seeds, and scripts that regenerate every number in this paper from the result records (Sect.~\ref{sec:protocol} and the availability statements).
+\end{enumerate}
+
+\begin{figure*}[t]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, text width=2.85cm, minimum height=1.55cm, inner sep=3pt, fill=white},
+  ar/.style={-{Stealth[length=2mm]}, thick, color=black!70},
+  lab/.style={font=\footnotesize, align=center, text width=2.85cm, color=black!65}]
+\node[st] (a) at (0,0) {\textbf{AC-MOT}\\scene index sets the detector operating point};
+\node[st] (b) at (3.35,0) {\textbf{Attribution}\\a matched static point reproduces the gain};
+\node[st] (c) at (6.7,0) {\textbf{Transfer barrier}\\raw scores and scene\\indices are\\pipeline-specific};
+\node[st] (d) at (10.05,0) {\textbf{Self-calibration}\\score bands from the stream (prior design)};
+\node[st] (e) at (13.4,0) {\textbf{V7f /}\\\textbf{General AC-MOT}\\host-aware\\selective intervention};
+\foreach \x/\y in {a/b,b/c,c/d,d/e} \draw[ar] (\x) -- (\y);
+\node[lab, below=1mm of a] {\V{s1.qb.dHOTA} HOTA on\\VisDrone test-dev};
+\node[lab, below=1mm of b] {$\Delta$HOTA \V{ms.dHOTA}; operating-point calibration};
+\node[lab, below=1mm of c] {0--\V{raw.fasterrcnn.cat} catastrophic\\sequences at one\\raw threshold};
+\node[lab, below=1mm of d] {helps noisy streams,\\harms strong\\two-stage trackers};
+\node[lab, below=1mm of e] {one frozen policy\\across detectors\\and trackers};
+\end{tikzpicture}
+\end{adjustbox}
+\caption{From AC-MOT to General AC-MOT. The scene-adaptive controller worked; attribution showed that its gain came from a calibrated operating point; transferring that calibration through raw scores or scene indices failed across detectors and pipelines; self-calibrated score bands fixed noisy detector streams but harmed well-matched trackers; the final layer self-calibrates and intervenes only when the tracker's declared operating point does not fit the stream.}
+\label{fig:journey}
+\end{figure*}
+
+The rest of the paper is organized as follows. Section~\ref{sec:related} reviews related work. Section~\ref{sec:stage1} describes the original AC-MOT controller and Sect.~\ref{sec:method} the General AC-MOT layer. Section~\ref{sec:protocol} gives the protocol, Sects.~\ref{sec:results}--\ref{sec:runtime} the results, ablations and runtime, Sect.~\ref{sec:published} the comparison with published trackers, and Sect.~\ref{sec:boundary} the boundary cases. Sections~\ref{sec:discussion}--\ref{sec:conclusion} discuss the findings, the limitations and the conclusions.
+
+%==========================================================================================
+\section{Related Work}\label{sec:related}
+%==========================================================================================
+\paragraph{Tracking by detection and its thresholds.} SORT predicts boxes with a Kalman filter~\cite{kalman1960} and matches them to detections by overlap with the Hungarian method~\cite{bewley2016sort,kuhn1955hungarian}; DeepSORT and StrongSORT add appearance~\cite{wojke2017deepsort,du2023strongsort}. ByteTrack added a second association stage for low-score detections~\cite{zhang2022bytetrack}, a design inherited by BoT-SORT~\cite{aharon2022botsort}, SparseTrack~\cite{liu2025sparsetrack}, BoostTrack~\cite{stanojevic2024boosttrack} and Hybrid-SORT~\cite{yang2024hybridsort}. OC-SORT, Deep OC-SORT and PD-SORT use a single confidence threshold~\cite{cao2023ocsort,maggiolino2023deepocsort,wang2025pdsort}. More recent trackers learn association from coordinates (C-TWiX~\cite{miah2025twix}), associate through parallel paths (TOPICTrack~\cite{cao2025topictrack}) or with two detection views (TrackTrack~\cite{shim2025tracktrack}); end-to-end trackers predict identities directly~\cite{zeng2022motr,gao2025motip}. Nearly all of them read detector scores through fixed thresholds chosen for one detector, often YOLOX~\cite{ge2021yolox}.
+
+\paragraph{Adaptive thresholds inside trackers.} Several trackers adapt their own thresholds: an adaptive confidence threshold for ByteTrack computed from the detections of each frame~\cite{ma2023adaptivebytetrack}, adaptive thresholding of the matching step in AdapTrack~\cite{shim2024adaptrack}, confidence-aware matching~\cite{shim2024cmtrack,jung2024conftrack}, and a scheme that sets high and low thresholds per frame from the distribution of detection confidences~\cite{act2026adaptive}. These methods are part of the tracker they were designed for, and the adaptive-threshold schemes derive their thresholds from the detections of the current frame. The layer studied here differs in four respects: its statistics come from previous frames only; it decides per stream whether to intervene at all and otherwise keeps the tracker's operating point; it acts on unmodified published trackers through a declared contract; and one frozen policy is evaluated under confidence shift and on external systems.
+
+\paragraph{Confidence calibration and test-time adaptation.} Detector confidence is not calibrated across models and conditions~\cite{kuppers2020detcalib,guo2017calibration}, and detector families~\cite{redmon2016yolo,ren2017fasterrcnn,lin2017focal,carion2020detr,zhao2024rtdetr} produce different score distributions. Post hoc calibration usually needs labelled data from the target domain, and test-time adaptation updates model parameters online~\cite{wang2021tent,liang2024ttasurvey}. Our layer neither trains nor changes the detector; it uses order statistics of the score stream, which are invariant to monotone affine changes of the logit, and it is evaluated on unmodified detectors. Figure~\ref{fig:scores} shows how different these distributions are for four detectors on the same aerial frames (Sect.~\ref{sec:res_transfer}).
+
+\paragraph{Adaptive inference and aerial tracking.} Adaptive inference changes computation or configuration with the input~\cite{han2022dynamic,jiang2018chameleon}, usually with a policy learned or profiled per model. Aerial multi-object tracking faces small objects, camera motion and density changes~\cite{zhu2022visdrone,du2018uavdt,liu2022uavmot,wu2022uavsurvey}. Scene-driven controllers of the detector operating point, such as our Stage-1 controller, are calibrated with one detector and cannot observe a change of the detector's score scale, because such a change leaves the image unchanged. This observation motivates moving the control point behind the detector.
+
+%==========================================================================================
+\section{Stage 1: the Scene-Adaptive AC-MOT Controller}\label{sec:stage1}
+%==========================================================================================
+The original AC-MOT pipeline is
+\begin{center}
+frame $\rightarrow$ scene complexity analysis $\rightarrow$ adaptive detector operating point $\rightarrow$ detector $\rightarrow$ tracker.
+\end{center}
+The detector is the COCO-pretrained YOLOv8n of the Ultralytics library~\cite{jocher2023ultralytics} (person, car, bus and truck classes, half precision), and the tracker is ByteTrack in the Ultralytics implementation. Both stay frozen.
+
+\paragraph{Scene complexity index.} Five causal cues are computed on analysis frames: crowding (empirical rank of the number of detector boxes of the previous frame), the fraction of previous boxes smaller than $32\times 32$ pixels, edge complexity (empirical rank of the mean Sobel gradient magnitude), low light (one minus the rank of the mean brightness) and blur (one minus the rank of the Laplacian variance). The empirical ranks use distributions of detector outputs and image statistics recorded on validation frames, never ground-truth counts. The SCI is the weighted sum of the cues, recomputed every \V{cfg.stride} frames and averaged over the last \V{cfg.window} values.
+
+\paragraph{Operating-point mapping.} The confidence threshold and the suppression (NMS) IoU are interpolated linearly in the SCI between an ``easy'' and a ``hard'' value, and the input resolution switches between three levels at two SCI thresholds.
+
+\paragraph{Validation-only calibration.} All parameters were selected on VisDrone2019-MOT val (seven sequences) in three stages: one-factor screens over \V{cfg.nres_screened} resolutions, \V{cfg.nconf} confidence values and \V{cfg.nnms} NMS values; an ablation over \V{cfg.ntemporal} smoothing-window and stride combinations; and a joint tree-structured Parzen estimator search with Optuna~\cite{akiba2019optuna} (\V{cfg.trials} trials, seed \V{cfg.tpe_seed}) over the cue weights, the confidence and NMS end points and the resolution switching thresholds, restricted to the values supported by the screens and subject to a processing-rate gate of \V{s1.fpsgate} frames per second and an identity-switch gate. The selected configuration (trial \V{cfg.trial}) uses resolution levels \V{cfg.res} px, confidence from \V{cfg.conf_easy} (easy) to \V{cfg.conf_hard} (hard), a constant NMS IoU of \V{cfg.nms_easy}, switching thresholds \V{cfg.th_mid} and \V{cfg.th_high}, and the largest weight on edge complexity (\V{cfg.w_edge}). It was frozen at commit \texttt{\V{s1.freeze}} together with a ByteTrack profile tuned in earlier validation work (high/low/new-track thresholds, buffer, match: \V{cfg.trk_tuned}; library default \V{cfg.trk_default}). The test split was not accessed during calibration.
+
+%==========================================================================================
+\section{General AC-MOT: Self-Calibrating, Host-Aware Operating-Point Control}\label{sec:method}
+%==========================================================================================
+\subsection{Two placements of operating-point control}\label{sec:placements}
+AC-MOT asked: \emph{how should the detector be operated for this scene?} It acted before the detector, through the detector's own settings. General AC-MOT adds a more general question: \emph{how should the output of this detector be calibrated and connected to this tracker, without values specific to either?} It acts after the detector and before the tracker. Both are forms of operating-point control; they differ in where the control point sits and in what they observe. A controller placed before the detector observes the image and cannot see a change of the detector's score scale. A layer placed after the detector observes the score stream itself, which is where calibration problems become visible. V7f is therefore not a new scene complexity index: it does not score the scene, but the evidence that the detector's own scores provide about which candidates are objects.
+
+\subsection{Architecture}\label{sec:arch}
+Figure~\ref{fig:arch} shows the frozen system:
+\begin{center}
+frame $\rightarrow$ detector adapter $\rightarrow$ detector $\rightarrow$ canonical detections $\rightarrow$ V7f online self-calibration $\rightarrow$ host-aware selective intervention $\rightarrow$ tracker adapter $\rightarrow$ tracker $\rightarrow$ tracks.
+\end{center}
+The frozen configuration (tag \texttt{general-acmot-g1-freeze}) also contains a compute interface that issues a generic compute request to the detector adapter. In the frozen system this request is constant (736 pixels on the longest side for every detector): no scene policy for compute passed its pre-registered selection rule (Sect.~\ref{sec:boundary}). The compute interface is therefore part of the software, not of the method, and General AC-MOT is behaviourally V7f at a fixed detector setting.
+
+\begin{figure*}[t]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[
+  bx/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=1.05cm, text width=2.3cm, inner sep=2pt, fill=white},
+  fz/.style={bx, fill=black!8},
+  pol/.style={bx, fill=blue!8, draw=blue!55!black},
+  ar/.style={-{Stealth[length=2mm]}, thick, color=black!75},
+  da/.style={-{Stealth[length=2mm]}, thick, dashed, color=black!55},
+  lab/.style={font=\footnotesize, color=black!70, align=center}]
+\node[bx] (f) at (0,0) {Frame $t$};
+\node[bx] (dad) at (3.6,0) {Detector adapter};
+\node[fz] (det) at (7.2,0) {Detector (frozen)};
+\node[bx, text width=2.7cm] (can) at (11.3,0) {Canonical detections\\{\footnotesize $[x_1,y_1,x_2,y_2,s,c]$}};
+\node[pol, text width=2.9cm] (cal) at (11.3,-2.3) {V7f online\\self-calibration};
+\node[pol] (sel) at (7.2,-2.3) {Host-aware\\selective\\intervention};
+\node[bx] (tad) at (3.6,-2.3) {Tracker adapter};
+\node[fz] (trk) at (0,-2.3) {Tracker (frozen)};
+\node[bx] (out) at (0,-4.4) {Tracks $t$};
+\node[bx] (hc) at (7.2,-4.4) {Host contract\\{\footnotesize $(a,b,\ell,m_0)$}};
+\node[bx, dashed] (cmp) at (3.6,1.85) {Compute request\\{\footnotesize constant, 736 px}};
+\draw[ar] (f) -- (dad); \draw[ar] (dad) -- (det); \draw[ar] (det) -- (can);
+\draw[ar] (can) -- (cal);
+\draw[ar] (cal) -- node[lab, above]{bands,\\regime} (sel);
+\draw[ar] (sel) -- node[lab, above]{$P_t$,\\scores} node[lab, below]{$a_t,b_t,$\\$m_t$} (tad);
+\draw[ar] (tad) -- (trk);
+\draw[ar] (trk) -- (out);
+\draw[ar] (hc) -- (sel);
+\draw[da] (cmp) -- (dad);
+\draw[da] (out.south) -- ++(0,-0.45) -| node[lab, pos=0.25, below]{tracks of frame $t$ are used from frame $t+1$ (continuation, duplicates)} (cal.south);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Architecture of General AC-MOT. White boxes are translation (implementation-specific adapters) and data; blue boxes are the decision policy, which contains no detector, tracker or dataset names; grey boxes are the frozen models. The policy decides from the score stream of previous frames, the tracker's declared host contract and the tracks of the previous frame. The compute request is constant in the frozen system.}
+\label{fig:arch}
+\end{figure*}
+
+\subsection{Problem formulation}\label{sec:problem}
+At frame $t$ the frozen detector emits candidates $\{(\mathbf{x}_i, s_i, c_i)\}_{i=1}^{n_t}$ with boxes, scores $s_i\in(0,1)$ and class labels, down to a score floor; $z_i=\log\bigl(s_i/(1-s_i)\bigr)$ is the logit. The frozen tracker declares a host contract $(a, b, \ell, m_0)$: the score threshold of its first association, the lowest score at which it starts a track, the lowest score used by any of its association stages, and its matching tolerance (one minus its minimum overlap). A host is \emph{single-stage} when $\ell \geq \min(a,b)$ and \emph{two-stage} otherwise. For each frame the layer outputs the set $P_t$ of candidates passed to the tracker, their scores, the thresholds $(a_t, b_t)$ and the tolerance $m_t$ that the tracker uses at that frame. The requirements are: no training and no labels at deployment; one frozen configuration for every detector, tracker and dataset; causality (the thresholds of frame $t$ depend only on frames before $t$); and no change of the output when the tracker's operating point already fits the stream. The thresholds therefore cannot be fixed numbers shared by all detectors: Fig.~\ref{fig:scores} shows the same raw threshold falling at different positions in the score streams of four detectors.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_score_distributions.pdf}
+\caption{Score distributions of four detectors on the same frames (VisDrone2019-MOT val, 736 px, all candidates above the 0.01 floor, logits clipped to $[-5,5]$). The dashed line is the shared raw threshold 0.25; the solid and dotted lines are the medians over frames of the self-calibrated thresholds $t_1$ and $t_2$. The shared raw threshold lies between $t_1$ and $t_2$ for every detector, but at very different relative positions: just above the background split for Faster R-CNN, and just below the confident split for RetinaNet.}
+\label{fig:scores}
+\end{figure*}
+
+\subsection{Canonical interfaces and adapters}\label{sec:adapters}
+A detector adapter runs an implementation (Ultralytics YOLOv8n and RT-DETR-L; torchvision Faster R-CNN~\cite{ren2017fasterrcnn,lin2017fpn} and RetinaNet~\cite{lin2017focal}) with a score floor of 0.01, at most 1000 detections per frame and the detector's native suppression, keeps the person, car, bus and truck classes, and returns canonical detections $[x_1,y_1,x_2,y_2,s,c]$. A tracker adapter converts canonical detections and the layer's thresholds into the native call of a tracker (for ByteTrack, the association threshold becomes \texttt{track\_high\_thresh}, the birth threshold \texttt{new\_track\_thresh}, the tolerance \texttt{match\_thresh}; for OC-SORT, \texttt{det\_thresh} $=\min(a_t,b_t)$ and the IoU gate $1-m_t$) and returns tracks in canonical form. Adapters are translation: they may be specific to one implementation, and their only parameters are those of the native interface. The decision policy below never sees a model name. A unit test checks that the policy code contains no detector, tracker, dataset or sequence name, and the pass-through path (adapters and layer without intervention) reproduces the native hosts exactly (Sect.~\ref{sec:ablation}).
+
+\subsection{Causal score history}\label{sec:history}
+The layer keeps the logits of the candidates retained after duplicate handling in each of the last $W=\V{const.window}$ frames, one entry per frame, including empty frames. The pooled history used at frame $t$ is
+\begin{equation}
+H_t=\bigcup_{\tau=t-W}^{t-1}\{z_i^{\tau}: i\in K_\tau\},
+\end{equation}
+where $K_\tau$ is the retained set of frame $\tau$. Frame-$t$ logits enter the history only after the decision for frame $t$ has been made, so no decision uses its own frame's scores to set its thresholds, and no future frame is ever used. If $H_t$ holds fewer than \V{const.minlogits} values or has zero spread, the frame is \emph{cold} and the host's own thresholds are used.
+
+\subsection{Nested exact Otsu thresholds}\label{sec:otsu}
+For a finite set $V$ of logits sorted as $v_{(1)}\le\dots\le v_{(n)}$, the exact two-class Otsu threshold~\cite{otsu1979} is
+\begin{equation}
+\mathrm{Otsu}(V)=\tfrac12\bigl(v_{(k^\ast)}+v_{(k^\ast+1)}\bigr),\qquad k^\ast=\arg\max_{k}\;k\,(n-k)\,\bigl(\bar v_{1:k}-\bar v_{k+1:n}\bigr)^2,
+\end{equation}
+computed over all split points without histogram bins. The layer applies it twice:
+\begin{equation}
+t_1=\mathrm{Otsu}(H_t),\qquad t_2=\mathrm{Otsu}\bigl(\{z\in H_t: z\ge t_1\}\bigr),
+\end{equation}
+with $t_2=t_1$ if the second split is undefined. The first split separates background-like candidates from object-like ones; the second, computed inside the object-like part only, separates ambiguous from confident candidates, so that it does not depend on how many background candidates the detector emits. Figure~\ref{fig:otsu} shows the result on one real ten-frame window of RT-DETR-L.
+
+\subsection{Detection bands}\label{sec:bands}
+The two thresholds define three bands: \emph{primary} candidates ($z\ge t_2$) may start and continue tracks; \emph{extension} (ambiguous) candidates ($t_1\le z<t_2$) may continue existing tracks but not start new ones; \emph{reject} candidates ($z<t_1$) are not passed when the layer intervenes. Because Otsu thresholds are order statistics, the band membership of every candidate is unchanged by any increasing affine transformation of the logits, including temperature scaling. The clean regime compares the bands with the host's fixed thresholds, so V7f as a whole is not invariant to recalibration; its regime decision and its noisy-regime output are.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig4_nested_otsu.pdf}
+\caption{Nested Otsu bands on one real window: the logits of RT-DETR-L candidates in the ten frames before one decision frame (VisDrone val sequence uav0000086, \V{fig4.pooled} candidates). The first split $t_1$ (score \V{fig4.t1score}) separates background-like from object-like candidates; the second split $t_2$ (score \V{fig4.t2score}), computed inside the object-like part only, separates extension from primary candidates. The dashed line marks the tracker's raw threshold of 0.25. Computed with the frozen thresholding function on the cached detector output; duplicate handling is not applied in this illustration.}
+\label{fig:otsu}
+\end{figure}
+
+\subsection{Regime estimate: when to intervene}\label{sec:regime}
+The share of confident candidates among object-like candidates,
+\begin{equation}
+\rho_t=\frac{\bigl|\{z\in H_t: z\ge t_2\}\bigr|}{\bigl|\{z\in H_t: z\ge t_1\}\bigr|},
+\end{equation}
+is high when the detector separates objects cleanly and low when its object-like scores are spread out. Before $\rho_t$ is used, an interpretability check asks whether the first split really found a background mode: if fewer candidates lie below $t_1$ than above it, the split is not interpreted as background versus objects and $\rho_t$ is set to 1. The regime uses the median over the whole stream so far,
+\begin{equation}
+\bar\rho_t=\operatorname{median}\{\rho_\tau:\tau\le t,\ \tau\ \text{not cold}\},\qquad \text{clean if } \bar\rho_t\ge \tfrac12,\ \text{noisy otherwise},
+\end{equation}
+where each $\rho_\tau$ is computed from frames before $\tau$. The cumulative median makes the regime a property of the stream rather than of a few frames.
+
+\subsection{Clean regime: minimal intervention}\label{sec:clean}
+On a clean stream the layer keeps the tracker's operating point and only lowers a threshold that lies above the stream's confident band:
+\begin{equation}
+a_t=\min\bigl(a,\sigma(t_2)\bigr),\qquad b_t=\min\bigl(b,\sigma(t_2)\bigr),
+\end{equation}
+with $\sigma$ the logistic function. No candidate is discarded by the bands (only cross-class duplicates are removed, Sect.~\ref{sec:dup}), raw scores are passed unchanged, and the host's own low-score stage keeps working. By construction the clean regime never raises a host threshold; a unit test asserts this property.
+
+\subsection{Noisy regime: intervention}\label{sec:noisy}
+On a noisy stream the layer replaces the host's operating point by the stream's bands: candidates below $t_1$ are discarded, the association and birth thresholds both move to $t_2$, and the scores of the passed candidates are remapped by rank so that the host's thresholds become meaningful,
+\begin{equation}
+s'_i=\begin{cases}0.5+0.5\,u_i & z_i\ge t_2,\\ 0.1+0.4\,u_i & t_1\le z_i<t_2,\end{cases}\qquad a_t=b_t=0.5,
+\end{equation}
+where $u_i\in(0,1)$ is the mid-rank of $s_i$ in a reference sample of retained raw scores (frame~1 and every \V{const.ecdfstride}th frame, last \V{const.ecdfwin} samples). Primary candidates thus reach the host above its association and birth thresholds; extension candidates reach a two-stage host's low-score stage but cannot start tracks. The remapping is applied only in noisy frames; in clean and cold frames the raw scores are passed.
+
+\subsection{Crowd-safe duplicate handling}\label{sec:dup}
+Overlapping candidates are a frequent symptom of a noisy detector, but in crowded scenes overlapping boxes are often distinct objects. In noisy frames, candidates are visited in descending score, and a candidate overlapping an already kept one (IoU $>0.5$) is dropped \emph{unless} it is claimed (IoU $\ge 0.5$) by a different track of frame $t-1$ than the kept candidate. In clean and cold frames only cross-class duplicates are removed (overlap above 0.5 with a kept candidate of another class), so single-class streams pass unchanged.
+
+\subsection{Track continuation for lower-scored detections}\label{sec:rescue}
+A single-stage tracker ignores every candidate below its threshold, even one that continues an existing track. When a track of frame $t-1$ is not covered by any candidate the host will use (IoU $\ge 0.5$), the highest-scored candidate that overlaps it (IoU $\ge 0.5$), lies in the object-like part of the stream (raw score $\ge\sigma(t_1)$) and would otherwise be invisible to the host receives a score just above the lowest score the host uses at that frame (margin \V{const.margin}). For a single-stage host that floor is $\min(a_t,b_t)$; for a two-stage host it is $\ell$, so the host's own low-stage bound is respected. For a two-stage host the lifted score stays below the birth threshold, so the continuation cannot start a track; for a single-stage host it reaches the host's only threshold, so an unmatched continuation candidate could start one. When the interpretability check found no background mode, every candidate of a single-stage host counts as object-like.
+
+\subsection{Motion-conditioned matching tolerance}\label{sec:motion}
+When frames are available, a global motion cue $c_t$ (phase-correlation shift of quarter-resolution grey frames, normalized by the image diagonal~\cite{reddy1996phasecorr}) is compared with the median of its previous values, $r_t=c_t/\operatorname{median}(c_{t-100},\dots,c_{t-1})$ after \V{const.warmup} warm-up values. In noisy frames only, the matching tolerance becomes $m_t=\min\bigl(0.95,\,1-(1-m_0)/\max(1,r_t)\bigr)$. The rule is inactive when no frames are available, which is the case for every MOT17 and external-tracker experiment of this paper.
+
+\subsection{Host contract and host-aware selective intervention}\label{sec:host}
+Table~\ref{tab:contracts} lists the contracts declared by the tested trackers. The contract contains numbers only; no field names the tracker. Everything that distinguishes trackers enters through it: whether a low-score stage exists (single- versus two-stage), whether tracks start at a different threshold than they associate, and the matching tolerance. The policy therefore needs no branch of the form ``if the tracker is ByteTrack''. Host awareness acts in three places: the clean regime keeps the declared operating point; the continuation floor follows the declared lowest stage; and the noisy regime maps its decisions onto the declared thresholds. We call the resulting behaviour \emph{host-aware selective intervention}. It is a design property, not a guarantee: Sect.~\ref{sec:boundary} reports cases in which the regime decision was wrong and the layer degraded a tracker.
+
+\input{tables/tab_contracts.tex}
+
+\subsection{Causality}\label{sec:causality}
+Every threshold, band and regime decision for frame $t$ uses statistics of frames before $t$. Duplicate handling and continuation use the geometry of frame $t$ and the host's tracks of frame $t-1$; the matching tolerance uses the image cue of frame $t$ normalized by the history of earlier frames. Frame-$t$ data update the state only after the decision. Unit tests run on the frozen V7f configuration assert that the operating point and the regime of frame $t$ do not change when the candidates of frame $t$ are replaced, that future frames do not change past decisions, that a reset equals a fresh layer, that clean and cold frames never raise host thresholds or change the matching tolerance, and that the regime decisions are invariant to increasing affine recalibration of the logits.
+
+\subsection{Algorithm and complexity}\label{sec:algorithm}
+Algorithm~\ref{alg:v7f} gives the complete per-frame procedure. With $n$ candidates per frame, $k$ previous tracks and window $W$, exact Otsu on the pooled history costs $O(Wn\log Wn)$, duplicate handling $O(n^2)$, the track claims and continuation $O(nk)$, and the rank remap $O(n\log M)$ for a reference sample of size $M$. The frozen implementation recomputes the cumulative median of $\rho$ over all previous frames, which adds $O(T)$ at frame $T$; a two-heap median would reduce this to $O(\log T)$ without changing any decision. The motion cue adds one phase correlation on a quarter-resolution frame. Measured costs are in Sect.~\ref{sec:runtime}.
+
+\begin{algorithm}[t]
+\caption{V7f decision for frame $t$ (frozen policy)}\label{alg:v7f}
+\footnotesize
+\begin{algorithmic}[1]
+\Require candidates $\{(\mathbf{x}_i,s_i,c_i)\}$ of frame $t$; host contract $(a,b,\ell,m_0)$; tracks $\mathcal{T}_{t-1}$; motion cue $c_t$ (optional); state (window of retained logits, $\rho$ history, rank reference, motion history)
+\State $z_i\gets\log(s_i/(1-s_i))$; \ $H\gets$ pooled logits of frames $t-W,\dots,t-1$
+\If{$|H|<3$ or $H$ has zero spread} \Comment{cold}
+  \State $(a_t,b_t)\gets(a,b)$; no discard; regime $\gets$ cold
+\Else
+  \State $t_1\gets\mathrm{Otsu}(H)$; \ $t_2\gets\mathrm{Otsu}(\{z\in H:z\ge t_1\})$
+  \State $\rho\gets|\{z\ge t_2\}|/|\{z\ge t_1\}|$; \ \textbf{if} $|\{z<t_1\}|<|\{z\ge t_1\}|$ \textbf{then} $\rho\gets 1$
+  \State append $\rho$ to history; \ $\bar\rho\gets$ median of history
+  \If{$\bar\rho\ge\frac12$} \Comment{clean: keep host operating point}
+     \State $a_t\gets\min(a,\sigma(t_2))$; \ $b_t\gets\min(b,\sigma(t_2))$; no discard
+  \Else \Comment{noisy: intervene}
+     \State discard threshold $\gets t_1$; \ $a_t, b_t\gets t_2$ (on the logit scale)
+  \EndIf
+\EndIf
+\State $K\gets$ duplicate handling (noisy: crowd-safe rule with $\mathcal{T}_{t-1}$; otherwise cross-class rule only)
+\State $P\gets\{i\in K: z_i\ge$ discard threshold$\}$
+\If{noisy} rank-remap scores of $P$ ($0.5+0.5u$ primary, $0.1+0.4u$ extension); \ $(a_t,b_t)\gets(0.5,0.5)$
+\Else \ pass raw scores; \ $(a_t,b_t)\gets(\sigma(a_t),\sigma(b_t))$ \EndIf
+\State floor $\gets\min(a_t,b_t)$ if $\ell\ge\min(a,b)$ else $\ell$
+\For{each track $j\in\mathcal{T}_{t-1}$ not covered (IoU $\ge 0.5$) by a candidate above the floor}
+  \State lift the best-scored overlapping candidate with raw score $\ge\sigma(t_1)$ to floor $+\,10^{-3}$ (not in cold frames)
+\EndFor
+\State $m_t\gets m_0$; \ \textbf{if} noisy and $c_t$ given: $m_t\gets\min(0.95,1-(1-m_0)/\max(1,r_t))$
+\State \textbf{after the decision:} push logits of $K$ to the window; update rank reference and motion history
+\State \Return $P$, scores, $(a_t,b_t)$, $m_t$ to the tracker adapter
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Constants}\label{sec:constants}
+Table~\ref{tab:constants} lists every constant of the frozen policy. The window, the overlap rule, the rank ranges and the safety bounds are structural or conventional; the thresholds $t_1$ and $t_2$ are computed online; the host values are declared by the tracker. The regime boundary $\bar\rho_t\ge\frac12$ and the switches between the mechanisms were fixed during development on labelled development data. ``Training-free'' in this paper therefore means that nothing is fitted and no label is needed at deployment, not that the design never saw labels.
+
+\input{tables/tab_constants.tex}
+
+%==========================================================================================
+\section{Experimental Protocol}\label{sec:protocol}
+%==========================================================================================
+\paragraph{Data and roles.} Table~\ref{tab:protocol} lists the settings. VisDrone2019-MOT~\cite{zhu2022visdrone} test-dev (\V{s1.nseq} sequences, \V{s1.frames} frames) and UAVDT~\cite{du2018uavdt} test (\V{uav.nseq} sequences, \V{uav.frames} frames) evaluate Stage 1. VisDrone2019-MOT val (\V{vd.nseq} sequences, \V{vd.frames} frames), KITTI tracking training~\cite{geiger2012kitti} and MOT17~\cite{milan2016mot16} val-half are development data of V7f. External systems were run on MOT17 val-half, KITTIMOTS val and DanceTrack val~\cite{sun2022dancetrack}. The status of every result is marked: \emph{development} (the data or the host were visible while V7f was designed), \emph{predeclared external} (selected and declared in the freeze commit of V7f, evaluated once), \emph{post-freeze external} (selected after the freeze under a written protocol, evaluated once), and \emph{unseen detector} (a detector family never used in the project before the freeze of General AC-MOT, evaluated under a transfer lock committed before any of its tracking metrics existed). Only DanceTrack is a dataset that no development run used. Detections come from five detectors, YOLOv8n, RT-DETR-L and RetinaNet run by us, the published YOLOX-X models of the MOT17 and DanceTrack trackers, and PermaTrack, and from the released DanceTrack detection set of TrackTrack; Faster R-CNN appears only in the raw-threshold analysis of Sect.~\ref{sec:res_transfer}.
+
+\input{tables/tab_protocol.tex}
+
+\paragraph{Freezes and locks.} Stage 1 was frozen at tag \texttt{v1.0.0-acmot-frozen} before its locked test-dev run, in which each system ran once in its own T4 session. V7f was frozen at tag \texttt{universal-acmot-v7-freeze} with a file-hash lock (\texttt{research/V7\_POLICY\_LOCK.json}); General AC-MOT at tag \texttt{general-acmot-g1-freeze} with a lock over the policy, adapters, host contracts and runners (\texttt{research/GENERAL\_ACMOT\_G1\_LOCK.json}). Every file in both locks matches its recorded hash in the evidence snapshot used for this paper. Nothing was retuned on any transfer target.
+
+\paragraph{Metrics and evaluation.} We report HOTA~\cite{luiten2021hota}, MOTA~\cite{bernardin2008clear} and IDF1~\cite{ristani2016idf1} (in percentage points), identity switches (IDS), false positives and negatives, precision and recall, computed with TrackEval at commit \texttt{\V{s1.trackeval}}. Stage-1 VisDrone and UAVDT results use a custom class-agnostic protocol (VisDrone ground-truth categories 1, 4, 5, 6 and 9, score 1, occlusion and truncation below 2) that is not the official VisDrone toolkit. For General AC-MOT on VisDrone we additionally report an \emph{official-compatible} evaluation, a port of the VisDrone MOT toolkit (class-aware, ignored regions removed) with HOTA added; it is not the evaluation server. COCO detectors have no ``van'' class, so van objects count as misses under that protocol. MOT17, KITTI and DanceTrack results are validation-split evaluations in our environment; none is a test-server submission. A sequence with MOTA $<0$ is called \emph{catastrophic}.
+
+\paragraph{Statistics.} Differences are paired over sequences (or detector--sequence cells for pooled results) and reported with percentile 95\% bootstrap intervals: 5,000 resamples with seed 42 for Stage 1 and 10,000 resamples with seed 42 for all later results. Each interval is descriptive and per comparison, without correction for multiple comparisons. W/T/L counts the sequences won, tied and lost.
+
+\paragraph{Hardware.} Stage-1 timing was measured on an NVIDIA Tesla T4 as processing throughput on decoded frames. V7f and General AC-MOT were timed on CPUs only (Sect.~\ref{sec:runtime}); no GPU timing of them is reported.
+
+%==========================================================================================
+\section{Results}\label{sec:results}
+%==========================================================================================
+\subsection{Stage 1: AC-MOT worked}\label{sec:res_stage1}
+Table~\ref{tab:stage1} gives the locked test-dev comparison. The calibrated controller raised HOTA by \Vz{s1.qb.dHOTA}, MOTA by \Vz{s1.qb.dMOTA} and IDF1 by \Vz{s1.qb.dIDF1} over the static default and won on all \V{s1.nseq} sequences (W/T/L \V{s1.qb.wtl}); per-sequence gains ranged from \V{s1.qb.seqmin} to \V{s1.qb.seqmax} HOTA points. The gain came mostly from recall: false negatives fell by \V{s1.qb.dFN}, false positives rose by \V{s1.qb.dFP}, and the identity-switch reduction (\V{s1.qb.dIDS_reduction}) was not significant. Against the hand-designed SCI controller it gained \Vz{s1.qh.dHOTA} HOTA but had more identity switches (\V{s1.q.IDS} against \V{s1.heur.IDS}; reduction \Vz{s1.qh.dIDS_reduction}), so it did not dominate the earlier controller on every metric. Frozen and unchanged, it transferred to UAVDT with \Vz{uav.qb.dHOTA} HOTA (W/T/L \V{uav.qb.wtl}). The controller ran at \V{s1.q.FPS} frames per second of processing on a T4; this figure excludes JPEG decoding (\V{t4.decode}~ms per frame), with which serialized playback of a matched static configuration reached \V{t4.playfps} frames per second, and repeated measurements of one configuration in different sessions differed by several frames per second.
+
+\input{tables/tab_stage1.tex}
+
+\subsection{Why AC-MOT worked: operating-point calibration}\label{sec:res_attribution}
+The calibrated controller hardly switched: on validation it ran at a mean input of \V{val.q.res} px, a mean confidence of \V{val.q.conf} and a constant NMS IoU of \V{val.q.nms}. We therefore ran, post hoc, the matched static operating point (\V{ms.a0.res} px, confidence \V{ms.a0.conf}, NMS \V{ms.a0.nms}, tuned tracker) on test-dev (Table~\ref{tab:attribution}). It reached \V{ms.a0.HOTA} HOTA against \V{s1.q.HOTA} for the controller (\Vz{ms.dHOTA}); MOTA, IDF1 and IDS differences also had intervals containing zero. On validation, the step from the static default to the tuned tracker profile added \V{val.d_tracker} HOTA, the calibrated static operating point a further \V{val.d_operating}, and scene switching \V{val.d_switch}. This matched-static test is post hoc and is used only for attribution, not as a fourth system of the locked comparison.
+
+\input{tables/tab_attribution.tex}
+
+The reading is not that the SCI was useless. The SCI and its validation-only calibration were the procedure that found an operating point (high resolution, a higher confidence threshold, strong suppression) far better than the default; the hand-designed SCI controller had itself raised HOTA over the static default (\V{s1.heur.HOTA} against \V{s1.base.HOTA}; no interval was recorded for this pair). What the attribution shows is that, once found, a calibrated operating point carried the gain, and that operating-point calibration is the most transferable mechanism inside AC-MOT.
+
+\subsection{Why the calibration does not transfer directly}\label{sec:res_transfer}
+\paragraph{Scene indices are pipeline-specific.} When the AC-MOT design was placed on a second pipeline (the U2MOT tracker~\cite{liu2023u2mot} with its authors' YOLOX-X detector on VisDrone), the SCI computed on that pipeline's validation data ranged from \V{u2.sci_lo} to \V{u2.sci_hi}, whereas the frozen switching thresholds were \V{u2.bound_lo} and \V{u2.bound_hi}: every frame would have fallen into the hardest tier. A separately recalibrated controller of the same design, frozen before its test-dev run, changed HOTA by \Vz{u2.dHOTA} against the authors' static operating point (W/T/L \V{u2.wtl}; post hoc TrackEval rescore of outputs evaluated with the U2MOT repository protocol, 10,000 resamples, seed 0).
+
+\paragraph{Raw scores are detector-specific.} Table~\ref{tab:rawscale} and Fig.~\ref{fig:scores} show four COCO detectors on the same VisDrone frames at the same input size and with the same tracker thresholds. Their score streams differ in density (from \V{fig3.fasterrcnn.perframe} to \V{fig3.retinanet.perframe} candidates per frame) and in where object-like candidates sit: the median self-calibrated thresholds $\sigma(t_2)$ range from \V{fig3.retinanet.t2} (RetinaNet) to \V{fig3.fasterrcnn.t2} (Faster R-CNN). With the shared raw threshold of 0.25, YOLOv8n had no catastrophic sequence, while RT-DETR-L had \V{raw.rtdetr.cat}, RetinaNet \V{raw.retinanet.cat} and Faster R-CNN \V{raw.fasterrcnn.cat}; precision ranged from \V{raw.retinanet.Precision} to \V{raw.yolov8.Precision}.
+
+\input{tables/tab_rawscale.tex}
+
+
+\paragraph{Fixed thresholds break when the score scale moves.} On MOT17 with published YOLOX-X detections, multiplying every score by 0.5 drove ByteTrack (official setting) to \V{cal.byoff.scale05.native} and OC-SORT to \V{cal.oc.scale05.native} HOTA, because no detection reached their fixed thresholds (Table~\ref{tab:calib}); a cubic reshaping $s^3$ reduced them to \V{cal.byoff.pow3.native} and \V{cal.oc.pow3.native} HOTA, against \V{mot.byoff.base.HOTA} and \V{mot.oc.base.HOTA} on the unchanged stream. A per-detector threshold would repair each case but is exactly the per-system tuning that the layer must avoid.
+
+\paragraph{From these findings to the design.}\label{sec:barrier} The layer therefore needs thresholds that come from the score stream itself, statistics that do not depend on the score scale, and causal updates. Earlier designs in this project tested these requirements one at a time: a histogram normalizer with a ratio gate, an order-only score transform with a global gate, and a version with global constants selected on VisDrone. The last training-free predecessor, which always applied self-calibrated nested-Otsu bands, repaired noisy streams but, added to two strong published trackers, cost SparseTrack \Vz{v6.sparse.dHOTA} and BoostTrack \Vz{v6.boost.dHOTA} HOTA on MOT17. The missing element was a decision about \emph{when not to intervene}, which became the regime estimate and the host contract of V7f.
+
+\subsection{General AC-MOT on development detectors}\label{sec:res_dev}
+Table~\ref{tab:central} collects every native-versus-V7f result; Fig.~\ref{fig:forest} plots the HOTA differences with their intervals, and Fig.~\ref{fig:matrix} arranges them as a detector--tracker matrix.
+
+\input{tables/tab_central.tex}
+
+\paragraph{VisDrone val (aerial, development detectors).} With ByteTrack, General AC-MOT raised HOTA by \Vz{vd.yolov8.int.dHOTA} for YOLOv8n and \Vz{vd.rtdetr.int.dHOTA} for RT-DETR-L on all seven sequences, and IDF1 by \V{vd.yolov8.int.dIDF1} and \V{vd.rtdetr.int.dIDF1}. For RT-DETR-L, MOTA rose by \Vz{vd.rtdetr.int.dMOTA} and the catastrophic sequences fell from \V{vd.rtdetr.base.cat} to \V{vd.rtdetr.g1.cat}, at the price of \V{vd.rtdetr.int.dFN} more false negatives; for YOLOv8n the MOTA interval contains zero (\Vz{vd.yolov8.int.dMOTA}). The layer judged the RT-DETR-L stream noisy most of the time (clean share \V{vd.rtdetr.g1.clean}). Under the official-compatible protocol the pooled HOTA gain was \Vz{vd.pool.off.dHOTA} (Table~\ref{tab:visdrone_official}).
+
+\input{tables/tab_visdrone_official.tex}
+
+\paragraph{KITTI (development).} With the noisier RT-DETR-L detector, the layer raised the MOTA of the two-stage hosts by \Vz{kitd.rtdetr.by.dMOTA} (ByteTrack) and \Vz{kitd.rtdetr.bot.dMOTA} (BoT-SORT) and their IDF1 by \V{kitd.rtdetr.by.dIDF1} and \V{kitd.rtdetr.bot.dIDF1}. For the single-stage OC-SORT, whose fixed threshold of 0.6 does not fit YOLOv8n, HOTA rose by \Vz{kitd.yolov8.oc.dHOTA}. With YOLOv8n and the two-stage hosts the layer cost MOTA (\Vz{kitd.yolov8.by.dMOTA} and \Vz{kitd.yolov8.bot.dMOTA}) while roughly halving identity switches (Sect.~\ref{sec:boundary}).
+
+\paragraph{MOT17 (development hosts, published detections).} On two-stage hosts with well-matched detections the layer was transparent: BoostTrack and the library ByteTrack produced identical output, SparseTrack changed by \Vz{mot.st.dHOTA} and the official ByteTrack setting by \Vz{mot.byoff.dHOTA}. On the single-stage OC-SORT, which has no low-score stage, HOTA rose by \Vz{mot.oc.dHOTA} with gains on all seven sequences.
+
+%==========================================================================================
+\section{Transfer Experiments}\label{sec:transfer}
+%==========================================================================================
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/fig5_forest.pdf}
+\caption{HOTA difference (host with the frozen layer minus host alone) with 95\% paired bootstrap intervals for every recorded combination, grouped by dataset and marked by evidence status. Filled markers: interval excludes zero. VisDrone rows use the frozen General AC-MOT configuration (V7f at 736 px); KITTI values are KITTI HOTA (car/pedestrian mean).}
+\label{fig:forest}
+\end{figure*}
+
+\subsection{Transfer across trackers}\label{sec:tracker_transfer}
+\paragraph{Predeclared external trackers.} Two published trackers were declared in the freeze commit of V7f and run once on MOT17 val-half with the YOLOX-X detections released by the PD-SORT authors. Our reproduction of PD-SORT~\cite{wang2025pdsort} matched the authors' released output to three decimals (\V{ext.pd.base.HOTA} HOTA). The frozen layer raised its HOTA by \Vz{ext.pd.dHOTA}, MOTA by \Vz{ext.pd.dMOTA} and IDF1 by \Vz{ext.pd.dIDF1}, while false negatives changed by \V{ext.pd.dFN} and false positives by \V{ext.pd.dFP}. PD-SORT is single-stage; Hybrid-SORT~\cite{yang2024hybridsort}, a two-stage host, produced identical output with and without the layer.
+
+\paragraph{Post-freeze external trackers.} Three further systems were selected after the freeze under a written protocol that classified each reproduction before the layer was added. C-TWiX~\cite{miah2025twix} (coordinate-only association) changed by \Vz{ctx.mot.dHOTA} on MOT17, \Vz{ctx.kcar.dHOTA} on KITTIMOTS cars, \Vz{ctx.kped.dHOTA} on KITTIMOTS pedestrians and \Vz{ctx.dance.dHOTA} on DanceTrack. TrackTrack~\cite{shim2025tracktrack} (two detection views) changed by \Vz{tt.dance.dHOTA} on DanceTrack, an interval that excludes zero but a difference of about one hundredth of a point. TOPICTrack~\cite{cao2025topictrack} could not be reproduced within the protocol's tolerance (\V{tp.mot.base.HOTA} against \V{tp.mot.refHOTA} HOTA) and is excluded from the main results.
+
+\paragraph{Development trackers behind the host contract on aerial data.} BoT-SORT and OC-SORT were development trackers of V7f; their VisDrone runs test whether the same frozen configuration works behind other host contracts on aerial data, not transfer to unseen trackers. With BoT-SORT, HOTA changed by \Vz{bot.yolov8.int.dHOTA} for YOLOv8n and \Vz{bot.rtdetr.int.dHOTA} for RT-DETR-L. With OC-SORT, whose fixed threshold left a recall of only \V{oc.yolov8.base.Recall}\% with YOLOv8n, HOTA rose by \Vz{oc.yolov8.int.dHOTA} and \Vz{oc.rtdetr.int.dHOTA}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig6_transfer_matrix.pdf}
+\caption{Transfer matrix: HOTA difference for each detector stream (rows) and tracker (columns); dashes mark combinations not run. Letters give the evidence status (D development, U unseen detector on development sequences, P predeclared external, X post-freeze external); an asterisk marks an interval that excludes zero; ``id.'' marks identical output.}
+\label{fig:matrix}
+\end{figure*}
+
+\subsection{Transfer to an unseen detector}\label{sec:detector_transfer}
+RetinaNet ResNet50-FPN v2~\cite{lin2017focal}, a one-stage detector with sigmoid focal-loss scores, entered the project only after the freeze of V7f; its adapter was added for General AC-MOT, and its transfer lock, which fixes the detector weights, the adapter, the hosts, the arms and two predictions (non-negative HOTA change with ByteTrack, no new catastrophic sequence), was committed before any RetinaNet tracking metric existed. Only the adapter (API translation) is new. The evaluation used the VisDrone val sequences, which are development sequences of V7f. With ByteTrack, General AC-MOT raised HOTA by \Vz{rn.by.736.int.dHOTA} under the internal protocol and \Vz{rn.by.736.off.dHOTA} under the official-compatible one; with BoT-SORT by \Vz{bot.retinanet.int.dHOTA} and \Vz{bot.retinanet.off.dHOTA} (Table~\ref{tab:retinanet}). Both predictions held. In the pre-declared compute arms the gain was smaller at 640 px (\Vz{rn.by.640.int.dHOTA}) and \Vz{rn.by.832.int.dHOTA} at 832 px. FCOS, chosen later as an unseen detector for a separate compute study, has not been evaluated.
+
+\input{tables/tab_retinanet.tex}
+
+\subsection{Transfer to other datasets}\label{sec:dataset_transfer}
+The external systems add two settings beyond the development data: KITTIMOTS val with PermaTrack detections~\cite{tokmakov2021permatrack} (a new detector on sequences that are part of the KITTI training split used in development) and DanceTrack val, the only dataset that no development run used. On DanceTrack the layer changed C-TWiX by \Vz{ctx.dance.dHOTA} and TrackTrack by \Vz{tt.dance.dHOTA}: neither a gain nor a large loss. On KITTIMOTS the C-TWiX car result is the one significant external degradation (\Vz{ctx.kcar.dHOTA}), analysed in Sect.~\ref{sec:boundary}. The frozen layer was not evaluated on UAVDT, VisDrone test-dev or the reserved VisDrone confirmation split.
+
+\subsection{Robustness to detector-score calibration shift}\label{sec:calib}
+Table~\ref{tab:calib} applies four monotone score transformations to the MOT17 development streams before the tracker. Of \V{cal.n} host--transformation conditions, \V{cal.rec} showed significant recoveries, \V{cal.deg} significant degradations, \V{cal.ident} identical outputs and \V{cal.ns} no significant change. The halved scale that drove ByteTrack (official) and OC-SORT to zero was restored to \V{cal.byoff.scale05.v7f} and \V{cal.oc.scale05.v7f} HOTA. The library ByteTrack under a temperature of~2 was not corrected (identical output): its clean-regime thresholds are only lowered, never raised. These are development hosts, so the intervals quantify robustness, not held-out generalization.
+
+\input{tables/tab_calib.tex}
+
+%==========================================================================================
+\section{Ablation}\label{sec:ablation}
+%==========================================================================================
+\paragraph{From native host to full V7f.} Table~\ref{tab:ablation} adds one mechanism at a time on MOT17 development hosts. The pass-through path (adapters and layer without intervention) reproduced the hosts exactly on \V{abl.passthrough.identical} of \V{abl.passthrough.cells} host/floor cells, and its SparseTrack and BoostTrack outputs were byte-identical to the official replays. Self-calibration alone, applying the nested-Otsu bands to every frame, reduced ByteTrack (official) from \V{abl.host.by} to \V{abl.v6.by} and OC-SORT from \V{abl.host.oc} to \V{abl.v6.oc}. The host-aware regime with a clean regime anchored to the host and crowd-safe duplicates recovered most of the loss; estimating the regime from the whole stream, the track continuation and the interpretability check brought ByteTrack and BoostTrack back to their host-alone values and OC-SORT above its host alone (\V{abl.v7f.oc} against \V{abl.host.oc}). On KITTI with YOLOv8n and OC-SORT the continuation stage contributed most (\V{abl.v7d.kitoc} to \V{abl.v7e.kitoc}). These are development values without intervals.
+
+\input{tables/tab_ablation.tex}
+
+\paragraph{Rejected alternatives.} Variants recorded in the development ledger were not adopted: starting without host thresholds in cold frames, continuing tracks from candidates below the host's lowest stage, remapping scores in clean frames, projecting the host operating point onto the noisy bands, and pooling scores before duplicate handling. On the development hosts they lowered HOTA, left it unchanged, or, for the projection, passed many more boxes per frame on a noisy stream.
+
+\paragraph{Scene control on top of V7f.} A pre-registered factorial on VisDrone val (Table~\ref{tab:factorial}) combined the historical SCI resolution rule with V7f. V7f alone gained \Vz{fw.c_a.int.dHOTA} HOTA over the native host; the SCI alone changed HOTA by \Vz{fw.b_a.int.dHOTA}; adding the SCI on top of V7f changed it by \Vz{fw.d_c.int.dHOTA} and, under the official-compatible protocol, lowered MOTA by \Vz{fw.d_c.off.dMOTA}; and the SCI schedule was indistinguishable from budget-matched shuffled schedules. Static compute points behaved as expected: relative to 736 px, 832 px changed HOTA by \Vz{fw.high.int.dHOTA} and 640 px by \Vz{fw.low.int.dHOTA}. The score layer and the compute decision can be composed without changing V7f, but the historical scene rule added neither accuracy nor a compute saving.
+
+\input{tables/tab_factorial.tex}
+
+%==========================================================================================
+\section{Runtime Analysis}\label{sec:runtime}
+%==========================================================================================
+Table~\ref{tab:runtime} and Fig.~\ref{fig:runtime} report CPU timings. With live YOLOv8n and ByteTrack on KITTI frames (\V{rt.cpu}, \V{rt.threads} threads), the layer took \V{rt.v7f.ctrl}~ms per frame on average (P95 \V{rt.v7f.ctrl95}~ms), and end-to-end time rose by \V{rt.e2e_delta}~ms (\V{rt.e2e_pct}\% including frame reading, \V{rt.pipe_pct}\% excluding it). On a two-thread \V{g1rt.cpu} runner with VisDrone frames, the layer, including its motion cue, took \V{g1rt.yolov8.g1.score}, \V{g1rt.rtdetr.g1.score} and \V{g1rt.retinanet.g1.score}~ms with YOLOv8n, RT-DETR-L and RetinaNet, an overhead of \V{g1rt.yolov8.pct}\%, \V{g1rt.rtdetr.pct}\% and \V{g1rt.retinanet.pct}\% of the total. The tracker became faster with the layer because fewer candidates reached it. None of these CPU pipelines runs at video rate, and no GPU timing of V7f was available; we do not convert CPU throughput to other hardware. For Stage 1, the cue analysis of the adaptive controller was not profiled separately; in the matched static configuration on the T4, the detector took \V{t4.det}~ms and the tracker \V{t4.trk}~ms per frame.
+
+\input{tables/tab_runtime.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig7_runtime.pdf}
+\caption{Runtime. Left: mean per-frame time of detector, control layer and tracker with YOLOv8n, host alone and with the layer, on two CPUs (decode excluded). Right: total-time overhead of the layer for three detectors. CPU measurements only.}
+\label{fig:runtime}
+\end{figure}
+
+%==========================================================================================
+\section{Comparison with Published Methods}\label{sec:published}
+%==========================================================================================
+Table~\ref{tab:published} compares, for each published tracker, the number reported by its authors, our reproduction, and the reproduction with the frozen layer. The comparison is fair only in one sense: the layer is added to the same reproduced system on the same split with the same evaluator, so the difference measures what the layer contributes. The included reproductions differ from the reported values by less than one HOTA point (TOPICTrack failed the reproduction criterion and is excluded), the reported values are validation-split numbers, and none of our numbers is a test-server result. We therefore make no claim of state-of-the-art accuracy and do not rank our system against the published trackers. On VisDrone and UAVDT, published tracker results are usually reported with the official toolkits, on other splits or with other detectors; our Stage-1 protocol is custom and the official-compatible port is not the evaluation server, so those results are not directly comparable and are not tabulated against published numbers.
+
+\input{tables/tab_published.tex}
+
+The contribution claimed here is therefore not a higher HOTA than any published tracker. It is a training-free, causal layer that needs no target-specific calibration, separates the policy from detector and tracker through adapters and a host contract, self-calibrates scores online, is deployed as one frozen policy, transfers across the tested systems with low overhead, and comes with a reproducibility record.
+
+%==========================================================================================
+\section{Generalization Analysis and Boundary Cases}\label{sec:boundary}
+%==========================================================================================
+\paragraph{Where the layer helps.} The gains concentrate in three situations: trackers without a low-score stage whose fixed threshold does not fit the detector (OC-SORT on MOT17, on KITTI with YOLOv8n, and on VisDrone; PD-SORT), noisy or miscalibrated detector streams (RT-DETR-L and RetinaNet on VisDrone, RT-DETR-L on KITTI), and shifted score scales (Table~\ref{tab:calib}). On two-stage trackers with well-matched detections the layer is transparent or nearly so.
+
+\paragraph{Trade-offs between metrics.} Gains in HOTA and IDF1 are not always gains in MOTA or recall. With RT-DETR-L on VisDrone, false positives changed by \V{vd.rtdetr.int.dFP} and false negatives by \V{vd.rtdetr.int.dFN}; recall fell from \V{vd.rtdetr.base.int.Recall} to \V{vd.rtdetr.g1.int.Recall}. With OC-SORT, false positives rose (\V{oc.yolov8.base.FP} to \V{oc.yolov8.g1.FP} for YOLOv8n) as recall rose. With PD-SORT, false positives changed by \V{ext.pd.dFP} and false negatives by \V{ext.pd.dFN}.
+
+\paragraph{A tracker without enough evidence: C-TWiX on KITTIMOTS cars.} The one significant external degradation (\Vz{ctx.kcar.dHOTA}) came from a sparse stream: the regime statistic of sequence 0014 stayed between \V{fig8.rhomin} and \V{fig8.rhomax} after its first 50 frames, the regime switched \V{fig8.switches} times and \V{fig8.noisy} of its \V{fig8.frames} frames were judged noisy (Fig.~\ref{fig:boundary}, left); the car HOTA of that sequence changed by \V{ctx.kcar.seq0014}. A regime decision without a margin or hysteresis is fragile when few candidates per frame are available. On DanceTrack, C-TWiX changed by \Vz{ctx.dance.dHOTA}; which operation caused this was not isolated.
+
+\paragraph{An under-confident detector with two-stage trackers.} With YOLOv8n on KITTI, the noisy-regime birth restriction cost ByteTrack and BoT-SORT MOTA (\V{kitd.yolov8.by.dMOTA}, \V{kitd.yolov8.bot.dMOTA}) while identity switches changed by \V{kitd.yolov8.by.dIDS} and \V{kitd.yolov8.bot.dIDS}; the BoT-SORT HOTA interval contains zero.
+
+\paragraph{New catastrophic sequences.} Under the official-compatible protocol, General AC-MOT with OC-SORT produced \V{oc.cat.g1.off} catastrophic sequences where OC-SORT alone had \V{oc.cat.base.off}, although HOTA rose on both detectors; the cause of this trade-off was not isolated.
+
+\paragraph{No headroom for dynamic compute.} The compute interface of General AC-MOT is constant because adaptive compute did not pay off on the tested aerial data. Beyond the factorial of Sect.~\ref{sec:ablation}, a ground-truth oracle that allocates 640, 736 or 832 px per 30-frame segment at the compute of a fixed 736 px gained only \Vz{or.m3} HOTA, and an oracle over nine resolutions \Vz{or.f736}; no causal cue met the selection rule declared for the cue audit. Compute itself paid off in a detector-specific way (Fig.~\ref{fig:boundary}, right): from 512 to 960 px, HOTA with V7f rose much more for YOLOv8n than for RT-DETR-L. In a supplementary study of compute allocation, pre-registered oracle gates (an oracle gain of at least \V{g2.gate} HOTA with an interval above zero, or the same HOTA at no more than \V{g2.cost} of the cost) were not met for resolution allocation (best \Vz{g2.s1_100}) or for invocation frequency combined with resolution (best \Vz{g2.s2_35}). A scene-response index from that study, fitted and scored on the same development segments, ranked segment difficulty (mean rank correlation \V{gsci.D.G}) but did not locate where extra compute pays off (\V{gsci.B.G}); it is a difficulty measure, not a compute controller. That study is not part of the method, and its tile-refinement stage was not complete when this paper was written.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig8_boundary.pdf}
+\caption{Boundary cases. Left: cumulative median regime statistic $\bar\rho_t$ of C-TWiX on KITTIMOTS sequence 0014 (frozen V7f audit log); shaded frames were judged noisy; $\bar\rho_t$ hovers around the boundary $\frac12$. Right: HOTA with and without V7f against relative detector compute on VisDrone val (ByteTrack, internal protocol; values from the development record, no intervals); the benefit of compute differs strongly between detectors.}
+\label{fig:boundary}
+\end{figure*}
+
+%==========================================================================================
+\section{Discussion}\label{sec:discussion}
+%==========================================================================================
+\paragraph{One idea, two placements.} AC-MOT and General AC-MOT apply the same idea, operating-point control, at two places. Before the detector, the controller could find a good operating point for one detector and one tracker, and that operating point carried its gain. Behind the detector, the layer can see what a controller before the detector cannot: the scale and separation of the detector's own scores. Moving the control point there turned a calibration that had to be redone for every pipeline into one that is redone online, by the layer, for every stream.
+
+\paragraph{Restraint as part of adaptation.} The step from the always-on predecessor to V7f was not more adaptation but adaptation with restraint: estimating whether the tracker's declared operating point already fits, and doing nothing when it does. The ablation shows that this restraint is what keeps strong two-stage trackers unchanged, while the continuation stage and the noisy-regime bands supply what single-stage trackers and noisy detectors lack.
+
+\paragraph{What the evidence supports.} The development evidence is broad (two detectors run by us and published YOLOX-X detections, five trackers, three datasets), but it is development evidence. The external evidence is narrower: one significant improvement of a predeclared tracker, one transparent predeclared tracker, mixed post-freeze results with one significant loss, and one unseen detector on development sequences. The appropriate claim is that one frozen policy transfers across the heterogeneous detection--tracking pipelines we tested, helps where the tracker's operating point does not fit the stream, and stays out of the way of most well-matched trackers, not that it improves every tracker.
+
+%==========================================================================================
+\section{Limitations}\label{sec:limits}
+%==========================================================================================
+\begin{enumerate}
+\item \emph{Development versus external evidence.} Most positive V7f results are on development data or hosts. External evidence covers two predeclared and three post-freeze trackers, mostly on MOT17 val-half, and one unseen detector evaluated on development sequences.
+\item \emph{No test-server or official benchmark results.} All MOT17, KITTI and DanceTrack values are validation-split evaluations; VisDrone results use a custom or an official-compatible protocol.
+\item \emph{No held-out aerial result for V7f.} The frozen layer was not evaluated on VisDrone test-dev, UAVDT or the reserved VisDrone confirmation split.
+\item \emph{Hardware.} V7f and General AC-MOT were timed on CPUs only; Stage-1 timing excludes frame decoding and varied between sessions.
+\item \emph{Regime decision.} The boundary $\bar\rho_t\ge\frac12$ has no margin or hysteresis, which caused the significant C-TWiX loss; the clean regime never raises thresholds, so a host whose thresholds are too low for a stream is not corrected.
+\item \emph{Design constants.} The regime boundary and the mechanism choices were fixed on labelled development data; they are not fitted at deployment but were not derived without labels.
+\item \emph{Untested parts.} The motion rule was inactive in every MOT17 and external experiment; no head-to-head comparison with trackers that adapt their own thresholds per frame was run.
+\item \emph{Statistical resolution.} Intervals are per comparison, without correction for multiple comparisons, and with seven VisDrone validation sequences differences below about half a HOTA point are not resolvable.
+\item \emph{Stage-1 scope.} Stage 1 used one detector and one tracker profile; its matched-static attribution is post hoc and its per-sequence values were not archived.
+\end{enumerate}
+
+%==========================================================================================
+\section{Conclusion}\label{sec:conclusion}
+%==========================================================================================
+AC-MOT began as scene adaptation, and it worked. Analysing why it worked showed that the generalizable part was not the scene index but operating-point calibration. Raw detector scores and scene indices did not carry that calibration across detectors and pipelines, so we turned it into a self-calibrating layer placed between the detector and the tracker, which separates the control logic from the scale of the detector's scores and from the properties of the tracker. One frozen policy, without training, without target-specific calibration and with a small runtime cost, improved an unseen detector and a predeclared external tracker, restored trackers whose input scores had been shifted, and left most well-matched trackers unchanged; it also failed in identifiable conditions, chiefly sparse streams near the regime boundary. A regime decision with a margin, held-out aerial and test-server evaluations, and GPU timing are the next steps.
+
+\backmatter
+
+\bmhead{Acknowledgements}
+The authors thank the authors of the evaluated detectors and trackers for releasing their code, weights and detections, and the maintainers of VisDrone, UAVDT, MOT17, KITTI, DanceTrack and TrackEval.
+
+\section*{Declarations}
+
+\noindent\textbf{Funding:} The authors declare that no funds, grants, or other support were received during the preparation of this manuscript.
+
+\noindent\textbf{Competing interests:} The authors have no relevant financial or non-financial interests to disclose.
+
+\noindent\textbf{Ethics approval and consent to participate:} Not applicable.
+
+\noindent\textbf{Consent for publication:} Not applicable.
+
+\noindent\textbf{Data availability:} All datasets used (VisDrone2019-MOT, UAVDT, MOT17, KITTI tracking, DanceTrack) are publicly available from their providers. Tracker outputs, bootstrap records, derived detector caches with their SHA-256 checksums, the frozen configurations and their file-hash locks are available from the corresponding author on reasonable request.
+
+\noindent\textbf{Materials availability:} Not applicable.
+
+\noindent\textbf{Code availability:} The implementation of the controller and the layer, the adapters, the evaluation scripts and the scripts that regenerate every table, figure and number of this paper from the result records are available from the corresponding author on reasonable request. The frozen systems are identified by version tags (Stage~1: \texttt{v1.0.0-acmot-frozen}; V7f: \texttt{universal-acmot-v7-freeze}; General AC-MOT: \texttt{general-acmot-g1-freeze}).
+
+\noindent\textbf{Author contribution:} Ahmed Gouda Ismail: conceptualization, methodology, software, experiments, formal analysis, writing of the original draft. Mohamed S. Mohamed and Tarek Ahmed Mahmoud: supervision, methodology review, writing (review and editing). All authors read and approved the final manuscript.
+
+\bibliography{references}
+
+\end{document}

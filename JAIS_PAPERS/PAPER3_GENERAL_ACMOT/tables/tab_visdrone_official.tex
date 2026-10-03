@@ -1,0 +1,21 @@
+\begin{tableorg}[!htbp]
+\centering
+\caption{Frozen General AC-MOT (V7f at 736 px) versus ByteTrack alone on VisDrone2019-MOT val (development detectors). Internal: custom class-agnostic protocol. Official-compatible: port of the VisDrone MOT toolkit (class-aware, ignored regions removed) with HOTA added; it is not the official evaluation server. Paired bootstrap over sequences (pooled: over detector--sequence cells), 10,000 resamples, seed 42.}
+\label{tab:visdrone_official}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{llrrllll}
+\toprule
+Detector & Protocol & Host & + V7f & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 & $\Delta$IDS \\
+\midrule
+YOLOv8n & internal & 31.72 & 33.89 & +2.17 [+1.20, +3.58] & +1.07 [\ensuremath{-}0.45, +2.36] & +3.90 [+2.17, +6.40] & \ensuremath{-}115 \\
+YOLOv8n & official-compatible & 28.89 & 30.34 & +1.45 [+0.91, +2.29] & +0.25 [\ensuremath{-}2.18, +2.01] & +2.54 [+1.51, +4.10] & \ensuremath{-}118 \\
+RT-DETR-L & internal & 36.76 & 41.06 & +4.30 [+2.25, +6.42] & +27.27 [+14.66, +40.36] & +6.13 [+2.81, +9.53] & \ensuremath{-}671 \\
+RT-DETR-L & official-compatible & 31.25 & 34.50 & +3.25 [+1.67, +5.03] & +22.93 [+11.47, +38.11] & +4.16 [+2.05, +6.59] & \ensuremath{-}1,132 \\
+Pooled (14 cells) & internal & -- & -- & +2.98 [+1.76, +4.47] & +14.17 [+5.78, +24.43] & +4.54 [+2.54, +6.85] & \ensuremath{-}786 \\
+Pooled (14 cells) & official-compatible & -- & -- & +2.29 [+1.19, +3.59] & +11.59 [+4.15, +21.16] & +3.17 [+1.56, +4.92] & \ensuremath{-}1,250 \\
+\botrule
+\end{tabular}
+\end{adjustbox}
+\end{tableorg}
