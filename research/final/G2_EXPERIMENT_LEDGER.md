@@ -233,3 +233,30 @@ Decisions by the pre-registered rules:
   medians, group weights, composite bounds and G weights), `tools/g2/gsci_audit.py` (sha256 64e90dbb06db26d3445b431fb02df3c64e8d695d40dca7cf5684b3bc01177c77);
   `indices(rows, frozen)` applies them without refit (test: the frozen parameters reproduce the development
   indices exactly). Its FCOS test is a difficulty-index transfer, run only after the FCOS transfer lock.
+
+### S3 — crop refinement: gate result (`g2/oracle/gate_S3.md`, `bootstrap_gate_S3.json`)
+Caches: GitHub Actions run 37015873635, release `g2-s3-1` (tar sha256 80a0e7b8…9b70, verified on download).
+Cost axis `configs/g2_compute_cost_s3.json` (one host per detector; one 736 px tile = 0.93 / 0.96 of a
+full 736 px call). All static profiles re-run on this axis.
+
+Static points (V7f, ByteTrack, internal HOTA; cost):
+- YOLOv8n: full frame 512 → 1344 px 27.90 (0.55) … 37.98 (1.61), 38.28 (2.08), 39.35 (2.41), 39.67 (2.84);
+  one tile 33.69–34.14 (1.93); four tiles 33.75 (4.71); round-robin 33.99 (1.93).
+- RT-DETR-L: full frame 39.04 (0.55) … 41.95 (1.59), then falls: 39.92 (2.05), 37.82 (2.53), 34.62 (3.04);
+  one tile 39.95–41.36 (1.96); four tiles 34.52 (4.84, MOTA −50.26); round-robin 41.16 (1.96).
+No tile profile is on the static frontier of either detector; at equal cost the full frame at a higher
+resolution is better (YOLOv8n R1088 38.28 vs one tile ≤ 34.14). The scene-blind round-robin equals a fixed
+tile.
+
+Oracle (one profile per 30-frame segment among all 17 S3 profiles, matched mean cost) vs the concave static
+envelope: ΔHOTA YOLOv8n +0.68 / +0.12 / −1.04 / −1.25, RT-DETR-L +0.31 / +0.23 / +0.47 / +0.47 at budgets
+1.0 / 1.5 / 2.0 / ≥ 3.0; cost ratios ≤ 1.15 where finite. Pooled oracle − anchor: S3_100 +0.25 [−0.36, +1.08],
+S3_150 +0.32 [−0.37, +1.02], S3_200 −0.26 [−1.38, +0.94], S3_300/400 −0.90 [−2.16, +0.21] HOTA. The oracle
+chooses a tile profile on 0–2 % (YOLOv8n) and 3–8 % (RT-DETR-L) of frames.
+Gate: neither criterion met at any budget. **S3 rejected as an adaptive space.**
+
+### G2 gate summary
+S1 (resolution), S2 (call frequency × resolution), S3 (crop refinement + high resolution) and the
+persistent-regime unit all fail the pre-registered GT-oracle gate. No controller is designed (rule:
+headroom first). G2 outcome = **E: static compute operating point + frozen V7f**; per detector, the
+efficient static profiles above are the deployable operating points.
