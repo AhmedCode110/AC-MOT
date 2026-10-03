@@ -133,8 +133,10 @@ from ultralytics import YOLO
 run_dir = f'{OUT}/train/yolo11m_vd1536'
 last = f'{run_dir}/weights/last.pt'
 if os.path.exists(last):
-    model = YOLO(last)
-    model.train(resume=True)
+    try:
+        YOLO(last).train(resume=True)
+    except AssertionError as e:          # training already finished
+        print(e)
 else:
     model = YOLO('yolo11m.pt')
     model.train(data=f'{Y}/data.yaml', imgsz=IMGSZ, epochs=EPOCHS, batch=BATCH, seed=SEED, deterministic=True,
