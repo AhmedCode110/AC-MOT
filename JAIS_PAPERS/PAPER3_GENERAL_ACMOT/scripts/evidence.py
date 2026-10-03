@@ -728,6 +728,51 @@ def _boundary():
     transcribed("cue.none", "none", led, "Selected cue set: none.")
 
 
+# ============================================================================ 8. Method constants and host contracts
+CONTRACTS = [
+    ("ByteTrack (library default; also BoT-SORT)", "two-stage", "0.25", "0.25", "0.1", "0.8",
+     "ByteTrack (library default) & two-stage & 0.25 & 0.25 & 0.1 & 0.8"),
+    ("ByteTrack (official MOT17)", "two-stage", "0.6", "0.7", "0.1", "0.8",
+     "ByteTrack (official MOT17) & two-stage & 0.6 & 0.7 & 0.1 & 0.8"),
+    ("SparseTrack", "two-stage", "$\\tau$", "$\\tau+0.1$", "0.1", "published",
+     "SparseTrack & two-stage & $\\tau$ & $\\tau+0.1$ & 0.1 & published"),
+    ("BoostTrack", "two-stage", "$\\tau$", "$\\tau$", "0.1", "$1-$IoU gate",
+     "BoostTrack & two-stage & $\\tau$ & $\\tau$ & 0.1 & $1-$IoU gate"),
+    ("Hybrid-SORT", "two-stage", "$\\tau$", "$\\tau$", "0.1", "$1-$IoU gate",
+     "Hybrid-SORT & two-stage & $\\tau$ & $\\tau$ & 0.1 & $1-$IoU gate"),
+    ("OC-SORT", "single-stage", "0.6", "0.6", "0.6", "0.7", "OC-SORT & single-stage & 0.6 & 0.6 & 0.6 & 0.7"),
+    ("PD-SORT", "single-stage", "$\\tau$", "$\\tau$", "$\\tau$", "$1-$IoU gate",
+     "PD-SORT & single-stage & $\\tau$ & $\\tau$ & $\\tau$ & $1-$IoU gate"),
+    ("C-TWiX (MOT17 / KITTI / DanceTrack)", "single-stage", "0.5", "0.7 / 0.5 / 0.9", "0.5", "not mapped",
+     "C-TWiX (MOT17 / KITTI / DanceTrack) & single-stage & 0.5 & 0.7 / 0.5 / 0.9 & 0.5 & not mapped"),
+    ("TrackTrack", "two-view", "$\\tau_{\\mathrm{det}}$", "$\\tau_{\\mathrm{init}}$", "0.1", "not mapped",
+     "TrackTrack & two-view & $\\tau_{\\mathrm{det}}$ & $\\tau_{\\mathrm{init}}$ & 0.1 & not mapped"),
+]
+
+
+def _method():
+    src = "JAIS_PAPERS/PAPER2_SIVP_SPRINGER/tables/tab1_contracts.tex"
+    for i, row in enumerate(CONTRACTS):
+        transcribed(f"contract.{i}", row[0], src, row[6])
+    cfgp = "configs/universal_acmot_policy_v7.json"
+    cfg = J(cfgp)["spec"]
+    put("const.window", cfg["window"], cfgp + "::spec.window", nd=0)
+    put("const.dup_iou", cfg["dup_iou"], cfgp + "::spec.dup_iou", nd=1)
+    put("const.hist", cfg["hist"], cfgp + "::spec.hist", nd=0)
+    put("const.warmup", cfg["warmup"], cfgp + "::spec.warmup", nd=0)
+    code = "acmot_v7.py"
+    for k, val, f in [("const.regime", "$\\bar\\rho_t \\geq 0.5$", "(s.regime == \"rho\" and rho_bar >= 0.5))"),
+                      ("const.minlogits", "3", "if len(H) < 3:"),
+                      ("const.remap", "$0.5+0.5u$ / $0.1+0.4u$", "out = np.where(Lp >= ta, 0.5 + 0.5 * u, 0.1 + 0.4 * u)"),
+                      ("const.ecdfwin", "20", "self.ecdf_samples = deque(maxlen=20)"),
+                      ("const.ecdfstride", "10", "(self.frame == 1 or self.frame % 10 == 0)"),
+                      ("const.ecdfclip", "$10^{-6}$", "return np.clip((lo + hi) / (2.0 * len(ref)), 1e-6, 1 - 1e-6)"),
+                      ("const.margin", "$10^{-3}$", "else floor_pass + 1e-3 if s.rescue_band == \"fg\""),
+                      ("const.cap", "0.95", "match = min(0.95, 1.0 - (1.0 - h.match) / max(1.0, r))"),
+                      ("const.logitclip", "$10^{-9}$", "s = np.clip(np.asarray(s, dtype=np.float64), 1e-9, 1 - 1e-9)")]:
+        transcribed(k, val, code, f)
+
+
 def build():
     if REG:
         return REG
@@ -738,6 +783,7 @@ def build():
     _ablation()
     _runtime()
     _boundary()
+    _method()
     return REG
 
 
