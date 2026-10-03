@@ -1,0 +1,25 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Runtime per frame (ms). Mean unless marked P95.}
+\label{tab:runtime}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{p{3.6cm}rlrrrrl}
+\toprule
+Configuration & Detector & Control layer & Tracker & Total & P95 total & FPS & Overhead \\
+\midrule
+\multicolumn{8}{l}{\textit{V7f layer, YOLOv8n + ByteTrack, KITTI frames, Intel Xeon @ 2.10 GHz, 4 vCPU (4 threads), 736 px, 2,279 frames per arm}} \\
+Host alone & 41.91 & 0.02 & 2.04 & 57.85 & 76.35 & 17.29 & -- \\
++ V7f & 42.17 & 2.95 (P95 4.39) & 1.43 & 60.44 & 80.78 & 16.55 & +2.59 ms (+4.5\%) \\
+\midrule
+\multicolumn{8}{l}{\textit{General AC-MOT, VisDrone val frames, AMD EPYC 7763 (2 threads), 736 px, 300 frames, decode excluded}} \\
+YOLOv8n, host alone & 83.35 & 0.03 & 3.27 & 86.66 & 90.19 & 11.540 & -- \\
+YOLOv8n, General AC-MOT & 84.82 & 5.23 & 2.76 & 92.82 & 96.06 & 10.774 & +7.1\% \\
+RT-DETR-L, host alone & 1196.51 & 0.05 & 7.61 & 1204.17 & 1273.61 & 0.830 & -- \\
+RT-DETR-L, General AC-MOT & 1213.04 & 7.38 & 3.64 & 1224.07 & 1293.81 & 0.817 & +1.7\% \\
+RetinaNet, host alone & 935.50 & 0.07 & 6.11 & 941.69 & 950.11 & 1.062 & -- \\
+RetinaNet, General AC-MOT & 934.16 & 13.14 & 4.97 & 952.27 & 971.14 & 1.050 & +1.1\% \\
+\botrule
+\end{tabular}
+\par\smallskip\parbox{\linewidth}{\scriptsize End-to-end time in the first block includes frame reading; the overhead relative to the pipeline without reading is +5.9\%. The control-layer time includes its quarter-resolution phase-correlation motion cue. The tracker is faster with the layer because fewer candidates reach it. CPU measurements only; no GPU timing of V7f or General AC-MOT was available, and no FPS is converted to other hardware.}
+\end{table*}

@@ -1,0 +1,23 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Pre-registered factorial on VisDrone2019-MOT val (ByteTrack, YOLOv8n and RT-DETR-L, pooled over 14 detector--sequence cells). The historical scene controller is compared with and without V7f, and with budget-matched scene-blind schedules. Paired bootstrap, 10,000 resamples, seed 42.}
+\label{tab:factorial}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{p{5.6cm}llll}
+\toprule
+Comparison & $\Delta$HOTA internal & $\Delta$MOTA internal & $\Delta$HOTA official & $\Delta$MOTA official \\
+\midrule
+V7f only $-$ native (C$-$A) & +2.98 [+1.76, +4.47] & +14.17 & +2.29 [+1.19, +3.59] & +11.59 [+4.15, +21.16] \\
+historical SCI only $-$ native (B$-$A) & \textminus{}0.21 [\textminus{}0.45, \textminus{}0.01] & \textminus{}0.31 & \textminus{}0.17 [\textminus{}0.42, +0.01] & \textminus{}0.29 [\textminus{}0.89, +0.28] \\
+SCI + V7f $-$ V7f only (D$-$C) & \textminus{}0.17 [\textminus{}0.56, +0.20] & \textminus{}0.18 & \textminus{}0.26 [\textminus{}0.59, +0.04] & \textminus{}0.77 [\textminus{}1.51, \textminus{}0.20] \\
+SCI + V7f $-$ SCI only (D$-$B) & +3.03 [+1.73, +4.62] & +14.30 & +2.20 [+1.06, +3.57] & +11.11 [+3.55, +20.91] \\
+SCI + V7f $-$ budget-matched shuffled schedule, seed 1 & \textminus{}0.03 [\textminus{}0.30, +0.24] & \textminus{}0.09 & \textminus{}0.07 [\textminus{}0.27, +0.14] & \textminus{}0.34 [\textminus{}1.05, +0.21] \\
+SCI + V7f $-$ shuffled schedule, seed 2 & +0.04 [\textminus{}0.25, +0.33] & \textminus{}0.12 & \textminus{}0.19 [\textminus{}0.48, +0.07] & \textminus{}0.60 [\textminus{}1.17, \textminus{}0.15] \\
+SCI + V7f $-$ shuffled schedule, seed 3 & +0.05 [\textminus{}0.32, +0.48] & \textminus{}0.02 & \textminus{}0.18 [\textminus{}0.47, +0.15] & \textminus{}0.37 [\textminus{}0.87, +0.11] \\
+V7f at 832 px $-$ V7f at 736 px & +0.74 [+0.05, +1.48] & +1.16 & +0.96 [+0.60, +1.42] & +0.59 [\textminus{}0.88, +2.12] \\
+V7f at 640 px $-$ V7f at 736 px & \textminus{}1.22 [\textminus{}1.89, \textminus{}0.55] & \textminus{}1.69 & \textminus{}1.27 [\textminus{}1.80, \textminus{}0.82] & \textminus{}1.87 [\textminus{}3.40, \textminus{}0.60] \\
+\botrule
+\end{tabular}
+\par\smallskip\parbox{\linewidth}{\scriptsize Relative compute of the scene-adaptive arms: SCI only 0.949 (YOLOv8n) / 1.026 (RT-DETR-L); SCI + V7f 0.979 / 1.012; 832 px 1.278; 640 px 0.756 (736 px = 1). The decision rule was committed before the first result.}
+\end{table*}

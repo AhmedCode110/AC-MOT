@@ -1,0 +1,21 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Evaluation settings and the role of each. `Development' data were visible while the corresponding system was designed; `external' systems were run once with the frozen policy. No result in this paper is a test-server or leaderboard submission.}
+\label{tab:protocol}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{p{2.9cm}p{1.8cm}p{2.0cm}p{2.4cm}p{2.6cm}p{2.3cm}}
+\toprule
+Data & System & Detector(s) & Tracker(s) & Role & Evaluation \\
+\midrule
+VisDrone2019-MOT test-dev & Stage 1 & YOLOv8n & ByteTrack & held-out, locked one-shot (Stage 1) & custom class-agnostic \\
+UAVDT test & Stage 1 & YOLOv8n & ByteTrack & frozen transfer, no retuning (Stage 1) & UAVDT adapter, IoU 0.5 \\
+VisDrone2019-MOT val (7 seq.) & V7f, General AC-MOT & YOLOv8n, RT-DETR-L & ByteTrack, BoT-SORT, OC-SORT & development & internal and official-compatible \\
+VisDrone2019-MOT val (7 seq.) & General AC-MOT & RetinaNet & ByteTrack, BoT-SORT & unseen detector (locked), development sequences & internal and official-compatible \\
+KITTI tracking training (21 seq.) & V7f & YOLOv8n, RT-DETR-L & ByteTrack, BoT-SORT, OC-SORT & development & KITTI HOTA (car/pedestrian mean) \\
+MOT17 val-half (7 seq.) & V7f & YOLOX-X (published) & SparseTrack, BoostTrack, ByteTrack, OC-SORT & development & TrackEval, internal \\
+MOT17 val-half (7 seq.) & V7f & YOLOX-X (published) & PD-SORT, Hybrid-SORT & predeclared external & TrackEval, internal \\
+MOT17 val-half / KITTIMOTS val / DanceTrack val & V7f & released detections (incl. PermaTrack) & C-TWiX, TrackTrack & post-freeze external & TrackEval, internal \\
+\botrule
+\end{tabular}
+\end{table*}

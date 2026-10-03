@@ -1,0 +1,45 @@
+\begin{sidewaystable}[!htbp]
+\centering
+\caption{Central result: the host alone versus the host with the frozen layer, for every detector--tracker--dataset combination with a recorded result. HOTA, MOTA, IDF1 in points; $\Delta$ = host + V7f $-$ host alone.}
+\label{tab:central}
+\scriptsize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{lllrrlrrrlll}
+\toprule
+Detector & Tracker & St. & Host & +V7f & $\Delta$HOTA [95\% CI] & $\Delta$MOTA & $\Delta$IDF1 & $\Delta$IDS & FP & FN & Prec. / Rec. \\
+\midrule
+\multicolumn{12}{l}{\textit{VisDrone val-7}} \\
+YOLOv8n & ByteTrack & D & 31.72 & 33.89 & +2.17 [+1.20, +3.58] & +1.07 & +3.90 & \textminus{}115 & 9,740$\to$9,552 & 45,768$\to$45,351 & 68.90$\to$69.72 / 32.04$\to$32.66 \\
+RT-DETR-L & ByteTrack & D & 36.76 & 41.06 & +4.30 [+2.25, +6.42] & +27.27 & +6.13 & \textminus{}671 & 42,646$\to$14,074 & 28,065$\to$38,946 & 47.95$\to$66.86 / 58.33$\to$42.17 \\
+YOLOv8n & BoT-SORT & D & 35.99 & 36.60 & +0.61 [\textminus{}0.05, +1.54] & +0.94 & +0.83 & \textminus{}54 & 11,637$\to$10,721 & 43,792$\to$44,127 & 66.9$\to$68.4 / 35.0$\to$34.5 \\
+RT-DETR-L & BoT-SORT & D & 41.41 & 43.56 & +2.15 [+0.16, +4.50] & +34.88 & +2.35 & \textminus{}274 & 51,836$\to$16,242 & 24,310$\to$36,691 & 45.4$\to$65.4 / 63.9$\to$45.5 \\
+YOLOv8n & OC-SORT & D & 19.04 & 33.90 & +14.86 [+12.32, +19.50] & +10.23 & +20.18 & +75 & 798$\to$6,724 & 60,423$\to$47,531 & 89.7$\to$74.7 / 10.3$\to$29.4 \\
+RT-DETR-L & OC-SORT & D & 35.24 & 42.00 & +6.76 [+2.88, +11.82] & +2.45 & +9.75 & \textminus{}52 & 2,736$\to$8,185 & 48,710$\to$41,660 & 87.2$\to$75.8 / 27.7$\to$38.1 \\
+RetinaNet & ByteTrack & U & 27.92 & 31.93 & +4.01 [+2.25, +5.46] & +9.12 & +5.81 & \textminus{}158 & 32,229$\to$26,911 & 42,892$\to$42,226 & 43.1$\to$48.3 / 36.3$\to$37.3 \\
+RetinaNet & BoT-SORT & U & 31.73 & 34.67 & +2.94 [+1.28, +4.54] & +11.00 & +4.55 & \textminus{}86 & 37,619$\to$30,274 & 40,306$\to$40,327 & 41.8$\to$47.2 / 40.1$\to$40.1 \\
+\multicolumn{12}{l}{\textit{KITTI train}} \\
+YOLOv8n & ByteTrack & D & 45.31 & 45.37 & +0.06 [\textminus{}1.19, +1.24] & \textminus{}1.87 & +1.49 & \textminus{}271 & n/r & n/r & n/r / n/r \\
+YOLOv8n & BoT-SORT & D & 49.21 & n/r & \textminus{}1.02 [\textminus{}2.43, +0.25] & \textminus{}2.43 & +0.35 & \textminus{}227 & n/r & n/r & n/r / n/r \\
+YOLOv8n & OC-SORT & D & 36.27 & 44.17 & +7.91 [+5.47, +9.98] & +9.40 & +9.60 & +79 & n/r & n/r & n/r / n/r \\
+RT-DETR-L & ByteTrack & D & 50.73 & 51.64 & +0.91 [+0.22, +1.55] & +5.98 & +3.87 & \textminus{}297 & n/r & n/r & n/r / n/r \\
+RT-DETR-L & BoT-SORT & D & 53.91 & n/r & +0.61 [\textminus{}0.39, +1.61] & +7.86 & +3.10 & \textminus{}226 & n/r & n/r & n/r / n/r \\
+RT-DETR-L & OC-SORT & D & 52.64 & 52.83 & +0.19 [\textminus{}0.57, +1.19] & \textminus{}0.57 & +0.04 & \textminus{}4 & n/r & n/r & n/r / n/r \\
+\multicolumn{12}{l}{\textit{MOT17 val-half}} \\
+YOLOX-X & SparseTrack & D & 68.876 & 68.931 & +0.055 [\textminus{}0.011, +0.254] & +0.078 & +0.156 & +7 & 2,231$\to$2,249 & 9,582$\to$9,515 & 95.206$\to$95.176 / 82.219$\to$82.344 \\
+YOLOX-X & BoostTrack (online) & D & 68.492 & 68.492 & 0 (identical) & 0 & 0 & 0 & 1,637$\to$1,637 & 11,452$\to$11,452 & 96.286$\to$96.286 / 78.749$\to$78.749 \\
+YOLOX-X & ByteTrack (official) & D & 67.698 & 67.684 & \textminus{}0.014 [\textminus{}0.058, +0.009] & +0.058 & \textminus{}0.031 & +4 & 2,592$\to$2,622 & 9,263$\to$9,198 & 94.511$\to$94.458 / 82.811$\to$82.932 \\
+YOLOX-X & ByteTrack (library) & D & 66.000 & 66.000 & 0 (identical) & 0 & 0 & 0 & 5,722$\to$5,722 & 7,458$\to$7,458 & 89.029$\to$89.029 / 86.161$\to$86.161 \\
+YOLOX-X & OC-SORT & D & 66.428 & 67.041 & +0.613 [+0.363, +1.241] & +1.267 & +0.656 & \textminus{}8 & 1,303$\to$2,198 & 12,135$\to$10,565 & 96.974$\to$95.172 / 77.482$\to$80.395 \\
+YOLOX-X & PD-SORT & P & 68.011 & 68.624 & +0.613 [+0.268, +1.646] & +1.128 & +0.817 & +2 & 1,304$\to$1,985 & 11,940$\to$10,649 & 96.985$\to$95.611 / 77.844$\to$80.239 \\
+YOLOX-X & Hybrid-SORT & P & 66.698 & 66.698 & 0 (identical) & 0 & 0 & 0 & 3,707$\to$3,707 & 9,228$\to$9,228 & 92.336$\to$92.336 / 82.876$\to$82.876 \\
+YOLOX-X & C-TWiX & X & 77.550 & 77.495 & \textminus{}0.055 [\textminus{}0.456, +0.398] & +0.242 & +0.175 & \textminus{}57 & 846$\to$1,323 & 4,223$\to$3,672 & 98.330$\to$97.441 / 92.186$\to$93.205 \\
+\multicolumn{12}{l}{\textit{KITTIMOTS val}} \\
+PermaTrack & C-TWiX (car) & X & 89.266 & 87.745 & \textminus{}1.521 [\textminus{}4.053, \textminus{}0.134] & \textminus{}2.106 & \textminus{}1.213 & \textminus{}2 & 62$\to$62 & 56$\to$217 & 99.179$\to$99.161 / 99.258$\to$97.125 \\
+PermaTrack & C-TWiX (ped.) & X & 70.772 & 70.670 & \textminus{}0.103 [\textminus{}2.163, +0.034] & \textminus{}0.306 & \textminus{}0.010 & \textminus{}11 & 118$\to$121 & 338$\to$356 & 96.131$\to$96.013 / 89.664$\to$89.113 \\
+\multicolumn{12}{l}{\textit{DanceTrack val}} \\
+released & C-TWiX & X & 59.615 & 58.610 & \textminus{}1.005 [\textminus{}2.622, +0.646] & +0.127 & \textminus{}1.549 & +148 & 4,311$\to$5,568 & 18,134$\to$16,443 & 97.960$\to$97.401 / 91.946$\to$92.697 \\
+released & TrackTrack & X & 62.961 & 62.948 & \textminus{}0.013 [\textminus{}0.032, \textminus{}0.001] & \textminus{}0.073 & +0.009 & +2 & 6,900$\to$6,912 & 8,611$\to$8,762 & 96.912$\to$96.905 / 96.175$\to$96.108 \\
+\botrule
+\end{tabular}
+\par\smallskip\parbox{\linewidth}{\scriptsize Status: D development (data or host visible while V7f was designed), U unseen detector evaluated under a transfer lock on development sequences, P predeclared external system, X post-freeze external system. VisDrone rows use the frozen General AC-MOT configuration (V7f at 736 px) and the internal protocol; official-compatible values are in Tables~\ref{tab:visdrone_official} and~\ref{tab:retinanet}. KITTI: official KITTI HOTA script, car/pedestrian mean; BoT-SORT cells exclude sequence 0020 (host numerical failure); FP, FN, precision and recall are not reported as pooled values (n/r). MOT17 ByteTrack (official) and OC-SORT use the 0.01 score floor. Intervals: paired sequence bootstrap, 10,000 resamples, seed 42. Runtime is reported separately (Table~\ref{tab:runtime}) because it was measured on three configurations only.}
+\end{sidewaystable}

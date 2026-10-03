@@ -1,0 +1,22 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Host contracts: the operating point each tracker declares to the layer (association threshold, birth threshold, lowest score used by any association stage, matching tolerance). $\tau$ is the tracker's own published threshold. A host is single-stage when its lowest stage equals its association/birth threshold. The contract carries no tracker identity.}
+\label{tab:contracts}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{p{5.0cm}lcccl}
+\toprule
+Tracker (setting) & Type & assoc & birth & low & match \\
+\midrule
+ByteTrack (library default; also BoT-SORT) & two-stage & 0.25 & 0.25 & 0.1 & 0.8 \\
+ByteTrack (official MOT17) & two-stage & 0.6 & 0.7 & 0.1 & 0.8 \\
+SparseTrack & two-stage & $\tau$ & $\tau+0.1$ & 0.1 & published \\
+BoostTrack & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate \\
+Hybrid-SORT & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate \\
+OC-SORT & single-stage & 0.6 & 0.6 & 0.6 & 0.7 \\
+PD-SORT & single-stage & $\tau$ & $\tau$ & $\tau$ & $1-$IoU gate \\
+C-TWiX (MOT17 / KITTI / DanceTrack) & single-stage & 0.5 & 0.7 / 0.5 / 0.9 & 0.5 & not mapped \\
+TrackTrack & two-view & $\tau_{\mathrm{det}}$ & $\tau_{\mathrm{init}}$ & 0.1 & not mapped \\
+\botrule
+\end{tabular}
+\end{table*}

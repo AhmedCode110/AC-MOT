@@ -1,0 +1,268 @@
+[
+ {
+  "key": "ma2023adaptiveconf",
+  "query_title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/iccais59597.2023.10382403",
+   "type": "proceedings-article",
+   "title": "Adaptive Confidence Threshold for ByteTrack in Multi-Object Tracking",
+   "authors": [
+    "Linh Van Ma",
+    "Muhammad Ishfaq Hussain",
+    "JongHyun Park",
+    "Jeongbae Kim",
+    "Moongu Jeon"
+   ],
+   "container": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)",
+   "volume": null,
+   "issue": null,
+   "pages": "370-374",
+   "year": 2023,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2023 12th International Conference on Control, Automation and Information Sciences (ICCAIS)"
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "shim2024adaptrack",
+  "query_title": "Adaptrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/icip51287.2024.10648139",
+   "type": "proceedings-article",
+   "title": "Adaptrack: Adaptive Thresholding-Based Matching for Multi-Object Tracking",
+   "authors": [
+    "Kyujin Shim",
+    "Kangwook Ko",
+    "Jubi Hwang",
+    "Changick Kim"
+   ],
+   "container": "2024 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "2222-2228",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "shim2024cmtrack",
+  "query_title": "A Confidence-Aware Matching Strategy For Generalized Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/icip51287.2024.10647729",
+   "type": "proceedings-article",
+   "title": "A Confidence-Aware Matching Strategy For Generalized Multi-Object Tracking",
+   "authors": [
+    "Kyujin Shim",
+    "Jubi Hwang",
+    "Kangwook Ko",
+    "Changick Kim"
+   ],
+   "container": "2024 IEEE International Conference on Image Processing (ICIP)",
+   "volume": null,
+   "issue": null,
+   "pages": "4042-4048",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE International Conference on Image Processing (ICIP)"
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "gwon2026act",
+  "query_title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.3390/electronics15174047",
+   "type": "journal-article",
+   "title": "Adaptive Threshold Control Scheme Based on Detection Confidence Distribution for Data Association in Multi-Object Tracking",
+   "authors": [
+    "Dong Uk Gwon",
+    "Won Il Lee"
+   ],
+   "container": "Electronics",
+   "volume": "15",
+   "issue": "17",
+   "pages": "4047",
+   "year": 2026,
+   "publisher": "MDPI AG",
+   "article_number": null,
+   "event": null
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "liang2024ttasurvey",
+  "query_title": "A Comprehensive Survey on Test-Time Adaptation Under Distribution Shifts",
+  "crossref": {
+   "doi": "10.1007/s11263-024-02181-w",
+   "type": "journal-article",
+   "title": "A Comprehensive Survey on Test-Time Adaptation Under Distribution Shifts",
+   "authors": [
+    "Jian Liang",
+    "Ran He",
+    "Tieniu Tan"
+   ],
+   "container": "International Journal of Computer Vision",
+   "volume": "133",
+   "issue": "1",
+   "pages": "31-64",
+   "year": 2024,
+   "publisher": "Springer Science and Business Media LLC",
+   "article_number": null,
+   "event": null
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "tokmakov2021permatrack",
+  "query_title": "Learning to Track with Object Permanence",
+  "crossref": {
+   "doi": "10.1109/iccv48922.2021.01068",
+   "type": "proceedings-article",
+   "title": "Learning to Track with Object Permanence",
+   "authors": [
+    "Pavel Tokmakov",
+    "Jie Li",
+    "Wolfram Burgard",
+    "Adrien Gaidon"
+   ],
+   "container": "2021 IEEE/CVF International Conference on Computer Vision (ICCV)",
+   "volume": null,
+   "issue": null,
+   "pages": "10840-10849",
+   "year": 2021,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2021 IEEE/CVF International Conference on Computer Vision (ICCV)"
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "zhou2020centertrack",
+  "query_title": "Tracking Objects as Points",
+  "crossref": {
+   "doi": "10.1007/978-3-030-58548-8_28",
+   "type": "book-chapter",
+   "title": "Tracking Objects as Points",
+   "authors": [
+    "Xingyi Zhou",
+    "Vladlen Koltun",
+    "Philipp Kr\u00e4henb\u00fchl"
+   ],
+   "container": "Lecture Notes in Computer Science",
+   "volume": null,
+   "issue": null,
+   "pages": "474-490",
+   "year": 2020,
+   "publisher": "Springer International Publishing",
+   "article_number": null,
+   "event": null
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "jung2024conftrack",
+  "query_title": "ConfTrack: Kalman Filter-based Multi-Person Tracking by Utilizing Confidence Score of Detection Box",
+  "crossref": {
+   "doi": "10.1109/wacv57701.2024.00645",
+   "type": "proceedings-article",
+   "title": "ConfTrack: Kalman Filter-based Multi-Person Tracking by Utilizing Confidence Score of Detection Box",
+   "authors": [
+    "Hyeonchul Jung",
+    "Seokjun Kang",
+    "Takgen Kim",
+    "HyeongKi Kim"
+   ],
+   "container": "2024 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)",
+   "volume": null,
+   "issue": null,
+   "pages": "6569-6578",
+   "year": 2024,
+   "publisher": "IEEE",
+   "article_number": null,
+   "event": "2024 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)"
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "li2025lgmot",
+  "query_title": "Multi-Granularity Language-Guided Training for Multi-Object Tracking",
+  "crossref": {
+   "doi": "10.1109/tcsvt.2025.3572810",
+   "type": "journal-article",
+   "title": "Multi-Granularity Language-Guided Training for Multi-Object Tracking",
+   "authors": [
+    "Yuhao Li",
+    "Jiale Cao",
+    "Muzammal Naseer",
+    "Yu Zhu",
+    "Jinqiu Sun",
+    "Yanning Zhang",
+    "Fahad Shahbaz Khan"
+   ],
+   "container": "IEEE Transactions on Circuits and Systems for Video Technology",
+   "volume": "35",
+   "issue": "11",
+   "pages": "11001-11012",
+   "year": 2025,
+   "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+   "article_number": null,
+   "event": null
+  },
+  "status": "DOI_RESOLVED"
+ },
+ {
+  "key": "guo2017calibration",
+  "query_title": "On Calibration of Modern Neural Networks",
+  "arxiv": {
+   "id": "1706.04599",
+   "title": "On Calibration of Modern Neural Networks",
+   "authors": [
+    "Chuan Guo",
+    "Geoff Pleiss",
+    "Yu Sun",
+    "Kilian Q. Weinberger"
+   ],
+   "published": "2017-06-14T17:33:50Z"
+  },
+  "status": "ARXIV_RESOLVED"
+ },
+ {
+  "key": "wang2021tent",
+  "query_title": "Tent: Fully Test-time Adaptation by Entropy Minimization",
+  "arxiv": {
+   "id": "2006.10726",
+   "title": "Tent: Fully Test-time Adaptation by Entropy Minimization",
+   "authors": [
+    "Dequan Wang",
+    "Evan Shelhamer",
+    "Shaoteng Liu",
+    "Bruno Olshausen",
+    "Trevor Darrell"
+   ],
+   "published": "2020-06-18T17:55:28Z"
+  },
+  "status": "ARXIV_RESOLVED"
+ },
+ {
+  "key": "somers2025cameltrack",
+  "query_title": "CAMELTrack",
+  "arxiv": {
+   "id": "2505.01257",
+   "title": "CAMELTrack: Context-Aware Multi-cue ExpLoitation for Online Multi-Object Tracking",
+   "authors": [
+    "Vladimir Somers",
+    "Baptiste Standaert",
+    "Victor Joos",
+    "Alexandre Alahi",
+    "Christophe De Vleeschouwer"
+   ],
+   "published": "2025-05-02T13:26:23Z"
+  },
+  "status": "ARXIV_RESOLVED"
+ }
+]

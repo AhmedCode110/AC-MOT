@@ -1,0 +1,21 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Mechanism ablation, one change at a time (HOTA). MOT17 val-half with published YOLOX-X detections at the 0.1 score floor, no image motion cue.}
+\label{tab:ablation}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{p{7.2cm}rrrr}
+\toprule
+Variant & ByteTrack (official) & OC-SORT & BoostTrack & KITTI OC-SORT \\
+\midrule
+Native host through the layer and adapters, no intervention (pass-through) & 67.70 & 66.44 & 68.49 & -- \\
+Self-calibration only: nested-Otsu bands always applied, IoU duplicate rule, rank scores (prior design) & 56.41 & 45.72 & 62.55 & 40.20 \\
++ host-aware regime ($\rho$ over 100 frames), clean regime anchored to the host, crowd-safe duplicates & 67.56 & 65.70 & 68.37 & 41.13 \\
++ regime estimated from the whole stream & 67.70 & 66.07 & 68.47 & -- \\
++ foreground track-consistent continuation & 67.70 & 66.47 & 68.47 & 44.15 \\
++ interpretability check of the split = frozen V7f & 67.70 & 66.91 & 68.49 & 44.17 \\
+Host alone (original driver) & 67.70 & 66.44 & 68.49 & 36.27 \\
+\botrule
+\end{tabular}
+\par\smallskip\parbox{\linewidth}{\scriptsize Pass-through: on 7 of 7 MOT17 host/floor cells the pass-through output equals the host alone in every metric, and the SparseTrack and BoostTrack pass-through track files are byte-identical to the official replays (development ledger, E0). KITTI column: YOLOv8n + OC-SORT, KITTI HOTA. All rows are development evidence; no interval is claimed.}
+\end{table*}
