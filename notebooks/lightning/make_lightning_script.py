@@ -80,15 +80,13 @@ def _nvidia_smi():
 
 
 def _git_info():
-    try:
-        sha = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=BASE_REPO).stdout.strip()
-        dirty = bool(subprocess.run(["git", "status", "--short"], capture_output=True, text=True, cwd=BASE_REPO).stdout.strip())
-        return dict(commit=sha or None, dirty=dirty)
-    except Exception as e:
-        return dict(error=str(e))
-
-
-BASE_REPO = os.environ.get("AC_MOT_REPO", BASE)
+    # the Lightning Studio does not carry the .git directory; provenance is passed in explicitly
+    # from the Mac checkout that generated/launched this run, rather than guessed or fabricated here.
+    sha = os.environ.get("AC_MOT_GIT_COMMIT")
+    dirty = os.environ.get("AC_MOT_GIT_DIRTY")
+    if sha is None:
+        return dict(error="AC_MOT_GIT_COMMIT not set in the launching environment")
+    return dict(commit=sha, dirty=dirty == "1")
 assert torch.cuda.is_available(), "No CUDA GPU visible: this run must not continue on CPU."
 ENV = dict(
     mode=MODE,
