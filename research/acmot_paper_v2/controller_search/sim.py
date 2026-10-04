@@ -58,22 +58,25 @@ class SequenceData:
     detection rows keyed by frame, frozen image stats per frame, GT root."""
 
     def __init__(self, split: str, seq: str, data_root: Path):
+        self.split = split
         self.seq = seq
         self.data_root = data_root
         frame_dir = data_root / "sequences" / seq
         self.frame_paths = sorted(frame_dir.glob("*.jpg"))
         self.n_frames = len(self.frame_paths)
-        self.det = {}  # (res,nms) -> {frame:int -> rows (x1,y1,x2,y2,score,eval5_cls)}
-        for res in RESOLUTIONS:
-            for nms in NMS_VALUES:
-                npz = np.load(CACHE_ROOT / split / f"r{res}_{_nms_tag(nms)}" / f"{seq}.npz")
-                rows = npz["det"]
-                by_frame = {}
-                for t in range(1, self.n_frames + 1):
-                    by_frame[t] = rows[rows[:, 0] == t][:, 1:]
-                self.det[(res, nms)] = by_frame
-        self.shape = tuple(int(x) for x in npz["shape"])
+        self.det = {}  # (res,nms) -> {frame:int -> rows (x1,y1,x2,y2,score,eval5_cls)}; lazy per (res,nms)
+        self.shape = None
         self._stats_cache = {}
+
+    def _load(self, res: int, nms: float):
+        npz = np.load(CACHE_ROOT / self.split / f"r{res}_{_nms_tag(nms)}" / f"{self.seq}.npz")
+        rows = npz["det"]
+        by_frame = {}
+        for t in range(1, self.n_frames + 1):
+            by_frame[t] = rows[rows[:, 0] == t][:, 1:]
+        self.det[(res, nms)] = by_frame
+        if self.shape is None:
+            self.shape = tuple(int(x) for x in npz["shape"])
 
     def image_stats(self, t: int) -> dict:
         if t not in self._stats_cache:
@@ -82,6 +85,8 @@ class SequenceData:
         return self._stats_cache[t]
 
     def detections(self, t: int, res: int, nms: float):
+        if (res, nms) not in self.det:
+            self._load(res, nms)
         rows = self.det[(res, nms)][t]
         return [Detection(x1=r[0], y1=r[1], x2=r[2], y2=r[3], confidence=r[4], class_id=int(r[5])) for r in rows]
 
