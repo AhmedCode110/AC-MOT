@@ -40,6 +40,11 @@ CASES = [
 FLOORS = [0.10, 0.25, 0.40]
 IOU_MATCH = 0.90  # two boxes count as "the same detection" above this IoU
 
+# This is exactly the class filter and remapping used to construct the cache
+# in notebooks/lightning/make_cache_script.py.  The checkpoint predicts all
+# ten VisDrone classes; the cache stores only this eval5 subset.
+CKPT_TO_EVAL5 = {0: 0, 3: 1, 4: 2, 5: 3, 8: 4}
+
 
 def iou(a, b):
     x1, y1 = max(a[0], b[0]), max(a[1], b[1])
@@ -80,9 +85,14 @@ for seq, frame in CASES:
         cache_rows = det[(det[:, 0] == frame) & (det[:, 5] >= floor)]
         cache_boxes = cache_rows[:, 1:5].tolist()
         r = model.predict(img_path, imgsz=1536, conf=floor, iou=0.70, max_det=1000, half=HALF, verbose=False)[0]
-        fresh_boxes = r.boxes.xyxy.cpu().numpy().tolist()
+        fresh_raw_boxes = r.boxes.xyxy.cpu().numpy()
+        fresh_raw_classes = r.boxes.cls.cpu().numpy().astype(int)
+        keep = np.isin(fresh_raw_classes, list(CKPT_TO_EVAL5))
+        fresh_boxes = fresh_raw_boxes[keep].tolist()
+        fresh_eval5_classes = [CKPT_TO_EVAL5[int(c)] for c in fresh_raw_classes[keep]]
         only_cache, only_fresh = match(cache_boxes, fresh_boxes)
         results.append(dict(seq=seq, frame=frame, floor=floor, cache_n=len(cache_boxes), fresh_n=len(fresh_boxes),
+                             fresh_eval5_class_ids=fresh_eval5_classes,
                              only_in_cache=len(only_cache), only_in_fresh=len(only_fresh),
                              exact_match=len(only_cache) == 0 and len(only_fresh) == 0))
         print(results[-1])
@@ -90,6 +100,6 @@ for seq, frame in CASES:
 n_cases = len(results)
 n_exact = sum(r["exact_match"] for r in results)
 summary = dict(iou_match_threshold=IOU_MATCH, total_cases=n_cases, exact_matches=n_exact,
-               all_exact=n_exact == n_cases, results=results)
-json.dump(summary, open(f"{BASE}/outputs/acmot_oatrack/CONFIDENCE_EXACTNESS_CHECK.json", "w"), indent=1)
+               all_exact=n_exact == n_cases, class_filter="CKPT_TO_EVAL5", results=results)
+json.dump(summary, open(f"{BASE}/outputs/acmot_oatrack/CONFIDENCE_EXACTNESS_CHECK_FIXED.json", "w"), indent=1)
 print(json.dumps(dict(total_cases=n_cases, exact_matches=n_exact, all_exact=n_exact == n_cases), indent=1))
