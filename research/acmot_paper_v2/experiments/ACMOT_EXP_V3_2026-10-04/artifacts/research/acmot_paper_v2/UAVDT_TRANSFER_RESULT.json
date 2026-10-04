@@ -1,0 +1,784 @@
+{
+ "_label": "UAVDT_TRANSFER",
+ "_note": "frozen, no-retuning transfer evaluation; class-agnostic (single vehicle class) internal protocol via tools/seqstats.py, matching the pre-existing UAVDT adapter (tools/build_uavdt_view.py).",
+ "baseline_r1536_n70+bytetrack": {
+  "aggregate": {
+   "MOTA": -1.5725742580066093,
+   "HOTA": 45.92313384985427,
+   "IDF1": 58.4001393824731,
+   "IDS": 601,
+   "FP": 279616,
+   "FN": 66050,
+   "Precision": 49.57076281579593,
+   "Recall": 80.6251576680962,
+   "wall_seconds": 141.95707893371582
+  },
+  "per_sequence": {
+   "M0203": {
+    "num_objects": 5033,
+    "num_false_positives": 2018,
+    "num_misses": 264,
+    "num_switches": 24,
+    "idtp": 4643,
+    "idfp": 2144,
+    "idfn": 390
+   },
+   "M0205": {
+    "num_objects": 5219,
+    "num_false_positives": 2143,
+    "num_misses": 98,
+    "num_switches": 11,
+    "idtp": 5041,
+    "idfp": 2223,
+    "idfn": 178
+   },
+   "M0208": {
+    "num_objects": 784,
+    "num_false_positives": 417,
+    "num_misses": 145,
+    "num_switches": 0,
+    "idtp": 639,
+    "idfp": 417,
+    "idfn": 145
+   },
+   "M0209": {
+    "num_objects": 15689,
+    "num_false_positives": 7739,
+    "num_misses": 478,
+    "num_switches": 46,
+    "idtp": 14606,
+    "idfp": 8344,
+    "idfn": 1083
+   },
+   "M0403": {
+    "num_objects": 30304,
+    "num_false_positives": 2547,
+    "num_misses": 446,
+    "num_switches": 0,
+    "idtp": 29858,
+    "idfp": 2547,
+    "idfn": 446
+   },
+   "M0601": {
+    "num_objects": 10275,
+    "num_false_positives": 27169,
+    "num_misses": 3783,
+    "num_switches": 180,
+    "idtp": 4836,
+    "idfp": 28825,
+    "idfn": 5439
+   },
+   "M0602": {
+    "num_objects": 18142,
+    "num_false_positives": 6723,
+    "num_misses": 4587,
+    "num_switches": 134,
+    "idtp": 10142,
+    "idfp": 10136,
+    "idfn": 8000
+   },
+   "M0606": {
+    "num_objects": 17505,
+    "num_false_positives": 25705,
+    "num_misses": 1818,
+    "num_switches": 4,
+    "idtp": 14865,
+    "idfp": 26527,
+    "idfn": 2640
+   },
+   "M0701": {
+    "num_objects": 75412,
+    "num_false_positives": 43298,
+    "num_misses": 37246,
+    "num_switches": 64,
+    "idtp": 35462,
+    "idfp": 46002,
+    "idfn": 39950
+   },
+   "M0801": {
+    "num_objects": 3967,
+    "num_false_positives": 950,
+    "num_misses": 1,
+    "num_switches": 2,
+    "idtp": 3961,
+    "idfp": 955,
+    "idfn": 6
+   },
+   "M0802": {
+    "num_objects": 30535,
+    "num_false_positives": 20659,
+    "num_misses": 1838,
+    "num_switches": 5,
+    "idtp": 28667,
+    "idfp": 20689,
+    "idfn": 1868
+   },
+   "M1001": {
+    "num_objects": 19501,
+    "num_false_positives": 21265,
+    "num_misses": 905,
+    "num_switches": 9,
+    "idtp": 17535,
+    "idfp": 22326,
+    "idfn": 1966
+   },
+   "M1004": {
+    "num_objects": 4887,
+    "num_false_positives": 1507,
+    "num_misses": 746,
+    "num_switches": 5,
+    "idtp": 4103,
+    "idfp": 1545,
+    "idfn": 784
+   },
+   "M1007": {
+    "num_objects": 4505,
+    "num_false_positives": 24980,
+    "num_misses": 538,
+    "num_switches": 8,
+    "idtp": 3741,
+    "idfp": 25206,
+    "idfn": 764
+   },
+   "M1009": {
+    "num_objects": 10201,
+    "num_false_positives": 1216,
+    "num_misses": 1012,
+    "num_switches": 3,
+    "idtp": 8945,
+    "idfp": 1460,
+    "idfn": 1256
+   },
+   "M1101": {
+    "num_objects": 7696,
+    "num_false_positives": 34473,
+    "num_misses": 696,
+    "num_switches": 9,
+    "idtp": 6257,
+    "idfp": 35216,
+    "idfn": 1439
+   },
+   "M1301": {
+    "num_objects": 37676,
+    "num_false_positives": 16787,
+    "num_misses": 7522,
+    "num_switches": 28,
+    "idtp": 29638,
+    "idfp": 17303,
+    "idfn": 8038
+   },
+   "M1302": {
+    "num_objects": 20140,
+    "num_false_positives": 10688,
+    "num_misses": 1990,
+    "num_switches": 37,
+    "idtp": 17202,
+    "idfp": 11636,
+    "idfn": 2938
+   },
+   "M1303": {
+    "num_objects": 10149,
+    "num_false_positives": 6026,
+    "num_misses": 307,
+    "num_switches": 2,
+    "idtp": 9823,
+    "idfp": 6045,
+    "idfn": 326
+   },
+   "M1401": {
+    "num_objects": 13286,
+    "num_false_positives": 23306,
+    "num_misses": 1630,
+    "num_switches": 30,
+    "idtp": 11487,
+    "idfp": 23475,
+    "idfn": 1799
+   }
+  }
+ },
+ "v3_adaptive+bytetrack": {
+  "aggregate": {
+   "MOTA": 16.028171988759365,
+   "HOTA": 47.00375428875052,
+   "IDF1": 61.76737743953513,
+   "IDS": 486,
+   "FP": 212077,
+   "FN": 73702,
+   "Precision": 55.751010367613155,
+   "Recall": 78.3805506503259,
+   "wall_seconds": 199.45976090431213
+  },
+  "per_sequence": {
+   "M0203": {
+    "num_objects": 5033,
+    "num_false_positives": 1989,
+    "num_misses": 270,
+    "num_switches": 21,
+    "idtp": 4638,
+    "idfp": 2114,
+    "idfn": 395
+   },
+   "M0205": {
+    "num_objects": 5219,
+    "num_false_positives": 1464,
+    "num_misses": 95,
+    "num_switches": 3,
+    "idtp": 5101,
+    "idfp": 1487,
+    "idfn": 118
+   },
+   "M0208": {
+    "num_objects": 784,
+    "num_false_positives": 417,
+    "num_misses": 146,
+    "num_switches": 0,
+    "idtp": 638,
+    "idfp": 417,
+    "idfn": 146
+   },
+   "M0209": {
+    "num_objects": 15689,
+    "num_false_positives": 6339,
+    "num_misses": 626,
+    "num_switches": 10,
+    "idtp": 14709,
+    "idfp": 6693,
+    "idfn": 980
+   },
+   "M0403": {
+    "num_objects": 30304,
+    "num_false_positives": 2607,
+    "num_misses": 445,
+    "num_switches": 0,
+    "idtp": 29859,
+    "idfp": 2607,
+    "idfn": 445
+   },
+   "M0601": {
+    "num_objects": 10275,
+    "num_false_positives": 20140,
+    "num_misses": 3852,
+    "num_switches": 179,
+    "idtp": 4576,
+    "idfp": 21987,
+    "idfn": 5699
+   },
+   "M0602": {
+    "num_objects": 18142,
+    "num_false_positives": 5138,
+    "num_misses": 4944,
+    "num_switches": 124,
+    "idtp": 9992,
+    "idfp": 8344,
+    "idfn": 8150
+   },
+   "M0606": {
+    "num_objects": 17505,
+    "num_false_positives": 18092,
+    "num_misses": 1915,
+    "num_switches": 1,
+    "idtp": 15031,
+    "idfp": 18651,
+    "idfn": 2474
+   },
+   "M0701": {
+    "num_objects": 75412,
+    "num_false_positives": 27301,
+    "num_misses": 42413,
+    "num_switches": 79,
+    "idtp": 29274,
+    "idfp": 31026,
+    "idfn": 46138
+   },
+   "M0801": {
+    "num_objects": 3967,
+    "num_false_positives": 946,
+    "num_misses": 6,
+    "num_switches": 0,
+    "idtp": 3961,
+    "idfp": 946,
+    "idfn": 6
+   },
+   "M0802": {
+    "num_objects": 30535,
+    "num_false_positives": 17462,
+    "num_misses": 2129,
+    "num_switches": 4,
+    "idtp": 28179,
+    "idfp": 17689,
+    "idfn": 2356
+   },
+   "M1001": {
+    "num_objects": 19501,
+    "num_false_positives": 14956,
+    "num_misses": 1208,
+    "num_switches": 3,
+    "idtp": 16741,
+    "idfp": 16508,
+    "idfn": 2760
+   },
+   "M1004": {
+    "num_objects": 4887,
+    "num_false_positives": 1064,
+    "num_misses": 1024,
+    "num_switches": 6,
+    "idtp": 3807,
+    "idfp": 1120,
+    "idfn": 1080
+   },
+   "M1007": {
+    "num_objects": 4505,
+    "num_false_positives": 21070,
+    "num_misses": 550,
+    "num_switches": 1,
+    "idtp": 3755,
+    "idfp": 21270,
+    "idfn": 750
+   },
+   "M1009": {
+    "num_objects": 10201,
+    "num_false_positives": 605,
+    "num_misses": 1356,
+    "num_switches": 4,
+    "idtp": 8726,
+    "idfp": 724,
+    "idfn": 1475
+   },
+   "M1101": {
+    "num_objects": 7696,
+    "num_false_positives": 28362,
+    "num_misses": 691,
+    "num_switches": 5,
+    "idtp": 6255,
+    "idfp": 29112,
+    "idfn": 1441
+   },
+   "M1301": {
+    "num_objects": 37676,
+    "num_false_positives": 14814,
+    "num_misses": 7409,
+    "num_switches": 27,
+    "idtp": 29840,
+    "idfp": 15241,
+    "idfn": 7836
+   },
+   "M1302": {
+    "num_objects": 20140,
+    "num_false_positives": 7806,
+    "num_misses": 2221,
+    "num_switches": 12,
+    "idtp": 17257,
+    "idfp": 8468,
+    "idfn": 2883
+   },
+   "M1303": {
+    "num_objects": 10149,
+    "num_false_positives": 4178,
+    "num_misses": 304,
+    "num_switches": 0,
+    "idtp": 9845,
+    "idfp": 4178,
+    "idfn": 304
+   },
+   "M1401": {
+    "num_objects": 13286,
+    "num_false_positives": 17327,
+    "num_misses": 2098,
+    "num_switches": 7,
+    "idtp": 11120,
+    "idfp": 17395,
+    "idfn": 2166
+   }
+  }
+ },
+ "baseline_r1536_n70+oatrack": {
+  "aggregate": {
+   "MOTA": 19.60657776630508,
+   "HOTA": 47.72753226513935,
+   "IDF1": 62.10086092295219,
+   "IDS": 517,
+   "FP": 197937,
+   "FN": 75612,
+   "Precision": 57.27034676003981,
+   "Recall": 77.82027890386206,
+   "wall_seconds": 32.96421194076538
+  },
+  "per_sequence": {
+   "M0203": {
+    "num_objects": 5033,
+    "num_false_positives": 1638,
+    "num_misses": 277,
+    "num_switches": 16,
+    "idtp": 4588,
+    "idfp": 1806,
+    "idfn": 445
+   },
+   "M0205": {
+    "num_objects": 5219,
+    "num_false_positives": 1222,
+    "num_misses": 128,
+    "num_switches": 4,
+    "idtp": 5022,
+    "idfp": 1291,
+    "idfn": 197
+   },
+   "M0208": {
+    "num_objects": 784,
+    "num_false_positives": 397,
+    "num_misses": 236,
+    "num_switches": 0,
+    "idtp": 548,
+    "idfp": 397,
+    "idfn": 236
+   },
+   "M0209": {
+    "num_objects": 15689,
+    "num_false_positives": 5631,
+    "num_misses": 605,
+    "num_switches": 37,
+    "idtp": 13874,
+    "idfp": 6841,
+    "idfn": 1815
+   },
+   "M0403": {
+    "num_objects": 30304,
+    "num_false_positives": 2380,
+    "num_misses": 436,
+    "num_switches": 2,
+    "idtp": 29615,
+    "idfp": 2633,
+    "idfn": 689
+   },
+   "M0601": {
+    "num_objects": 10275,
+    "num_false_positives": 19871,
+    "num_misses": 3855,
+    "num_switches": 41,
+    "idtp": 5771,
+    "idfp": 20520,
+    "idfn": 4504
+   },
+   "M0602": {
+    "num_objects": 18142,
+    "num_false_positives": 5154,
+    "num_misses": 4786,
+    "num_switches": 80,
+    "idtp": 10847,
+    "idfp": 7663,
+    "idfn": 7295
+   },
+   "M0606": {
+    "num_objects": 17505,
+    "num_false_positives": 12674,
+    "num_misses": 2392,
+    "num_switches": 12,
+    "idtp": 14592,
+    "idfp": 13195,
+    "idfn": 2913
+   },
+   "M0701": {
+    "num_objects": 75412,
+    "num_false_positives": 32358,
+    "num_misses": 43250,
+    "num_switches": 131,
+    "idtp": 27800,
+    "idfp": 36720,
+    "idfn": 47612
+   },
+   "M0801": {
+    "num_objects": 3967,
+    "num_false_positives": 808,
+    "num_misses": 0,
+    "num_switches": 1,
+    "idtp": 3961,
+    "idfp": 814,
+    "idfn": 6
+   },
+   "M0802": {
+    "num_objects": 30535,
+    "num_false_positives": 15191,
+    "num_misses": 2524,
+    "num_switches": 11,
+    "idtp": 27933,
+    "idfp": 15269,
+    "idfn": 2602
+   },
+   "M1001": {
+    "num_objects": 19501,
+    "num_false_positives": 13810,
+    "num_misses": 1189,
+    "num_switches": 5,
+    "idtp": 17182,
+    "idfp": 14940,
+    "idfn": 2319
+   },
+   "M1004": {
+    "num_objects": 4887,
+    "num_false_positives": 875,
+    "num_misses": 1123,
+    "num_switches": 17,
+    "idtp": 3589,
+    "idfp": 1050,
+    "idfn": 1298
+   },
+   "M1007": {
+    "num_objects": 4505,
+    "num_false_positives": 18469,
+    "num_misses": 560,
+    "num_switches": 6,
+    "idtp": 3664,
+    "idfp": 18750,
+    "idfn": 841
+   },
+   "M1009": {
+    "num_objects": 10201,
+    "num_false_positives": 549,
+    "num_misses": 1428,
+    "num_switches": 26,
+    "idtp": 8440,
+    "idfp": 882,
+    "idfn": 1761
+   },
+   "M1101": {
+    "num_objects": 7696,
+    "num_false_positives": 26083,
+    "num_misses": 613,
+    "num_switches": 7,
+    "idtp": 6382,
+    "idfp": 26784,
+    "idfn": 1314
+   },
+   "M1301": {
+    "num_objects": 37676,
+    "num_false_positives": 14132,
+    "num_misses": 7915,
+    "num_switches": 62,
+    "idtp": 28663,
+    "idfp": 15230,
+    "idfn": 9013
+   },
+   "M1302": {
+    "num_objects": 20140,
+    "num_false_positives": 7047,
+    "num_misses": 2109,
+    "num_switches": 45,
+    "idtp": 16802,
+    "idfp": 8276,
+    "idfn": 3338
+   },
+   "M1303": {
+    "num_objects": 10149,
+    "num_false_positives": 3293,
+    "num_misses": 270,
+    "num_switches": 2,
+    "idtp": 9581,
+    "idfp": 3591,
+    "idfn": 568
+   },
+   "M1401": {
+    "num_objects": 13286,
+    "num_false_positives": 16355,
+    "num_misses": 1916,
+    "num_switches": 12,
+    "idtp": 10834,
+    "idfp": 16891,
+    "idfn": 2452
+   }
+  }
+ },
+ "v3_adaptive+oatrack": {
+  "aggregate": {
+   "MOTA": 22.873460719377192,
+   "HOTA": 47.64022733743635,
+   "IDF1": 62.931434447640605,
+   "IDS": 486,
+   "FP": 183669,
+   "FN": 78774,
+   "Precision": 58.80022700711753,
+   "Recall": 76.89275049427116,
+   "wall_seconds": 217.8359878063202
+  },
+  "per_sequence": {
+   "M0203": {
+    "num_objects": 5033,
+    "num_false_positives": 1686,
+    "num_misses": 268,
+    "num_switches": 18,
+    "idtp": 4561,
+    "idfp": 1890,
+    "idfn": 472
+   },
+   "M0205": {
+    "num_objects": 5219,
+    "num_false_positives": 1181,
+    "num_misses": 103,
+    "num_switches": 5,
+    "idtp": 5049,
+    "idfp": 1248,
+    "idfn": 170
+   },
+   "M0208": {
+    "num_objects": 784,
+    "num_false_positives": 415,
+    "num_misses": 199,
+    "num_switches": 0,
+    "idtp": 585,
+    "idfp": 415,
+    "idfn": 199
+   },
+   "M0209": {
+    "num_objects": 15689,
+    "num_false_positives": 5963,
+    "num_misses": 565,
+    "num_switches": 34,
+    "idtp": 14334,
+    "idfp": 6753,
+    "idfn": 1355
+   },
+   "M0403": {
+    "num_objects": 30304,
+    "num_false_positives": 2334,
+    "num_misses": 419,
+    "num_switches": 1,
+    "idtp": 29802,
+    "idfp": 2417,
+    "idfn": 502
+   },
+   "M0601": {
+    "num_objects": 10275,
+    "num_false_positives": 18600,
+    "num_misses": 3827,
+    "num_switches": 38,
+    "idtp": 6002,
+    "idfp": 19046,
+    "idfn": 4273
+   },
+   "M0602": {
+    "num_objects": 18142,
+    "num_false_positives": 4962,
+    "num_misses": 4869,
+    "num_switches": 88,
+    "idtp": 10845,
+    "idfp": 7390,
+    "idfn": 7297
+   },
+   "M0606": {
+    "num_objects": 17505,
+    "num_false_positives": 12574,
+    "num_misses": 2273,
+    "num_switches": 5,
+    "idtp": 14633,
+    "idfp": 13173,
+    "idfn": 2872
+   },
+   "M0701": {
+    "num_objects": 75412,
+    "num_false_positives": 23151,
+    "num_misses": 45920,
+    "num_switches": 151,
+    "idtp": 25291,
+    "idfp": 27352,
+    "idfn": 50121
+   },
+   "M0801": {
+    "num_objects": 3967,
+    "num_false_positives": 839,
+    "num_misses": 0,
+    "num_switches": 1,
+    "idtp": 3964,
+    "idfp": 842,
+    "idfn": 3
+   },
+   "M0802": {
+    "num_objects": 30535,
+    "num_false_positives": 15057,
+    "num_misses": 2898,
+    "num_switches": 7,
+    "idtp": 27075,
+    "idfp": 15619,
+    "idfn": 3460
+   },
+   "M1001": {
+    "num_objects": 19501,
+    "num_false_positives": 13256,
+    "num_misses": 1211,
+    "num_switches": 7,
+    "idtp": 17229,
+    "idfp": 14317,
+    "idfn": 2272
+   },
+   "M1004": {
+    "num_objects": 4887,
+    "num_false_positives": 788,
+    "num_misses": 1244,
+    "num_switches": 8,
+    "idtp": 3574,
+    "idfp": 857,
+    "idfn": 1313
+   },
+   "M1007": {
+    "num_objects": 4505,
+    "num_false_positives": 18309,
+    "num_misses": 582,
+    "num_switches": 3,
+    "idtp": 3690,
+    "idfp": 18542,
+    "idfn": 815
+   },
+   "M1009": {
+    "num_objects": 10201,
+    "num_false_positives": 493,
+    "num_misses": 1414,
+    "num_switches": 26,
+    "idtp": 8222,
+    "idfp": 1058,
+    "idfn": 1979
+   },
+   "M1101": {
+    "num_objects": 7696,
+    "num_false_positives": 24310,
+    "num_misses": 604,
+    "num_switches": 5,
+    "idtp": 6394,
+    "idfp": 25008,
+    "idfn": 1302
+   },
+   "M1301": {
+    "num_objects": 37676,
+    "num_false_positives": 13884,
+    "num_misses": 7764,
+    "num_switches": 48,
+    "idtp": 28933,
+    "idfp": 14863,
+    "idfn": 8743
+   },
+   "M1302": {
+    "num_objects": 20140,
+    "num_false_positives": 7079,
+    "num_misses": 2258,
+    "num_switches": 25,
+    "idtp": 16897,
+    "idfp": 8064,
+    "idfn": 3243
+   },
+   "M1303": {
+    "num_objects": 10149,
+    "num_false_positives": 3354,
+    "num_misses": 237,
+    "num_switches": 5,
+    "idtp": 9706,
+    "idfp": 3560,
+    "idfn": 443
+   },
+   "M1401": {
+    "num_objects": 13286,
+    "num_false_positives": 15434,
+    "num_misses": 2119,
+    "num_switches": 11,
+    "idtp": 10757,
+    "idfp": 15844,
+    "idfn": 2529
+   }
+  }
+ }
+}

@@ -1,0 +1,100 @@
+{
+ "generated_utc": "2026-10-04T21:18:35+00:00",
+ "checks": [
+  {
+   "check": "referenced_files_exist",
+   "ok": true,
+   "detail": "27 refs; missing=[]"
+  },
+  {
+   "check": "archived_copies_identical_to_sources",
+   "ok": true,
+   "detail": "mismatches=[]"
+  },
+  {
+   "check": "thresholds_match_trial7",
+   "ok": true,
+   "detail": "t_med=0.29747709701135766 t_high=0.5114928923560124"
+  },
+  {
+   "check": "action_map_match_trial7",
+   "ok": true,
+   "detail": "{\"LOW\": [1536, 0.7, 0.1], \"MEDIUM\": [1280, 0.45, 0.4], \"HIGH\": [1088, 0.6, 0.4]}"
+  },
+  {
+   "check": "thresholds_in_val_and_runtime_scripts",
+   "ok": true,
+   "detail": [
+    "research/acmot_paper_v2/run_v3_second_val_read.py",
+    "notebooks/lightning/run_v3_runtime_benchmark.py"
+   ]
+  },
+  {
+   "check": "action_map_in_SECOND_VAL_READ_V3_RESULT.json",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "action_map_in_V3_RUNTIME_BENCHMARK_RESULT.json",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "action_map_matches_owner_statement",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "detector_sha256_consistent",
+   "ok": true,
+   "detail": [
+    "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7"
+   ]
+  },
+  {
+   "check": "final_report_matches_json",
+   "ok": true,
+   "detail": "conflicts=[]; note: FINAL_REPORT rounds ByteTrack HOTA CI upper bound 3.3747 as +3.38 (PAPER_READY uses +3.37)"
+  },
+  {
+   "check": "single_v3_val_result_and_bootstrap",
+   "ok": true,
+   "detail": [
+    "BOOTSTRAP_V3_RESULT.json",
+    "SECOND_VAL_READ_V3_RESULT.json",
+    "V3_RUNTIME_BENCHMARK_RESULT.json"
+   ]
+  },
+  {
+   "check": "paper_numbers_traceable",
+   "ok": true,
+   "detail": "37 rows; unsourced=[]"
+  },
+  {
+   "check": "selection_rule_followed",
+   "ok": false,
+   "detail": "trial 7 != predeclared argmax (see FREEZE_MANIFEST.json selection_audit) -- disclosed, not corrected"
+  },
+  {
+   "check": "uavdt_included",
+   "ok": true,
+   "detail": "keys=['_label', '_note', 'baseline_r1536_n70+bytetrack', 'v3_adaptive+bytetrack', 'baseline_r1536_n70+oatrack', 'v3_adaptive+oatrack']"
+  },
+  {
+   "check": "uavdt_forward_passes_exact",
+   "ok": true,
+   "detail": "got=49776 expected=49776"
+  },
+  {
+   "check": "uavdt_total_frames_exact",
+   "ok": true,
+   "detail": "got=16592"
+  },
+  {
+   "check": "uavdt_numbers_in_paper_ready",
+   "ok": true,
+   "detail": "conflicts=[]"
+  }
+ ],
+ "blocking_failures": []
+}

@@ -1,0 +1,44 @@
+{
+ "gpu": "Tesla T4",
+ "action_map": {
+  "LOW": [
+   1536,
+   0.7,
+   0.1
+  ],
+  "MEDIUM": [
+   1280,
+   0.45,
+   0.4
+  ],
+  "HIGH": [
+   1088,
+   0.6,
+   0.4
+  ]
+ },
+ "results": [
+  {
+   "host": "bytetrack",
+   "n_frames": 200,
+   "mean_latency_ms": 74.32379452307819,
+   "p95_latency_ms": 100.68465010003247,
+   "fps": 13.454641362390227,
+   "mean_detector_ms": 54.568777851280764,
+   "mean_tracker_ms": 7.971220512818853,
+   "mean_controller_overhead_ms": 4.256215148719396,
+   "peak_gpu_reserved_gb": 0.69140625
+  },
+  {
+   "host": "oatrack",
+   "n_frames": 200,
+   "mean_latency_ms": 65.47477404102293,
+   "p95_latency_ms": 85.89692999996713,
+   "fps": 15.273057672157137,
+   "mean_detector_ms": 52.63992132307137,
+   "mean_tracker_ms": 1.8354655179508976,
+   "mean_controller_overhead_ms": 4.200976379488508,
+   "peak_gpu_reserved_gb": 0.69140625
+  }
+ ]
+}

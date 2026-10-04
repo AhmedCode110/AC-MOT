@@ -1,0 +1,195 @@
+{
+ "experiment_id": "ACMOT_EXP_V3_2026-10-04",
+ "archive_freeze_utc": "2026-10-04T21:18:35+00:00",
+ "status": "ARCHIVED -- COMPLETE (VisDrone + UAVDT transfer); final tag created at this freeze",
+ "authoritative_source": "research/acmot_paper_v2/controller_search/FREEZE_MANIFEST_V3_ADAPTIVE.json (sha256 6620d257705287c4a885dc1e3d6f4affeaaaef01024dddd6a77109e8881c270d)",
+ "controller_frozen_at_commit": "2ed0697325db3ce3f1680889baaef3c77d8f573e",
+ "freeze_commit": "309dca51b39fb358ccf603ee19ad7b1a4a3fd0ec",
+ "primary_method": "AC-MOT v3 adaptive controller",
+ "scene_layer": "acmot_sci.SceneLayer, FROZEN cue formulas (crowd/tiny/edge/dark/blur, unchanged), cue subset restricted to ['crowd'] (Stage 3A's selection, weight renormalized to 1.0), causal inputs only (image stats of frame t via run_universal_acmot.analyze_visual, frozen; tracker-reported boxes of frames < t, never GT, never future frames)",
+ "cue_subset": [
+  "crowd"
+ ],
+ "thresholds": {
+  "t_med": 0.29747709701135766,
+  "t_high": 0.5114928923560124
+ },
+ "action_mapping": {
+  "LOW": {
+   "resolution": 1536,
+   "nms_iou": 0.7,
+   "confidence_floor": 0.1
+  },
+  "MEDIUM": {
+   "resolution": 1280,
+   "nms_iou": 0.45,
+   "confidence_floor": 0.4
+  },
+  "HIGH": {
+   "resolution": 1088,
+   "nms_iou": 0.6,
+   "confidence_floor": 0.4
+  }
+ },
+ "baseline": {
+  "name": "r1536_n70",
+  "resolution": 1536,
+  "nms_iou": 0.7,
+  "detector_confidence_floor": "0.01 (cache floor; no additional filter)",
+  "source": "research/acmot_paper_v2/run_baseline_systems.py, research/acmot_paper_v2/BASELINE_SYSTEMS_RESULT.json"
+ },
+ "trackers": {
+  "bytetrack": "Ultralytics ByteTrack defaults (adapters/trackers/bytetrack.py), frozen",
+  "oatrack": "OATrack re-implementation (adapters/trackers/oatrack.py), min_conf=0.40 frozen"
+ },
+ "detector": {
+  "source": "dronefreak/visdrone-yolo11m (best.pt), Hugging Face",
+  "sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+  "frozen_since_commit": "fec8ac7861826aa44b8ce66da09225f08870275f",
+  "local_sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+  "matches_expected": true
+ },
+ "seeds": {
+  "optuna_sampler_seed": 43,
+  "shuffled_control_seed": 44,
+  "bootstrap_seed": 42,
+  "bootstrap_resamples": 5000
+ },
+ "cv_folds": [
+  [
+   "uav0000316_01288_v",
+   "uav0000289_06922_v"
+  ],
+  [
+   "uav0000013_00000_v",
+   "uav0000076_00720_v"
+  ],
+  [
+   "uav0000307_00000_v",
+   "uav0000020_00406_v"
+  ],
+  [
+   "uav0000315_00000_v",
+   "uav0000243_00001_v"
+  ]
+ ],
+ "calibration_split": "research/acmot_paper_v2/DETECTOR_SPLIT.json -> calibration (8 sequences, 3282 frames)",
+ "development_evidence": {
+  "cv_mean_delta_vs_r1536_n70": 2.4469571172780746,
+  "per_fold_delta": [
+   0.5916926698415423,
+   4.1635420122844025,
+   2.0290261817519735,
+   3.0035676052343803
+  ],
+  "all_4_folds_positive": true,
+  "level_frac": {
+   "LOW": 0.07617306520414381,
+   "MEDIUM": 0.1008531383302864,
+   "HIGH": 0.8229737964655698
+  },
+  "switches_per_100_frames_per_sequence": {
+   "uav0000316_01288_v": 1.5748031496062993,
+   "uav0000289_06922_v": 0.47619047619047616,
+   "uav0000013_00000_v": 0.37174721189591076,
+   "uav0000076_00720_v": 1.10803324099723,
+   "uav0000307_00000_v": 0.24154589371980675,
+   "uav0000020_00406_v": 0.7984031936127745,
+   "uav0000315_00000_v": 0.15822784810126583,
+   "uav0000243_00001_v": 0.13020833333333334
+  },
+  "genuinely_adaptive_eligibility": "PASSED: >=2 distinct action tuples each >=10% of frames (MEDIUM 10.1%, HIGH 82.3%; LOW at 7.6% is below the 10% bar individually but the controller genuinely varies all 3 dimensions across levels), within-sequence switching present in every one of the 8 calibration sequences.",
+  "shuffled_control_caveat": "IMPORTANT, reported not suppressed: SHUFFLED_CONTROL_RESULT.json shows a same-action-distribution, randomly-timed control performs at least as well (shuffled cv_mean=+2.617 vs causal +2.447). The large improvement over r1536_n70 is attributable to using a diverse mix of three operating points; this control does NOT establish that the causal, scene-conditioned TIMING of the switches itself adds value beyond the mixture effect. This caveat is part of the frozen record and must be reported in any paper claim about this method."
+ },
+ "selection_audit": {
+  "selected_trial": 7,
+  "selected_cv_mean": 2.4469571172780746,
+  "predeclared_rule": "argmax CV-mean objective among eligible (genuinely-adaptive, gate-passing) trials; ties broken by simplicity (fewest distinct action tuples, then lowest mean compute).",
+  "predeclared_eligibility": ">=2 distinct action tuples, each realized on >=10% of pooled calibration frames, AND within-sequence switching (not just sequence-to-sequence difference).",
+  "implemented_eligibility": "run_v3_joint_search.py: n_actions_ge10pct counts LEVELS (not distinct action tuples) >=10% AND mean switches > 0",
+  "eligible_by_implemented_flag": [
+   [
+    10,
+    2.533849811983581
+   ],
+   [
+    7,
+    2.4469571172780746
+   ],
+   [
+    8,
+    0.20379458964180763
+   ]
+  ],
+  "argmax_by_implemented_flag": [
+   10,
+   2.533849811983581
+  ],
+  "eligible_by_predeclared_tuple_rule": [
+   [
+    54,
+    2.9514886268347293
+   ],
+   [
+    7,
+    2.4469571172780746
+   ],
+   [
+    8,
+    0.20379458964180763
+   ]
+  ],
+  "argmax_by_predeclared_tuple_rule": [
+   54,
+   2.9514886268347293
+  ],
+  "finding": "DEVIATION RECORDED, NOT CORRECTED: trial 7 is not the argmax of the predeclared selection rule under either eligibility reading. Implemented flag -> trial 10 (MEDIUM and HIGH share one action tuple, so it fails the predeclared tuple rule). Predeclared tuple rule -> trial 54 (varies NMS only). Commit f2d94b5 justifies trial 7 as 'genuinely 3-way distinct across all dimensions', a criterion not in PREDECLARATION_V3_FINAL.json. The frozen controller is archived exactly as frozen; this deviation must be disclosed with any paper claim."
+ },
+ "static_control": {
+  "policy": {
+   "type": "fixed (static) operating point -- AC-MOT is a documented no-op on this host",
+   "resolution": 1088,
+   "nms_iou": 0.45,
+   "confidence_floor": 0.4,
+   "confidence_floor_provenance": "CONFIDENCE_EXACTNESS_CHECK.json's original 'not exact' finding was a bug in the verification script (class-filter mismatch), corrected in CONFIDENCE_EXACTNESS_CHECK_FIXED.json (18/18 exact) -- see CONFIDENCE_CORRECTION_NOTE.md. Once confirmed exact, a confidence-floor sweep (CONFIDENCE_ORACLE_RESULT.json) found conf=0.40 robustly beats conf=0.01 at this (resolution,NMS) point: +0.88 pooled HOTA, 7/8 sequences improve, 3/4 CV folds positive -- the first broadly-distributed (non-single-sequence) finding in the whole search. A diagnosis-motivated adaptive follow-up (level-dependent confidence, LOW->0.10/MEDIUM,HIGH->0.40) was tested and found WORSE than flat 0.40 on every one of the 8 sequences -- hypothesis refuted, no adaptive confidence policy beats the flat choice.",
+   "selection_rule": "matched-static: the pooled-HOTA-maximizing point among resolution x NMS x confidence-floor on all 8 calibration sequences, ByteTrack host, official evaluator. The adaptive-vs-this-point comparison (Stages 1/2/3A/3B4) predates the confidence-floor correction and used the weaker conf=0.01 reference throughout; all 5 of those stages were null regardless, and the subsequent confidence-floor and level-dependent-confidence checks (run after the correction) are also null -- the conclusion (no detector-side adaptive policy robustly beats the best fixed point) is unchanged by the correction, only the identity of the best fixed point improved."
+  },
+  "manifest": "research/acmot_paper_v2/controller_search/FREEZE_MANIFEST.json",
+  "role": "secondary control only; not the primary method, not the acceptance gate"
+ },
+ "visdrone_val_reads": [
+  {
+   "n": 1,
+   "commit": "bfa5cafca6d25e06fd4cb1635babf1db47b5e610",
+   "policy": "static r1088_n45_conf0.40",
+   "result": "research/acmot_paper_v2/FINAL_ACMOT_SYSTEMS_RESULT.json"
+  },
+  {
+   "n": 2,
+   "label": "SECOND VAL READ",
+   "commit": "0af0066f52795968cd061572bd18a1fda285aa9a",
+   "policy": "frozen v3 adaptive",
+   "result": "research/acmot_paper_v2/SECOND_VAL_READ_V3_RESULT.json"
+  }
+ ],
+ "uavdt": {
+  "status": "COMPLETE",
+  "kaggle_kernel": "ahmedgouda1111111/uavdt-v3-cache-gen",
+  "policy_to_evaluate": "this frozen controller, no retuning",
+  "forward_passes": 49776,
+  "expected_forward_passes": 49776,
+  "forward_passes_match": true,
+  "total_frames": 16592,
+  "expected_total_frames": 16592,
+  "result": "research/acmot_paper_v2/UAVDT_TRANSFER_RESULT.json",
+  "eval_script": "research/acmot_paper_v2/run_uavdt_transfer.py",
+  "commits": [
+   "7ecc63a (cache script authorized)",
+   "5a3d066 (kaggle kernel script, provenance)",
+   "040dbf1 (eval script)",
+   "010f253 (results)",
+   "87fd91a (final report section 8b)"
+  ]
+ },
+ "immutability": "Do not modify the controller, thresholds or action mapping. Any change is a new experiment ID."
+}

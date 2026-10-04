@@ -1,0 +1,53 @@
+{
+ "gpu": "Tesla T4",
+ "results": [
+  {
+   "op": "systems_1_2_default",
+   "host": "bytetrack",
+   "n_frames": 200,
+   "mean_latency_ms": 139.93341134358815,
+   "p95_latency_ms": 171.69196109999803,
+   "fps": 7.146256139962394,
+   "mean_detector_ms": 129.3098311641013,
+   "mean_tracker_ms": 10.623580179486826,
+   "peak_gpu_allocated_gb": 0.5053935050964355,
+   "peak_gpu_reserved_gb": 0.69140625
+  },
+  {
+   "op": "systems_1_2_default",
+   "host": "oatrack",
+   "n_frames": 200,
+   "mean_latency_ms": 128.85212802051544,
+   "p95_latency_ms": 162.4372326000355,
+   "fps": 7.760834185375527,
+   "mean_detector_ms": 126.64596404102515,
+   "mean_tracker_ms": 2.2061639794902734,
+   "peak_gpu_allocated_gb": 0.1958150863647461,
+   "peak_gpu_reserved_gb": 0.69140625
+  },
+  {
+   "op": "systems_3_4_frozen_acmot",
+   "host": "bytetrack",
+   "n_frames": 200,
+   "mean_latency_ms": 56.217358625639676,
+   "p95_latency_ms": 62.73908669998604,
+   "fps": 17.78810005392034,
+   "mean_detector_ms": 48.78608563076895,
+   "mean_tracker_ms": 7.431272994870725,
+   "peak_gpu_allocated_gb": 0.1368546485900879,
+   "peak_gpu_reserved_gb": 0.69140625
+  },
+  {
+   "op": "systems_3_4_frozen_acmot",
+   "host": "oatrack",
+   "n_frames": 200,
+   "mean_latency_ms": 49.977464143588776,
+   "p95_latency_ms": 53.532429400019055,
+   "fps": 20.009018407315136,
+   "mean_detector_ms": 48.25847420512562,
+   "mean_tracker_ms": 1.7189899384631575,
+   "peak_gpu_allocated_gb": 0.1367788314819336,
+   "peak_gpu_reserved_gb": 0.69140625
+  }
+ ]
+}

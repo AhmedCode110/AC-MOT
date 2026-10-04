@@ -1,0 +1,10 @@
+{
+ "generated_utc": "2026-10-04T21:18:29+00:00",
+ "missing_expected_files": [],
+ "n_copied": 100,
+ "n_external": 349,
+ "copied_bytes": 2413584,
+ "external_bytes": 310048858,
+ "detector_sha256_local": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+ "detector_sha256_match": true
+}

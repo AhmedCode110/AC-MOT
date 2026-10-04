@@ -1,0 +1,32 @@
+{
+  "predeclared_before_any_stage3_trial": true,
+  "timestamp_utc": "2026-10-04T11:05:00Z",
+  "context": "User-authorized expansion beyond Stage 1/2 (resolution/NMS action mapping only): also search acmot_sci.SceneSpec's cue subset, cue weights, and SCI thresholds. SceneLayer's cue FORMULAS are reused verbatim and unchanged (crowd, tiny, edge, dark, blur -- exactly the 5 historical cues); only the SceneSpec DATA fed into it (weights, which cues are active, t_med/t_high thresholds) is now a search target. No new cue is invented.",
+  "cue_subset_definition": {
+    "cues": ["crowd", "tiny", "edge", "dark", "blur"],
+    "n_nonempty_subsets": 31,
+    "renormalization_rule": "for a subset S, weight_i = original_w_i / sum(original_w_j for j in S) for i in S, 0 otherwise -- preserves the historical RELATIVE importance ratios among included cues (w_crowd:w_tiny:w_edge:w_dark:w_blur = 0.30:0.30:0.20:0.10:0.05) rather than inventing new relative weights; this rule is fixed before Stage 3A runs."
+  },
+  "stage_3a_cue_subset": {
+    "search_space": "all 31 non-empty cue subsets, weights renormalized per the rule above, t_med/t_high/hysteresis/dwell/probe UNCHANGED at their historical values, action mapping FIXED at the Stage1/2 selected mapping (resolution=1088 all levels, NMS from Stage 2's winner).",
+    "method": "exhaustive (31 configs), deterministic, no sampler needed.",
+    "objective": "same as Stage 1/2: CV-mean delta-HOTA vs matched-static (r1088_n45), ByteTrack host, 4 predeclared folds.",
+    "purpose": "isolate whether ANY cue subset (holding thresholds and action mapping fixed) produces a scene-level partition that helps, before touching thresholds or action mapping jointly."
+  },
+  "stage_3b_thresholds": {
+    "search_space": "t_med in [0.10, 0.50], t_high in [t_med+0.05, 0.90] (continuous, bounded to keep LOW<MEDIUM<HIGH ordering meaningful); cue subset FIXED at Stage 3A's winner; action mapping FIXED at Stage1/2's winner.",
+    "method": "Optuna TPESampler, seed=42, n_trials=40 (predeclared budget; the full continuous space cannot be exhaustively enumerated, so a fixed-budget TPE search is used instead -- this is a tractability decision made before running, not a result-driven one).",
+    "objective": "same CV-mean delta-HOTA definition."
+  },
+  "stage_4_joint_refinement": {
+    "search_space": "cue_subset (31 categorical) x t_med, t_high (continuous, same bounds as 3B) x res_low,res_medium,res_high (categorical, {1088,1280,1536}) x nms_low,nms_medium,nms_high (categorical, {0.45,0.60,0.70}).",
+    "method": "Optuna TPESampler, seed=42, n_trials=50 (predeclared budget, limited per the user's 'if useful, perform a LIMITED joint refinement' instruction; a budget, not exhaustive, given ~(31 x continuous x 3^6) configurations are intractable to enumerate).",
+    "objective": "same CV-mean delta-HOTA definition.",
+    "purpose": "check whether jointly retuning scene partitioning AND the action mapping together (rather than staged/sequentially) finds something the staged search missed."
+  },
+  "robustness_gate": {
+    "rule": "a candidate policy from ANY stage is eligible for freezing ONLY IF: (a) CV-mean delta-HOTA > 0, AND (b) at least 3 of the 4 folds individually show delta-HOTA > 0 (not driven by a single fold/sequence pair), AND (c) the policy is not degenerate-equal to matched-static (i.e., it actually uses the SceneLayer's levels to vary the action).",
+    "if_no_candidate_passes": "record a NULL RESULT: AC-MOT (detector-side, resolution/NMS only, this detector) shows no robust calibration evidence of benefit over the matched-static operating point. The matched-static point itself becomes the 'AC-MOT' entry for systems 3/4, documented explicitly as a null/negative finding, not hidden or re-searched further.",
+    "will_not_expand_search_space_after_seeing_results": true
+  }
+}

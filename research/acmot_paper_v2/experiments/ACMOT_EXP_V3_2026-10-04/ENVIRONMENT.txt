@@ -1,0 +1,33 @@
+# ENVIRONMENT (as recorded in repository artifacts; nothing re-measured)
+recorded_utc: 2026-10-04T21:18:35+00:00
+
+## Pinned project requirements (requirements.txt)
+# Controlled v12 environment from its existing notebook.
+# Install a matched torch/torchvision pair for your platform first (see README).
+ultralytics==8.3.200
+numpy==2.2.6
+scipy==1.15.3
+lap==0.5.12
+opencv-python==4.11.0.86
+# Upstream TrackEval imports these dependencies.
+pandas==2.2.3
+matplotlib==3.10.3
+pycocotools==2.0.10
+tabulate==0.9.0
+
+## Mac development .venv (research/context/ENVIRONMENT_AND_PATHS.md, verified 2026-09-27)
+python 3.12.14, torch 2.14.0, torchvision 0.29.0, ultralytics 8.3.200, numpy 2.2.6, scipy 1.18.1, motmetrics 1.4.0,
+optuna 5.0.0, opencv 4.11.0, pandas 3.0.6. NOT re-queried on 2026-10-04 (NEEDS VERIFICATION: run `.venv/bin/pip freeze`).
+
+## GPU runs
+Lightning T4 (cache generation, confidence check, runtime): GPU 'Tesla T4' / 'Tesla T4' per runtime results; cache stats: {"forward_passes": 18384, "frames_by_split": {"visdrone_val": 2846, "visdrone_calib": 3282}, "started_utc": "2026-10-04T01:39:36Z", "wall_seconds": 5896.217299938202, "finished_utc": "2026-10-04T03:17:52Z", "cache_res": [1088, 1280, 1536], "nms_iou": [0.45, 0.6, 0.7], "frozen_checkpoint_sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7", "eval5_names": ["pedestrian", "car", "van", "truck", "bus"]}
+Kaggle UAVDT kernel ahmedgouda1111111/uavdt-v3-cache-gen: ultralytics==8.3.200 (pip-installed in-kernel, pinned, matches project requirement); GPU per kernel-metadata.json enable_gpu=true (exact device name not re-verified from this archive host); completed run: 49776 forward passes, 16592 total frames.
+
+## Detector checkpoint
+ultralytics version inside checkpoint: 8.4.56; pinned: 8.3.200; sha256 c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7
+
+## Evaluator
+TrackEval commit 12c8791 via tools/v6/eval_official.py (official VisDrone Task-4b port).
+
+## Archive host (this archival run only, not used for any result)
+python 3.14.8 on Darwin arm64
