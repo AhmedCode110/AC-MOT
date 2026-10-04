@@ -154,23 +154,67 @@ val to diagnose).
 
 ## 8. Runtime
 
-Reusing `RUNTIME_BENCHMARK_RESULT.json` (real end-to-end T4 measurement,
-not cache playback): detector forward-pass time dominates end-to-end
-latency at every tested resolution (1088: ~48ms, 1536: ~127-129ms,
-negligible tracker overhead in both cases, <11ms). Since the v3
-controller's 3 actions sit at exactly these already-measured resolution
-points (1536/1280/1088) and the controller/SceneLayer's own per-frame
-overhead is a handful of cheap OpenCV calls (`analyze_visual`: one
-resize + Canny + Laplacian on a downsampled frame) plus trivial Python
-logic, **a dedicated v3 runtime run is not required to bound the
-answer**: end-to-end latency for v3 is the level_frac-weighted average
-of the already-measured per-resolution detector times (~48-129ms
-depending on instantaneous level) plus negligible (<1ms, unmeasured but
-clearly dominated by detector time) controller overhead. A precise
-single-number FPS for v3 specifically has NOT been separately measured
-and would need a brief, cheap GPU run if an exact figure is required for
-the paper; this is flagged as the one remaining small gap, not a
-blocker.
+Two measurements, both real end-to-end T4 runs (not cache playback):
+
+1. `RUNTIME_BENCHMARK_RESULT.json` -- the two static operating-point
+   extremes (systems 1/2's `r1536_n70`, and the matched-static
+   `r1088_n45/conf0.40`): detector time dominates (1088: ~48ms, 1536:
+   ~127-129ms), tracker overhead <11ms.
+2. `V3_RUNTIME_BENCHMARK_RESULT.json` -- the frozen v3 controller
+   itself, exactly as specified (real causal SceneLayer decision +
+   real detector forward pass at whichever action it picks + real
+   tracker update), measured frame-by-frame on 200 consecutive
+   VisDrone-val frames:
+
+| host | mean latency | P95 latency | FPS | detector time | tracker time | controller overhead |
+|---|---|---|---|---|---|---|
+| ByteTrack | 74.3 ms | 100.7 ms | 13.45 | 54.6 ms | 8.0 ms | 4.3 ms |
+| OATrack | 65.5 ms | 85.9 ms | 15.27 | 52.6 ms | 1.8 ms | 4.2 ms |
+
+Controller (SceneLayer decision + `analyze_visual`'s resize/Canny/
+Laplacian) overhead is a flat ~4.2-4.3ms regardless of host -- small
+relative to detector time, but not negligible (~6-7% of the frame
+budget). GPU memory: 0.69GB peak reserved, flat across configurations.
+
+## 8b. UAVDT_TRANSFER: frozen cross-dataset transfer (no retuning)
+
+The frozen v3 policy (identical thresholds/action mapping/cue subset,
+zero changes) and the matched `r1536_n70` baseline were both run once
+on the UAVDT test-20 split (20 sequences, 16,592 frames, 49,776 detector
+forward passes, generated on Kaggle GPU after verifying the Kaggle-
+mounted `shakaibkaggle/uavdt-dataset` matches this project's own frozen
+protocol -- `UAVDT_EXTERNAL_PROTOCOL_FREEZE.json` -- exactly: all 20
+sequence names and all 20 per-sequence frame counts identical, total
+16,592). Scored with the pre-existing UAVDT adapter
+(`tools/build_uavdt_view.py`) and its matching class-agnostic scorer
+(`tools/seqstats.py`) -- a single placeholder "vehicle" GT class (car/
+van/truck/bus collapsed; pedestrian dropped, not present in UAVDT). This
+is a single frozen-policy run, not a search -- no bootstrap/CV needed,
+numbers reported plainly.
+
+| System | MOTA | HOTA | IDF1 | IDS | FP | FN | Precision | Recall |
+|---|---|---|---|---|---|---|---|---|
+| r1536_n70 + ByteTrack | -1.57 | 45.92 | 58.40 | 601 | 279616 | 66050 | 49.57 | 80.63 |
+| **v3 adaptive + ByteTrack** | **16.03** | 47.00 | 61.77 | 486 | 212077 | 73702 | 55.75 | 78.38 |
+| r1536_n70 + OATrack | 19.61 | 47.73 | 62.10 | 517 | 197937 | 75612 | 57.27 | 77.82 |
+| **v3 adaptive + OATrack** | 22.87 | 47.64 | 62.93 | 486 | 183669 | 78774 | 58.80 | 76.89 |
+
+**Deltas (v3 - baseline):**
+- ByteTrack: MOTA +17.60, HOTA +1.08, IDF1 +3.37, IDS -115, FP -67539,
+  Precision +6.18, Recall -2.24 -- large, consistent improvement,
+  directionally matching the VisDrone finding (fewer FP, better
+  precision, small recall cost).
+- OATrack: MOTA +3.27, HOTA **-0.09** (essentially flat), IDF1 +0.83,
+  IDS -31, FP -14268, Precision +1.53, Recall -0.93 -- small, mixed:
+  MOTA/IDF1/FP improve, HOTA is flat-to-marginally-negative.
+
+**Honest transfer conclusion**: the frozen v3 policy transfers with a
+clear, large benefit under ByteTrack and a small, mixed (not clearly
+positive on HOTA) benefit under OATrack. This is reported as-is; the
+policy was not touched in response to these numbers, consistent with
+the post-freeze rule. No statistical testing was performed here (single
+frozen run, matching the "no retuning" transfer design -- CV/bootstrap
+belong to development, not to a one-shot frozen transfer check).
 
 ## 9. Secondary/supplementary: static matched-static finding (NOT the primary method)
 
@@ -213,14 +257,24 @@ points rather than a single fixed one.
 
 ## 11. Remaining work
 
-1. UAVDT transfer with the frozen v3 policy, no retuning -- the required
-   raw data exists but sits inside a different, already-frozen
-   experiment's protected directory; owner authorization required
-   before touching it (unchanged from the earlier finding). **Blocked
-   on owner decision, not a technical gap.**
-2. Optional: a dedicated, precise v3 end-to-end FPS number (Section 8
-   gives a well-bounded estimate from already-measured per-resolution
-   timings; an exact number needs one brief GPU run if required).
-3. Old-AC-MOT apples-to-apples comparison -- scoped out, needs a
+All previously-flagged items are now resolved:
+
+- ~~UAVDT transfer~~ -- **done** (Section 8b), owner-authorized, using a
+  verified Kaggle-mounted mirror of the protected data (exact match to
+  the frozen 20-sequence/16,592-frame protocol, not the original
+  protected Drive copy), with the frozen v3 policy, no retuning.
+- ~~Exact v3 runtime~~ -- **done** (Section 8), real end-to-end T4
+  measurement with the actual frozen controller.
+
+Remaining:
+
+1. Old-AC-MOT apples-to-apples comparison -- scoped out, needs a
    separate protocol decision (different detector and controller
-   architecture).
+   architecture; see Section 9, Phase 6 of
+   `controller_search/DEVELOPMENT_DECISION_REPORT.md`).
+
+This completes the planned evidence chain: development/calibration ->
+genuinely adaptive AC-MOT -> improvement over the predeclared r1536_n70
+baseline -> freeze -> SECOND VAL READ (same-dataset held-out
+confirmation) -> frozen cross-dataset transfer (UAVDT). The project is
+at a paper-ready experimental state for this scope.
