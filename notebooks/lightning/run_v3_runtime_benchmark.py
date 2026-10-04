@@ -16,8 +16,16 @@ from ultralytics import YOLO
 
 sys.path.insert(0, "/teamspace/studios/this_studio")
 from acmot_sci import SceneLayer, SceneSpec  # noqa: E402
-from run_universal_acmot import analyze_visual  # noqa: E402
 from adapters.trackers.bytetrack import ByteTrackAdapter  # noqa: E402
+
+
+def analyze_visual(frame):
+    # verbatim copy of run_universal_acmot.analyze_visual (frozen, unchanged);
+    # inlined here to avoid pulling in that module's unrelated heavy deps (core.Config etc.)
+    small = cv2.resize(frame, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
+    gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+    return dict(edges=float(cv2.Canny(gray, 50, 120).mean() / 255.0), brightness=float(gray.mean()),
+                blur=float(cv2.Laplacian(gray, cv2.CV_64F).var()))
 from adapters.trackers.oatrack import OATrackAdapter  # noqa: E402
 from adapters.types import Detection  # noqa: E402
 
