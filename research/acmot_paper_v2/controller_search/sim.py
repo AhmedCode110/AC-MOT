@@ -84,10 +84,12 @@ class SequenceData:
             self._stats_cache[t] = analyze_visual(img)
         return self._stats_cache[t]
 
-    def detections(self, t: int, res: int, nms: float):
+    def detections(self, t: int, res: int, nms: float, conf_floor: float = 0.0):
         if (res, nms) not in self.det:
             self._load(res, nms)
         rows = self.det[(res, nms)][t]
+        if conf_floor > 0.0:
+            rows = rows[rows[:, 4] >= conf_floor]
         return [Detection(x1=r[0], y1=r[1], x2=r[2], y2=r[3], confidence=r[4], class_id=int(r[5])) for r in rows]
 
 
@@ -133,12 +135,12 @@ def run_policy_on_sequence(split: str, seq: str, action_map: dict[str, tuple[int
     return tracks_arr, levels_used
 
 
-def run_static_on_sequence(split: str, seq: str, res: int, nms: float, host: str):
+def run_static_on_sequence(split: str, seq: str, res: int, nms: float, host: str, conf_floor: float = 0.0):
     sd = get_sequence(split, seq)
     tracker = make_tracker(host)
     out = []
     for t in range(1, sd.n_frames + 1):
-        dets = sd.detections(t, res, nms)
+        dets = sd.detections(t, res, nms, conf_floor)
         tracks = tracker.update(dets, sd.shape)
         for tr in tracks:
             out.append([t, tr.track_id, tr.x1, tr.y1, tr.x2 - tr.x1, tr.y2 - tr.y1, tr.confidence, tr.class_id, -1, -1])
