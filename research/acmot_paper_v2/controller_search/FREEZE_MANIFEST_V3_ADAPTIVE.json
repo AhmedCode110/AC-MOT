@@ -1,0 +1,56 @@
+{
+  "status": "FROZEN -- PRIMARY METHOD (supersedes the static no-op as the proposed AC-MOT; FREEZE_MANIFEST.json is preserved unchanged as secondary control evidence, not deleted or altered)",
+  "freeze_date_utc": "2026-10-04T16:45:00Z",
+  "frozen_at_git_commit": "2ed0697325db3ce3f1680889baaef3c77d8f573e",
+  "selection_source": "research/acmot_paper_v2/controller_search/V3_JOINT_SEARCH_RESULT.json, trial 7 of 60 (Optuna TPESampler, seed=43)",
+  "primary_baseline": "r1536_n70 (systems 1/2's own predeclared default operating point), per owner research-direction correction. The static r1088_n45_conf0.40 point is NOT used as the acceptance gate or comparison target for this method.",
+
+  "controller": {
+    "scene_layer": "acmot_sci.SceneLayer, FROZEN cue formulas (crowd/tiny/edge/dark/blur, unchanged), cue subset restricted to ['crowd'] (Stage 3A's selection, weight renormalized to 1.0), causal inputs only (image stats of frame t via run_universal_acmot.analyze_visual, frozen; tracker-reported boxes of frames < t, never GT, never future frames)",
+    "thresholds": {"t_med": 0.29747709701135766, "t_high": 0.5114928923560124, "other_SceneSpec_fields": "historical defaults, unchanged"},
+    "action_mapping": {
+      "LOW": {"resolution": 1536, "nms_iou": 0.70, "confidence_floor": 0.10},
+      "MEDIUM": {"resolution": 1280, "nms_iou": 0.45, "confidence_floor": 0.40},
+      "HIGH": {"resolution": 1088, "nms_iou": 0.60, "confidence_floor": 0.40}
+    },
+    "action_space_dimensions_adapted": ["resolution", "nms_iou", "detector_confidence_floor"],
+    "note_on_oatrack_min_conf": "OATrack's internal min_conf=0.40 is a SEPARATE, frozen, tracker-side parameter, never modified, never conflated with the controller's detector-side confidence_floor action."
+  },
+
+  "development_evidence": {
+    "cv_mean_delta_vs_r1536_n70": 2.4469571172780746,
+    "per_fold_delta": [0.5916926698415423, 4.1635420122844025, 2.0290261817519735, 3.0035676052343803],
+    "all_4_folds_positive": true,
+    "level_frac": {"LOW": 0.07617306520414381, "MEDIUM": 0.1008531383302864, "HIGH": 0.8229737964655698},
+    "switches_per_100_frames_per_sequence": {
+      "uav0000316_01288_v": 1.5748031496062993, "uav0000289_06922_v": 0.47619047619047616,
+      "uav0000013_00000_v": 0.37174721189591076, "uav0000076_00720_v": 1.10803324099723,
+      "uav0000307_00000_v": 0.24154589371980675, "uav0000020_00406_v": 0.7984031936127745,
+      "uav0000315_00000_v": 0.15822784810126583, "uav0000243_00001_v": 0.13020833333333334
+    },
+    "genuinely_adaptive_eligibility": "PASSED: >=2 distinct action tuples each >=10% of frames (MEDIUM 10.1%, HIGH 82.3%; LOW at 7.6% is below the 10% bar individually but the controller genuinely varies all 3 dimensions across levels), within-sequence switching present in every one of the 8 calibration sequences.",
+    "shuffled_control_caveat": "IMPORTANT, reported not suppressed: SHUFFLED_CONTROL_RESULT.json shows a same-action-distribution, randomly-timed control performs at least as well (shuffled cv_mean=+2.617 vs causal +2.447). The large improvement over r1536_n70 is attributable to using a diverse mix of three operating points; this control does NOT establish that the causal, scene-conditioned TIMING of the switches itself adds value beyond the mixture effect. This caveat is part of the frozen record and must be reported in any paper claim about this method."
+  },
+
+  "detector": {
+    "source": "dronefreak/visdrone-yolo11m (best.pt), Hugging Face",
+    "sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+    "frozen_since_commit": "fec8ac7861826aa44b8ce66da09225f08870275f"
+  },
+  "class_mapping": {"0": 1, "3": 4, "4": 5, "5": 6, "8": 9},
+  "calibration_split_identity": "research/acmot_paper_v2/DETECTOR_SPLIT.json -> calibration (8 sequences, 3282 frames)",
+  "cv_folds": [
+    ["uav0000316_01288_v", "uav0000289_06922_v"],
+    ["uav0000013_00000_v", "uav0000076_00720_v"],
+    ["uav0000307_00000_v", "uav0000020_00406_v"],
+    ["uav0000315_00000_v", "uav0000243_00001_v"]
+  ],
+  "seeds": {"optuna_sampler_seed": 43, "shuffled_control_seed": 44},
+  "objective": "CV-mean(pooled-HOTA(candidate on fold) - pooled-HOTA(r1536_n70 on fold)), ByteTrack host, tools/v6/eval_official.py",
+  "cache_sufficiency": "no new cache generation required; all 3 resolutions (1088/1280/1536) and all 3 NMS values already cached for both calibration and VisDrone-val; detector-confidence filtering confirmed exact on the existing cache (CONFIDENCE_EXACTNESS_CHECK_FIXED.json, 18/18).",
+  "search_provenance_files": [
+    "PREDECLARATION_V3_FINAL.json", "V3_JOINT_SEARCH_RESULT.json", "SHUFFLED_CONTROL_RESULT.json",
+    "run_v3_joint_search.py", "run_shuffled_control.py"
+  ],
+  "post_freeze_rule": "this policy will NOT be modified based on any VisDrone-val result. The upcoming VisDrone-val evaluation of this controller is a SECOND VAL READ (val was already read once for the static/no-op method at commit bfa5caf) and must be labeled as such everywhere, never described as untouched held-out confirmation."
+}
