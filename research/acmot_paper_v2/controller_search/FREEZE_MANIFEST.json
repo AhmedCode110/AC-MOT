@@ -1,0 +1,43 @@
+{
+  "status": "FROZEN -- NULL RESULT",
+  "freeze_date_utc": "2026-10-04T14:50:00Z",
+  "frozen_at_git_commit": "c272089f123ca00e668a4e7932cec2f8b1b50484",
+  "decision": "No detector-side adaptive controller formulation passed the predeclared robustness gate (CV-mean delta-HOTA > 0 AND >=3/4 of 4 calibration folds individually positive AND non-degenerate action mapping), across 5 independent search stages (Stage 1: 27 exhaustive resolution-mapping configs; Stage 2: 27 exhaustive NMS-mapping configs; Stage 3A: 31 exhaustive cue-subset configs; Stage 3B+4 joint: 60 Optuna-TPE configs over thresholds+action mapping together; plus two oracle/headroom diagnostics and a segment-level diagnostic). Full provenance in DEVELOPMENT_DECISION_REPORT.md and PHASE2_DIAGNOSIS.md.",
+  "frozen_policy": {
+    "type": "fixed (static) operating point -- AC-MOT is a documented no-op on this host",
+    "resolution": 1088,
+    "nms_iou": 0.45,
+    "confidence_floor": 0.40,
+    "confidence_floor_provenance": "CONFIDENCE_EXACTNESS_CHECK.json's original 'not exact' finding was a bug in the verification script (class-filter mismatch), corrected in CONFIDENCE_EXACTNESS_CHECK_FIXED.json (18/18 exact) -- see CONFIDENCE_CORRECTION_NOTE.md. Once confirmed exact, a confidence-floor sweep (CONFIDENCE_ORACLE_RESULT.json) found conf=0.40 robustly beats conf=0.01 at this (resolution,NMS) point: +0.88 pooled HOTA, 7/8 sequences improve, 3/4 CV folds positive -- the first broadly-distributed (non-single-sequence) finding in the whole search. A diagnosis-motivated adaptive follow-up (level-dependent confidence, LOW->0.10/MEDIUM,HIGH->0.40) was tested and found WORSE than flat 0.40 on every one of the 8 sequences -- hypothesis refuted, no adaptive confidence policy beats the flat choice.",
+    "selection_rule": "matched-static: the pooled-HOTA-maximizing point among resolution x NMS x confidence-floor on all 8 calibration sequences, ByteTrack host, official evaluator. The adaptive-vs-this-point comparison (Stages 1/2/3A/3B4) predates the confidence-floor correction and used the weaker conf=0.01 reference throughout; all 5 of those stages were null regardless, and the subsequent confidence-floor and level-dependent-confidence checks (run after the correction) are also null -- the conclusion (no detector-side adaptive policy robustly beats the best fixed point) is unchanged by the correction, only the identity of the best fixed point improved."
+  },
+  "scene_layer": {
+    "status": "NOT ACTIVATED in the frozen policy (the frozen policy is a constant operating point; SceneLayer's causal level decision has no effect since the action mapping does not vary by level)",
+    "note": "SceneLayer itself was never modified -- cue formulas kept exactly as historically defined throughout all search stages; only its SceneSpec threshold DATA was searched (Stage 3B+4), and no retuning survived the robustness gate."
+  },
+  "cue_subset_explored_but_not_activated": ["crowd"],
+  "thresholds_explored_but_not_activated": "searched continuously in [0.10,0.50] (t_med) x [t_med+0.05, 0.90] (t_high) via Optuna TPE, 60 trials; best found did not survive the robustness gate",
+  "detector": {
+    "source": "dronefreak/visdrone-yolo11m (best.pt), Hugging Face",
+    "sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+    "frozen_since_commit": "fec8ac7861826aa44b8ce66da09225f08870275f"
+  },
+  "class_mapping": {"0": 1, "3": 4, "4": 5, "5": 6, "8": 9},
+  "calibration_split_identity": "research/acmot_paper_v2/DETECTOR_SPLIT.json -> calibration (8 sequences, listed in sim.py:CALIBRATION, 3282 frames total)",
+  "cv_folds": [
+    ["uav0000316_01288_v", "uav0000289_06922_v"],
+    ["uav0000013_00000_v", "uav0000076_00720_v"],
+    ["uav0000307_00000_v", "uav0000020_00406_v"],
+    ["uav0000315_00000_v", "uav0000243_00001_v"]
+  ],
+  "objective": "CV-mean(pooled-HOTA(candidate on fold) - pooled-HOTA(matched-static on fold)), ByteTrack host, tools/v6/eval_official.py",
+  "search_provenance_files": [
+    "PREDECLARATION.json", "PREDECLARATION_STAGE3PLUS.json", "PREDECLARATION_BROADENED.json",
+    "PREDECLARATION_AMENDMENT.json", "ORACLE_GATE_RESULT.json", "ORACLE_GATE_BROADENED_RESULT.json",
+    "SEGMENT_HEADROOM_RESULT.json", "STAGE1_RESULT.json", "STAGE2_RESULT.json", "STAGE3A_RESULT.json",
+    "STAGE3B4_JOINT_RESULT.json", "PHASE2_DIAGNOSIS.md", "CONFIDENCE_CORRECTION_NOTE.md",
+    "CONFIDENCE_ORACLE_RESULT.json", "DEVELOPMENT_DECISION_REPORT.md"
+  ],
+  "what_is_not_frozen": "the old/historical AC-MOT (FrozenSCIController, v1.0.0-acmot-frozen) is untouched and uncompared -- scoped out, see DEVELOPMENT_DECISION_REPORT.md Phase 6.",
+  "post_freeze_rule": "this policy will NOT be modified based on final held-out VisDrone-val results. Systems 3 and 4 in the final test use this frozen (null/static) policy as-is."
+}
