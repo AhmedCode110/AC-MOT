@@ -1,0 +1,28 @@
+{
+  "predeclared_before_any_v3_trial": true,
+  "timestamp_utc": "2026-10-04T15:55:00Z",
+  "supersedes": "PREDECLARATION_V2_ADAPTIVE.json (adds detector-confidence as a 3rd action dimension, per owner correction)",
+  "writer_check": "Verified before proceeding: no foreign uncommitted changes, no unexpected new commits, and the other 'claude' process (pid 63372, same repo root) shows no CPU activity growth consistent with active competing work over the check interval -- consistent with being this session's own backing process, not a separate writer. Proceeding on this basis; documented transparently, not silently assumed.",
+  "candidate_action": "A_t = (resolution_t in {1088,1280,1536}, NMS_t in {0.45,0.60,0.70}, detector_confidence_t in {0.10,0.25,0.40})",
+  "confidence_grid_justification": "reused, not invented: 0.10/0.25 are ByteTrack's own low/high thresholds, 0.40 is OATrack's own min_conf -- all pre-existing, scientifically meaningful constants already in this codebase, matching the same justification used for PREDECLARATION.json's original confidence floor candidates.",
+  "detector_vs_tracker_confidence": "detector_confidence_t is a DETECTOR-SIDE post-cache score filter (exact per CONFIDENCE_EXACTNESS_CHECK_FIXED.json), applied before detections reach the tracker. OATrack's min_conf=0.40 is a SEPARATE, frozen, TRACKER-SIDE parameter and is never modified or conflated with detector_confidence_t.",
+  "primary_baseline": "r1536_n70 (systems 1/2's own predeclared default operating point), NOT the static r1088_n45_conf0.40 point (preserved only as secondary control evidence, per DEVELOPMENT_DECISION_REPORT.md / FREEZE_MANIFEST.json, unmodified).",
+  "genuinely_adaptive_definition": {
+    "rule": ">=2 distinct action tuples, each realized on >=10% of pooled calibration frames, AND within-sequence switching (not just sequence-to-sequence difference).",
+    "measurement": "level_counts (frames/level) and switches_per_100_frames (frame-to-frame level changes x100/n_frames) per sequence and pooled.",
+    "failure_handling": "any candidate failing this is reported as static/no-op, never labeled AC-MOT."
+  },
+  "tractability_decision_made_before_running": {
+    "statement": "The full 7-way dimension-subset ablation (res only / nms only / conf only / res+nms / res+conf / nms+conf / all three) is NOT run as 7 independent blind searches. Reasoning, fixed before any trial: the full joint (all three dimensions, 'res+nms+conf') action space has strictly greater expressive power than every proper subset (any subset's candidate action set is a subset of the joint search's candidate set, since unused dimensions can always be held at a constant value within the joint parameterization). Therefore: (1) run ONE joint Optuna TPE search (60-trial predeclared budget, same style as Stage 3B+4) over the full 3-dimension action mapping + SCI thresholds, objective = CV-mean(delta-HOTA vs r1536_n70); (2) if NO eligible (genuinely-adaptive, robustness-gate-passing) candidate is found in the joint search, this logically bounds every subset -- a weaker (lower-dimensional) search cannot find something the superset search didn't, so the subset experiments are not independently run, and the null is reported for all 7 combinations together, citing this containment argument; (3) if an eligible candidate IS found, the per-dimension ablation table is then built by inspecting which dimension(s) that specific winning candidate actually varies across levels (a cheap, targeted analysis of the one result, not 6 more blind searches) plus the shuffled-control test on it.",
+    "why_this_is_not_search-space-narrowing-to-chase-a-result": "this bound is logical (containment of candidate sets), declared before any trial result is seen, and the decision rule (run subsets only if the superset finds something) does not depend on which direction the superset result goes -- a null superset result leads to reporting null-for-all-7, not to expanding the search."
+  },
+  "cv_folds": "same 4 folds as Stage 1-4 ([316,289],[013,076],[307,020],[315,243]).",
+  "objective": "CV-mean(pooled-HOTA(candidate on fold) - pooled-HOTA(r1536_n70 on fold)), ByteTrack host, official evaluator.",
+  "shuffled_control": {
+    "rule": "same per-sequence action-use counts as the winning candidate, temporal order randomized (fixed seed 44) within each sequence instead of causal scene-conditioning.",
+    "acceptance_rule": "the causal candidate must beat the shuffled control's CV-mean(delta vs r1536_n70) for the candidate to be accepted as providing genuine scene-conditioned value."
+  },
+  "cache_sufficiency": "no new cache generation needed: detector-confidence filtering is confirmed exact on the existing cache (CONFIDENCE_EXACTNESS_CHECK_FIXED.json, 18/18), and all 3 candidate resolutions (1088/1280/1536) and all 3 NMS values are already cached for all 8 calibration sequences. This entire study runs on Mac CPU; no Kaggle/Lightning GPU is required for calibration-only development.",
+  "val_read_tracking": "VisDrone-val read once already for AC-MOT, commit bfa5caf. Any new val read for this v3 adaptive controller will be labeled SECOND VAL READ everywhere, never 'untouched held-out'.",
+  "selection_rule": "argmax CV-mean objective among eligible (genuinely-adaptive, gate-passing) trials; ties broken by simplicity (fewest distinct action tuples, then lowest mean compute)."
+}
