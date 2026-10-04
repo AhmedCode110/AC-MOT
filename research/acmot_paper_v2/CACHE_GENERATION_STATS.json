@@ -1,0 +1,35 @@
+{
+ "forward_passes": 18384,
+ "frames_by_split": {
+  "visdrone_val": 2846,
+  "visdrone_calib": 3282
+ },
+ "started_utc": "2026-10-04T01:39:36Z",
+ "wall_seconds": 5896.217299938202,
+ "finished_utc": "2026-10-04T03:17:52Z",
+ "cache_res": [
+  1088,
+  1280,
+  1536
+ ],
+ "nms_iou": [
+  0.45,
+  0.6,
+  0.7
+ ],
+ "frozen_checkpoint_sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+ "eval5_names": [
+  "pedestrian",
+  "car",
+  "van",
+  "truck",
+  "bus"
+ ],
+ "class_filter": {
+  "0": 0,
+  "3": 1,
+  "4": 2,
+  "5": 3,
+  "8": 4
+ }
+}
