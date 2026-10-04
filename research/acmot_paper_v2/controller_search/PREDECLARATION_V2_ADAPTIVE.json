@@ -1,0 +1,19 @@
+{
+  "predeclared_before_any_v2_trial": true,
+  "timestamp_utc": "2026-10-04T15:40:00Z",
+  "reason_for_correction": "Owner directive: the paper's primary objective is a genuinely adaptive AC-MOT, evaluated against the predeclared host baseline r1536_n70 (systems 1/2's own operating point), not against the calibration-selected matched-static point. The static r1088_n45_conf0.40 finding is preserved as secondary control evidence (DEVELOPMENT_DECISION_REPORT.md, FREEZE_MANIFEST.json -- not deleted, not altered) but is no longer the primary objective, acceptance gate, or paper comparison.",
+  "genuinely_adaptive_definition": {
+    "rule": "the candidate policy must use >=2 distinct (resolution,NMS[,confidence]) action tuples, each realized on >=10% of calibration frames (pooled across all 8 sequences), AND must switch actions within at least one sequence (not just differ sequence-to-sequence).",
+    "measurement": "level_counts (frames per level) from sim.py's run_policy_on_sequence, plus switches_per_100_frames = 100 * (number of frame-to-frame level changes) / n_frames, computed per sequence and pooled.",
+    "failure_handling": "a candidate failing this definition is reported as a static/no-op result, never labeled AC-MOT, regardless of its score."
+  },
+  "primary_objective": "CV-mean(pooled-HOTA(candidate on fold) - pooled-HOTA(r1536_n70 on fold)), ByteTrack host, 4 predeclared folds (same as Stage 1-4), official evaluator.",
+  "search_space": "same as the Stage 3B+4 joint search (t_med, t_high, res_low/medium/high in {1088,1280,1536}, nms_low/medium/high in {0.45,0.60,0.70}), cue subset fixed at Stage 3A's winner (['crowd']). Optuna TPESampler, seed=43 (new seed, new objective -- distinguishing this run's provenance from Stage 3B+4's), n_trials=60 (same predeclared budget as before).",
+  "eligibility_filter": "trials are scored on the primary objective regardless, but only trials passing the genuinely-adaptive definition above are eligible for selection/freeze; trials failing it are recorded (not discarded) but excluded from best-trial selection.",
+  "shuffled_control": {
+    "rule": "for the selected eligible candidate, build a control policy that applies the SAME per-sequence action-use distribution (same count of frames at each action) but in a RANDOM (reproducible, fixed-seed) temporal order within each sequence, instead of the causal scene-conditioned order. Equal compute (same actions, same counts), different (random) assignment to frames.",
+    "acceptance_rule": "the causal candidate must beat the shuffled control's CV-mean(delta vs r1536_n70) on the calibration folds for the candidate to be accepted as genuinely providing scene-conditioned value, not just a favorable average action mix.",
+    "seed": 44
+  },
+  "val_read_tracking": "VisDrone-val was read once for AC-MOT already, commit bfa5caf (the static/no-op policy's final test). Any new read of VisDrone-val for THIS v2 adaptive controller is a SECOND VAL READ and will be labeled as such everywhere (result files, report, manifest, interpretation) -- never described as untouched held-out confirmation."
+}

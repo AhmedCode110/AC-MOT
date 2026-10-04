@@ -166,17 +166,44 @@ which is out of scope post-freeze).
   (scoped out: different detector, different controller architecture --
   `DEVELOPMENT_DECISION_REPORT.md` Phase 6).
 
+## 9b. Real end-to-end T4 runtime (200 frames, real detector forward pass, not cache playback)
+
+| operating point | tracker | mean latency | P95 latency | FPS | detector time | tracker time | peak GPU reserved |
+|---|---|---|---|---|---|---|---|
+| systems 1/2 default (1536/0.70) | ByteTrack | 139.9 ms | 171.7 ms | 7.15 | 129.3 ms | 10.6 ms | 0.69 GB |
+| systems 1/2 default (1536/0.70) | OATrack | 128.9 ms | 162.4 ms | 7.76 | 126.6 ms | 2.2 ms | 0.69 GB |
+| systems 3/4 frozen AC-MOT (1088/0.45/conf>=0.40) | ByteTrack | 56.2 ms | 62.7 ms | 17.79 | 48.8 ms | 7.4 ms | 0.69 GB |
+| systems 3/4 frozen AC-MOT (1088/0.45/conf>=0.40) | OATrack | 50.0 ms | 53.5 ms | 20.01 | 48.3 ms | 1.7 ms | 0.69 GB |
+
+Detector time dominates end-to-end latency in every configuration.
+Systems 3/4's operating point is also ~2.5x faster than systems 1/2's
+(lower resolution dominates the speedup) -- a real-time benefit on top
+of the quality benefit, though again attributable to the fixed
+operating-point choice, not to any online AC-MOT adaptation (no
+adaptation is active). Peak GPU memory is essentially flat across
+configurations (single-image inference, T4 15.36GB headroom).
+
 ## 10. Remaining work before this is paper-ready
 
-1. **T4 end-to-end runtime benchmark** (mean/P95 latency, FPS, detector
-   time, tracker time, GPU memory) -- not yet run; needs brief GPU time
-   on the real frozen implementation (not cache playback speed). Next
-   stage.
-2. **UAVDT transfer** -- the required raw data exists
+1. **UAVDT transfer** -- the required raw data exists
    (`UAV-benchmark-M` / `UAV-benchmark-MOTD_v1.0`) but sits inside a
    different, already-frozen experiment's protected directory
    (`UAVDT_EXTERNAL_GENERALIZATION`, dated 2026-09-12). The project's own
    protocol (`OATRACK_DESIGN.md`, `GAP_AUDIT.md` P4) requires the owner's
    explicit authorization before any new use of it. Not touched.
-3. Old-AC-MOT apples-to-apples comparison (scoped out, see above) --
+2. Old-AC-MOT apples-to-apples comparison (scoped out, see above) --
    would need a separate protocol decision.
+3. **Genuinely adaptive AC-MOT development (owner research-direction
+   correction, 2026-10-04)**: the owner has directed that the primary
+   paper objective is a genuinely adaptive controller evaluated against
+   the predeclared host baseline `r1536_n70` (not the static
+   `r1088_n45_conf0.40` point, which is preserved as secondary control
+   evidence only). A corrected predeclaration
+   (`controller_search/PREDECLARATION_V2_ADAPTIVE.json`) is drafted:
+   measurable "genuinely adaptive" definition (>=2 actions, each >=10%
+   of frames, with within-sequence switching), objective redefined vs
+   `r1536_n70`, and a same-distribution shuffled-control acceptance test.
+   **Paused before execution**: a second `claude` process was found
+   running against this same repository root; execution is held until
+   the owner confirms whether that is a separate concurrent session
+   (single-writer requirement).
