@@ -1,0 +1,48 @@
+{
+  "predeclared_before_any_trial": true,
+  "timestamp_utc": "2026-10-04T07:35:00Z",
+  "git_commit": "9514d0f",
+  "confidence_excluded": {
+    "reason": "CONFIDENCE_EXACTNESS_CHECK.json: 18/18 cases show cache-filtered detections are a strict subset of fresh inference at the same floor (precision-matched, half=True on CUDA, IoU-tolerant matching). Not exact. Excluded per the predeclared rule -- not approximated silently.",
+    "search_dimensions_remaining": ["resolution", "nms_iou"]
+  },
+  "search_space": {
+    "resolution": [1088, 1280, 1536],
+    "nms_iou": [0.45, 0.60, 0.70],
+    "note": "both exact by construction of the cache (one forward pass per frame/resolution; NMS re-run per IoU value on the same pre-NMS predictions, verified by tools/oatrack/multi_nms.py)."
+  },
+  "scene_layer": {
+    "source": "acmot_sci.SceneLayer / SceneSpec",
+    "status": "FROZEN, UNCHANGED -- every weight/threshold/hysteresis constant kept exactly as historically copied from core.Controller (tests/test_sci_v7.py asserts equality). No retuning in this experiment.",
+    "levels": ["LOW", "MEDIUM", "HIGH"],
+    "causal_inputs": "image stats of frame t (run_universal_acmot.analyze_visual, frozen) + tracker-reported boxes of frames < t (not GT)."
+  },
+  "what_is_new_and_calibration_selected": {
+    "artifact": "level -> (resolution, nms_iou) action mapping",
+    "note": "the only free parameter; SceneLayer itself is not modified."
+  },
+  "intractability_and_factoring": {
+    "measured_cost": "official_sequence_stats (TrackEval HOTA, 19-alpha sweep) ~17-25s per (sequence, candidate) call on this CPU; tracking itself is ~0.2s/sequence.",
+    "full_joint_grid": "3 resolutions^3 levels x 3 nms^3 levels = 729 configs; at 8 calibration sequences x ~20s/seq-score, ~40 hours -- intractable within this session.",
+    "decision_made_before_any_trial": "factor the search into two sequential exhaustive 27-config grids: STAGE 1 selects the level->resolution mapping with NMS fixed at 0.70 (Ultralytics default, a neutral predeclared choice, same value used as the 'matched static' default in the OATrack-comparison design doc); STAGE 2 fixes the Stage-1 resolution mapping and selects the level->NMS mapping. This is a tractability simplification, not a result-driven choice -- recorded here before Stage 1 runs."
+  },
+  "oracle_gate": {
+    "purpose": "establish whether ANY adaptive policy could plausibly beat the single best fixed (matched-static) operating point, using an upper-bound diagnostic (best per-sequence static point in hindsight) before building an online controller.",
+    "procedure": "evaluate all 9 static (resolution, nms) points on all 8 calibration sequences (ByteTrack host); matched_static = argmax over the 9 points of the POOLED (all 8 seq) HOTA; oracle = mean over sequences of each sequence's own best-point HOTA (hindsight upper bound, NOT a causal policy); headroom = oracle_mean - matched_static_pooled_equivalent (computed per-sequence for the matched point too, for a fair per-sequence comparison).",
+    "decision_rule": "if headroom (oracle mean per-sequence HOTA - matched-static mean per-sequence HOTA) <= 0, report a null result and do NOT build/freeze an adaptive controller; if > 0, proceed to Stage 1/2 search."
+  },
+  "cv_folds": {
+    "procedure": "4 predeclared folds of 2 calibration sequences each, fixed grouping by the CALIBRATION list order (no shuffling, no selection): fold assignment is sim.CALIBRATION sliced [0:2],[2:4],[4:6],[6:8].",
+    "use": "per-candidate robustness check: CV-mean and per-fold breakdown of delta-vs-matched-static, to avoid selecting a policy that wins only because of one sequence."
+  },
+  "objective": {
+    "definition": "CV-mean(delta HOTA) = mean over the 4 folds of [ pooled-HOTA(candidate policy's tracks on that fold's 2 sequences) - pooled-HOTA(matched-static's tracks on that fold's 2 sequences) ], host=ByteTrack, official evaluator (tools/v6/eval_official.py).",
+    "host_for_calibration": "ByteTrack (policy calibrated once, applied unchanged to both ByteTrack and OATrack hosts at final test time -- a host-specific policy would undermine the general-layer claim).",
+    "will_not_be_changed_after_seeing_results": true
+  },
+  "selection_rule": {
+    "primary": "argmax CV-mean(delta HOTA) among the Stage-1 (then Stage-2) grid.",
+    "tie_break_simplicity": "among candidates within 1 bootstrap-free CV standard deviation of the best CV-mean, select the one using the FEWEST distinct (resolution[,nms]) values across the 3 levels (prefers a constant/degenerate policy over a 3-way-distinct one when statistically indistinguishable).",
+    "null_result_handling": "if the best candidate's CV-mean delta is <= 0, or the oracle gate itself showed no headroom, report a null result (no adaptive policy adopted; matched-static is the AC-MOT-free reference) rather than freezing a policy that shows no calibration evidence of benefit."
+  }
+}
