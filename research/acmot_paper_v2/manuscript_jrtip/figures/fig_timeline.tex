@@ -1,0 +1,4 @@
+\begin{tikzpicture}[font=\scriptsize, node distance=4mm, every node/.style={draw,rounded corners,align=center,inner sep=3pt}, arr/.style={->,thick}]
+\node (a) {Original\\five-cue AC--MOT}; \node[right=of a] (b) {Component\\ablations};\node[right=of b] (c) {V1 quality\\calibration};\node[right=of c] (d) {V2 identity/\\speed trade-off};\node[right=of d] (e) {Modern audit\\and v3 freeze};\node[below=of e] (f) {Two hosts, T4\\and UAVDT};
+\draw[arr](a)--(b);\draw[arr](b)--(c);\draw[arr](c)--(d);\draw[arr](d)--(e);\draw[arr](e)--(f);
+\end{tikzpicture}

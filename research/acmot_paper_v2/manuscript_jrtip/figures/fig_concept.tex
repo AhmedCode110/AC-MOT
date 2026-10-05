@@ -1,0 +1,10 @@
+\begin{tikzpicture}[font=\small, node distance=9mm and 9mm, box/.style={draw, rounded corners, align=center, minimum height=10mm, inner sep=3pt}, arr/.style={->,thick}]
+\node[box] (scene) {Changing UAV scene\\density, scale, light, blur};
+\node[box, right=of scene] (fixed) {Fixed detector\\operating point};
+\node[box, below=of fixed] (loss) {Quality/cost mismatch};
+\node[box, below=of scene] (sci) {AC--MOT\\scene analysis};
+\node[box, right=of sci] (action) {Confidence, NMS,\\resolution action};
+\node[box, right=of action] (mot) {Detector $\rightarrow$ tracker\\tracks};
+\draw[arr] (scene)--(fixed); \draw[arr] (fixed)--(loss);
+\draw[arr] (scene)--(sci); \draw[arr] (sci)--(action); \draw[arr] (action)--(mot);
+\end{tikzpicture}
