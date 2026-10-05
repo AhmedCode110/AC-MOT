@@ -1,0 +1,61 @@
+\section{AC--MOT V1: Quality-Oriented Optimization}
+An early heuristic prototype was used to identify the controllable detector
+variables and the detector--tracker causal interface. We define V1 as the
+first formal optimization-derived AC--MOT configuration evaluated under the
+frozen experimental protocol. The prototype remains fully documented in
+Online Resource~1, but it is not treated as the primary AC--MOT generation.
+
+\subsection{Optimization design}
+V1 fixed pretrained YOLOv8n and a tuned ByteTrack profile and searched only on
+the VisDrone2019-MOT validation split. The test split was not accessed during
+search. At analysis step $j$, the controller formed five inexpensive cues:
+crowd count, the fraction of prior boxes below $32\times32$ pixels, edge
+density, low brightness, and low Laplacian variance. Each cue was calibrated
+empirically from fixed-detector validation outputs or validation image
+statistics, and the SCI was their weighted sum,
+\begin{equation}
+\begin{aligned}
+S_j&=\sum_{k\in\{c,t,e,n,b\}}w_k x_{k,j},\\
+w_k&\geq0,\quad\sum_k w_k=1.
+\end{aligned}
+\end{equation}
+The seven-entry moving average was evaluated every ten frames. Confidence and
+NMS were linearly interpolated between the selected SCI=0 and SCI=1 endpoints,
+while two sorted SCI thresholds selected one of the three resolution levels.
+
+The canonical Optuna/TPE study jointly searched five normalized cue weights,
+the confidence endpoints, the NMS endpoints, and the two SCI thresholds
+\cite{akiba2019optuna}. The resolution levels $512,928,960$, supported
+confidence values $\{0.25,0.30,0.35,0.40,0.45\}$, supported NMS values from
+$0.30$ through $0.70$, and the temporal settings $W=7$ and stride $10$ were
+provided by preceding validation screens or the frozen temporal design; they
+were not falsely presented as variables of the final joint search.
+
+The study recorded the multi-objective directions maximize MOTA, minimize IDS,
+and maximize FPS. The final validation-only feasibility rule required the FPS
+gate and $\mathrm{IDS}\leq271$ (the OLD--A3 validation reference), after which
+the highest MOTA was selected, with lower IDS, HOTA, IDF1, and FPS as tie
+breaks. Trial24 was frozen from this procedure. Its exact controller values
+were
+\begin{equation*}
+\begin{split}
+&w_c=0.1294928,\quad w_t=0.2217477,\\
+&w_e=0.4337134,\quad w_n=0.0535577,\\
+&w_b=0.1614885,\\
+&(c_{easy},c_{hard})=(0.30,0.40),\\
+&(n_{easy},n_{hard})=(0.35,0.35),\\
+&(\tau_{mid},\tau_{high})=(0.1353494,0.2872868).
+\end{split}
+\end{equation*}
+
+\subsection{Historical held-out profile}
+On the historical held-out comparison, the baseline obtained MOTA/HOTA/IDF1
+$19.729/28.430/32.724$, IDS $1235$, and 36.528 FPS. V1 obtained
+$26.948/33.835/41.546$, IDS $1184$, and 38.985 FPS. The archived paired
+bootstrap supports V1--baseline gains of $+7.2195$ MOTA, $+5.4051$ HOTA, and
+$+8.8220$ IDF1, with 95\% intervals $[5.4362,9.2934]$,
+$[4.1273,6.9022]$, and $[6.9005,11.0537]$, respectively. The IDS reduction
+of 51 has interval $[-114,219]$ and is therefore not a statistically
+established identity improvement. V1 is a quality-oriented profile: it was
+not selected as the lowest-IDS profile and it is not claimed to be a universal
+operating point.

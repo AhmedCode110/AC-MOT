@@ -1,4 +1,4 @@
-\section{Our modern frozen AC--MOT model}
+\section{Modern Frozen AC--MOT v3 (our model)}
 \subsection{Motivation and development boundary}
 The modern redesign was needed because the historical controller had been evaluated through several intertwined choices: detector, tracker, operating grid, evaluation protocol, and selection objective. A stronger public YOLO11m checkpoint made detector-side sensitivity a central question, while earlier calibration searches showed that an adaptive policy could fail to beat a matched static point. The modern study therefore froze a detector checkpoint, declared a calibration split, used sequence-level cross-validation, retained negative search results, and evaluated two tracker hosts. It also added bootstrap uncertainty, end-to-end timing, frozen UAVDT transfer, and attribution controls.
 

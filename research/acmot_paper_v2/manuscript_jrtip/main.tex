@@ -28,8 +28,8 @@
 \usepackage{tabularx}
 \usepackage{tikz}
 \usepackage{url}
-\setlength{\bibsep}{0.5em}
-\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{0.2em}
+\renewcommand{\bibfont}{\scriptsize}
 \usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
 \hypersetup{hypertexnames=false}
 \newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\fbox{Figure source unavailable}}}
@@ -44,7 +44,7 @@
 
 \begin{document}
 \abstract{
-Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We present AC--MOT, a training-free detector-control layer that changes confidence threshold, non-maximum-suppression threshold, and input resolution online while preserving the detector--tracker separation. The paper traces the method from the original five-cue scene-complexity controller through validation-calibrated historical profiles to a frozen modern policy. On the documented second read of seven VisDrone2019-MOT validation sequences, our model improved HOTA over the predeclared high-resolution baseline by 2.94 points with ByteTrack and 1.33 points with OATrack; paired sequence bootstrap intervals excluded zero. End-to-end Tesla T4 measurements were 13.45 and 15.27 frames/s, including 4.3 and 4.2 ms controller overhead. On a no-retuning UAVDT transfer, ByteTrack MOTA improved by 17.60 points; OATrack improved MOTA and identity metrics but had essentially unchanged HOTA. Attribution controls show that the evidence supports operating-point calibration and observation-set shaping relative to the declared baseline, but does not isolate a consistent additional quality contribution from the precise scene-conditioned switching schedule.
+Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We frame AC--MOT as an optimization-driven, training-free detector-control layer that changes confidence, non-maximum-suppression, and input resolution while preserving detector--tracker separation. An early heuristic prototype established the causal interface; V1 was the first formal quality-oriented Optuna calibration, and V2 explicitly optimized the identity--runtime trade-off through a feasible MOTA/IDS Pareto study. Historical transfer and cross-pipeline studies show that the resulting profiles are objective- and host-dependent. We then freeze a modern v3 policy with causal crowd-weighted scene control, recovery, hysteresis, dwell, two tracker hosts, paired bootstrap evidence, and end-to-end timing. On the documented second read of seven VisDrone2019-MOT sequences, our model improves HOTA by 2.937 points with ByteTrack and 1.325 points with OATrack; corresponding MOTA changes are 17.995 and 6.318 points. Tesla T4 throughput is 13.45 and 15.27 frames/s, including approximately 4.3 and 4.2 ms controller overhead. A no-retuning UAVDT transfer is strongly positive for ByteTrack and mixed for OATrack. The evidence supports detector operating-point control and observation-set shaping, but not a separate timing-specific causal gain; these conclusions are bounded by the modern frozen v3 validation protocol.
 }
 
 \keywords{multi-object tracking; UAV video; adaptive inference; real-time image processing}
@@ -52,41 +52,26 @@ Unmanned-aerial-vehicle multi-object tracking must balance observation quality a
 \maketitle
 
 \input{draft_sections/01_introduction.tex}
-\begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_concept.tex}}
-  \vspace{-2mm}
-  \caption{Fixed versus scene-conditioned detector operating points.}
-  \label{fig:concept}
-\end{figure}
-
 \input{draft_sections/02_related_work.tex}
 
-\input{draft_sections/03_original_acmot.tex}
-\begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_architecture.tex}}
-  \vspace{-2mm}
-  \caption{Original causal AC--MOT flow; prior tracker boxes feed the next analysis.}
-  \label{fig:architecture}
-\end{figure}
-
-\input{draft_sections/04_acmot_evolution.tex}
+\input{draft_sections/03_acmot_v1.tex}
 \begin{table}[t]
-\caption{Compact historical evolution; full ablation, bootstrap, and UAVDT rows are in Online Resource 1, Sec.~S1.}
-\label{tab:historical-summary}
+\caption{Optimization-derived historical profiles; full ablation, parameters, bootstrap, and transfer rows are in Online Resource 1, Sec.~S1.}
+\label{tab:historical-profiles}
 \centering\scriptsize
 \begin{tabularx}{\linewidth}{Xrrrr}
 \toprule
 Profile & HOTA & MOTA & IDS & FPS\\
 \midrule
-Original full AC--MOT & 33.064 & 18.165 & 271 & 37.962\\
-V1 quality profile & 33.835 & 26.948 & 1184 & 38.985\\
-V2 identity/speed profile & 31.218 & 23.792 & 919 & 46.024\\
+Baseline & 28.430 & 19.729 & 1235 & 36.528\\
+V1 quality & 33.835 & 26.948 & 1184 & 38.985\\
+V2 identity & 31.218 & 23.792 & 919 & 46.024\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
+\input{draft_sections/04_acmot_v2.tex}
+\input{draft_sections/05_pre_v3_generalization.tex}
 \input{draft_sections/05_modern_acmot_v3.tex}
 \begin{figure}[t]
   \centering

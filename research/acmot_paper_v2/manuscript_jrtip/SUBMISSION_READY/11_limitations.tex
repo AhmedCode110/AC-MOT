@@ -1,26 +1,33 @@
 \section{Limitations}
-The modern seven-sequence VisDrone result is a second validation read: a static
-control had already read those sequences before ours. It is therefore a frozen,
-documented comparison, not an untouched held-out confirmation; the historical
-test-dev experiment is the cleaner historical held-out evidence.
+The modern seven-sequence VisDrone result is a documented second validation
+read: a static control had already read those sequences before our model. It is
+therefore a frozen comparison, not an untouched held-out confirmation; the
+historical test-dev experiment is the cleaner historical held-out evidence.
+The freeze also records that Trial 7 is not the literal argmax of the
+documented modern selection rule under either archived eligibility
+interpretation. We report this provenance limitation without rerunning the
+search.
 
-The freeze records that Trial 7 is not the literal argmax of the documented
-selection rule under either archived eligibility interpretation. This provenance
-limitation is reported without rerunning the search. Matched-static and
-shuffled-timing controls further weaken a claim that exact switching timing
-causes the accuracy gain. The project class-agnostic evaluator is not an
-official VisDrone leaderboard protocol.
+Matched-static and shuffled-timing controls weaken a claim that exact switching
+timing causes the accuracy gain. The project class-agnostic evaluator is not an
+official VisDrone leaderboard protocol. Only one modern detector checkpoint is
+used: a third-party VisDrone-DET-trained YOLO11m model rather than a
+VisDrone-MOT-trained or published OATrack detector. Two tracker hosts show
+interaction but not tracker independence, and the OATrack implementation is a
+controlled repository reimplementation rather than a direct published-system
+comparison.
 
-Only one modern detector checkpoint is used: a third-party
-VisDrone-DET-trained YOLO11m model rather than a VisDrone-MOT-trained or
-published OATrack detector. Two tracker hosts demonstrate interaction but not
-tracker independence, and the OATrack implementation is a controlled
-repository reimplementation rather than a direct published-system comparison.
+The historical V1/V2 studies use older detectors, custom held-out protocols,
+and objective-specific profiles. The U2MOT transfer uses a separate VisDrone
+pipeline with unsupervised boundary recalibration and no HOTA or confidence
+interval; the SparseTrack transfer is a same-development-set, near-neutral
+MOT17 study whose bootstrap interval includes zero. Neither establishes
+universal cross-pipeline quality. UAVDT transfer is a single frozen-policy run
+per host without cross-validation or bootstrap, and OATrack HOTA is essentially
+flat there.
 
-UAVDT transfer is a single frozen-policy run per host without cross-validation
-or bootstrap. Its ByteTrack result is strongly positive in MOTA and FP, while
-OATrack HOTA is essentially flat. T4 timing is measured, but image-read work is
-not instrumented identically in baseline and our harnesses. Finally, throughput
-is below 30 FPS. These limits constrain generalization and attribution while
-leaving a reproducible detector-operating-point study with measured quality,
-cost, and transfer behaviour.
+T4 timing is measured, but image-read work is not instrumented identically in
+the baseline and our harnesses. Finally, throughput is below 30 FPS. These
+limits constrain generalization and attribution while leaving a reproducible
+detector-operating-point study with measured quality, cost, and transfer
+behaviour.

@@ -1,36 +1,31 @@
 \section{Results}
-\subsection{Historical reference}
-The historical chain provides context without being pooled with our model. Original
-AC--MOT reached HOTA 33.064 in the component ablation; V1 reached HOTA 33.835
-and MOTA 26.948; V2 reached HOTA 31.218 while reducing IDS to 919 and raising
-FPS to 46.024. V1 is therefore a quality-oriented profile, whereas V2 is an
-identity/runtime trade-off. The full archived rows and uncertainty are in
-Online Resource 1, Sec.~S1.
-
 \subsection{Modern VisDrone}
 Table~\ref{tab:modern-vis} reports the aggregate results on the documented
-seven-sequence second validation read. For ByteTrack, ours changes HOTA from
-41.586 to 44.523, MOTA from 9.876 to 27.871, IDF1 from 48.569 to 53.929, and
-IDS from 1341 to 1016. FP falls from 39274 to 24892, while FN rises from 24121
-to 25902. This is a selective observation stream: clutter and identity-
-confusing candidates decrease at a recall cost.
+seven-sequence second validation read. For ByteTrack, our model changes HOTA
+from 41.586 to 44.523, MOTA from 9.876 to 27.871, IDF1 from 48.569 to
+53.929, and IDS from 1341 to 1016. FP falls from 39274 to 24892, while FN
+rises from 24121 to 25902. This is a selective observation stream: clutter and
+identity-confusing candidates decrease at a recall cost.
 
 For OATrack, HOTA changes from 46.770 to 48.095, MOTA from 28.165 to 34.483,
 IDF1 from 57.107 to 59.364, and IDS from 773 to 604. FP falls from 25394 to
 21400 and FN changes from 25432 to 25057. The smaller increment is consistent
-with a stronger baseline and different association response, not evidence that
-the controller is ineffective. The two hosts are therefore reported separately
-rather than pooled into one AC--MOT gain.
+with a stronger baseline and a different association response, not evidence
+that the controller is ineffective. The two hosts are therefore reported
+separately rather than pooled into one AC--MOT gain.
 
 The paired bootstrap in Table~\ref{tab:modern-bootstrap} supports the main
 positive differences. ByteTrack HOTA, MOTA, IDF1, and IDS changes are
-$+2.937$ [2.356,3.375], $+17.995$ [13.541,23.282], $+5.360$ [4.490,6.178],
-and $-325$ [-498,-164]. OATrack changes are $+1.325$ [0.200,2.264],
-$+6.318$ [4.741,7.879], $+2.258$ [0.548,3.474], and $-169$ [-292,-42]. The
-ByteTrack FN increase has CI [288,3594.075], whereas OATrack FN has CI
-[-1462.575,670]; the evidence is consequently a quality trade-off rather than
-an unqualified recall improvement.
+$+2.937$ [2.356,3.375], $+17.995$ [13.541,23.282], $+5.360$
+[4.490,6.178], and $-325$ [-498,-164]. OATrack changes are $+1.325$
+[0.200,2.264], $+6.318$ [4.741,7.879], $+2.258$ [0.548,3.474], and
+$-169$ [-292,-42]. The ByteTrack FN increase has CI [288,3594.075], whereas
+OATrack FN has CI [-1462.575,670]; the evidence is consequently a quality
+trade-off rather than an unqualified recall improvement.
 
-The state occupancy is reported in Online Resource 1, Sec.~S2. It
-confirms that both hosts use multiple actions and that their trajectories
-differ, but occupancy alone does not establish timing causality.
+The state occupancy is reported in Online Resource~1, Sec.~S2. It confirms
+that both hosts use multiple actions and that their trajectories differ, but
+occupancy alone does not establish timing causality. The historical V1/V2
+records and the pre-v3 transfer results are reported in their dedicated
+sections so that their different detectors, splits, and objectives are not
+pooled with this modern evaluation.

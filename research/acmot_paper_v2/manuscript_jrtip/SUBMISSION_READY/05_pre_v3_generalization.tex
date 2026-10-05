@@ -1,0 +1,45 @@
+\section{Pre-v3 Generalization Studies}
+Before the modern freeze, the controller family was examined across datasets
+and association backends. These studies are kept separate from v3 because
+their detectors, evaluators, development splits, and action definitions are
+not identical.
+
+\subsection{Historical UAVDT transfer}
+The frozen historical profiles were transferred to UAVDT without retuning. The
+baseline obtained HOTA/MOTA/IDF1/IDS $24.085/13.841/27.887/558$; V1 obtained
+$28.390/17.399/34.453/321$; and V2 obtained $26.930/16.118/32.014/308$.
+This supports portability of frozen operating profiles, not a universal
+quality ordering and not evidence that the modern v3 policy was trained on
+UAVDT.
+
+\subsection{U2MOT host on VisDrone}
+The cross-pipeline study used the published U2MOT host with YOLOX-X
+\cite{liu2023u2mot,ge2021yolox}. Development used seven VisDrone validation
+sequences and held-out evaluation used 17 VisDrone test-dev sequences. The
+V1 SCI weights and transforms were retained, the tracker was not modified,
+and the action boundaries were recalibrated from the U2MOT validation
+distribution using unsupervised 33rd/67th percentiles because the V1
+thresholds placed all frames in the hard region. No ground-truth metric was
+used for that recalibration, but the U2MOT action tuples were hand-set and do
+not have a selection record.
+
+On test-dev, the custom evaluator reported baseline MOTA 53.9, IDF1 69.8,
+IDS 1239, FP 41385, and FN 63241; the transferred controller reported MOTA
+53.7668, IDF1 69.8494, IDS 1152, FP 40155, and FN 64801. The defensible
+summary is approximately unchanged accuracy, 87 fewer IDS, 1230 fewer FP, and
+1560 more FN. No HOTA, confidence interval, or matched-baseline speed claim
+is attached. This is a VisDrone cross-pipeline study, not a UAVDT result or a
+universal quality win.
+
+\subsection{SparseTrack host on MOT17}
+The separate SparseTrack study used the published pseudo-depth association
+host \cite{liu2025sparsetrack} on MOT17 \texttt{val\_half}, seven FRCNN
+sequences, and 2652 frames. Its minimal Adaptive Edge V1 transfer changed only
+NMS from 0.70 to 0.80; confidence, resolution, detector, and tracker settings
+were unchanged. The threshold came from a leave-one-sequence-out stump study
+on those development sequences. Static versus adaptive evaluation gave MOTA
+76.8881 versus 76.9252, IDF1 81.4943 versus 81.5299, and IDS 136 versus 123.
+The MOTA change was only $+0.0371$ percentage points with bootstrap CI
+$[-0.041,+0.182]$, so the manifest does not establish superiority. This
+near-neutral result is retained because it limits claims of broad
+cross-dataset generalization.

@@ -116,6 +116,52 @@ V2 & 16.118 & 26.930 & 32.014 & 308\\
 \end{tabular}
 \end{table}
 
+\subsection*{S1.4 V1 optimization record}
+The first formal optimization-derived configuration used fixed pretrained
+YOLOv8n and tuned ByteTrack on VisDrone2019-MOT-val. Test data were not used
+during search. The canonical Optuna/TPE stage searched five non-negative SCI
+weights normalized to sum one, confidence and NMS endpoints selected from the
+supported validation sets, and two sorted SCI thresholds. The preceding
+validation screens supplied resolution levels 512, 928, and 960; the temporal
+design supplied a seven-entry history and stride 10. The final directions were
+maximize MOTA, minimize IDS, and maximize FPS, followed by the validation-only
+feasibility rule FPS gate and IDS no greater than the OLD--A3 reference, then
+highest MOTA with the documented tie breaks. Trial24 was frozen.
+
+The exact V1 weights are crowd 0.1294928, tiny 0.2217477, edge 0.4337134,
+night 0.0535577, and blur 0.1614885. The confidence endpoints are 0.30 and
+0.40, both NMS endpoints are 0.35, and the SCI thresholds are 0.1353494 and
+0.2872868. The V1 held-out bootstrap intervals and complete historical rows
+are in Tables~\ref{tab:s1-visdrone} and~\ref{tab:s1-bootstrap}; the values are
+not a new experiment.
+
+\subsection*{S1.5 V2 optimization record}
+V2 reused the V1 validation design and changed the explicit objective to
+maximize MOTA and minimize IDS with only FPS $\geq25$ as a feasibility gate.
+The implementation constructs the feasible Pareto front by the standard
+no-worse-in-both-objectives and strictly-better-in-one rule, then records
+highest-MOTA, lowest-IDS, and balanced candidates. The balanced candidate uses
+the documented equal-weight normalized MOTA/IDS score with HOTA, IDF1, FPS,
+and trial-index tie breaks. Trial22 was the official selected configuration;
+49 trials (0--48) completed in the archived study. Its validation record is
+MOTA 19.330, HOTA 31.651, IDF1 34.226, IDS 168, and 51.406 FPS. The separate
+post-selection testdev rerun is 23.792 MOTA, 31.218 HOTA, 37.870 IDF1, 919
+IDS, and 46.024 FPS, and is not the selection record.
+
+\subsection*{S1.6 Cross-pipeline audit}
+The U2MOT host is the published ICCV implementation with YOLOX-X. V1 cue
+weights and transforms were retained, while U2MOT validation distributions
+provided unsupervised q33/q67 boundaries because the V1 boundaries collapsed
+all frames into the hard region. The held-out custom evaluator reported
+baseline/controller MOTA 53.9/53.7668, IDF1 69.8/69.8494, and IDS 1239/1152;
+no HOTA, confidence interval, or matched speed claim is available.
+
+The SparseTrack host was evaluated on MOT17 \texttt{val\_half}. Its transfer changes
+only NMS using an edge cue sampled every ten frames, with a threshold learned
+by leave-one-sequence-out development on the same seven sequences. Static and
+adaptive MOTA are 76.8881 and 76.9252, with bootstrap CI
+$[-0.041,+0.182]$ for the change; the manifest does not establish superiority.
+
 \section*{S2. Extended modern result evidence}
 
 \subsection*{S2.1 Full paired bootstrap metrics}
@@ -196,9 +242,38 @@ cross-validation.
 \section*{S3. Implementation traces}
 
 \subsection*{S3.1 Original AC--MOT execution order}
-The full original pseudocode is retained here so that the main paper can keep
-the equations and causal information flow without spending a second algorithm
-float on historical implementation detail.
+The early heuristic prototype is retained here as provenance and reproducibility
+evidence, not as the primary AC--MOT generation. The controller sits between a
+frame stream and a fixed detector--tracker pair. It reads cheap image
+statistics and boxes retained by the preceding tracker, computes a scene state,
+maps that state to detector confidence, NMS, and resolution, runs the detector,
+and stores the new tracker output for the next decision. It never reads future
+frames, ground truth, or the current action's post-association output.
+
+The historical cues are crowd count $C_t=\min(N_t/30,1)$, the fraction of
+previous boxes below $32\times32$ pixels, normalized Canny edge density, a
+brightness-below-80 night indicator, and a Laplacian-variance-below-180 blur
+indicator. The historical SCI was
+\begin{equation*}
+S_t=0.30C_t+0.30T_t+0.20E_t+0.10N_t+0.05B_t,
+\end{equation*}
+whose coefficients intentionally sum to 0.95. The Smart Calibrator used
+$c_t=0.245-0.050S_t$, applied a documented $-0.012$ correction for crowded,
+tiny, or night scenes, and clipped confidence to $[0.19,0.28]$. It used
+$\eta_t=0.490-0.050S_t$, applied a $-0.012$ blur correction, and clipped NMS
+to $[0.40,0.52]$. The historical resolution actions were 640, 736, and 832
+pixels, with analysis stride 10 and a seven-entry moving mean. These details
+are preserved to prevent the heuristic prototype from being confused with V1.
+The 832-pixel action was used when $S_t>0.60$ or the tiny-object ratio exceeded
+0.50; the 736-pixel action was used when $S_t>0.35$ or the scene was labelled
+crowded or tiny; otherwise the action was 640 pixels. At an analysis frame,
+crowd and tiny-object values came from the previously stored tracker boxes,
+whereas edge, brightness, and blur came from the current reduced image. New
+boxes were stored only after detector execution and association, so the
+controller did not create a within-frame feedback loop. An empty previous
+output gave a zero tiny ratio and a crowd value that saturated at one after
+thirty boxes. Scene labels were evaluated alongside the scalar index, and the
+seven-entry mean reduced one-frame noise at the cost of response delay.
 
 \begin{algorithm}[ht]
 \caption{Original AC--MOT controller}

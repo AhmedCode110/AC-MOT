@@ -6,19 +6,30 @@ fragmentation \cite{bewley2016sort,wojke2017deepsort}. ByteTrack changed the
 detector--tracker interface by associating high-confidence detections first and
 then using lower-confidence boxes to recover objects that would otherwise be
 lost \cite{zhang2022bytetrack}. Other modern trackers further refine motion and
-appearance association. These trackers
-primarily improve the interpretation of the boxes they receive; AC--MOT asks
-the complementary upstream question of which observations, at which resolution
-and suppression policy, should reach the tracker.
+appearance association. These trackers primarily improve the interpretation
+of the boxes they receive; AC--MOT asks the complementary upstream question of
+which observations, at which resolution and suppression policy, should reach
+the tracker.
+
+The broader tracking-by-detection literature includes detector-regression
+tracking (Tracktor) \cite{bergmann2019tracktor}, joint detection and association
+with transformer queries (TrackFormer) \cite{meinhardt2022trackformer}, and
+end-to-end alternatives that change the association interface itself. These
+lines of work motivate treating the detector--tracker boundary as an explicit
+experimental variable rather than assuming that a tracker can compensate for
+every detection-side choice. Standardized MOT evaluation and reporting are
+rooted in MOTChallenge protocols \cite{milan2020motchallenge},
+whereas the present aerial studies retain their project-specific protocol
+boundaries.
 
 VisDrone and UAVDT capture the small targets, changing target count, camera
 motion, viewpoint variation, and clutter that make aerial MOT difficult
 \cite{zhu2022visdrone,du2018uavdt}. In this paper they have separated roles:
 historical VisDrone and UAVDT evidence describes earlier profiles, while a
-modern frozen protocol tests our model. OATrack is a second tracker host rather than a
-claim of superiority over its published system \cite{qi2026oatrack}; its frozen
-repository implementation and tracker-side \texttt{min\_conf=0.40} are kept
-distinct from the model's detector-side confidence floor.
+modern frozen protocol tests our model. OATrack is a second tracker host rather
+than a claim of superiority over its published system \cite{qi2026oatrack}; its
+frozen repository implementation and tracker-side \texttt{min\_conf=0.40} are
+kept distinct from the model's detector-side confidence floor.
 
 \subsection{Detector operating points and adaptive inference}
 Confidence floors, NMS overlap thresholds, and input resolution are often
@@ -31,20 +42,37 @@ without changing detector weights.
 
 Dynamic inference systems such as Chameleon show that conditional computation
 can adapt inference to content and resource constraints
-\cite{jiang2018chameleon}. AC--MOT is intentionally lighter: its
+\cite{jiang2018chameleon}. Resolution-adaptive networks and spatially adaptive
+video models likewise use content to trade computation against quality
+\cite{yang2020ranet}. AC--MOT is intentionally lighter: its
 state uses scalar image statistics and prior tracker boxes, its action set is
 finite, and its state machine is auditable line by line. It therefore tests an
 operating-point intervention at the detector--tracker boundary rather than a
 learned scheduler.
 
-\subsection{Evaluation and gap}
+The detector host is also part of the evidence boundary. YOLOX provides a
+representative modern anchor-free detector used by the U2MOT cross-pipeline
+study \cite{ge2021yolox}, while U2MOT and SparseTrack illustrate that changes in
+the association backend can alter the response to the same detector-side
+policy \cite{liu2023u2mot,liu2025sparsetrack}. OATrack is therefore included as
+a relevant recent UAV tracker host, not as a published system that this paper
+claims to outperform \cite{qi2026oatrack}.
+
+\subsection{Optimization and evaluation gap}
+Black-box configuration is commonly implemented with automated hyperparameter
+optimization; Optuna's define-by-run framework and TPE sampling are directly
+relevant to the V1/V2 development record \cite{akiba2019optuna}. V2's explicit
+trade-off is reported as a feasible Pareto front, using the standard notion of
+non-dominance associated with multi-objective optimization \cite{deb2002nsga2}.
+This distinction matters because V1 and V2 were not two arbitrary manual
+settings: they answer different constrained questions.
+
 MOTA emphasizes detection and identity errors, IDF1 emphasizes identity
 precision and recall, and HOTA balances detection and association
-\cite{luiten2021hota}. Their different
-responses are useful here because selectivity may reduce FP and IDS while
-increasing FN. Sequence-level paired bootstrap resampling preserves
-within-sequence dependence while quantifying system differences
-\cite{efron1993bootstrap}.
+\cite{luiten2021hota}. Their different responses are useful here because
+selectivity may reduce FP and IDS while increasing FN. Sequence-level paired
+bootstrap resampling preserves within-sequence dependence while quantifying
+system differences \cite{efron1993bootstrap}.
 
 The gap is consequently specific: rigorous evaluation of a training-free
 online controller that changes detector resolution, confidence, and NMS in

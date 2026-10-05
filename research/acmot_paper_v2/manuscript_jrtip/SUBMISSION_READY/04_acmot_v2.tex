@@ -1,0 +1,36 @@
+\section{AC--MOT V2: Identity-Aware Multi-Objective Optimization}
+V1 established that validation-derived detector operating points could improve
+the historical quality profile, but quality was not the only deployment goal.
+Identity fragmentation and compute can move in a different direction from
+MOTA. V2 therefore retained the frozen V1 search design while changing the
+selection question from a constrained quality profile to an explicit
+identity--runtime trade-off.
+
+The V2 validation study maximized MOTA and minimized IDS subject only to
+$\mathrm{FPS}\geq25$; it removed the V1 $\mathrm{IDS}\leq271$ gate. It used
+Optuna's seeded TPE sampler, validation data only, and the same five-cue SCI,
+supported detector operating points, seven-entry temporal window, and
+ten-frame analysis stride. The implementation explicitly constructed a
+feasible Pareto front: a trial dominated another when it had no lower MOTA and
+no higher IDS, with at least one strict improvement. The archive records
+highest-MOTA, lowest-IDS, and balanced Pareto candidates. The balanced choice
+used the documented equal-weight normalized MOTA/IDS score, with HOTA, IDF1,
+FPS, and trial index as tie-breaks; Pareto terminology is therefore an
+implementation fact rather than a retrospective label \cite{deb2002nsga2}.
+
+Trial22 was the official selected V2 configuration. Its validation record was
+MOTA 19.330, HOTA 31.651, IDF1 34.226, IDS 168, and 51.406 FPS. The frozen
+profile used weights $w_c=0.1646453$, $w_t=0.1746265$, and $w_e=0.5076113$;
+$w_n=0.1206956$ and $w_b=0.0324213$. Its confidence endpoints were
+$0.40/0.40$, NMS endpoints $0.60/0.35$, and SCI thresholds
+$0.2927136/0.6661672$, with the same $512/928/960$ operating levels. The
+historical post-selection technical testdev rerun gave MOTA 23.792, HOTA
+31.218, IDF1 37.870, IDS 919, and 46.024 FPS; these are reported as a
+secondary post-hoc record, not as the validation values that selected Trial22.
+
+The V1/V2 distinction is consequently objective-dependent: V1 is the
+quality-oriented profile, while V2 is the identity/runtime profile. Neither
+profile replaces the other for every tracker or metric, and V1's IDS must not
+be described as worse than the baseline (1184 versus 1235 in the archived
+held-out record). The complete parameter records, all historical trials, and
+the uncertainty tables are retained in Online Resource~1.

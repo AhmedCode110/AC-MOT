@@ -9,48 +9,48 @@ merge nearby targets; and fixed resolution spends the same detector budget on
 easy and difficult frames. These choices affect FP, FN, IDS, HOTA, MOTA, and
 throughput together.
 
-AC--MOT was introduced as a training-free runtime layer that computes cheap
-scene cues, forms a Scene Complexity Index (SCI), and changes detector
-confidence, NMS, and input resolution while keeping detector and tracker
-separate. Its scientific value is the control interface: the detector
-operating point becomes an auditable runtime variable rather than an immutable
-deployment setting.
+AC--MOT is a training-free runtime layer that computes inexpensive scene cues,
+forms a Scene Complexity Index (SCI), and changes detector confidence, NMS, and
+input resolution while keeping detector and tracker separate. Its scientific
+value is the control interface: the detector operating point becomes an
+auditable runtime variable rather than an immutable deployment setting.
 
-This paper follows the evolution from original AC--MOT through component
-ablations, validation-calibrated profiles V1 and V2, and the stricter modern
-policy frozen as our model. Historical evidence asks whether detector-side controls
-change tracking behaviour and whether distinct calibrated profiles transfer.
-The modern protocol asks whether a frozen operating point policy improves a
-declared high-resolution baseline, whether the direction survives a second
-tracker host, what quality--throughput trade-off is measured on a Tesla T4, and
-whether exact scene-conditioned timing adds evidence beyond a useful mixture of
-operating points.
+The paper is organized around the optimization-driven evolution of that
+interface. An early heuristic prototype established the controllable variables
+and causal boundary. V1 was the first formal quality-oriented optimization;
+V2 then made identity and deployment cost explicit through a multi-objective
+Pareto study. Historical transfer and cross-pipeline studies exposed which
+claims were portable and which were objective- or host-dependent. The modern
+phase finally froze a stronger detector, a causal policy, a second tracker
+host, runtime instrumentation, and attribution controls.
 
 The contributions are bounded and evidence-oriented:
 \begin{enumerate}
-\item We reconstruct original AC--MOT, including its five cues, historical SCI,
-      temporal smoothing, Smart Calibrator, and three detector-side controls.
-\item We document the V1/V2 evolution as distinct quality, identity, and runtime
-      profiles, preserving the component trend and historical trade-offs.
-\item We specify our frozen model at implementation level: the crowd-selected SCI,
-      surrounding state logic, thresholds, recovery probe, hysteresis, dwell,
-      causal information flow, and action map.
+\item We distinguish the preliminary heuristic interface from V1, the first
+      formal optimization-derived AC--MOT configuration, and report its exact
+      quality-oriented search and held-out uncertainty.
+\item We document V2 as an identity-aware multi-objective extension with an
+      explicit feasible Pareto front and an objective-dependent profile choice.
+\item We report historical UAVDT transfer and separate U2MOT/VisDrone and
+      SparseTrack/MOT17 cross-pipeline studies, including their negative or
+      near-neutral evidence.
+\item We specify the modern frozen model at implementation level: the
+      crowd-selected SCI, surrounding state logic, thresholds, recovery probe,
+      hysteresis, dwell, causal information flow, and action map.
 \item We evaluate ByteTrack and a controlled OATrack host with aggregate metrics
       and paired 5000-resample sequence bootstrap intervals.
-\item We measure end-to-end Tesla T4 latency and report detector, tracker, and
-      controller components without calling a sub-30-FPS system 30-FPS real
-      time.
-\item We report no-retuning UAVDT transfer and matched-static and shuffled-
-      timing controls to separate baseline-relative operating-point evidence
-      from an unproven timing-specific causal benefit.
+\item We measure end-to-end Tesla T4 latency, no-retuning UAVDT transfer, and
+      matched-static/shuffled-timing attribution controls without claiming a
+      separate timing-specific causal benefit.
 \end{enumerate}
 
 The supported claim is precise. AC--MOT is an auditable training-free mechanism
 for shaping the detector observation stream and computational operating point
-of aerial MOT. The frozen evidence supports positive changes relative to the
-declared baseline and strong ByteTrack transfer, with a smaller mixed effect on
-OATrack. It does not establish universal improvement, official leaderboard
-equivalence, or that exact scene-conditioned timing is necessary for the
-observed accuracy gains. Historical and modern protocols are therefore kept
-separate throughout the paper; extended historical and audit material is
-provided in Online Resource 1.
+of aerial MOT. The historical evidence supports distinct quality and
+identity/runtime profiles; the frozen modern evidence supports positive changes
+relative to the declared baseline and strong ByteTrack transfer, with a smaller
+mixed effect on OATrack. It does not establish universal improvement, official
+leaderboard equivalence, or that exact scene-conditioned timing is necessary
+for the observed accuracy gains. Historical, cross-pipeline, and modern
+protocols are therefore kept separate; extended historical and audit material
+is provided in Online Resource 1.
