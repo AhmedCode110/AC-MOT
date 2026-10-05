@@ -1,4 +1,4 @@
-\section{Original AC--MOT}
+\section{Preliminary Heuristic Prototype}
 \subsection{Pipeline and information flow}
 The original controller is placed between the image stream and an otherwise fixed detector--tracker pair. At an analysis step it receives inexpensive image statistics and information about the boxes retained by the preceding tracking step. It computes a scene state, maps that state to detector confidence, NMS, and resolution, executes the detector, and passes the resulting boxes to the tracker. The tracker output is stored for a later analysis step. This ordering is important: the controller does not use ground truth, future frames, or the tracker output produced by the detector action it is currently choosing.
 

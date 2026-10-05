@@ -1,6 +1,6 @@
 \section{Experimental protocol}
 \subsection{Historical and modern separation}
-Historical results come from the legacy freeze: original AC--MOT, V1 Trial 24,
+Historical results include the preliminary heuristic prototype, V1 Trial 24,
 V2 Trial 22, historical VisDrone test-dev, and historical UAVDT transfer.
 Modern results come from tag \texttt{acmot-v3-exp-2026-10-04-freeze} and its
 archived experiment package. The protocols are not pooled because their
@@ -23,19 +23,19 @@ cross-validation claim is attached.
 \subsection{Trackers, baseline, and metrics}
 ByteTrack uses the frozen archive defaults. OATrack is the repository's frozen
 reimplementation with tracker-side \texttt{min\_conf=0.40}; this is separate
-from the model's detector-side confidence floor. The declared modern baseline is
+from the controller's detector-side confidence floor. The declared modern baseline is
 \texttt{r1536\_n70}: resolution 1536, NMS IoU 0.70, and no detector filter
-above the cache floor 0.01. Ours uses the frozen action map and thresholds; no
+above the cache floor 0.01. AC--MOT v3 uses the frozen action map and thresholds; no
 detector, tracker, or operating choice changes after the freeze.
 
 We report HOTA, MOTA, IDF1, IDS, FP, FN, precision, and recall. HOTA balances
 detection and association, MOTA exposes the combined FP/FN/IDS effect, and
-IDF1 measures identity precision and recall. Baseline and ours are paired by
+IDF1 measures identity precision and recall. Baseline and AC--MOT v3 are paired by
 sequence. The archived modern bootstrap uses 5000 paired resamples with seed
 42; it is not applied to the single-run UAVDT transfer.
 
 \subsection{Runtime and evaluation handling}
-Our runtime is measured on a Tesla T4 over 200 frames with causal scene
+AC--MOT v3 runtime is measured on a Tesla T4 over 200 frames with causal scene
 analysis, detector execution at the selected resolution, and tracker update.
 Mean latency, P95 latency, FPS, detector time, tracker time, and controller
 overhead are recorded. The baseline harness does not include image-read work

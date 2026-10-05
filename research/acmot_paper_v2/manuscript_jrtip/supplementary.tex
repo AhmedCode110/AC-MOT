@@ -43,7 +43,7 @@ are not new experiments.
 
 \subsection*{S1.1 Component ablation}
 The archived component progression is shown in full. The rows are historical
-evidence and are not pooled with our model's results.
+evidence and are not pooled with AC--MOT v3's results.
 
 \begin{table}[ht]
 \centering\small
@@ -132,8 +132,8 @@ The exact V1 weights are crowd 0.1294928, tiny 0.2217477, edge 0.4337134,
 night 0.0535577, and blur 0.1614885. The confidence endpoints are 0.30 and
 0.40, both NMS endpoints are 0.35, and the SCI thresholds are 0.1353494 and
 0.2872868. The V1 held-out bootstrap intervals and complete historical rows
-are in Tables~\ref{tab:s1-visdrone} and~\ref{tab:s1-bootstrap}; the values are
-not a new experiment.
+are in Tables~\ref{tab:s1-visdrone} and~\ref{tab:s1-bootstrap}; these are
+archived records rather than new experiments.
 
 \subsection*{S1.5 V2 optimization record}
 V2 reused the V1 validation design and changed the explicit objective to
@@ -201,7 +201,7 @@ detector stochasticity independent.
 
 \begin{table}[ht]
 \centering\small
-\caption{Our model's state occupancy on the second VisDrone validation read.}
+\caption{AC--MOT v3 state occupancy on the second VisDrone validation read.}
 \label{tab:s2-occupancy}
 \begin{tabular}{lrrr}
 \toprule
@@ -228,9 +228,9 @@ timing causes the quality difference.
 Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
 \midrule
 ByteTrack & baseline & 45.923 & -1.573 & 58.400 & 601 & 279616 & 66050 & 49.571 & 80.625\\
-ByteTrack & our model & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
+ByteTrack & AC--MOT v3 & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
 OATrack & baseline & 47.728 & 19.607 & 62.101 & 517 & 197937 & 75612 & 57.270 & 77.820\\
-OATrack & our model & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
+OATrack & AC--MOT v3 & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -241,7 +241,7 @@ cross-validation.
 
 \section*{S3. Implementation traces}
 
-\subsection*{S3.1 Original AC--MOT execution order}
+\subsection*{S3.1 Preliminary heuristic prototype execution order}
 The early heuristic prototype is retained here as provenance and reproducibility
 evidence, not as the primary AC--MOT generation. The controller sits between a
 frame stream and a fixed detector--tracker pair. It reads cheap image
@@ -276,7 +276,7 @@ thirty boxes. Scene labels were evaluated alongside the scalar index, and the
 seven-entry mean reduced one-frame noise at the cost of response delay.
 
 \begin{algorithm}[ht]
-\caption{Original AC--MOT controller}
+\caption{Preliminary heuristic prototype controller}
 \label{alg:s3-original}
 \begin{algorithmic}[1]
 \State initialize seven-entry SCI history and previous tracker boxes
@@ -292,7 +292,7 @@ seven-entry mean reduced one-frame noise at the cost of response delay.
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{S3.2 Execution trace for our model}
+\subsection*{S3.2 Execution trace for AC--MOT v3}
 At an analysis step, \texttt{analyze\_visual} computes reduced grayscale
 statistics from the current image: Canny edge fraction, mean brightness, and
 Laplacian variance. The SceneLayer reads \texttt{prev\_boxes}, reported by the
@@ -321,13 +321,13 @@ its boxes for a later decision.
 \item Keep the eight-sequence calibration split separate from the seven-sequence
       modern evaluation read.
 \item Preserve the crowd history length of seven and analysis stride of ten.
-\item Apply the exact thresholds used by our model, including the tiny guard, recovery probe, hysteresis,
+\item Apply the exact thresholds used by AC--MOT v3, including the tiny guard, recovery probe, hysteresis,
       30-frame dwell, and action tuples.
 \item Keep detector-side confidence distinct from OATrack's tracker-side
       \texttt{min\_conf=0.40}.
 \item Use the class-agnostic project evaluator and label it as such rather than
       as an official VisDrone leaderboard protocol.
-\item Pair the baseline and our model by sequence and use 5000 resamples with seed 42 for
+\item Pair the baseline and AC--MOT v3 by sequence and use 5000 resamples with seed 42 for
       the modern bootstrap.
 \item Do not retune on the seven-sequence read or on UAVDT.
 \end{enumerate}
@@ -348,7 +348,7 @@ manuscript reports this deviation and does not rerun the search.
 
 The matched static control uses 1088 resolution, NMS IoU 0.45, and confidence
 0.40. Its HOTA is approximately 44.530 for ByteTrack and 48.269 for OATrack,
-compared with our model's values 44.523 and 48.095. The shuffled timing control has
+compared with AC--MOT v3's values 44.523 and 48.095. The shuffled timing control has
 development mean $\Delta$HOTA 2.446957 for the causal schedule and 2.617228 for
 the same-action-distribution shuffled schedule. These controls shift the safe
 interpretation toward operating-point calibration and observation-set shaping;

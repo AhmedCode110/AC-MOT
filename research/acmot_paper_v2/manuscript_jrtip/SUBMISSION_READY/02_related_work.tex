@@ -26,10 +26,10 @@ VisDrone and UAVDT capture the small targets, changing target count, camera
 motion, viewpoint variation, and clutter that make aerial MOT difficult
 \cite{zhu2022visdrone,du2018uavdt}. In this paper they have separated roles:
 historical VisDrone and UAVDT evidence describes earlier profiles, while a
-modern frozen protocol tests our model. OATrack is a second tracker host rather
+modern frozen protocol tests AC--MOT v3. OATrack is a second tracker host rather
 than a claim of superiority over its published system \cite{qi2026oatrack}; its
 frozen repository implementation and tracker-side \texttt{min\_conf=0.40} are
-kept distinct from the model's detector-side confidence floor.
+kept distinct from the controller's detector-side confidence floor.
 
 \subsection{Detector operating points and adaptive inference}
 Confidence floors, NMS overlap thresholds, and input resolution are often

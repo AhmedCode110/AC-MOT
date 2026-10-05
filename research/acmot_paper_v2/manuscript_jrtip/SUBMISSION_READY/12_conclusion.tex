@@ -1,10 +1,10 @@
 \section{Conclusion}
 AC--MOT is best understood as an optimization-driven detector operating-point
-interface rather than as a single timeless heuristic. An early prototype
-established the causal boundary. V1 was the first formal quality-oriented
-optimization and produced a quality profile with uncertainty. V2 then made
-identity and deployment cost explicit through a feasible Pareto search, showing
-why a lower-IDS/faster profile need not be the strongest HOTA profile.
+interface rather than as a single timeless heuristic. V1 was the first formal
+quality-oriented optimization and produced a quality profile with uncertainty.
+V2 then made identity and deployment cost explicit through a feasible Pareto
+search, showing why a lower-IDS/faster profile need not be the strongest HOTA
+profile.
 Historical UAVDT transfer, U2MOT on VisDrone, and SparseTrack on MOT17 further
 showed that profile choice and tracker host matter, including negative and
 near-neutral cases.
@@ -16,11 +16,8 @@ UAVDT transfer. The modern results support positive changes over the declared
 \texttt{r1536\_n70} baseline on ByteTrack and OATrack, with stronger ByteTrack
 effects and mixed OATrack transfer.
 
-The final conclusion remains bounded. Matched-static results are close to our
-model and shuffled timing is at least as good on calibration, so the current
-record does not establish that exact scene-conditioned timing is necessary for
-the observed accuracy gains. It supports training-free detector operating-
-point control as a reproducible mechanism for shaping tracking quality and
-compute, while timing-specific causality, universal tracker independence, and
-broader detector generalization remain questions for explicitly designed future
-experiments.
+The final conclusion is that AC--MOT supports objective-driven detector
+operating-point control with tracker- and dataset-dependent outcomes. The
+current record does not establish universal tracker independence,
+timing-specific causality, or broader detector generalization; these remain
+questions for explicitly designed future experiments.

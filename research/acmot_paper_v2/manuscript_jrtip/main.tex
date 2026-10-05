@@ -36,7 +36,7 @@
 \newcommand{\sourcepath}[1]{\texttt{\detokenize{#1}}}
 \newcommand{\checkpointsha}{\texttt{c6f98247\allowbreak{}e7c731a5\allowbreak{}67aaf37c\allowbreak{}a7b808be\allowbreak{}ff588b68\allowbreak{}7623e028\allowbreak{}b25a2e1d\allowbreak{}846e96e7}}
 
-\title{AC--MOT: Adaptive Detector Operating-Point Control for Real-Time Aerial Multi-Object Tracking}
+\title{AC--MOT: Optimization-Guided Adaptive Detector Operating-Point Control for Aerial Multi-Object Tracking}
 \author{Ahmed Gouda Ismail, Mohamed S. Mohamed, and Tarek Ahmed Mahmoud}
 \affil{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \city{Cairo}, \country{Egypt}}
 \affil{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \city{Cairo}, \country{Egypt}}
@@ -44,7 +44,7 @@
 
 \begin{document}
 \abstract{
-Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We frame AC--MOT as an optimization-driven, training-free detector-control layer that changes confidence, non-maximum-suppression, and input resolution while preserving detector--tracker separation. An early heuristic prototype established the causal interface; V1 was the first formal quality-oriented Optuna calibration, and V2 explicitly optimized the identity--runtime trade-off through a feasible MOTA/IDS Pareto study. Historical transfer and cross-pipeline studies show that the resulting profiles are objective- and host-dependent. We then freeze a modern v3 policy with causal crowd-weighted scene control, recovery, hysteresis, dwell, two tracker hosts, paired bootstrap evidence, and end-to-end timing. On the documented second read of seven VisDrone2019-MOT sequences, our model improves HOTA by 2.937 points with ByteTrack and 1.325 points with OATrack; corresponding MOTA changes are 17.995 and 6.318 points. Tesla T4 throughput is 13.45 and 15.27 frames/s, including approximately 4.3 and 4.2 ms controller overhead. A no-retuning UAVDT transfer is strongly positive for ByteTrack and mixed for OATrack. The evidence supports detector operating-point control and observation-set shaping, but not a separate timing-specific causal gain; these conclusions are bounded by the modern frozen v3 validation protocol.
+Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We frame AC--MOT as an optimization-guided, training-free detector-control layer that changes confidence, non-maximum-suppression, and input resolution while preserving detector--tracker separation. V1 was the first formal quality-oriented Optuna calibration, and V2 explicitly optimized the identity--runtime trade-off through a feasible MOTA/IDS Pareto study. Historical transfer and cross-pipeline studies show that the resulting profiles are objective- and host-dependent. We then freeze a modern v3 policy with causal crowd-weighted scene control, recovery, hysteresis, dwell, two tracker hosts, paired bootstrap evidence, and end-to-end timing. On the documented second read of seven VisDrone2019-MOT sequences, AC--MOT v3 improves HOTA by 2.937 points with ByteTrack and 1.325 points with OATrack; corresponding MOTA changes are 17.995 and 6.318 points. Tesla T4 throughput is 13.45 and 15.27 frames/s, including approximately 4.3 and 4.2 ms controller overhead. A no-retuning UAVDT transfer is strongly positive for ByteTrack and mixed for OATrack. The evidence supports objective-driven detector operating-point control and observation-set shaping with tracker- and dataset-dependent outcomes, bounded by the modern frozen v3 validation protocol.
 }
 
 \keywords{multi-object tracking; UAV video; adaptive inference; real-time image processing}
@@ -77,11 +77,11 @@ V2 identity & 31.218 & 23.792 & 919 & 46.024\\
   \centering
   \resizebox{\linewidth}{!}{\safeinput{figures/fig_state_machine.tex}}
   \vspace{-2mm}
-  \caption{Frozen state machine for our model; crowd SCI and auxiliary guards remain separate, with causal delayed feedback.}
+  \caption{Frozen state machine for AC--MOT v3; crowd SCI and auxiliary guards remain separate, with causal delayed feedback.}
   \label{fig:state-machine}
 \end{figure}
 \begin{table}[t]
-\caption{Frozen action map for our model. State names are controller labels, not a monotonic resolution ranking.}
+\caption{Frozen action map for AC--MOT v3. State names are controller labels, not a monotonic resolution ranking.}
 \label{tab:actions}
 \centering\small
 \begin{tabular}{lrrr}
@@ -105,7 +105,7 @@ HIGH & 1088 & 0.60 & 0.40\\
   \label{fig:modern-results}
 \end{figure*}
 \begin{table*}[t]
-\caption{Modern VisDrone aggregates on seven sequences and 71,830 ground-truth boxes; our model is a documented second read.}
+\caption{Modern VisDrone aggregates on seven sequences and 71,830 ground-truth boxes; AC--MOT v3 is a documented second read.}
 \label{tab:modern-vis}
 \centering\scriptsize
 \resizebox{\linewidth}{!}{%
@@ -114,9 +114,9 @@ HIGH & 1088 & 0.60 & 0.40\\
 Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
 \midrule
 ByteTrack & baseline & 41.586 & 9.876 & 48.569 & 1341 & 39274 & 24121 & 54.849 & 66.419\\
-ByteTrack & ours & 44.523 & 27.871 & 53.929 & 1016 & 24892 & 25902 & 64.852 & 63.940\\
+ByteTrack & AC--MOT v3 & 44.523 & 27.871 & 53.929 & 1016 & 24892 & 25902 & 64.852 & 63.940\\
 OATrack & baseline & 46.770 & 28.165 & 57.107 & 773 & 25394 & 25432 & 64.628 & 64.594\\
-OATrack & ours & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\\
+OATrack & AC--MOT v3 & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\\
 \bottomrule
 \end{tabular}%
 }
@@ -168,7 +168,7 @@ OATrack & IDS & -169 & [-292, -42]\\
 
 \noindent\textbf{Submission exclusivity.} The manuscript is not under consideration elsewhere and has not been published previously.
 
-\noindent\textbf{AI use in manuscript preparation.} The authors used an OpenAI Codex generative AI assistant (GPT-5-based; October 2026) for substantive drafting, organization, language refinement, and source-level visual/layout cleanup of Figures~1--4. The tool did not run experiments, generate data, select results, or make scientific decisions. The authors reviewed and verified all scientific content, numerical values, and final figures, and accept full responsibility for the final manuscript.
+\noindent\textbf{AI use in manuscript preparation.} The authors used an OpenAI Codex generative AI assistant (GPT-5-based; October 2026) for substantive drafting, organization, language refinement, and source-level visual and layout refinement of selected manuscript figures. The tool did not run experiments, generate data, select results, or make scientific decisions. The authors reviewed and verified all scientific content, numerical values, and final figures and accept full responsibility for the final manuscript.
 
 \small
 \bibliography{references}

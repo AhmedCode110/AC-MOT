@@ -1,9 +1,8 @@
 \section{AC--MOT V1: Quality-Oriented Optimization}
-An early heuristic prototype was used to identify the controllable detector
-variables and the detector--tracker causal interface. We define V1 as the
-first formal optimization-derived AC--MOT configuration evaluated under the
-frozen experimental protocol. The prototype remains fully documented in
-Online Resource~1, but it is not treated as the primary AC--MOT generation.
+Preliminary heuristic experiments established the detector-control interface
+and candidate variables; their implementation details are retained in Online
+Resource~1. V1 is the first formal optimization-derived AC--MOT configuration
+considered in the main study.
 
 \subsection{Optimization design}
 V1 fixed pretrained YOLOv8n and a tuned ByteTrack profile and searched only on
@@ -28,14 +27,21 @@ the confidence endpoints, the NMS endpoints, and the two SCI thresholds
 \cite{akiba2019optuna}. The resolution levels $512,928,960$, supported
 confidence values $\{0.25,0.30,0.35,0.40,0.45\}$, supported NMS values from
 $0.30$ through $0.70$, and the temporal settings $W=7$ and stride $10$ were
-provided by preceding validation screens or the frozen temporal design; they
-were not falsely presented as variables of the final joint search.
+provided by preceding validation screens or the frozen temporal design; these
+quantities were fixed before the final joint search and were not optimization
+variables in that stage.
 
-The study recorded the multi-objective directions maximize MOTA, minimize IDS,
-and maximize FPS. The final validation-only feasibility rule required the FPS
-gate and $\mathrm{IDS}\leq271$ (the OLD--A3 validation reference), after which
-the highest MOTA was selected, with lower IDS, HOTA, IDF1, and FPS as tie
-breaks. Trial24 was frozen from this procedure. Its exact controller values
+The V1 Optuna study recorded the multi-objective directions maximize MOTA,
+minimize IDS, and maximize FPS. The final validation-only feasibility and
+ranking rule required the FPS gate and $\mathrm{IDS}\leq271$ (the OLD--A3
+validation reference), after which the highest MOTA was selected, with lower
+IDS, HOTA, IDF1, and FPS as tie breaks. Trial24 was frozen from this procedure.
+Although the V1 Optuna study recorded multiple optimization directions, its
+final feasibility and ranking rule selected a single quality-oriented operating
+profile. V2 changed the selection mechanism itself: feasible trials were
+evaluated on an explicit MOTA--IDS Pareto front under the FPS constraint,
+making identity stability a first-class deployment objective rather than a
+secondary feasibility criterion. Its exact controller values
 were
 \begin{equation*}
 \begin{split}

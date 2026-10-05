@@ -1,18 +1,17 @@
 \section{Discussion and attribution}
 The modern experiments establish that detector operating point affects
-downstream MOT, that our model changes the declared high-resolution baseline on
+downstream MOT, that AC--MOT v3 changes the declared high-resolution baseline on
 two tracker hosts, and that operating-point choices shape measured compute.
 They do not isolate a separate accuracy contribution from the exact
 scene-conditioned switching schedule.
 
-The matched-static control used resolution 1088, NMS IoU 0.45, and confidence
-0.40. Its HOTA was approximately 44.530 for ByteTrack and 48.269 for OATrack,
-close to our model's 44.523 and 48.095. The control therefore supports moving
-away from the declared \texttt{r1536\_n70} baseline, while leaving the precise
-timing benefit unresolved. The shuffled-timing control has the same
-interpretation: its development mean HOTA change was 2.617228 versus 2.446957
-for the causal schedule. Detailed control construction and values are retained
-in Online Resource~1 rather than treated as headline results.
+A matched-static control achieved comparable HOTA (44.530 versus 44.523 for
+ByteTrack; 48.269 versus 48.095 for OATrack), and shuffled timing did not
+underperform the causal schedule on development ($\Delta$HOTA = 2.617228 versus
+2.446957). The present experiments therefore support operating-point
+calibration and observation-set shaping, but do not isolate an additional
+accuracy benefit from exact switching timing. Full attribution-control details
+are provided in Online Resource~1.
 
 The systems interpretation is still meaningful. A finite policy can allocate
 detector compute online, react to changing scene statistics, and expose a

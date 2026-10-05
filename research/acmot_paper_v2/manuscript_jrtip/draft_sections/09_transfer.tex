@@ -1,17 +1,17 @@
 \section{Frozen UAVDT transfer}
-The modern transfer applies ours to UAVDT without retuning thresholds,
+The modern transfer applies AC--MOT v3 to UAVDT without retuning thresholds,
 weights, action mapping, or tracker configuration. It contains 20 sequences,
 16,592 frames, and 49,776 detector forward passes from three action-specific
 cache pairs. Each host is run once without bootstrap or cross-validation.
 
-For ByteTrack, baseline/ours values are HOTA 45.923/47.004, MOTA
+For ByteTrack, baseline/AC--MOT v3 values are HOTA 45.923/47.004, MOTA
 $-1.573/16.028$, IDF1 58.400/61.767, IDS 601/486, FP 279616/212077, and FN
 66050/73702. The changes are HOTA +1.081, MOTA +17.601, IDF1 +3.367, IDS
 $-115$, and FP $-67539$; the false-positive reduction accompanies a false-
 negative increase of 7652. This supports a strong MOTA/precision direction for
 ByteTrack, not an uncertainty-certified universal improvement.
 
-For OATrack, baseline/ours values are HOTA 47.728/47.640, MOTA 19.607/22.873,
+For OATrack, baseline/AC--MOT v3 values are HOTA 47.728/47.640, MOTA 19.607/22.873,
 IDF1 62.101/62.931, IDS 517/486, and FP 197937/183669. MOTA, IDF1, IDS, and
 FP improve, but HOTA changes by $-0.087$. This mixed transfer is why the result
 is reported per tracker host. The class-agnostic adapter is not an official

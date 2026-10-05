@@ -16,8 +16,7 @@ value is the control interface: the detector operating point becomes an
 auditable runtime variable rather than an immutable deployment setting.
 
 The paper is organized around the optimization-driven evolution of that
-interface. An early heuristic prototype established the controllable variables
-and causal boundary. V1 was the first formal quality-oriented optimization;
+interface. V1 was the first formal quality-oriented optimization;
 V2 then made identity and deployment cost explicit through a multi-objective
 Pareto study. Historical transfer and cross-pipeline studies exposed which
 claims were portable and which were objective- or host-dependent. The modern
@@ -26,22 +25,22 @@ host, runtime instrumentation, and attribution controls.
 
 The contributions are bounded and evidence-oriented:
 \begin{enumerate}
-\item We distinguish the preliminary heuristic interface from V1, the first
-      formal optimization-derived AC--MOT configuration, and report its exact
-      quality-oriented search and held-out uncertainty.
+\item We present V1 as the first formal optimization-derived AC--MOT
+      configuration and report its exact quality-oriented search and held-out
+      uncertainty.
 \item We document V2 as an identity-aware multi-objective extension with an
       explicit feasible Pareto front and an objective-dependent profile choice.
 \item We report historical UAVDT transfer and separate U2MOT/VisDrone and
       SparseTrack/MOT17 cross-pipeline studies, including their negative or
       near-neutral evidence.
-\item We specify the modern frozen model at implementation level: the
+\item We specify the modern frozen AC--MOT v3 controller at implementation
+      level: the
       crowd-selected SCI, surrounding state logic, thresholds, recovery probe,
       hysteresis, dwell, causal information flow, and action map.
 \item We evaluate ByteTrack and a controlled OATrack host with aggregate metrics
       and paired 5000-resample sequence bootstrap intervals.
-\item We measure end-to-end Tesla T4 latency, no-retuning UAVDT transfer, and
-      matched-static/shuffled-timing attribution controls without claiming a
-      separate timing-specific causal benefit.
+\item We measure end-to-end Tesla T4 latency and no-retuning UAVDT transfer
+      for the two tracker hosts.
 \end{enumerate}
 
 The supported claim is precise. AC--MOT is an auditable training-free mechanism

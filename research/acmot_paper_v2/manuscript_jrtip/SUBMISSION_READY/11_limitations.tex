@@ -1,6 +1,6 @@
 \section{Limitations}
 The modern seven-sequence VisDrone result is a documented second validation
-read: a static control had already read those sequences before our model. It is
+read: a static control had already read those sequences before AC--MOT v3. It is
 therefore a frozen comparison, not an untouched held-out confirmation; the
 historical test-dev experiment is the cleaner historical held-out evidence.
 The freeze also records that Trial 7 is not the literal argmax of the
@@ -27,7 +27,7 @@ per host without cross-validation or bootstrap, and OATrack HOTA is essentially
 flat there.
 
 T4 timing is measured, but image-read work is not instrumented identically in
-the baseline and our harnesses. Finally, throughput is below 30 FPS. These
+the baseline and AC--MOT v3 harnesses. Finally, throughput is below 30 FPS. These
 limits constrain generalization and attribution while leaving a reproducible
 detector-operating-point study with measured quality, cost, and transfer
 behaviour.
