@@ -53,7 +53,8 @@ Unmanned-aerial-vehicle multi-object tracking must balance observation quality a
 \begin{figure}[t]
   \centering
   \resizebox{\linewidth}{!}{\safeinput{fig_concept.tex}}
-  \caption{Fixed versus scene-conditioned detector operating points; the AC--MOT action is auditable.}
+  \vspace{-2mm}
+  \caption{Fixed versus scene-conditioned detector operating points.}
   \label{fig:concept}
 \end{figure}
 
@@ -63,7 +64,8 @@ Unmanned-aerial-vehicle multi-object tracking must balance observation quality a
 \begin{figure}[t]
   \centering
   \resizebox{\linewidth}{!}{\safeinput{fig_architecture.tex}}
-  \caption{Original causal AC--MOT information flow; past tracker output is feedback and detector and tracker remain separate.}
+  \vspace{-2mm}
+  \caption{Original causal AC--MOT flow; prior tracker boxes feed the next analysis.}
   \label{fig:architecture}
 \end{figure}
 
@@ -87,7 +89,8 @@ V2 identity/speed profile & 31.218 & 23.792 & 919 & 46.024\\
 \begin{figure}[t]
   \centering
   \resizebox{\linewidth}{!}{\safeinput{fig_state_machine.tex}}
-  \caption{Frozen v3 state machine; the crowd-weighted SCI remains distinct from the auxiliary SceneLayer guards.}
+  \vspace{-2mm}
+  \caption{Frozen v3 state machine; crowd SCI and auxiliary guards remain separate, with causal delayed feedback.}
   \label{fig:state-machine}
 \end{figure}
 \begin{table}[t]
@@ -110,6 +113,7 @@ HIGH & 1088 & 0.60 & 0.40\\
 \begin{figure*}[t]
   \centering
   \resizebox{\linewidth}{!}{\safeinput{fig_modern_results.tex}}
+  \vspace{-2mm}
   \caption{Modern VisDrone second-read results on seven sequences; hosts are evaluated separately under the custom protocol.}
   \label{fig:modern-results}
 \end{figure*}
