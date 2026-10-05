@@ -28,6 +28,8 @@
 \usepackage{tabularx}
 \usepackage{tikz}
 \usepackage{url}
+\setlength{\bibsep}{0.5em}
+\renewcommand{\bibfont}{\small}
 \usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
 \hypersetup{hypertexnames=false}
 \newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\fbox{Figure source unavailable}}}
@@ -41,13 +43,13 @@
 \email{a7medgouda1@gmail.com; mohamedms@mtc.edu.eg; tarek.mohamed@eui.edu.eg}
 
 \begin{document}
-\maketitle
-
-\begin{abstract}
+\abstract{
 Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We present AC--MOT, a training-free detector-control layer that changes confidence threshold, non-maximum-suppression threshold, and input resolution online while preserving the detector--tracker separation. The paper traces the method from the original five-cue scene-complexity controller through validation-calibrated historical profiles to a frozen modern policy. On the documented second read of seven VisDrone2019-MOT validation sequences, the frozen v3 policy improved HOTA over the predeclared high-resolution baseline by 2.94 points with ByteTrack and 1.33 points with OATrack; paired sequence bootstrap intervals excluded zero. End-to-end Tesla T4 measurements were 13.45 and 15.27 frames/s, including 4.3 and 4.2 ms controller overhead. On a no-retuning UAVDT transfer, ByteTrack MOTA improved by 17.60 points; OATrack improved MOTA and identity metrics but had essentially unchanged HOTA. Attribution controls show that the evidence supports operating-point calibration and observation-set shaping relative to the declared baseline, but does not isolate a consistent additional quality contribution from the precise scene-conditioned switching schedule.
-\end{abstract}
+}
 
-\keywords{multi-object tracking \and UAV video \and adaptive inference \and real-time image processing}
+\keywords{multi-object tracking; UAV video; adaptive inference; real-time image processing}
+
+\maketitle
 
 \input{draft_sections/01_introduction.tex}
 \begin{figure}[t]
@@ -181,7 +183,7 @@ OATrack & IDS & -169 & [-292, -42]\\
 
 \noindent\textbf{Submission exclusivity.} The manuscript is not under consideration elsewhere and has not been published previously.
 
-\noindent\textbf{AI use in manuscript preparation.} The authors used an OpenAI Codex generative AI assistant (GPT-5-based; October 2026) for substantive drafting, organization, and language refinement. Prompts covered evidence-constrained section drafting, layout and traceability checks, and editorial compression. The tool did not run experiments, generate data, select results, or replace scientific judgment; no generative AI was used to create or alter the figures. The authors defined the research, controlled the experiments and frozen evidence, verified all technical statements and numerical results, and accept full responsibility for the final manuscript.
+\noindent\textbf{AI use in manuscript preparation.} The authors used an OpenAI Codex generative AI assistant (GPT-5-based; October 2026) for substantive drafting, organization, language refinement, and source-level visual/layout cleanup of Figures~1--4. The tool did not run experiments, generate data, select results, or make scientific decisions. The authors reviewed and verified all scientific content, numerical values, and final figures, and accept full responsibility for the final manuscript.
 
 \small
 \bibliography{references}

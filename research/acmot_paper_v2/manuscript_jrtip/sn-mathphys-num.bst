@@ -400,10 +400,6 @@ FUNCTION {format.pub.address}
             {springer.publisher} 
           if$ 
            "publisher" make.tag
-          #1 bother =
-            {", \blocation{???}" *  }
-            'skip$
-           if$
            output   
         }
         {
@@ -3205,7 +3201,6 @@ FUNCTION {export.xml}{
 %%EXECUTE {end.bmcxmlcomment}
 
 %% End of file `sn-mathphys-num.bst'.
-
 
 
 

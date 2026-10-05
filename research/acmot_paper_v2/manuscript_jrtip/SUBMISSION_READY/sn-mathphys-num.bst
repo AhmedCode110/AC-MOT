@@ -400,11 +400,7 @@ FUNCTION {format.pub.address}
             {springer.publisher}
           if$
            "publisher" make.tag
-          #1 bother =
-            {", \blocation{???}" *  }
-            'skip$
-           if$
-           output
+          output
         }
         {
           publisher empty$
