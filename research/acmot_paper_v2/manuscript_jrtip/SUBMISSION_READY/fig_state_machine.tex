@@ -1,0 +1,9 @@
+\begin{tikzpicture}[font=\scriptsize,node distance=5mm and 6mm,box/.style={draw,rounded corners,align=center,minimum height=8mm,text width=22mm,inner sep=2pt},wide/.style={draw,rounded corners,align=center,minimum height=8mm,text width=27mm,inner sep=2pt},arr/.style={->,thick},feedback/.style={->,dashed,thick}]
+\node[box] (input) {Current image\\prior tracker boxes}; \node[box,right=of input] (cues) {Image cues +\\crowd/tiny};
+\node[wide,right=of cues] (sci) {Seven-entry\\crowd SCI history}; \node[wide,right=of sci] (target) {Target state\\HIGH / MEDIUM / LOW};
+\node[wide,right=of target] (guards) {Recovery probe,\\hysteresis, 30-frame dwell}; \node[wide,right=of guards] (action) {Frozen action\\resolution / NMS / confidence};
+\node[box,right=of action] (track) {Detector +\\tracker};
+\draw[arr](input)--(cues); \draw[arr](cues)--(sci); \draw[arr](sci)--(target); \draw[arr](target)--(guards); \draw[arr](guards)--(action); \draw[arr](action)--(track);
+\draw[feedback](track.south) |- ++(0,-8mm) -| (input.south);
+\node[anchor=north] at ($(track.south)!0.5!(input.south)+(0,-8mm)$) {feedback is causal and delayed};
+\end{tikzpicture}

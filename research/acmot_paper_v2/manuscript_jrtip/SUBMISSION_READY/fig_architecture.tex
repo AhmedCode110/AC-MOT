@@ -1,0 +1,8 @@
+\begin{tikzpicture}[font=\scriptsize,node distance=5mm and 6mm,box/.style={draw,rounded corners,align=center,minimum height=8mm,inner sep=2.5pt},arr/.style={->,thick}]
+\node[box] (frame) {Frame $I_t$}; \node[box,right=of frame] (cue) {Five scene cues};
+\node[box,right=of cue] (sci) {SCI + temporal\\smoothing}; \node[box,right=of sci] (cal) {Smart\\Calibrator};
+\node[box,right=of cal] (det) {Detector}; \node[box,right=of det] (trk) {Tracker};
+\node[box,below=9mm of cal] (ctrl) {confidence / NMS / resolution};
+\node[box,below=9mm of trk] (past) {Past tracks only};
+\draw[arr](frame)--(cue);\draw[arr](cue)--(sci);\draw[arr](sci)--(cal);\draw[arr](cal)--(ctrl);\draw[arr](ctrl)--(det);\draw[arr](det)--(trk);\draw[arr](trk)--(past);\draw[arr](past.west)-|(cue.south);
+\end{tikzpicture}

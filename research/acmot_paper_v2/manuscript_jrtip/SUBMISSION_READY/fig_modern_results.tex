@@ -1,0 +1,10 @@
+\begin{tikzpicture}[font=\scriptsize,x=0.025cm,y=0.10cm]
+\draw[->](0,0)--(520,0) node[right]{system}; \draw[->](0,0)--(0,55) node[above]{HOTA};
+\foreach \y in {0,10,20,30,40,50} {\draw(-2,\y)--(0,\y); \node[anchor=east] at(-3,\y){\y};}
+\node[anchor=north] at(95,-4){ByteTrack}; \node[anchor=north] at(325,-4){OATrack};
+\fill[gray!55](55,0) rectangle(105,41.586); \fill[blue!65](115,0) rectangle(165,44.523);
+\fill[gray!55](285,0) rectangle(335,46.770); \fill[blue!65](345,0) rectangle(395,48.095);
+\node[anchor=south] at(80,41.586){41.59}; \node[anchor=south] at(140,44.523){44.52}; \node[anchor=south] at(310,46.770){46.77}; \node[anchor=south] at(370,48.095){48.10};
+\node[draw,fill=gray!55,minimum width=8mm,minimum height=3mm] at(430,42){}; \node[anchor=west] at(438,42){baseline};
+\node[draw,fill=blue!65,minimum width=8mm,minimum height=3mm] at(430,36){}; \node[anchor=west] at(438,36){v3};
+\end{tikzpicture}

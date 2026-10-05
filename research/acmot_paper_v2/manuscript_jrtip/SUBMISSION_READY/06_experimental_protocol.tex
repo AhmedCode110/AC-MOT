@@ -1,0 +1,54 @@
+\section{Experimental protocol}
+\subsection{Historical and modern separation}
+Historical results come from the legacy freeze: original AC--MOT, V1 Trial 24,
+V2 Trial 22, historical VisDrone test-dev, and historical UAVDT transfer.
+Modern results come from tag \texttt{acmot-v3-exp-2026-10-04-freeze} and its
+archived experiment package. The protocols are not pooled because their
+detectors, operating grids, evaluation details, and held-out roles differ.
+
+\subsection{Modern detector, splits, and transfer}
+The modern detector is \texttt{dronefreak/visdrone-yolo11m} trained on
+VisDrone2019-DET at 640 pixels; the checkpoint SHA256 is \checkpointsha.
+Development uses eight VisDrone2019-MOT calibration sequences and four
+sequence-level folds. The modern VisDrone read uses seven sequences and 71,830
+ground-truth boxes. It is the project's class-agnostic protocol, not an
+official VisDrone leaderboard evaluation, and it is disclosed as a second
+validation read because a static control had already read the sequences.
+
+UAVDT transfer uses 20 sequences, 16,592 frames, and 49,776 detector forward
+passes from three action-specific cache pairs. The frozen policy is applied
+without recalibration or retuning, once per tracker host, so no bootstrap or
+cross-validation claim is attached.
+
+\subsection{Trackers, baseline, and metrics}
+ByteTrack uses the frozen archive defaults. OATrack is the repository's frozen
+reimplementation with tracker-side \texttt{min\_conf=0.40}; this is separate
+from the detector-side v3 confidence floor. The declared modern baseline is
+\texttt{r1536\_n70}: resolution 1536, NMS IoU 0.70, and no detector filter
+above the cache floor 0.01. V3 uses the frozen action map and thresholds; no
+detector, tracker, or operating choice changes after the freeze.
+
+We report HOTA, MOTA, IDF1, IDS, FP, FN, precision, and recall. HOTA balances
+detection and association, MOTA exposes the combined FP/FN/IDS effect, and
+IDF1 measures identity precision and recall. Baseline and v3 are paired by
+sequence. The archived modern bootstrap uses 5000 paired resamples with seed
+42; it is not applied to the single-run UAVDT transfer.
+
+\subsection{Runtime and evaluation handling}
+V3 runtime is measured on a Tesla T4 over 200 frames with causal scene
+analysis, detector execution at the selected resolution, and tracker update.
+Mean latency, P95 latency, FPS, detector time, tracker time, and controller
+overhead are recorded. The baseline harness does not include image-read work
+identically, so the comparison is reported with that caveat and is not called a
+perfectly matched speedup. The analysis does not claim a 30-FPS deployment
+target.
+
+Detector outputs are cached at the required resolution/NMS combinations for
+reproducibility. The project maps classes to its documented class-agnostic
+vehicle/tracking protocol before TrackEval-style scoring; these values must
+therefore not be described as official leaderboard metrics. The archive records
+the detector hash, controller thresholds, action map, tracker descriptions,
+calibration folds, forward-pass count, and source checksums. It also records
+that frozen Trial 7 is not the literal argmax of the documented selection rule
+under either eligibility interpretation; the paper reports this deviation and
+does not rerun the search.

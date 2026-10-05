@@ -49,25 +49,25 @@ Unmanned-aerial-vehicle multi-object tracking must balance observation quality a
 
 \keywords{multi-object tracking \and UAV video \and adaptive inference \and real-time image processing}
 
-\input{draft_sections/01_introduction.tex}
+\input{01_introduction.tex}
 \begin{figure}[t]
   \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_concept.tex}}
+  \resizebox{\linewidth}{!}{\safeinput{fig_concept.tex}}
   \caption{Fixed versus scene-conditioned detector operating points; the AC--MOT action is auditable.}
   \label{fig:concept}
 \end{figure}
 
-\input{draft_sections/02_related_work.tex}
+\input{02_related_work.tex}
 
-\input{draft_sections/03_original_acmot.tex}
+\input{03_original_acmot.tex}
 \begin{figure}[t]
   \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_architecture.tex}}
+  \resizebox{\linewidth}{!}{\safeinput{fig_architecture.tex}}
   \caption{Original causal AC--MOT information flow; past tracker output is feedback and detector and tracker remain separate.}
   \label{fig:architecture}
 \end{figure}
 
-\input{draft_sections/04_acmot_evolution.tex}
+\input{04_acmot_evolution.tex}
 \begin{table}[t]
 \caption{Compact historical evolution; full ablation, bootstrap, and UAVDT rows are in Online Resource 1, Sec.~S1.}
 \label{tab:historical-summary}
@@ -83,10 +83,10 @@ V2 identity/speed profile & 31.218 & 23.792 & 919 & 46.024\\
 \end{tabularx}
 \end{table}
 
-\input{draft_sections/05_modern_acmot_v3.tex}
+\input{05_modern_acmot_v3.tex}
 \begin{figure}[t]
   \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_state_machine.tex}}
+  \resizebox{\linewidth}{!}{\safeinput{fig_state_machine.tex}}
   \caption{Frozen v3 state machine; the crowd-weighted SCI remains distinct from the auxiliary SceneLayer guards.}
   \label{fig:state-machine}
 \end{figure}
@@ -105,11 +105,11 @@ HIGH & 1088 & 0.60 & 0.40\\
 \end{tabular}
 \end{table}
 
-\input{draft_sections/06_experimental_protocol.tex}
-\input{draft_sections/07_results.tex}
+\input{06_experimental_protocol.tex}
+\input{07_results.tex}
 \begin{figure*}[t]
   \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_modern_results.tex}}
+  \resizebox{\linewidth}{!}{\safeinput{fig_modern_results.tex}}
   \caption{Modern VisDrone second-read results on seven sequences; hosts are evaluated separately under the custom protocol.}
   \label{fig:modern-results}
 \end{figure*}
@@ -150,13 +150,13 @@ OATrack & IDS & -169 & [-292, -42]\\
 \bottomrule
 \end{tabular}
 \end{table}
-\input{draft_sections/08_runtime.tex}
-\input{draft_sections/09_transfer.tex}
+\input{08_runtime.tex}
+\input{09_transfer.tex}
 
-\input{draft_sections/10_attribution_discussion.tex}
+\input{10_attribution_discussion.tex}
 
-\input{draft_sections/11_limitations.tex}
-\input{draft_sections/12_conclusion.tex}
+\input{11_limitations.tex}
+\input{12_conclusion.tex}
 
 \backmatter
 \small

@@ -1,0 +1,51 @@
+\section{Attribution and discussion}
+The experiments establish that detector operating point affects downstream MOT,
+that v3 changes the declared high-resolution baseline on two tracker hosts, and
+that operating-point choices shape measured compute. The remaining question is
+whether the observed quality difference is caused specifically by the exact
+scene-conditioned switching schedule.
+
+The matched static control uses resolution 1088, NMS IoU 0.45, and detector
+confidence 0.40. Its HOTA is approximately 44.530 for ByteTrack and 48.269 for
+OATrack, close to v3 values 44.523 and 48.095. The comparison against
+\texttt{r1536\_n70} therefore supports moving away from the declared baseline,
+but does not isolate an additional accuracy benefit from changing the action
+frame by frame.
+
+The timing control has the same implication: development mean $\Delta$HOTA is
+2.446957 for the causal schedule and 2.617228 for a same-action-distribution
+shuffled schedule. This does not show that random timing is globally superior;
+both are calibration statistics from one frozen control. It does show that the
+present evidence cannot claim exact scene-conditioned timing as necessary for
+the baseline-relative gain.
+
+The controller nevertheless has systems value when much of the accuracy
+difference is explained by operating-point mixture. It provides online compute
+allocation, reacts to changing scene statistics, and exposes a finite action
+interface without retraining detector weights. A dynamic policy may therefore
+be preferable under an average detector-time budget even when a matched static
+point has similar HOTA. This is a deployment interpretation, not a new causal
+claim.
+
+Tracker dependence supports keeping the hosts separate. ByteTrack starts from a
+weaker modern baseline and shows a larger VisDrone change; OATrack starts
+stronger and has a smaller HOTA increment and essentially flat UAVDT HOTA
+transfer. The detector-side policy changes the observations available to each
+association algorithm, so a pooled ``AC--MOT gain'' would be misleading.
+
+The negative searches also bound the conclusion. Resolution-only, NMS-only,
+cue-subset, and earlier joint formulations did not pass the predeclared
+matched-static robustness gate. The final candidate was selected against
+\texttt{r1536\_n70}, not because the archive established that scene timing beat
+every fixed point. The selection audit records that Trial 7 was not the literal
+argmax under either eligibility interpretation; the freeze is preserved and
+the deviation is reported as provenance.
+
+The strongest supported conclusion is that AC--MOT is an auditable,
+training-free mechanism for shaping the detector observation stream and
+computational operating point of aerial MOT. It can improve a declared baseline
+and transfer with tracker-dependent outcomes. It does not yet establish that
+exact causal switching adds a separate, consistent accuracy benefit beyond
+operating-point calibration and action-mixture effects. Cost-matched randomized
+policies, more detectors and trackers, and a predeclared dynamic-scheduling
+objective are the appropriate future tests.

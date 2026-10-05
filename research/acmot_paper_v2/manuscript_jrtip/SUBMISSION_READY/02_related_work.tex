@@ -1,0 +1,55 @@
+\section{Related work}
+\subsection{Tracking by detection and aerial MOT}
+SORT established a compact online pipeline based on motion prediction and
+assignment, while DeepSORT added appearance information to reduce identity
+fragmentation \cite{bewley2016sort,wojke2017deepsort}. ByteTrack changed the
+detector--tracker interface by associating high-confidence detections first and
+then using lower-confidence boxes to recover objects that would otherwise be
+lost \cite{zhang2022bytetrack}. Other modern trackers further refine motion and
+appearance association. These trackers
+primarily improve the interpretation of the boxes they receive; AC--MOT asks
+the complementary upstream question of which observations, at which resolution
+and suppression policy, should reach the tracker.
+
+VisDrone and UAVDT capture the small targets, changing target count, camera
+motion, viewpoint variation, and clutter that make aerial MOT difficult
+\cite{zhu2022visdrone,du2018uavdt}. In this paper they have separated roles:
+historical VisDrone and UAVDT evidence describes earlier profiles, while a
+modern frozen protocol tests v3. OATrack is a second tracker host rather than a
+claim of superiority over its published system \cite{qi2026oatrack}; its frozen
+repository implementation and tracker-side \texttt{min\_conf=0.40} are kept
+distinct from the detector-side v3 confidence floor.
+
+\subsection{Detector operating points and adaptive inference}
+Confidence floors, NMS overlap thresholds, and input resolution are often
+treated as implementation settings. In aerial scenes they are coupled
+scientific variables: resolution changes small-object evidence and cost,
+confidence changes recall and clutter, and NMS changes whether nearby targets
+remain separate. AC--MOT does not replace detector architecture research; it
+makes these deployment choices explicit and lets them respond to scene evidence
+without changing detector weights.
+
+Dynamic inference systems such as Chameleon show that conditional computation
+can adapt inference to content and resource constraints
+\cite{jiang2018chameleon}. AC--MOT is intentionally lighter: its
+state uses scalar image statistics and prior tracker boxes, its action set is
+finite, and its state machine is auditable line by line. It therefore tests an
+operating-point intervention at the detector--tracker boundary rather than a
+learned scheduler.
+
+\subsection{Evaluation and gap}
+MOTA emphasizes detection and identity errors, IDF1 emphasizes identity
+precision and recall, and HOTA balances detection and association
+\cite{luiten2021hota}. Their different
+responses are useful here because selectivity may reduce FP and IDS while
+increasing FN. Sequence-level paired bootstrap resampling preserves
+within-sequence dependence while quantifying system differences
+\cite{efron1993bootstrap}.
+
+The gap is consequently specific: rigorous evaluation of a training-free
+online controller that changes detector resolution, confidence, and NMS in
+aerial MOT while separating historical development from a frozen modern
+protocol, testing two tracker hosts, measuring runtime, transferring without
+retuning, and checking whether exact scene timing explains the gain. AC--MOT
+addresses this gap empirically and does not claim to invent adaptive inference
+or a new tracker.
