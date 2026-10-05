@@ -44,7 +44,7 @@
 
 \begin{document}
 \abstract{
-Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We present AC--MOT, a training-free detector-control layer that changes confidence threshold, non-maximum-suppression threshold, and input resolution online while preserving the detector--tracker separation. The paper traces the method from the original five-cue scene-complexity controller through validation-calibrated historical profiles to a frozen modern policy. On the documented second read of seven VisDrone2019-MOT validation sequences, the frozen v3 policy improved HOTA over the predeclared high-resolution baseline by 2.94 points with ByteTrack and 1.33 points with OATrack; paired sequence bootstrap intervals excluded zero. End-to-end Tesla T4 measurements were 13.45 and 15.27 frames/s, including 4.3 and 4.2 ms controller overhead. On a no-retuning UAVDT transfer, ByteTrack MOTA improved by 17.60 points; OATrack improved MOTA and identity metrics but had essentially unchanged HOTA. Attribution controls show that the evidence supports operating-point calibration and observation-set shaping relative to the declared baseline, but does not isolate a consistent additional quality contribution from the precise scene-conditioned switching schedule.
+Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We present AC--MOT, a training-free detector-control layer that changes confidence threshold, non-maximum-suppression threshold, and input resolution online while preserving the detector--tracker separation. The paper traces the method from the original five-cue scene-complexity controller through validation-calibrated historical profiles to a frozen modern policy. On the documented second read of seven VisDrone2019-MOT validation sequences, our model improved HOTA over the predeclared high-resolution baseline by 2.94 points with ByteTrack and 1.33 points with OATrack; paired sequence bootstrap intervals excluded zero. End-to-end Tesla T4 measurements were 13.45 and 15.27 frames/s, including 4.3 and 4.2 ms controller overhead. On a no-retuning UAVDT transfer, ByteTrack MOTA improved by 17.60 points; OATrack improved MOTA and identity metrics but had essentially unchanged HOTA. Attribution controls show that the evidence supports operating-point calibration and observation-set shaping relative to the declared baseline, but does not isolate a consistent additional quality contribution from the precise scene-conditioned switching schedule.
 }
 
 \keywords{multi-object tracking; UAV video; adaptive inference; real-time image processing}
@@ -92,11 +92,11 @@ V2 identity/speed profile & 31.218 & 23.792 & 919 & 46.024\\
   \centering
   \resizebox{\linewidth}{!}{\safeinput{figures/fig_state_machine.tex}}
   \vspace{-2mm}
-  \caption{Frozen v3 state machine; crowd SCI and auxiliary guards remain separate, with causal delayed feedback.}
+  \caption{Frozen state machine for our model; crowd SCI and auxiliary guards remain separate, with causal delayed feedback.}
   \label{fig:state-machine}
 \end{figure}
 \begin{table}[t]
-\caption{Frozen modern v3 action map. State names are controller labels, not a monotonic resolution ranking.}
+\caption{Frozen action map for our model. State names are controller labels, not a monotonic resolution ranking.}
 \label{tab:actions}
 \centering\small
 \begin{tabular}{lrrr}
@@ -120,7 +120,7 @@ HIGH & 1088 & 0.60 & 0.40\\
   \label{fig:modern-results}
 \end{figure*}
 \begin{table*}[t]
-\caption{Modern VisDrone aggregates on seven sequences and 71,830 ground-truth boxes; v3 is a documented second read.}
+\caption{Modern VisDrone aggregates on seven sequences and 71,830 ground-truth boxes; our model is a documented second read.}
 \label{tab:modern-vis}
 \centering\scriptsize
 \resizebox{\linewidth}{!}{%
@@ -129,9 +129,9 @@ HIGH & 1088 & 0.60 & 0.40\\
 Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
 \midrule
 ByteTrack & baseline & 41.586 & 9.876 & 48.569 & 1341 & 39274 & 24121 & 54.849 & 66.419\\
-ByteTrack & v3 & 44.523 & 27.871 & 53.929 & 1016 & 24892 & 25902 & 64.852 & 63.940\\
+ByteTrack & ours & 44.523 & 27.871 & 53.929 & 1016 & 24892 & 25902 & 64.852 & 63.940\\
 OATrack & baseline & 46.770 & 28.165 & 57.107 & 773 & 25394 & 25432 & 64.628 & 64.594\\
-OATrack & v3 & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\\
+OATrack & ours & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\\
 \bottomrule
 \end{tabular}%
 }

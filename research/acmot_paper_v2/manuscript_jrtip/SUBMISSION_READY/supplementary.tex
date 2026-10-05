@@ -43,7 +43,7 @@ are not new experiments.
 
 \subsection*{S1.1 Component ablation}
 The archived component progression is shown in full. The rows are historical
-evidence and are not pooled with modern v3 results.
+evidence and are not pooled with our model's results.
 
 \begin{table}[ht]
 \centering\small
@@ -155,7 +155,7 @@ detector stochasticity independent.
 
 \begin{table}[ht]
 \centering\small
-\caption{Modern v3 state occupancy on the second VisDrone validation read.}
+\caption{Our model's state occupancy on the second VisDrone validation read.}
 \label{tab:s2-occupancy}
 \begin{tabular}{lrrr}
 \toprule
@@ -182,9 +182,9 @@ timing causes the quality difference.
 Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
 \midrule
 ByteTrack & baseline & 45.923 & -1.573 & 58.400 & 601 & 279616 & 66050 & 49.571 & 80.625\\
-ByteTrack & v3 & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
+ByteTrack & our model & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
 OATrack & baseline & 47.728 & 19.607 & 62.101 & 517 & 197937 & 75612 & 57.270 & 77.820\\
-OATrack & v3 & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
+OATrack & our model & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -217,7 +217,7 @@ float on historical implementation detail.
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{S3.2 Modern v3 execution trace}
+\subsection*{S3.2 Execution trace for our model}
 At an analysis step, \texttt{analyze\_visual} computes reduced grayscale
 statistics from the current image: Canny edge fraction, mean brightness, and
 Laplacian variance. The SceneLayer reads \texttt{prev\_boxes}, reported by the
@@ -246,13 +246,13 @@ its boxes for a later decision.
 \item Keep the eight-sequence calibration split separate from the seven-sequence
       modern evaluation read.
 \item Preserve the crowd history length of seven and analysis stride of ten.
-\item Apply the exact v3 thresholds, tiny guard, recovery probe, hysteresis,
+\item Apply the exact thresholds used by our model, including the tiny guard, recovery probe, hysteresis,
       30-frame dwell, and action tuples.
 \item Keep detector-side confidence distinct from OATrack's tracker-side
       \texttt{min\_conf=0.40}.
 \item Use the class-agnostic project evaluator and label it as such rather than
       as an official VisDrone leaderboard protocol.
-\item Pair baseline and v3 by sequence and use 5000 resamples with seed 42 for
+\item Pair the baseline and our model by sequence and use 5000 resamples with seed 42 for
       the modern bootstrap.
 \item Do not retune on the seven-sequence read or on UAVDT.
 \end{enumerate}
@@ -273,7 +273,7 @@ manuscript reports this deviation and does not rerun the search.
 
 The matched static control uses 1088 resolution, NMS IoU 0.45, and confidence
 0.40. Its HOTA is approximately 44.530 for ByteTrack and 48.269 for OATrack,
-compared with v3 values 44.523 and 48.095. The shuffled timing control has
+compared with our model's values 44.523 and 48.095. The shuffled timing control has
 development mean $\Delta$HOTA 2.446957 for the causal schedule and 2.617228 for
 the same-action-distribution shuffled schedule. These controls shift the safe
 interpretation toward operating-point calibration and observation-set shaping;

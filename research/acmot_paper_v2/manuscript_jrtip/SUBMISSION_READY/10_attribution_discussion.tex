@@ -1,13 +1,13 @@
 \section{Attribution and discussion}
 The experiments establish that detector operating point affects downstream MOT,
-that v3 changes the declared high-resolution baseline on two tracker hosts, and
+that ours changes the declared high-resolution baseline on two tracker hosts, and
 that operating-point choices shape measured compute. The remaining question is
 whether the observed quality difference is caused specifically by the exact
 scene-conditioned switching schedule.
 
 The matched static control uses resolution 1088, NMS IoU 0.45, and detector
 confidence 0.40. Its HOTA is approximately 44.530 for ByteTrack and 48.269 for
-OATrack, close to v3 values 44.523 and 48.095. The comparison against
+OATrack, close to ours at 44.523 and 48.095. The comparison against
 \texttt{r1536\_n70} therefore supports moving away from the declared baseline,
 but does not isolate an additional accuracy benefit from changing the action
 frame by frame.
