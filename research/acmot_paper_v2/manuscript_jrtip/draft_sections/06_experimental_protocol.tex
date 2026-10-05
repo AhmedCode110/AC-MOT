@@ -1,0 +1,19 @@
+\section{Experimental protocol}
+\subsection{Separation of historical and modern protocols}
+Historical results come from the legacy freeze and its files under `research/paper_split/evidence/legacy/`. They contain the original controller, V1 Trial 24, V2 Trial 22, historical VisDrone test-dev, and historical UAVDT transfer. Modern results come from tag `acmot-v3-exp-2026-10-04-freeze` and the archive `ACMOT_EXP_V3_2026-10-04/`. Metrics from these protocols are not pooled because detector, operating grid, evaluation details, and held-out roles differ.
+
+\subsection{Modern detector and datasets}
+The modern detector is `dronefreak/visdrone-yolo11m` (`best.pt`) trained on VisDrone2019-DET at 640 pixels. The expected and local checkpoint SHA256 is `c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7`. Modern development uses eight VisDrone2019-MOT calibration sequences and four sequence-level folds. The modern validation read contains seven sequences and 71,830 ground-truth boxes. It uses the project's class-agnostic AC--MOT evaluation protocol and is not an official VisDrone leaderboard submission; this distinction is retained in all result labels.
+
+UAVDT transfer uses 20 sequences and 16,592 frames. The same frozen v3 policy is applied without recalibration or retuning. Three action-specific detector cache pairs give 49,776 forward passes, exactly $16,592\times3$. The transfer is one run per tracker host, so no confidence interval or cross-validation claim is attached to it.
+
+\subsection{Trackers, baseline, and policy}
+ByteTrack uses the frozen Ultralytics defaults recorded in the archive. OATrack is the repository's frozen reimplementation with tracker-side `min_conf=0.40`; this value is separate from the detector-side v3 confidence floor. The declared modern baseline is `r1536_n70`: resolution 1536, NMS IoU 0.70, and no additional detector confidence filter above the cache floor 0.01. V3 uses the exact action map and thresholds in Sec. 5. The detector and tracker weights, code, and operating choices are not changed after the freeze.
+
+\subsection{Metrics and statistics}
+We report HOTA, MOTA, IDF1, IDS, FP, FN, precision, and recall. HOTA balances detection and association; MOTA exposes the combined effect of FP, FN, and IDS; IDF1 reports identity precision and recall. Differences between v3 and the corresponding baseline are computed at the sequence level and paired by sequence. The archived bootstrap uses 5000 paired resamples with seed 42. It is used for modern VisDrone baseline comparisons, not for the single-run UAVDT transfer.
+
+\subsection{Runtime}
+V3 runtime is measured on a Tesla T4 over 200 frames with the real causal scene analysis, detector call at the selected resolution, and tracker update. We record mean latency, P95 latency, FPS, detector time, tracker time, and controller overhead. The earlier baseline harness does not include image-read work identically, so baseline and v3 values are reported with that instrumentation caveat. The analysis does not assert a 30-FPS deployment target.
+
+The resulting protocol separates development evidence, frozen modern validation, and external transfer. It also makes the attribution comparison possible: the modern v3 result is measured against the predeclared high-resolution baseline, while the matched static control and shuffled timing control are interpreted as separate evidence rather than silently substituted baselines.

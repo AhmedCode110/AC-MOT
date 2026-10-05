@@ -1,0 +1,51 @@
+\section{Original AC--MOT}
+\subsection{Pipeline and information flow}
+The original controller is placed between the image stream and an otherwise fixed detector--tracker pair. At an analysis step it receives inexpensive image statistics and information about the boxes retained by the preceding tracking step. It computes a scene state, maps that state to detector confidence, NMS, and resolution, executes the detector, and passes the resulting boxes to the tracker. The tracker output is stored for a later analysis step. This ordering is important: the controller does not use ground truth, future frames, or the tracker output produced by the detector action it is currently choosing.
+
+\subsection{Five scene cues}
+Let $N_t$ denote the number of boxes available from the preceding frame and let $a_{i,t}$ denote their source-image areas. The crowd cue is
+\begin{equation}
+C_t=\min\left(\frac{N_t}{30},1\right).
+\end{equation}
+The tiny-object cue is the fraction of available boxes below the historical $32\times32$ pixel area threshold,
+\begin{equation}
+T_t=\begin{cases}N_t^{-1}\sum_i\mathbf{1}[a_{i,t}<1024],&N_t>0,\\0,&N_t=0.\end{cases}
+\end{equation}
+The edge cue is the Canny edge fraction normalized by the historical edge norm of 0.14 and clipped to one. The night cue is the indicator that mean grayscale brightness is below 80. The blur cue is the indicator that Laplacian variance is below 180. These cues were selected because they are cheap relative to detector inference and correspond to different failure modes: density, target scale, image structure, illumination, and sharpness.
+
+The historical raw SCI is
+\begin{equation}
+S_t=0.30C_t+0.30T_t+0.20E_t+0.10N_t+0.05B_t.
+\end{equation}
+The coefficients sum to 0.95, not one. This is an intentional property of the historical implementation and is retained in the description rather than silently renormalized. Analyses are performed every ten frames and the controller uses the mean of the most recent seven analysis values. Between analysis steps the operating point is held.
+
+\subsection{Smart Calibrator}
+The original confidence mapping is a decreasing function of scene complexity. Before clipping and the documented scene correction, it is
+\begin{equation}
+c_t=0.245-0.050S_t.
+\end{equation}
+For a scene classified as crowded, tiny, or night, the code applies a $-0.012$ correction and clips the result to $[0.19,0.28]$. The correction preserves more low-score observations when the scene cue indicates that a simple scalar index may underestimate difficulty.
+
+The NMS mapping is similarly
+\begin{equation}
+\eta_t=0.490-0.050S_t.
+\end{equation}
+Blur applies a $-0.012$ correction, and the result is clipped to $[0.40,0.52]$. This adjustment changes how aggressively overlapping candidates are suppressed and is therefore detector-side, not a change to the tracker's association gate.
+
+Resolution is selected by a discrete rule. The high-complexity action uses 832 pixels when $S_t>0.60$ or $T_t>0.50$. The medium action uses 736 pixels when $S_t>0.35$ or the scene label is crowded or tiny. The remaining state uses 640 pixels. The three controls are therefore adapted together, but they are not assumed to have identical monotonic effects on tracking quality.
+
+\begin{algorithm}[t]\caption{Original AC--MOT controller}\label{alg:original}
+\begin{algorithmic}[1]
+\State initialize seven-entry SCI history and previous tracker boxes
+\For{each frame $t$}
+\If{$t=1$ or $t\bmod 10=1$}
+\State compute $C_t,T_t,E_t,N_t,B_t$ from current image and prior boxes
+\State append $S_t$ to the history and average the available entries
+\State apply Smart Calibrator confidence, NMS, and resolution rules
+\EndIf
+\State run detector at held operating point and update the fixed tracker
+\State store tracker boxes for future analysis
+\EndFor
+\end{algorithmic}\end{algorithm}
+
+The architecture is causal but not necessarily optimal. A controller may hold a state through a scene transition, and a detector operating point chosen for small-object recall may increase clutter for an association algorithm. Those are empirical questions addressed by the ablation and evolution sections. The original method's role in this paper is to establish the control idea and its exact historical semantics; modern v3 is evaluated as a separately frozen implementation.

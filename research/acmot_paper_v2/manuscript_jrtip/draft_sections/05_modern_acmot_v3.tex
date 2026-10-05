@@ -1,0 +1,47 @@
+\section{Modern frozen AC--MOT v3}
+\subsection{Motivation and development boundary}
+The modern redesign was needed because the historical controller had been evaluated through several intertwined choices: detector, tracker, operating grid, evaluation protocol, and selection objective. A stronger public YOLO11m checkpoint made detector-side sensitivity a central question, while earlier calibration searches showed that an adaptive policy could fail to beat a matched static point. The modern study therefore froze a detector checkpoint, declared a calibration split, used sequence-level cross-validation, retained negative search results, and evaluated two tracker hosts. It also added bootstrap uncertainty, end-to-end timing, frozen UAVDT transfer, and attribution controls.
+
+Development used eight VisDrone2019-MOT calibration sequences comprising 3282 frames. Four folds held out sequence pairs during calibration; the final seven-sequence modern VisDrone evaluation was not used to choose the policy. The detector is `dronefreak/visdrone-yolo11m`, trained on VisDrone-DET at 640 pixels, with checkpoint hash `c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7`. This is not the OATrack detector and is not a VisDrone-MOT-trained checkpoint.
+
+\subsection{Cue audit and modern SCI}
+The search first audited which scene information was useful under the new detector and protocol. Stage 3A selected the cue subset `['crowd']`. The result must be stated carefully. The weighted modern SCI is crowd-selected; the wider SceneLayer still computes tiny-object, edge, brightness, and blur statistics because those values participate in scene labels, the tiny guard, and the recovery and hysteresis machinery.
+
+At analysis step $j$, let $N_j$ be the number of boxes reported by the tracker before the current detector decision. The crowd measurement is
+\begin{equation}
+C_j=\min(N_j/30,1).
+\end{equation}
+The weighted v3 index is the mean of the most recent up-to-seven crowd measurements,
+\begin{equation}
+S_j=\frac{1}{|H_j|}\sum_{k\in H_j}C_k,
+\end{equation}
+where $H_j$ is the current seven-entry history. Analyses occur every ten frames. The current frame's tracker output is not available when $S_j$ is computed; it is stored after detection and association for future decisions.
+
+\subsection{State target and surrounding guards}
+The raw target state is HIGH when $S_j>0.5114928923560124$ or the tiny-object ratio exceeds 0.50. It is MEDIUM when $S_j>0.29747709701135766$ or the scene label is crowded or tiny. Otherwise it is LOW. HIGH is a state label, not a statement that HIGH uses the largest input resolution.
+
+The target is then processed by the state-stabilization logic. The scene label is `night` when brightness is below 80, `blur` when Laplacian variance is below 180, `tiny` when the tiny ratio exceeds 0.50, and `crowded` when crowd or edge conditions exceed their historical scene thresholds. These labels do not add weight to the selected SCI, but they can guard a state transition. The implementation tracks a decaying peak count. After at least five observed boxes, a count below 0.40 of the decaying peak increments the drop age; during up to three analysis steps after such a collapse, the recovery probe requests HIGH. The probe is a bounded response to a sudden loss of observations, not access to future frames or ground truth.
+
+Downward transitions are held by hysteresis. A HIGH state remains HIGH when $S_j>0.50$ or tiny exceeds 0.40; a MEDIUM state remains MEDIUM when $S_j>0.25$. Finally, a 30-frame dwell rule prevents a new target from changing the state within 30 frames of the preceding change. The ordering is target, recovery probe, downward holds, dwell, and state update. The resulting machine is causal and auditable, but it is not asserted to be an optimal controller.
+
+\subsection{Frozen action map}
+The frozen actions are LOW $(1536,0.70,0.10)$, MEDIUM $(1280,0.45,0.40)$, and HIGH $(1088,0.60,0.40)$, where each tuple is resolution, NMS IoU, and detector confidence floor. The apparent non-monotonicity is intentional. State names describe scene difficulty, whereas the action was selected from the calibration search and need not increase resolution with state rank. Reporting the names as resolution ranks would reverse the meaning of the frozen method.
+
+\begin{algorithm}[t]\caption{Frozen v3 causal controller}\label{alg:v3}
+\begin{algorithmic}[1]
+\State initialize level LOW, empty seven-entry history, empty previous boxes, peak count 0
+\For{each frame $t$}
+\If{$t=1$ or $t\bmod10=1$}
+\State compute image statistics and crowd/tiny values using boxes from frames $<t$
+\State append $C_j$ and set $S_j$ to the history mean
+\State set target HIGH, MEDIUM, or LOW using $S_j$, tiny, and scene label
+\State update decaying peak; if collapse gate passes, apply up to three-step HIGH probe
+\State apply downward holds, then reject changes inside the 30-frame dwell interval
+\State update persistent level
+\EndIf
+\State select frozen action for the persistent level; run detector and confidence filter
+\State update the fixed tracker and store its boxes for future frames
+\EndFor
+\end{algorithmic}\end{algorithm}
+
+This algorithm makes the interface explicit. AC--MOT controls the detector operating point; ByteTrack or OATrack remains responsible for association. The detector-side confidence floor is not OATrack's tracker-side `min_conf=0.40`. No detector scores enter the scene layer, no online labels are used, and no parameter is changed after the freeze.
