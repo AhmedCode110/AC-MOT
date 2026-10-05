@@ -7,7 +7,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+# data.py lives at <repo>/research/acmot_paper_v2/manuscript_jrtip/scripts.
+# Four parent steps reach the repository root; no experiment is run here.
+ROOT = Path(__file__).resolve().parents[4]
 PAPER = ROOT / "research" / "acmot_paper_v2"
 LEGACY = ROOT / "research" / "paper_split" / "evidence" / "legacy"
 
@@ -34,3 +36,4 @@ def legacy():
 if __name__ == "__main__":
     d = modern()
     print("Frozen v3 action map:", d["freeze"]["action_mapping"])
+    print("Modern result records loaded:", ", ".join(sorted(d)))

@@ -1,89 +1,303 @@
-% Uses the official local Springer class in Overleaf. The fallback lets the
-% isolated desktop preview compile when it cannot stage sibling class files.
-\IfFileExists{sn-jnl.cls}{\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}}{\documentclass{article}\newcommand{\fnm}[1]{##1}\newcommand{\sur}[1]{##1}\def\affil##1{}\def\email##1{}\newcommand{\orgdiv}[1]{##1}\newcommand{\orgname}[1]{##1}\newcommand{\city}[1]{##1}\newcommand{\country}[1]{##1}\newcommand{\keywords}[1]{\par\noindent\textbf{Keywords:} ##1\par}\newcommand{\backmatter}{}\newcommand{\bmhead}[1]{\par\medskip\noindent\textbf{##1}. }}
-\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{graphicx,booktabs,tabularx,amsmath,tikz,algorithm,algpseudocode}
-\usetikzlibrary{positioning,arrows.meta}
-\newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\fbox{Figure generated in the Overleaf package}}}
-\newcommand{\safecite}[2]{\IfFileExists{references.bib}{\cite{#1}}{[#2]}}
+% AC--MOT Paper 1, assembled from the frozen staged sections.
+% The staged section files remain the authoritative scientific prose source.
+\IfFileExists{sn-jnl.cls}{%
+  \documentclass[pdflatex,sn-mathphys-num]{sn-jnl}%
+}{%
+  \documentclass{article}%
+  \newcommand{\fnm}[1]{##1}%
+  \newcommand{\sur}[1]{##1}%
+  \newcommand{\orgdiv}[1]{##1}%
+  \newcommand{\orgname}[1]{##1}%
+  \newcommand{\city}[1]{##1}%
+  \newcommand{\country}[1]{##1}%
+  \newcommand{\affil}[1]{}%
+  \newcommand{\email}[1]{}%
+  \newcommand{\keywords}[1]{\par\noindent\textbf{Keywords:} ##1\par}%
+  \newcommand{\backmatter}{}%
+  \newcommand{\bmhead}[1]{\section*{##1}}%
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{url}
+\usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
+\newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\fbox{Figure source unavailable}}}
+\newcommand{\sourcepath}[1]{\texttt{\detokenize{#1}}}
+
 \title{AC--MOT: Adaptive Detector Operating-Point Control for Real-Time Aerial Multi-Object Tracking}
 \author{Ahmed Gouda Ismail, Mohamed S. Mohamed, and Tarek Ahmed Mahmoud}
 \affil{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \city{Cairo}, \country{Egypt}}
 \affil{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \city{Cairo}, \country{Egypt}}
 \email{a7medgouda1@gmail.com; mohamedms@mtc.edu.eg; tarek.mohamed@eui.edu.eg}
-\begin{document}\maketitle
+
+\begin{document}
+\maketitle
+
 \begin{abstract}
 Unmanned-aerial-vehicle multi-object tracking must balance observation quality and latency while density, target scale, illumination, and blur vary within a video. We present AC--MOT, a training-free detector-control layer that changes confidence threshold, non-maximum-suppression threshold, and input resolution online while preserving the detector--tracker separation. The paper traces the method from the original five-cue scene-complexity controller through validation-calibrated historical profiles to a frozen modern policy. On the documented second read of seven VisDrone2019-MOT validation sequences, the frozen v3 policy improved HOTA over the predeclared high-resolution baseline by 2.94 points with ByteTrack and 1.33 points with OATrack; paired sequence bootstrap intervals excluded zero. End-to-end Tesla T4 measurements were 13.45 and 15.27 frames/s, including 4.3 and 4.2 ms controller overhead. On a no-retuning UAVDT transfer, ByteTrack MOTA improved by 17.60 points; OATrack improved MOTA and identity metrics but had essentially unchanged HOTA. Attribution controls show that the evidence supports operating-point calibration and observation-set shaping relative to the declared baseline, but does not isolate a consistent additional quality contribution from the precise scene-conditioned switching schedule.
 \end{abstract}
+
 \keywords{multi-object tracking \and UAV video \and adaptive inference \and real-time image processing}
-\section{Introduction}
-Tracking by detection is a practical route to persistent identities in UAV video, but its detector settings are commonly fixed although the scene is not. Aerial sequences combine tiny targets, moving viewpoints, crowding, low illumination, and blur \safecite{zhu2022visdrone,du2018uavdt}{1,2}. AC--MOT treats confidence, NMS, and resolution as a small runtime control space; it does not retrain a detector or alter association logic. This is relevant to real-time image processing because resolution dominates detector cost, while a poor observation set can harm both detection and identity association.
 
-The contribution is a documented scientific evolution: (i) the original five-cue Scene Complexity Index (SCI) and Smart Calibrator; (ii) historical ablations, a quality-oriented V1, and a V2 identity/false-positive/speed profile; and (iii) a frozen v3 protocol with two tracker hosts, paired bootstrap uncertainty, measured T4 latency, and no-retuning transfer. Claims are deliberately bounded: the modern VisDrone data were already read for a static control, and timing controls do not prove that frame-to-frame switching itself causes the observed baseline-relative gains.
-\begin{figure}[t]\centering\safeinput{figures/fig_concept.tex}\caption{AC--MOT replaces a fixed detector operating point with an auditable scene-conditioned action.}\label{fig:concept}\end{figure}
-\section{Related work}
-SORT and DeepSORT established efficient online association \safecite{bewley2016sort,wojke2017deepsort}{3,4}; ByteTrack exploits every detection box through two-stage association \safecite{zhang2022bytetrack}{5}. HOTA complements MOTA and identity scores in MOT evaluation \safecite{luiten2021hota}{6}. Dynamic neural networks and adaptive video analytics have shown content-aware configuration selection \safecite{han2022dynamic,jiang2018chameleon}{7,8}. AC--MOT narrows that broad idea to three detector controls selected by a lightweight, inspectable scene layer.
-\section{AC--MOT method}
-\subsection{Original scene representation and Smart Calibrator}
-Every ten frames, original AC--MOT formed a seven-analysis moving average of five normalized cues: crowd, tiny-object ratio, edge density, night, and blur. Its historical score was
-\begin{equation} \mathrm{SCI}=0.30C+0.30T+0.20E+0.10N+0.05B, \label{eq:sci}\end{equation}
-whose coefficients deliberately sum to 0.95. The historical Smart Calibrator adapted confidence as $0.245-0.050\mathrm{SCI}$ and NMS as $0.490-0.050\mathrm{SCI}$, with the code-defined scene adjustments and clipping. It selected resolution 832 for high complexity ($\mathrm{SCI}>0.60$ or $T>0.50$), 736 for medium complexity ($\mathrm{SCI}>0.35$ or crowded/tiny), and 640 otherwise. Thus confidence, NMS, and resolution adaptation predate v3.
-\begin{figure}[t]\centering\safeinput{figures/fig_architecture.tex}\caption{Original AC--MOT architecture. Past tracker output is feedback only; the detector and tracker remain distinct.}\label{fig:architecture}\end{figure}
-\subsection{Frozen modern v3}
-At frame $t$, v3 uses image statistics from $t$ and tracker-reported boxes from frames $<t$ only. Its frozen implementation analyses frame 1 and frames with $t\bmod10=1$, smooths a seven-entry history, and applies hysteresis, a 30-frame dwell time, and an object-collapse probe. Stage 3A selected the crowd cue subset. Thresholds are $t_{med}=0.29747709701135766$ and $t_{high}=0.5114928923560124$.
-\begin{table}[t]\caption{Frozen v3 detector actions.}\label{tab:actions}\centering\begin{tabular}{lrrr}\toprule State&Resolution&NMS IoU&Confidence floor\\\midrule LOW&1536&0.70&0.10\\MEDIUM&1280&0.45&0.40\\HIGH&1088&0.60&0.40\\\bottomrule\end{tabular}\end{table}
-\section{Experimental evolution and design}
-Original component ablations motivated detector-side control: historical HOTA progressed from 29.837 (baseline component configuration) to 30.864 with tuned ByteTrack, 31.384 with adaptive confidence/NMS, 32.446 with resolution-only control, and 33.064 for full historical AC--MOT. Historical V1 was the quality-oriented profile; V2 was retained as an identity/false-positive/speed trade-off rather than a global winner.
-\begin{figure}[t]\centering\safeinput{figures/fig_timeline.tex}\caption{Evidence-preserving evolution from original AC--MOT to frozen v3.}\label{fig:timeline}\end{figure}
+\input{draft_sections/01_introduction.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_concept.tex}}
+  \caption{Motivation for AC--MOT: a fixed detector operating point spends the same observation and compute budget across changing aerial scenes, whereas AC--MOT exposes an auditable scene-conditioned action.}
+  \label{fig:concept}
+\end{figure}
 
-The modern audit is also informative. Resolution-only, NMS-only, cue-subset, and earlier joint searches against a calibration-selected static point did not pass their robustness gates. A later 60-trial calibration-only joint search versus the predeclared \texttt{r1536\_n70} baseline produced the frozen three-action policy. Its trial selection is a limitation: Trial 7 was not the literal argmax under either archived eligibility reading. This provenance deviation is disclosed rather than corrected post hoc.
-\section{Experimental protocol}
-The immutable archive is tag \texttt{acmot-v3-exp-2026-10-04-freeze}, commit \texttt{280b4a2d2c2a53311d18b27886bce714b046f3b8}. The detector is \texttt{dronefreak/visdrone-yolo11m}, trained on VisDrone2019-DET at 640 pixels; its SHA256 is \texttt{c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7}. Evaluation uses the project class-agnostic protocol, not the official leaderboard protocol. The baseline \texttt{r1536\_n70} uses 1536 pixels, NMS 0.70, and no additional detector filter beyond cache floor 0.01.
+\input{draft_sections/02_related_work.tex}
 
-Development used eight VisDrone training sequences (3282 frames), four sequence folds, and sampler seed 43. Modern VisDrone evaluation has seven sequences and 71,830 GT boxes. ByteTrack used frozen defaults. OATrack is a frozen second host with tracker-side \texttt{min\_conf=0.40}, separate from detector-side confidence; no direct published-OATrack superiority is claimed. Bootstrap intervals use 5000 sequence resamples, seed 42. T4 runtime measured 200 frames. UAVDT transfer comprises 20 sequences and 16,592 frames, one frozen-policy run per host, with no bootstrap.
-\section{Results}
-\subsection{Historical evidence}
-Historical frozen VisDrone results show baseline/V1/V2 HOTA of 28.430/33.835/31.218, respectively. V1 versus baseline had $\Delta$HOTA $+5.4051$ (95\% CI [4.1273,6.9022]) and $\Delta$MOTA $+7.2195$ (95\% CI [5.4362,9.2934]). On historical zero-retuning UAVDT, baseline/V1/V2 HOTA were 24.085/28.390/26.930. These historical results and the modern protocol must not be pooled.
-\subsection{Modern VisDrone}
-\begin{table*}[t]\caption{Modern VisDrone aggregate results (seven sequences). V3 values are a documented second validation read.}\label{tab:vis}\centering\begin{tabular}{llrrrrrr}\toprule Host&Policy&HOTA&MOTA&IDF1&IDS&FP&FN\\\midrule ByteTrack&baseline&41.586&9.876&48.569&1341&39274&24121\\ByteTrack&v3&44.523&27.871&53.929&1016&24892&25902\\OATrack&baseline&46.770&28.165&57.107&773&25394&25432\\OATrack&v3&48.095&34.483&59.364&604&21400&25057\\\bottomrule\end{tabular}\end{table*}
-ByteTrack HOTA, MOTA, and IDF1 changes were +2.937 [2.356,3.375], +17.995 [13.541,23.282], and +5.360 [4.490,6.178]. OATrack changes were +1.325 [0.200,2.264], +6.318 [4.741,7.879], and +2.258 [0.548,3.474]. Both systems reduced false positives; ByteTrack recall decreased by approximately 2.48 points. V3 state occupancy was LOW 7.4\%, MEDIUM 30.1\%, HIGH 62.5\% for ByteTrack and 7.4\%, 33.3\%, 59.3\% for OATrack.
-\subsection{Runtime and transfer}
-\begin{table}[t]\caption{Measured Tesla T4 end-to-end runtime (200 frames).}\label{tab:runtime}\centering\begin{tabular}{lrrrrr}\toprule Host&FPS&Mean&P95&Detector&Controller\\& &ms&ms&ms&ms\\\midrule ByteTrack&13.4546&74.3238&100.6847&54.5688&4.2562\\OATrack&15.2731&65.4748&85.8969&52.6399&4.2010\\\bottomrule\end{tabular}\end{table}
-\begin{figure}[t]\centering\safeinput{figures/fig_runtime.tex}\caption{Mean latency measurements. Baseline and v3 harnesses do not include image-read work identically; the bars must not be read as a perfectly component-matched speedup.}\label{fig:runtime}\end{figure}
-On UAVDT, ByteTrack baseline/v3 HOTA were 45.923/47.004 and MOTA $-1.573$/16.028, with 67,539 fewer false positives under v3. OATrack baseline/v3 HOTA were 47.728/47.640 while MOTA improved from 19.607 to 22.873; this transfer is mixed, not universal.
-\section{Discussion and limitations}
-The controller reduces detector time and adds approximately 4.2 ms of explicit overhead, but modern measured throughput is below 30 FPS. The central attribution control is decisive: matched static 1088/NMS 0.45/confidence 0.40 reached approximately 44.53 HOTA with ByteTrack and 48.27 with OATrack, versus 44.52 and 48.10 for v3. Further, shuffled timing scored +2.617 against causal +2.447 mean development $\Delta$HOTA. Therefore the available evidence supports detector operating-point calibration and observation-set shaping relative to the declared baseline, not a separate causal accuracy gain from exact scene timing. Modern VisDrone was already read before v3; it is not an untouched confirmation.
-\section{Attribution and reproducibility audit}
-\subsection{Matched static control}
-The adaptive result should be read against two different static references. The declared baseline is \texttt{r1536\_n70}, used before final evaluation and intended to represent the high-resolution default. A separately calibrated static point uses resolution 1088, NMS 0.45, and detector confidence 0.40. On the first validation read this static point obtained HOTA 44.53 with ByteTrack and 48.27 with OATrack, compared with 44.52 and 48.10 for v3 on the second read. The close values are not a failure of the control layer: they show why a detector-control paper must separate the benefit of selecting an operating point from the benefit of changing it frame by frame.
+\input{draft_sections/03_original_acmot.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_architecture.tex}}
+  \caption{Original AC--MOT information flow. Past tracker output is feedback only; the detector and tracker remain distinct, and the current decision cannot use the current frame's future tracker output.}
+  \label{fig:architecture}
+\end{figure}
 
-\subsection{Selection and read-order disclosures}
-The archived selection audit records selected Trial 7 with calibration mean $\Delta$HOTA=2.446957. The implemented eligibility flag would have selected Trial 10 (2.533850), while the literal predeclared tuple rule would have selected Trial 54 (2.951489). The frozen policy is retained exactly; the discrepancy is reported as provenance, not repaired by another search. Similarly, the modern seven-sequence VisDrone evaluation is a second read because the static control had already consumed that set. The historical test-dev experiment remains the cleaner held-out historical evidence.
+\input{draft_sections/04_acmot_evolution.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_timeline.tex}}
+  \caption{Evidence-preserving evolution from original AC--MOT through historical profiles, the modern audit, frozen v3, two tracker hosts, runtime measurement, and transfer.}
+  \label{fig:timeline}
+\end{figure}
 
-\subsection{Causal timing control}
-The same-action-distribution shuffled control produced development mean $\Delta$HOTA=2.617, compared with 2.447 for the causal schedule. This does not establish that shuffled scheduling is generally superior; it does establish that the present experiment cannot attribute the whole baseline-relative gain to scene-conditioned timing. The strongest reproducible claim is consequently that AC--MOT provides an auditable policy for selecting a useful mixture of detector operating points under a runtime budget.
+\begin{table}[t]
+\caption{Historical original component ablation on the archived VisDrone protocol. Dashes denote metrics not recorded for an intermediate row.}
+\label{tab:historical-ablation}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Configuration & MOTA & HOTA & IDF1 & IDS\\
+\midrule
+OLD--A0 & 17.633 & 29.837 & 30.892 & 283\\
+Tuned ByteTrack & -- & 30.864 & -- & --\\
+Adaptive confidence/NMS & -- & 31.384 & -- & --\\
+Adaptive resolution & -- & 32.446 & -- & --\\
+OLD--A3 full AC--MOT & 18.165 & 33.064 & 36.296 & 271\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Implementation and deployment details}
-The scene layer is score-independent. At an analysis step it receives the current image's edge fraction, brightness, and Laplacian variance, together with boxes reported by the tracker at the preceding step. The crowd cue is $\min(n/30,1)$ and the tiny cue is the fraction of preceding boxes with source-image area below $1024$ pixels. The five-cue historical implementation also defines thresholds for night, blur, and edge; v3's frozen search selected the crowd subset and renormalized its contribution. The current frame's tracker result is stored only after detection and association, so it can affect later decisions but not its own decision.
+\begin{table}[t]
+\caption{Historical frozen VisDrone comparison. These rows belong to the legacy protocol and are not pooled with modern v3 results.}
+\label{tab:historical-vis}
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+System & MOTA & HOTA & IDF1 & IDS & FPS\\
+\midrule
+Baseline & 19.729 & 28.430 & 32.724 & 1235 & 36.528\\
+Old AC--MOT & 23.236 & 32.698 & 39.516 & 1061 & 41.957\\
+V1 Trial 24 & 26.948 & 33.835 & 41.546 & 1184 & 38.985\\
+V2 Trial 22 & 23.792 & 31.218 & 37.870 & 919 & 46.024\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The detector confidence floor is applied at the detector-side cache/action interface. It is distinct from OATrack's internal tracker-side minimum confidence of 0.40. This distinction matters because conflating the two would make the cross-host comparison uninterpretable. The detector checkpoint is frozen by SHA256, the action map is finite, and no online learning or gradient update occurs during deployment.
+\begin{table}[t]
+\caption{Historical zero-retuning UAVDT transfer.}
+\label{tab:historical-uavdt}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+System & MOTA & HOTA & IDF1 & IDS\\
+\midrule
+Baseline & 13.841 & 24.085 & 27.887 & 558\\
+V1 & 17.399 & 28.390 & 34.453 & 321\\
+V2 & 16.118 & 26.930 & 32.014 & 308\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{table}[t]\caption{Compact protocol and provenance summary.}\label{tab:protocol}\centering\small\begin{tabular}{p{.34\linewidth}p{.56\linewidth}}\toprule Item&Frozen definition\\\midrule Detector&\texttt{dronefreak/visdrone-yolo11m}; SHA256 \texttt{c6f98247...e96e7}\\ Development&8 VisDrone sequences; 3282 frames; four sequence folds; sampler seed 43\\ Modern VisDrone&7 sequences; 71,830 GT boxes; second read for v3\\ Trackers&Ultralytics ByteTrack defaults; frozen OATrack reimplementation\\ Statistics&5000 paired sequence resamples; seed 42\\ Runtime&Tesla T4; 200 frames; end-to-end v3 timing\\ Transfer&UAVDT; 20 sequences; 16,592 frames; no retuning\\\bottomrule\end{tabular}\end{table}
+\begin{table}[t]
+\caption{Historical V1 paired bootstrap against baseline. The archived analysis did not find a significant IDS difference.}
+\label{tab:historical-bootstrap}
+\centering\small
+\begin{tabular}{lrr}
+\toprule
+Metric & Difference & 95\% CI\\
+\midrule
+MOTA & +7.2195 & [5.4362, 9.2934]\\
+HOTA & +5.4051 & [4.1273, 6.9022]\\
+IDF1 & +8.8220 & [6.9005, 11.0537]\\
+IDS & -- & not significant\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Limitations}
-First, this is a project-specific class-agnostic evaluation protocol and should not be described as an official VisDrone leaderboard score. Second, the detector is trained on VisDrone-DET rather than VisDrone-MOT, and the OATrack detector used in its publication is not the detector used here. Third, the UAVDT result is a single frozen transfer run per host without cross-validation or bootstrap intervals. Fourth, the measured modern throughput is below 30 FPS and baseline and v3 timing harnesses do not include image-read work identically; the numbers should therefore be used to compare measured components, not to claim a perfectly matched speedup. Fifth, the selection-rule deviation and validation read order restrict confirmatory interpretation. Finally, the evidence does not establish universal improvement over every tracker, detector, or dataset.
+\input{draft_sections/05_modern_acmot_v3.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_state_machine.tex}}
+  \caption{Frozen v3 state machine. The weighted SCI uses the selected crowd cue, while tiny, edge, brightness, blur, recovery, hysteresis, and dwell logic remain part of the surrounding causal SceneLayer.}
+  \label{fig:state-machine}
+\end{figure}
+\begin{table}[t]
+\caption{Frozen modern v3 action map. State names are controller labels, not a monotonic resolution ranking.}
+\label{tab:actions}
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+State & Resolution & NMS IoU & Detector confidence floor\\
+\midrule
+LOW & 1536 & 0.70 & 0.10\\
+MEDIUM & 1280 & 0.45 & 0.40\\
+HIGH & 1088 & 0.60 & 0.40\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Conclusion}
-AC--MOT is an auditable, training-free detector-control framework for aerial tracking. Historical and modern records show that operating-point choices can materially alter tracking quality and cost. The frozen v3 policy has positive baseline-relative modern intervals on two tracker hosts and a strong ByteTrack transfer, while the controls establish the necessary narrower conclusion about switching attribution.
-\section*{Supplementary result tables for reproducibility}
-The following compact tables preserve the historical and modern distinctions needed to reproduce the narrative. They are included in the submission source rather than being reconstructed from rounded prose.
-\begin{table}[t]\caption{Historical original component ablation on the archived VisDrone protocol.}\label{tab:historical-ablation}\centering\small\begin{tabular}{lrrrr}\toprule Configuration&MOTA&HOTA&IDF1&IDS\\\midrule OLD--A0&17.633&29.837&30.892&283\\ Tuned ByteTrack&--&30.864&--&--\\ Adaptive confidence/NMS&--&31.384&--&--\\ Adaptive resolution&--&32.446&--&--\\ OLD--A3 full AC--MOT&18.165&33.064&36.296&271\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Historical frozen VisDrone comparison.}\label{tab:historical-vis}\centering\small\begin{tabular}{lrrrrr}\toprule System&MOTA&HOTA&IDF1&IDS&FPS\\\midrule Baseline&19.729&28.430&32.724&1235&36.528\\ Old AC--MOT&23.236&32.698&39.516&1061&41.957\\ V1 Trial 24&26.948&33.835&41.546&1184&38.985\\ V2 Trial 22&23.792&31.218&37.870&919&46.024\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Historical zero-retuning UAVDT transfer.}\label{tab:historical-uavdt}\centering\small\begin{tabular}{lrrrr}\toprule System&MOTA&HOTA&IDF1&IDS\\\midrule Baseline&13.841&24.085&27.887&558\\ V1&17.399&28.390&34.453&321\\ V2&16.118&26.930&32.014&308\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Historical V1 paired bootstrap against baseline.}\label{tab:historical-bootstrap}\centering\small\begin{tabular}{lrr}\toprule Metric&Difference&95\% CI\\\midrule MOTA&+7.2195&[5.4362,9.2934]\\ HOTA&+5.4051&[4.1273,6.9022]\\ IDF1&+8.8220&[6.9005,11.0537]\\ IDS&--&not significant\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Modern paired bootstrap changes versus the predeclared baseline.}\label{tab:modern-bootstrap}\centering\small\begin{tabular}{llrr}\toprule Host&Metric&Difference&95\% CI\\\midrule ByteTrack&HOTA&+2.937&[+2.356,+3.375]\\ ByteTrack&MOTA&+17.995&[+13.541,+23.282]\\ ByteTrack&IDF1&+5.360&[+4.490,+6.178]\\ ByteTrack&IDS&-325&[-498,-164]\\ OATrack&HOTA&+1.325&[+0.200,+2.264]\\ OATrack&MOTA&+6.318&[+4.741,+7.879]\\ OATrack&IDF1&+2.258&[+0.548,+3.474]\\ OATrack&IDS&-169&[-292,-42]\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Modern UAVDT transfer with the same frozen policy and no retuning.}\label{tab:modern-uavdt}\centering\small\begin{tabular}{llrrrr}\toprule Host&Policy&HOTA&MOTA&IDF1&FP\\\midrule ByteTrack&baseline&45.923&-1.573&58.400&279616\\ ByteTrack&v3&47.004&16.028&61.767&212077\\ OATrack&baseline&47.728&19.607&62.101&197937\\ OATrack&v3&47.640&22.873&62.931&183669\\\bottomrule\end{tabular}\end{table}
-\begin{table}[t]\caption{Submission reproducibility checklist.}\label{tab:checklist}\centering\small\begin{tabular}{p{.43\linewidth}p{.45\linewidth}}\toprule Check&Frozen evidence\\\midrule Scientific freeze&\texttt{acmot-v3-exp-2026-10-04-freeze}\\ Method implementation&\texttt{acmot\_sci.py}; causal previous-box feedback\\ Detector provenance&Checkpoint SHA256 recorded in archive\\ Selection provenance&Trial 7 deviation disclosed\\ Statistical protocol&5000 paired sequence resamples, seed 42\\ Runtime protocol&200-frame Tesla T4 end-to-end measurement\\ Transfer protocol&UAVDT, no retuning, one run per host\\\bottomrule\end{tabular}\end{table}
+\input{draft_sections/06_experimental_protocol.tex}
+\input{draft_sections/07_results.tex}
+\begin{figure*}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_modern_results.tex}}
+  \caption{Modern VisDrone results on the documented seven-sequence second validation read. The adaptive policy is compared with the predeclared high-resolution baseline separately for ByteTrack and OATrack; the custom class-agnostic protocol and read-order caveat apply.}
+  \label{fig:modern-results}
+\end{figure*}
+\begin{table*}[t]
+\caption{Modern VisDrone aggregate results on seven sequences and 71,830 ground-truth boxes. V3 is a documented second validation read.}
+\label{tab:modern-vis}
+\centering\scriptsize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llrrrrrrrr}
+\toprule
+Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
+\midrule
+ByteTrack & baseline & 41.586 & 9.876 & 48.569 & 1341 & 39274 & 24121 & 54.849 & 66.419\\
+ByteTrack & v3 & 44.523 & 27.871 & 53.929 & 1016 & 24892 & 25902 & 64.852 & 63.940\\
+OATrack & baseline & 46.770 & 28.165 & 57.107 & 773 & 25394 & 25432 & 64.628 & 64.594\\
+OATrack & v3 & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+\begin{table}[t]
+\caption{Modern paired bootstrap changes versus the predeclared baseline. The intervals use 5000 paired sequence resamples with seed 42.}
+\label{tab:modern-bootstrap}
+\centering\scriptsize
+\begin{tabular}{llrr}
+\toprule
+Host & Metric & Difference & 95\% CI\\
+\midrule
+ByteTrack & HOTA & +2.937 & [+2.356, +3.375]\\
+ByteTrack & MOTA & +17.995 & [+13.541, +23.282]\\
+ByteTrack & IDF1 & +5.360 & [+4.490, +6.178]\\
+ByteTrack & IDS & -325 & [-498, -164]\\
+OATrack & HOTA & +1.325 & [+0.200, +2.264]\\
+OATrack & MOTA & +6.318 & [+4.741, +7.879]\\
+OATrack & IDF1 & +2.258 & [+0.548, +3.474]\\
+OATrack & IDS & -169 & [-292, -42]\\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[t]
+\caption{Modern v3 state occupancy on the second VisDrone validation read. Occupancy verifies policy use but does not establish timing causality.}
+\label{tab:occupancy}
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+Host & LOW & MEDIUM & HIGH\\
+\midrule
+ByteTrack & 7.38\% & 30.15\% & 62.47\%\\
+OATrack & 7.38\% & 33.31\% & 59.31\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\input{draft_sections/08_runtime.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_runtime.tex}}
+  \caption{Measured Tesla T4 mean latency for the v3 hosts and the declared high-resolution baseline. The baseline and v3 harnesses do not include image-read work identically, so the bars are not a perfectly component-matched speedup.}
+  \label{fig:runtime}
+\end{figure}
+\begin{table}[t]
+\caption{Measured Tesla T4 end-to-end runtime over 200 frames.}
+\label{tab:runtime}
+\centering\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{llrrrrrr}
+\toprule
+System & Host & FPS & Mean ms & P95 ms & Detector ms & Tracker ms & Controller ms\\
+\midrule
+Baseline & ByteTrack & 7.15 & 139.9 & 171.7 & 129.3 & 10.6 & --\\
+Baseline & OATrack & 7.76 & 128.9 & 162.4 & 126.6 & 2.2 & --\\
+V3 & ByteTrack & 13.45 & 74.3 & 100.7 & 54.6 & 8.0 & 4.3\\
+V3 & OATrack & 15.27 & 65.5 & 85.9 & 52.6 & 1.8 & 4.2\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\input{draft_sections/09_transfer.tex}
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\safeinput{figures/fig_uavdt.tex}}
+  \caption{Frozen no-retuning UAVDT transfer. ByteTrack shows a strong MOTA/FP direction, whereas OATrack has mixed transfer with essentially unchanged HOTA.}
+  \label{fig:uavdt}
+\end{figure}
+\begin{table*}[t]
+\caption{Modern UAVDT transfer with the same frozen policy and no retuning. The evaluation is a single run per host under the project class-agnostic adapter; no bootstrap interval is claimed.}
+\label{tab:modern-uavdt}
+\centering\scriptsize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llrrrrrrrr}
+\toprule
+Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
+\midrule
+ByteTrack & baseline & 45.923 & -1.573 & 58.400 & 601 & 279616 & 66050 & 49.571 & 80.625\\
+ByteTrack & v3 & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
+OATrack & baseline & 47.728 & 19.607 & 62.101 & 517 & 197937 & 75612 & 57.270 & 77.820\\
+OATrack & v3 & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\input{draft_sections/10_attribution_discussion.tex}
+\begin{table}[t]
+\caption{Attribution controls. The static control is from the first validation read; the shuffled timing comparison is calibration evidence.}
+\label{tab:attribution}
+\centering\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{p{.24\linewidth}p{.15\linewidth}p{.15\linewidth}p{.24\linewidth}}
+\toprule
+Control & ByteTrack & OATrack & Interpretation\\
+\midrule
+Matched static 1088/0.45/0.40 HOTA & 44.530 & 48.269 & Close to v3 values 44.523 and 48.095; switching gain is not isolated.\\
+Shuffled timing CV mean $\Delta$HOTA & 2.617 & 2.617 & At least as high as causal 2.447 on calibration; exact timing benefit is unproven.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\input{draft_sections/11_limitations.tex}
+\input{draft_sections/12_conclusion.tex}
+
 \backmatter
-\bmhead{Declarations}\bmhead{Funding} To be completed by the authors before submission. \bmhead{Conflict of interest} The authors declare no competing interests, subject to author confirmation. \bmhead{Data availability} VisDrone and UAVDT are publicly available under their terms. \bmhead{Code availability} Frozen artifact and release status require author confirmation.
+\bmhead{Declarations}
+\noindent\textbf{Funding.} No funding statement has been supplied in the current project record; the authors should complete this declaration before submission.
+
+\noindent\textbf{Competing interests.} The authors should complete the competing-interests declaration before submission.
+
+\noindent\textbf{Ethics approval and consent to participate.} This computational study uses public benchmark data and does not involve human participants or animals.
+
+\noindent\textbf{Consent for publication.} Not applicable.
+
+\noindent\textbf{Data and code availability.} The frozen controller specification, result records, evidence map, staged sections, scripts, and build package are included in the project repository. Dataset redistribution remains subject to the original benchmark licenses and access terms.
+
+\noindent\textbf{Authors' contributions.} The authors should complete the contribution statement before submission.
+
+\noindent\textbf{Acknowledgements.} The authors should complete this statement before submission.
+
 \bibliography{references}
 \end{document}
