@@ -1,24 +1,36 @@
 \section{Results}
 \subsection{Historical reference}
-The historical chain gives context for the modern numbers. The original full controller reached HOTA 33.064 in the component ablation. V1 Trial 24 reached HOTA 33.835 and MOTA 26.948 on the historical frozen VisDrone comparison, with HOTA change $+5.4051$ and 95\% CI [4.1273,6.9022] versus its baseline. V2 Trial 22 reached HOTA 31.218 but reduced IDS to 919 and increased FPS to 46.024. These are deliberately retained as separate historical profiles: V1 is quality-oriented, while V2 trades quality for identity and runtime behaviour.
+The historical chain provides context without being pooled with v3. Original
+AC--MOT reached HOTA 33.064 in the component ablation; V1 reached HOTA 33.835
+and MOTA 26.948; V2 reached HOTA 31.218 while reducing IDS to 919 and raising
+FPS to 46.024. V1 is therefore a quality-oriented profile, whereas V2 is an
+identity/runtime trade-off. The full archived rows and uncertainty are in
+Supplementary Information, Sec.~S1.
 
-\subsection{Modern ByteTrack}
-The modern ByteTrack baseline has HOTA 41.586243867991065, MOTA 9.8760963385772, IDF1 48.56907180142684, 1341 IDS, 39274 FP, 24121 FN, precision 54.84864858650541, and recall 66.41932340247807. V3 has HOTA 44.523254059460484, MOTA 27.871362940275645, IDF1 53.9291973361374, 1016 IDS, 24892 FP, 25902 FN, precision 64.85173679751483, and recall 63.939857998050954.
+\subsection{Modern VisDrone}
+Table~\ref{tab:modern-vis} reports the aggregate results on the documented
+seven-sequence second validation read. For ByteTrack, v3 changes HOTA from
+41.586 to 44.523, MOTA from 9.876 to 27.871, IDF1 from 48.569 to 53.929, and
+IDS from 1341 to 1016. FP falls from 39274 to 24892, while FN rises from 24121
+to 25902. This is a selective observation stream: clutter and identity-
+confusing candidates decrease at a recall cost.
 
-The HOTA change is +2.937010191469419. The much larger MOTA change, +17.995266601698447, reflects the operating-point effect on the detection component of the tracking pipeline. IDF1 increases by +5.360125534710562 and IDS falls by 325, while FP falls by 14382. These changes are accompanied by 1781 additional FN and a recall decrease of approximately 2.48 points. The policy is therefore more selective: it removes many false observations and identity-confusing candidates while accepting a recall cost. That direction is mechanistically consistent with a detector confidence/NMS/resolution policy, but it is not evidence that selectivity is always preferable.
+For OATrack, HOTA changes from 46.770 to 48.095, MOTA from 28.165 to 34.483,
+IDF1 from 57.107 to 59.364, and IDS from 773 to 604. FP falls from 25394 to
+21400 and FN changes from 25432 to 25057. The smaller increment is consistent
+with a stronger baseline and different association response, not evidence that
+the controller is ineffective. The two hosts are therefore reported separately
+rather than pooled into one AC--MOT gain.
 
-The paired bootstrap supports the main positive metrics. HOTA has CI [2.3563311673055694,3.374680030512714], MOTA [13.541204948990849,23.281599318692013], IDF1 [4.489507356419196,6.178296208800193], IDS [-498,-164], and FP [-19176,-9620]. FN increases with CI [288,3594.075], so the interval evidence describes a quality trade-off rather than an unqualified gain.
+The paired bootstrap in Table~\ref{tab:modern-bootstrap} supports the main
+positive differences. ByteTrack HOTA, MOTA, IDF1, and IDS changes are
+$+2.937$ [2.356,3.375], $+17.995$ [13.541,23.282], $+5.360$ [4.490,6.178],
+and $-325$ [-498,-164]. OATrack changes are $+1.325$ [0.200,2.264],
+$+6.318$ [4.741,7.879], $+2.258$ [0.548,3.474], and $-169$ [-292,-42]. The
+ByteTrack FN increase has CI [288,3594.075], whereas OATrack FN has CI
+[-1462.575,670]; the evidence is consequently a quality trade-off rather than
+an unqualified recall improvement.
 
-The distinction between MOTA and HOTA is informative. MOTA is directly affected by the large reduction in FP and the reduction in IDS, but it also penalizes the increase in FN. HOTA combines detection and association quality and therefore moves more moderately than MOTA. IDF1 and IDS show that the more selective observation stream is not merely deleting detections: the surviving observations produce more stable identities for ByteTrack. This pattern is consistent with a detector operating-point intervention that suppresses clutter, but it does not tell us whether the same result would be obtained by a fixed calibrated action; that is the role of the attribution controls.
-
-\subsection{Modern OATrack}
-The OATrack baseline starts stronger: HOTA 46.76965850496934, MOTA 28.165112070165666, IDF1 57.10684992549888, 773 IDS, 25394 FP, and 25432 FN. V3 reaches HOTA 48.09515445301727, MOTA 34.48280662675762, IDF1 59.364442190524485, 604 IDS, 21400 FP, and 25057 FN. The incremental HOTA change is +1.32549594804793, MOTA +6.317694556591956, IDF1 +2.2575922650256075, IDS -169, and FP -3994. The smaller HOTA increment is consistent with a stronger baseline and different tracker response, not evidence that the controller is ineffective.
-
-The corresponding CIs are HOTA [0.20003190440844776,2.2644994774393084], MOTA [4.74060896979228,7.879234167893966], IDF1 [0.5480440878609443,3.473559648363689], and IDS [-292,-42]. FN changes by -375 with CI [-1463,670], so the false-negative direction is not significant for this host. We report this tracker dependence rather than collapsing the two systems into a single average.
-
-OATrack's stronger starting point changes the interpretation of the absolute increment. Its baseline already has higher HOTA, MOTA, IDF1, and fewer IDS than the ByteTrack baseline under the same detector and declared operating point. The remaining room for improvement is consequently smaller, and its association logic responds differently to the detector's selective stream. The positive HOTA interval is still evidence of a baseline-relative change, while the nonsignificant FN interval warns against describing the OATrack result as a uniform recall or detection improvement.
-
-\subsection{State occupancy and consistency}
-On the modern evaluation sequences, ByteTrack uses LOW 7.38\%, MEDIUM 30.15\%, and HIGH 62.47\%; OATrack uses LOW 7.38\%, MEDIUM 33.31\%, and HIGH 59.31\%. The nonzero occupancy and within-sequence changes verify that the controller does switch states on these sequences. They do not, by themselves, prove that the timing of each switch causes the quality difference. That question is addressed by the matched-static and shuffled controls.
-
-The occupancy also shows why an aggregate result cannot be explained by a single rare probe. HIGH is the most frequent state for both hosts, but MEDIUM occupies roughly one third of frames and LOW remains present. The two hosts have similar LOW usage but different MEDIUM/HIGH proportions, indicating that tracker feedback changes the state trajectory even though the SceneLayer does not read detector scores. State occupancy is therefore evidence of policy use and tracker interaction, not a direct measure of causal value.
+The state occupancy is reported in Supplementary Information, Sec.~S2. It
+confirms that both hosts use multiple actions and that their trajectories
+differ, but occupancy alone does not establish timing causality.

@@ -1,30 +1,54 @@
 \section{Experimental protocol}
-\subsection{Separation of historical and modern protocols}
-Historical results come from the legacy freeze and its files under \texttt{research/paper\_split/evidence/legacy/}. They contain the original controller, V1 Trial 24, V2 Trial 22, historical VisDrone test-dev, and historical UAVDT transfer. Modern results come from tag \texttt{acmot-v3-exp-2026-10-04-freeze} and the archive \texttt{ACMOT\_EXP\_V3\_2026-10-04/}. Metrics from these protocols are not pooled because detector, operating grid, evaluation details, and held-out roles differ.
+\subsection{Historical and modern separation}
+Historical results come from the legacy freeze: original AC--MOT, V1 Trial 24,
+V2 Trial 22, historical VisDrone test-dev, and historical UAVDT transfer.
+Modern results come from tag \texttt{acmot-v3-exp-2026-10-04-freeze} and its
+archived experiment package. The protocols are not pooled because their
+detectors, operating grids, evaluation details, and held-out roles differ.
 
-\subsection{Modern detector and datasets}
-The modern detector is \texttt{dronefreak/visdrone-yolo11m} (\texttt{best.pt}) trained on VisDrone2019-DET at 640 pixels. The expected and local checkpoint SHA256 is \texttt{c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7}. Modern development uses eight VisDrone2019-MOT calibration sequences and four sequence-level folds. The modern validation read contains seven sequences and 71,830 ground-truth boxes. It uses the project's class-agnostic AC--MOT evaluation protocol and is not an official VisDrone leaderboard submission; this distinction is retained in all result labels.
+\subsection{Modern detector, splits, and transfer}
+The modern detector is \texttt{dronefreak/visdrone-yolo11m} trained on
+VisDrone2019-DET at 640 pixels; the checkpoint SHA256 is \checkpointsha.
+Development uses eight VisDrone2019-MOT calibration sequences and four
+sequence-level folds. The modern VisDrone read uses seven sequences and 71,830
+ground-truth boxes. It is the project's class-agnostic protocol, not an
+official VisDrone leaderboard evaluation, and it is disclosed as a second
+validation read because a static control had already read the sequences.
 
-UAVDT transfer uses 20 sequences and 16,592 frames. The same frozen v3 policy is applied without recalibration or retuning. Three action-specific detector cache pairs give 49,776 forward passes, exactly $16,592\times3$. The transfer is one run per tracker host, so no confidence interval or cross-validation claim is attached to it.
+UAVDT transfer uses 20 sequences, 16,592 frames, and 49,776 detector forward
+passes from three action-specific cache pairs. The frozen policy is applied
+without recalibration or retuning, once per tracker host, so no bootstrap or
+cross-validation claim is attached.
 
-\subsection{Trackers, baseline, and policy}
-ByteTrack uses the frozen Ultralytics defaults recorded in the archive. OATrack is the repository's frozen reimplementation with tracker-side \texttt{min\_conf=0.40}; this value is separate from the detector-side v3 confidence floor. The declared modern baseline is \texttt{r1536\_n70}: resolution 1536, NMS IoU 0.70, and no additional detector confidence filter above the cache floor 0.01. V3 uses the exact action map and thresholds in Sec. 5. The detector and tracker weights, code, and operating choices are not changed after the freeze.
+\subsection{Trackers, baseline, and metrics}
+ByteTrack uses the frozen archive defaults. OATrack is the repository's frozen
+reimplementation with tracker-side \texttt{min\_conf=0.40}; this is separate
+from the detector-side v3 confidence floor. The declared modern baseline is
+\texttt{r1536\_n70}: resolution 1536, NMS IoU 0.70, and no detector filter
+above the cache floor 0.01. V3 uses the frozen action map and thresholds; no
+detector, tracker, or operating choice changes after the freeze.
 
-\subsection{Metrics and statistics}
-We report HOTA, MOTA, IDF1, IDS, FP, FN, precision, and recall. HOTA balances detection and association; MOTA exposes the combined effect of FP, FN, and IDS; IDF1 reports identity precision and recall. Differences between v3 and the corresponding baseline are computed at the sequence level and paired by sequence. The archived bootstrap uses 5000 paired resamples with seed 42. It is used for modern VisDrone baseline comparisons, not for the single-run UAVDT transfer.
+We report HOTA, MOTA, IDF1, IDS, FP, FN, precision, and recall. HOTA balances
+detection and association, MOTA exposes the combined FP/FN/IDS effect, and
+IDF1 measures identity precision and recall. Baseline and v3 are paired by
+sequence. The archived modern bootstrap uses 5000 paired resamples with seed
+42; it is not applied to the single-run UAVDT transfer.
 
-\subsection{Runtime}
-V3 runtime is measured on a Tesla T4 over 200 frames with the real causal scene analysis, detector call at the selected resolution, and tracker update. We record mean latency, P95 latency, FPS, detector time, tracker time, and controller overhead. The earlier baseline harness does not include image-read work identically, so baseline and v3 values are reported with that instrumentation caveat. The analysis does not assert a 30-FPS deployment target.
+\subsection{Runtime and evaluation handling}
+V3 runtime is measured on a Tesla T4 over 200 frames with causal scene
+analysis, detector execution at the selected resolution, and tracker update.
+Mean latency, P95 latency, FPS, detector time, tracker time, and controller
+overhead are recorded. The baseline harness does not include image-read work
+identically, so the comparison is reported with that caveat and is not called a
+perfectly matched speedup. The analysis does not claim a 30-FPS deployment
+target.
 
-The resulting protocol separates development evidence, frozen modern validation, and external transfer. It also makes the attribution comparison possible: the modern v3 result is measured against the predeclared high-resolution baseline, while the matched static control and shuffled timing control are interpreted as separate evidence rather than silently substituted baselines.
-
-\subsection{Detection cache and class handling}
-The modern action space is evaluated through cached detector outputs generated at the required resolution/NMS combinations. The cache is a reproducibility device, not a new training set: v3 selects among already generated detector operating points, and the archive records the cache provenance and hashes. The evaluation maps the project classes to its class-agnostic vehicle/tracking protocol and applies the documented filters before TrackEval-style scoring. Pedestrian or unsupported labels are not silently counted as additional target classes. This is why the resulting values must be described as the project's class-agnostic protocol rather than as official VisDrone leaderboard metrics.
-
-\subsection{Pairing and aggregation}
-For each tracker host, baseline and v3 are evaluated on the same seven modern sequences and paired by sequence identifier. Aggregate metrics are read from the frozen result JSON; the paired bootstrap resamples these sequence-level pairs with replacement 5000 times. Thus the confidence interval quantifies uncertainty in the system difference across the available sequences, not pixel-level independence or repeated detector stochasticity. The archive's stored metric values are authoritative; the manuscript does not recompute a new evaluator or select a different pooling rule after observing the results.
-
-The historical protocol follows its own frozen files and is presented separately. In particular, the historical V1/V2 test-dev and UAVDT rows cannot be interpreted as additional folds of the modern experiment. This separation avoids mixing detector checkpoints, tracker settings, class filters, and baseline definitions under a single table.
-
-\subsection{Reproducibility lock}
-The modern freeze records the detector hash, controller thresholds, action map, tracker descriptions, random seeds, calibration fold membership, forward-pass count, and source-file checksums. The selection audit is retained even though the selected trial is not the literal argmax under the recorded rule. A reproduction should therefore begin by checking the archive hashes and Git freeze tag, then reconstructing the cached operating points and running only the declared evaluation scripts. It should not rerun Optuna, retune on the seven evaluation sequences, or replace the stored controller with a supposedly simpler static policy.
+Detector outputs are cached at the required resolution/NMS combinations for
+reproducibility. The project maps classes to its documented class-agnostic
+vehicle/tracking protocol before TrackEval-style scoring; these values must
+therefore not be described as official leaderboard metrics. The archive records
+the detector hash, controller thresholds, action map, tracker descriptions,
+calibration folds, forward-pass count, and source checksums. It also records
+that frozen Trial 7 is not the literal argmax of the documented selection rule
+under either eligibility interpretation; the paper reports this deviation and
+does not rerun the search.

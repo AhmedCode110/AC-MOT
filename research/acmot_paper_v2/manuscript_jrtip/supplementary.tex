@@ -1,0 +1,280 @@
+% Supplementary Information for the AC--MOT JRTIP manuscript.
+% This file contains supporting evidence moved out of the 12-page main paper.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{geometry}
+\usepackage{enumitem}
+\geometry{a4paper,margin=0.72in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newcommand{\checkpointsha}{\texttt{c6f98247\allowbreak{}e7c731a5\allowbreak{}67aaf37c\allowbreak{}a7b808be\allowbreak{}ff588b68\allowbreak{}7623e028\allowbreak{}b25a2e1d\allowbreak{}846e96e7}}
+
+\title{Supplementary Information\\[2pt]
+AC--MOT: Adaptive Detector Operating-Point Control for Real-Time Aerial Multi-Object Tracking}
+\author{Ahmed Gouda Ismail, Mohamed S. Mohamed, and Tarek Ahmed Mahmoud}
+\date{}
+
+\begin{document}
+\maketitle
+
+This supplementary document preserves supporting historical, implementation, and
+provenance evidence that is not required to understand the primary contribution
+or to verify the main-paper claims. Historical and modern protocols remain
+separate. All values below are copied from the frozen manuscript evidence and
+are not new experiments.
+
+\section*{S1. Extended historical evidence}
+
+\subsection*{S1.1 Component ablation}
+The archived component progression is shown in full. The rows are historical
+evidence and are not pooled with modern v3 results.
+
+\begin{table}[ht]
+\centering\small
+\caption{Full historical component ablation.}
+\label{tab:s1-ablation}
+\begin{tabular}{lrrrrr}
+\toprule
+Configuration & MOTA & HOTA & IDF1 & IDS & FPS\\
+\midrule
+OLD--A0 & 17.633 & 29.837 & 30.892 & 283 & 44.085\\
+OLD--A1 tuned tracker & 17.802 & 30.864 & 32.854 & 217 & 44.511\\
+OLD--A2 confidence/NMS & 17.636 & 31.384 & 33.727 & 210 & 40.651\\
+OLD--A2R resolution & 18.425 & 32.446 & 35.669 & 241 & 39.562\\
+OLD--A3 full AC--MOT & 18.165 & 33.064 & 36.296 & 271 & 37.962\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{S1.2 Historical VisDrone profiles}
+The historical frozen comparison contains separate operating profiles. V1 is
+quality-oriented, whereas V2 deliberately trades quality for identity and
+runtime behaviour.
+
+\begin{table}[ht]
+\centering\small
+\caption{Full historical VisDrone comparison.}
+\label{tab:s1-visdrone}
+\begin{tabular}{lrrrrr}
+\toprule
+System & MOTA & HOTA & IDF1 & IDS & FPS\\
+\midrule
+Baseline & 19.729 & 28.430 & 32.724 & 1235 & 36.528\\
+Old AC--MOT & 23.236 & 32.698 & 39.516 & 1061 & 41.957\\
+V1 Trial 24 & 26.948 & 33.835 & 41.546 & 1184 & 38.985\\
+V2 Trial 22 & 23.792 & 31.218 & 37.870 & 919 & 46.024\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{S1.3 Historical V1 uncertainty and UAVDT transfer}
+
+\begin{table}[ht]
+\centering\small
+\caption{Full archived V1 paired bootstrap against the historical baseline.}
+\label{tab:s1-bootstrap}
+\begin{tabular}{lrr}
+\toprule
+Metric & Difference & 95\% CI\\
+\midrule
+MOTA & +7.2195 & [5.4362, 9.2934]\\
+HOTA & +5.4051 & [4.1273, 6.9022]\\
+IDF1 & +8.8220 & [6.9005, 11.0537]\\
+IDS & -- & not significant\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering\small
+\caption{Full historical zero-retuning UAVDT transfer.}
+\label{tab:s1-uavdt}
+\begin{tabular}{lrrrr}
+\toprule
+System & MOTA & HOTA & IDF1 & IDS\\
+\midrule
+Baseline & 13.841 & 24.085 & 27.887 & 558\\
+V1 & 17.399 & 28.390 & 34.453 & 321\\
+V2 & 16.118 & 26.930 & 32.014 & 308\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{S2. Extended modern result evidence}
+
+\subsection*{S2.1 Full paired bootstrap metrics}
+The main paper reports the headline HOTA, MOTA, IDF1, and IDS intervals.
+The complete archived table additionally records false-positive and
+false-negative changes.
+
+\begin{table}[ht]
+\centering\scriptsize
+\caption{Complete modern paired bootstrap changes versus the declared baseline.}
+\label{tab:s2-bootstrap}
+\begin{tabular}{llrrr}
+\toprule
+Host & Metric & Difference & CI low & CI high\\
+\midrule
+ByteTrack & HOTA & +2.937 & +2.356 & +3.375\\
+ByteTrack & MOTA & +17.995 & +13.541 & +23.282\\
+ByteTrack & IDF1 & +5.360 & +4.490 & +6.178\\
+ByteTrack & IDS & -325 & -498 & -164\\
+ByteTrack & FP & -14382 & -19176 & -9620\\
+ByteTrack & FN & +1781 & +288 & +3594.075\\
+OATrack & HOTA & +1.325 & +0.200 & +2.264\\
+OATrack & MOTA & +6.318 & +4.741 & +7.879\\
+OATrack & IDF1 & +2.258 & +0.548 & +3.474\\
+OATrack & IDS & -169 & -292 & -42\\
+OATrack & FP & -3994 & -6190 & -2494.900\\
+OATrack & FN & -375 & -1462.575 & +670\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The bootstrap uses 5000 paired sequence resamples with seed 42. It quantifies
+uncertainty across the available sequences; it does not make frames or
+detector stochasticity independent.
+
+\subsection*{S2.2 State occupancy}
+
+\begin{table}[ht]
+\centering\small
+\caption{Modern v3 state occupancy on the second VisDrone validation read.}
+\label{tab:s2-occupancy}
+\begin{tabular}{lrrr}
+\toprule
+Host & LOW & MEDIUM & HIGH\\
+\midrule
+ByteTrack & 7.38\% & 30.15\% & 62.47\%\\
+OATrack & 7.38\% & 33.31\% & 59.31\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Occupancy verifies that the controller uses multiple states and that the
+trajectory differs by tracker host. It does not establish that exact switching
+timing causes the quality difference.
+
+\subsection*{S2.3 Full modern UAVDT transfer}
+
+\begin{table}[ht]
+\centering\scriptsize
+\caption{Full modern UAVDT transfer under the frozen policy and no retuning.}
+\label{tab:s2-uavdt}
+\begin{tabular}{llrrrrrrrr}
+\toprule
+Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
+\midrule
+ByteTrack & baseline & 45.923 & -1.573 & 58.400 & 601 & 279616 & 66050 & 49.571 & 80.625\\
+ByteTrack & v3 & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
+OATrack & baseline & 47.728 & 19.607 & 62.101 & 517 & 197937 & 75612 & 57.270 & 77.820\\
+OATrack & v3 & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The transfer contains 20 sequences, 16,592 frames, and 49,776 detector
+forward passes. It is a single frozen-policy run per host without bootstrap or
+cross-validation.
+
+\section*{S3. Implementation traces}
+
+\subsection*{S3.1 Original AC--MOT execution order}
+The full original pseudocode is retained here so that the main paper can keep
+the equations and causal information flow without spending a second algorithm
+float on historical implementation detail.
+
+\begin{algorithm}[ht]
+\caption{Original AC--MOT controller}
+\label{alg:s3-original}
+\begin{algorithmic}[1]
+\State initialize seven-entry SCI history and previous tracker boxes
+\For{each frame $t$}
+\If{$t=1$ or $t\bmod 10=1$}
+\State compute $C_t,T_t,E_t,N_t,B_t$ from current image and prior boxes
+\State append $S_t$ to the history and average the available entries
+\State apply Smart Calibrator confidence, NMS, and resolution rules
+\EndIf
+\State run detector at held operating point and update the fixed tracker
+\State store tracker boxes for future analysis
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{S3.2 Modern v3 execution trace}
+At an analysis step, \texttt{analyze\_visual} computes reduced grayscale
+statistics from the current image: Canny edge fraction, mean brightness, and
+Laplacian variance. The SceneLayer reads \texttt{prev\_boxes}, reported by the
+tracker on the last processed frame, and computes box count, crowd value,
+box-area tiny fraction, and the decaying object-count peak. On non-analysis
+frames the previous state and action remain unchanged.
+
+The implementation then evaluates the labels in order. Brightness can label a
+frame as night, blur can label it as blur, tiny-object fraction can label it as
+tiny, and crowd or edge conditions can label it as crowded. The raw target uses
+the modern thresholds and tiny guard. If the count falls below 0.40 of the
+decayed peak after the peak has reached five objects, the bounded recovery probe
+can request HIGH for up to three analysis steps.
+
+If the raw target is lower than the persistent state, the hold rules are
+checked: HIGH is held when SCI remains above 0.50 or tiny remains above 0.40,
+and MEDIUM is held when SCI remains above 0.25. The 30-frame dwell gate then
+prevents a state change too soon after the previous change. Only after these
+guards does the adapter translate the state into the frozen
+resolution/NMS/confidence tuple, run the detector, update the tracker, and store
+its boxes for a later decision.
+
+\subsection*{S3.3 Reproducibility checklist}
+\begin{enumerate}[leftmargin=*]
+\item Use the detector checkpoint \texttt{dronefreak} / \texttt{visdrone-yolo11m}.
+\item Keep the eight-sequence calibration split separate from the seven-sequence
+      modern evaluation read.
+\item Preserve the crowd history length of seven and analysis stride of ten.
+\item Apply the exact v3 thresholds, tiny guard, recovery probe, hysteresis,
+      30-frame dwell, and action tuples.
+\item Keep detector-side confidence distinct from OATrack's tracker-side
+      \texttt{min\_conf=0.40}.
+\item Use the class-agnostic project evaluator and label it as such rather than
+      as an official VisDrone leaderboard protocol.
+\item Pair baseline and v3 by sequence and use 5000 resamples with seed 42 for
+      the modern bootstrap.
+\item Do not retune on the seven-sequence read or on UAVDT.
+\end{enumerate}
+
+\section*{S4. Provenance and selection audit}
+
+The modern freeze records the detector hash, controller thresholds, action map,
+tracker descriptions, random seed, calibration fold membership, forward-pass
+count, and source-file checksums. Stage 3A selected the cue subset
+\texttt{['crowd']}; this describes the weighted SCI, not the removal of tiny,
+edge, brightness, or blur from the surrounding SceneLayer.
+
+The seven-sequence modern VisDrone evaluation is a documented second validation
+read. It must not be described as an untouched held-out confirmation. The
+archive also records that frozen Trial 7 is not the literal argmax of the
+documented selection rule under either archived eligibility interpretation. The
+manuscript reports this deviation and does not rerun the search.
+
+The matched static control uses 1088 resolution, NMS IoU 0.45, and confidence
+0.40. Its HOTA is approximately 44.530 for ByteTrack and 48.269 for OATrack,
+compared with v3 values 44.523 and 48.095. The shuffled timing control has
+development mean $\Delta$HOTA 2.446957 for the causal schedule and 2.617228 for
+the same-action-distribution shuffled schedule. These controls shift the safe
+interpretation toward operating-point calibration and observation-set shaping;
+they do not establish that random timing is globally superior.
+
+\section*{S5. Boundary of the supplementary evidence}
+
+The supplementary material supports auditability and future reproduction. It
+does not add a new claim of universal tracker independence, official leaderboard
+equivalence, 30-FPS operation, or a timing-specific causal gain. The main paper
+retains the negative attribution evidence, the second-read disclosure, the
+Trial 7 selection deviation, the runtime harness caveat, and the mixed OATrack
+UAVDT transfer because those facts define the supported claim boundary.
+
+\end{document}

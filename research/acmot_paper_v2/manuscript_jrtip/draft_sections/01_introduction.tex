@@ -1,24 +1,56 @@
 \section{Introduction}
-Multi-object tracking from an unmanned aerial vehicle is an observation problem as much as an association problem. A camera moving above a road or a built-up area sees a changing number of objects, changing apparent object scale, partial occlusion, camera motion, illumination changes, and blur \cite{zhu2022visdrone,du2018uavdt}. These changes are not independent: a dense scene tends to create overlapping boxes, a high viewpoint can reduce the pixel area of every target, and motion blur can make a detector's score distribution less separable. A tracker receives the detector's output rather than the image itself, so these changes are converted into missed observations, duplicate observations, and ambiguous associations.
+Multi-object tracking from an unmanned aerial vehicle is an observation problem
+as much as an association problem. Density, target scale, occlusion, camera
+motion, illumination, and blur change within a sequence, so a tracker receives
+an observation stream whose quality and cost are both time-varying
+\cite{zhu2022visdrone,du2018uavdt}. A fixed confidence floor can remove weak
+but useful boxes in a sparse scene and retain clutter in a dense one; NMS can
+merge nearby targets; and fixed resolution spends the same detector budget on
+easy and difficult frames. These choices affect FP, FN, IDS, HOTA, MOTA, and
+throughput together.
 
-In most tracking-by-detection systems, three detector operating points are fixed before deployment. The confidence floor controls which candidate boxes reach post-processing or the tracker. Non-maximum suppression (NMS) controls which overlapping candidates survive. Input resolution changes the evidence available for small objects and is also one of the dominant determinants of detector cost. A fixed confidence floor can remove weak but useful observations in a sparse aerial scene; the same floor can be necessary to suppress clutter in a dense scene. A fixed NMS threshold changes the degree to which nearby targets are merged. A fixed resolution avoids control overhead, but spends the same computational budget on easy and difficult frames. Consequently, operating-point choices affect false positives (FP), false negatives (FN), association opportunities, identity switches (IDS), HOTA and MOTA, and throughput at once.
+AC--MOT was introduced as a training-free runtime layer that computes cheap
+scene cues, forms a Scene Complexity Index (SCI), and changes detector
+confidence, NMS, and input resolution while keeping detector and tracker
+separate. Its scientific value is the control interface: the detector
+operating point becomes an auditable runtime variable rather than an immutable
+deployment setting.
 
-AC--MOT was introduced as a training-free runtime control layer for this coupled problem. The original controller computed inexpensive scene cues, combined them into a Scene Complexity Index (SCI), and used a Smart Calibrator to change detector confidence, NMS, and resolution while keeping the detector and tracker as separate modules. It did not require detector retraining or an online policy network. Its scientific value is therefore not only a particular parameter setting; it is the proposal to treat the detector operating point as a runtime control variable in an online MOT pipeline.
+This paper follows the evolution from original AC--MOT through component
+ablations, validation-calibrated profiles V1 and V2, and the stricter modern
+policy frozen as v3. Historical evidence asks whether detector-side controls
+change tracking behaviour and whether distinct calibrated profiles transfer.
+The modern protocol asks whether a frozen operating point policy improves a
+declared high-resolution baseline, whether the direction survives a second
+tracker host, what quality--throughput trade-off is measured on a Tesla T4, and
+whether exact scene-conditioned timing adds evidence beyond a useful mixture of
+operating points.
 
-This paper studies the evolution of that idea rather than presenting one final controller in isolation. The sequence is original AC--MOT, component ablations, the validation-calibrated quality profile V1, the identity/false-positive/runtime profile V2, and a stricter modern redesign frozen as v3. The historical stages answer whether the individual controls changed tracking behaviour and whether a calibrated operating profile transferred to another aerial dataset. The modern stage asks a narrower and more reproducible question with an explicitly frozen development split, a modern detector, two tracker hosts, paired sequence bootstrap intervals, end-to-end Tesla T4 measurements, and a frozen UAVDT transfer.
-
-The modern question is broader than whether dynamic switching increases HOTA. It asks four related questions. First, can a detector operating point selected from calibration improve downstream MOT relative to a declared high-resolution baseline? Second, does the effect survive a change in tracker host? Third, what quality--throughput trade-off is actually measured when the controller, detector, and tracker run together? Fourth, does the exact scene-conditioned timing of the changes add evidence beyond selecting a useful mixture of operating points? The last question is essential because a dynamic schedule can appear successful even when its matched static operating point explains most of the accuracy difference.
-
-The contributions are therefore bounded and evidence-oriented:
+The contributions are bounded and evidence-oriented:
 \begin{enumerate}
-\item We reconstruct the original AC--MOT method, including its five scene cues, historical SCI, temporal smoothing, Smart Calibrator, and three detector-side controls.
-\item We document the component ablation and the V1/V2 evolution as a sequence of design decisions, preserving both quality gains and negative or trade-off results.
-\item We specify the frozen v3 controller at implementation level: its crowd-selected weighted SCI, surrounding state logic, hysteresis, recovery probe, dwell rule, causal information flow, and action map.
-\item We evaluate the frozen policy on ByteTrack and a controlled OATrack host with exact aggregate metrics and paired 5000-resample sequence bootstrap intervals.
-\item We measure end-to-end v3 latency on a Tesla T4 and report detector, tracker, and controller components rather than calling a sub-30-FPS system 30-FPS real time.
-\item We perform frozen no-retuning transfer to UAVDT and use matched-static and shuffled-timing controls to distinguish baseline-relative operating-point benefit from an unproven timing-specific causal benefit.
+\item We reconstruct original AC--MOT, including its five cues, historical SCI,
+      temporal smoothing, Smart Calibrator, and three detector-side controls.
+\item We document the V1/V2 evolution as distinct quality, identity, and runtime
+      profiles, preserving the component trend and historical trade-offs.
+\item We specify frozen v3 at implementation level: the crowd-selected SCI,
+      surrounding state logic, thresholds, recovery probe, hysteresis, dwell,
+      causal information flow, and action map.
+\item We evaluate ByteTrack and a controlled OATrack host with aggregate metrics
+      and paired 5000-resample sequence bootstrap intervals.
+\item We measure end-to-end Tesla T4 latency and report detector, tracker, and
+      controller components without calling a sub-30-FPS system 30-FPS real
+      time.
+\item We report no-retuning UAVDT transfer and matched-static and shuffled-
+      timing controls to separate baseline-relative operating-point evidence
+      from an unproven timing-specific causal benefit.
 \end{enumerate}
 
-The resulting claim is deliberately precise. AC--MOT provides an auditable training-free mechanism for shaping the observation stream and computational operating point of aerial MOT. The frozen evidence supports positive changes relative to the declared baseline and a strong ByteTrack transfer, with a smaller mixed effect on OATrack. It does not establish universal improvement, official leaderboard equivalence, or that the exact scene-conditioned timing is necessary for the observed accuracy gains.
-
-The paper is organized to preserve this distinction. The original method is reconstructed before the modern method so that the modern crowd-selected index is not mistaken for the historical five-cue design. The evolution section keeps calibration, identity stability, and runtime trade-offs separate. The protocol section assigns each sequence split a role and identifies the custom evaluator. Results then report the two tracker hosts independently, followed by runtime, transfer, and attribution. This order lets the reader judge both the positive baseline-relative evidence and the limits of the causal interpretation.
+The supported claim is precise. AC--MOT is an auditable training-free mechanism
+for shaping the detector observation stream and computational operating point
+of aerial MOT. The frozen evidence supports positive changes relative to the
+declared baseline and strong ByteTrack transfer, with a smaller mixed effect on
+OATrack. It does not establish universal improvement, official leaderboard
+equivalence, or that exact scene-conditioned timing is necessary for the
+observed accuracy gains. Historical and modern protocols are therefore kept
+separate throughout the paper; extended historical and audit material is
+provided in Supplementary Information.

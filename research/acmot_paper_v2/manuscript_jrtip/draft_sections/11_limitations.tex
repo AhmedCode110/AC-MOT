@@ -1,12 +1,26 @@
 \section{Limitations}
-The modern seven-sequence VisDrone evaluation is a second validation read: a static control had already read that set before the v3 adaptive evaluation. The results should therefore not be called an untouched held-out confirmation. They remain a frozen, documented comparison, while the historical test-dev experiment is the cleaner historical held-out evidence.
+The modern seven-sequence VisDrone result is a second validation read: a static
+control had already read those sequences before v3. It is therefore a frozen,
+documented comparison, not an untouched held-out confirmation; the historical
+test-dev experiment is the cleaner historical held-out evidence.
 
-The selection audit records that frozen Trial 7 is not the literal argmax of the documented selection rule under either archived eligibility interpretation. This is a provenance limitation, not an invitation to rerun the search after seeing final results. The manuscript reports the deviation and keeps the frozen controller unchanged.
+The freeze records that Trial 7 is not the literal argmax of the documented
+selection rule under either archived eligibility interpretation. This provenance
+limitation is reported without rerunning the search. Matched-static and
+shuffled-timing controls further weaken a claim that exact switching timing
+causes the accuracy gain. The project class-agnostic evaluator is not an
+official VisDrone leaderboard protocol.
 
-Matched-static and shuffled-timing controls weaken a claim that exact switching timing causes the accuracy gain. They do not remove the measured difference from the declared \texttt{r1536\_n70} baseline, but they shift the supported attribution toward operating-point calibration and observation-set shaping. The custom class-agnostic evaluation protocol is also not an official VisDrone leaderboard protocol; comparisons must remain within the archived protocol.
+Only one modern detector checkpoint is used: a third-party
+VisDrone-DET-trained YOLO11m model rather than a VisDrone-MOT-trained or
+published OATrack detector. Two tracker hosts demonstrate interaction but not
+tracker independence, and the OATrack implementation is a controlled
+repository reimplementation rather than a direct published-system comparison.
 
-Only one modern detector checkpoint is used, and it is a third-party VisDrone-DET-trained YOLO11m model rather than a VisDrone-MOT-trained or published OATrack detector. Two tracker hosts demonstrate interaction but do not establish tracker independence. OATrack is a controlled repository reimplementation, so no direct superiority claim over the published OATrack system is made.
-
-The archive also contains a documented selection-rule deviation. This limits the strength of any claim that the selected trial was optimal under a predeclared objective, even though the controller itself is frozen and its baseline-relative evaluation is reproducible. The modern development evidence further shows that several adaptive formulations failed against a matched static point. Those negative results narrow the design space but should not be generalized to every possible adaptive controller.
-
-UAVDT transfer is a single frozen-policy run per host with no cross-validation or bootstrap interval. Its ByteTrack result is strongly positive in MOTA and FP, while its OATrack HOTA is essentially flat. Runtime measurements are real T4 measurements, but baseline and v3 harnesses include image-read work differently; the reported figures are not a perfectly matched speedup. Finally, the modern throughput is below 30 FPS. These limitations restrict generalization and attribution, but the frozen evidence still supports a reproducible detector-operating-point control study with measured quality, cost, and transfer behaviour.
+UAVDT transfer is a single frozen-policy run per host without cross-validation
+or bootstrap. Its ByteTrack result is strongly positive in MOTA and FP, while
+OATrack HOTA is essentially flat. T4 timing is measured, but image-read work is
+not instrumented identically in baseline and v3 harnesses. Finally, throughput
+is below 30 FPS. These limits constrain generalization and attribution while
+leaving a reproducible detector-operating-point study with measured quality,
+cost, and transfer behaviour.

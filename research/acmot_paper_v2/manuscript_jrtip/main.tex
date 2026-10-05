@@ -1,7 +1,7 @@
 % AC--MOT Paper 1, assembled from the frozen staged sections.
 % The staged section files remain the authoritative scientific prose source.
 \IfFileExists{sn-jnl.cls}{%
-  \documentclass[pdflatex,sn-mathphys-num]{sn-jnl}%
+  \documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}%
 }{%
   \documentclass{article}%
   \newcommand{\fnm}[1]{##1}%
@@ -29,6 +29,7 @@
 \usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
 \newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\fbox{Figure source unavailable}}}
 \newcommand{\sourcepath}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\checkpointsha}{\texttt{c6f98247\allowbreak{}e7c731a5\allowbreak{}67aaf37c\allowbreak{}a7b808be\allowbreak{}ff588b68\allowbreak{}7623e028\allowbreak{}b25a2e1d\allowbreak{}846e96e7}}
 
 \title{AC--MOT: Adaptive Detector Operating-Point Control for Real-Time Aerial Multi-Object Tracking}
 \author{Ahmed Gouda Ismail, Mohamed S. Mohamed, and Tarek Ahmed Mahmoud}
@@ -64,75 +65,19 @@ Unmanned-aerial-vehicle multi-object tracking must balance observation quality a
 \end{figure}
 
 \input{draft_sections/04_acmot_evolution.tex}
-\begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_timeline.tex}}
-  \caption{Evidence-preserving evolution from original AC--MOT through historical profiles, the modern audit, frozen v3, two tracker hosts, runtime measurement, and transfer.}
-  \label{fig:timeline}
-\end{figure}
-
 \begin{table}[t]
-\caption{Historical original component ablation on the archived VisDrone protocol. Dashes denote metrics not recorded for an intermediate row.}
-\label{tab:historical-ablation}
-\centering\small
-\begin{tabular}{lrrrr}
+\caption{Compact historical evolution summary. These rows belong to the legacy protocol and are not pooled with modern v3 results; full ablation, bootstrap, and UAVDT rows are in Supplementary Information, Sec.~S1.}
+\label{tab:historical-summary}
+\centering\scriptsize
+\begin{tabularx}{\linewidth}{Xrrrr}
 \toprule
-Configuration & MOTA & HOTA & IDF1 & IDS\\
+Profile & HOTA & MOTA & IDS & FPS\\
 \midrule
-OLD--A0 & 17.633 & 29.837 & 30.892 & 283\\
-Tuned ByteTrack & -- & 30.864 & -- & --\\
-Adaptive confidence/NMS & -- & 31.384 & -- & --\\
-Adaptive resolution & -- & 32.446 & -- & --\\
-OLD--A3 full AC--MOT & 18.165 & 33.064 & 36.296 & 271\\
+Original full AC--MOT & 33.064 & 18.165 & 271 & 37.962\\
+V1 quality profile & 33.835 & 26.948 & 1184 & 38.985\\
+V2 identity/speed profile & 31.218 & 23.792 & 919 & 46.024\\
 \bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\caption{Historical frozen VisDrone comparison. These rows belong to the legacy protocol and are not pooled with modern v3 results.}
-\label{tab:historical-vis}
-\centering\small
-\begin{tabular}{lrrrrr}
-\toprule
-System & MOTA & HOTA & IDF1 & IDS & FPS\\
-\midrule
-Baseline & 19.729 & 28.430 & 32.724 & 1235 & 36.528\\
-Old AC--MOT & 23.236 & 32.698 & 39.516 & 1061 & 41.957\\
-V1 Trial 24 & 26.948 & 33.835 & 41.546 & 1184 & 38.985\\
-V2 Trial 22 & 23.792 & 31.218 & 37.870 & 919 & 46.024\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\caption{Historical zero-retuning UAVDT transfer.}
-\label{tab:historical-uavdt}
-\centering\small
-\begin{tabular}{lrrrr}
-\toprule
-System & MOTA & HOTA & IDF1 & IDS\\
-\midrule
-Baseline & 13.841 & 24.085 & 27.887 & 558\\
-V1 & 17.399 & 28.390 & 34.453 & 321\\
-V2 & 16.118 & 26.930 & 32.014 & 308\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\caption{Historical V1 paired bootstrap against baseline. The archived analysis did not find a significant IDS difference.}
-\label{tab:historical-bootstrap}
-\centering\small
-\begin{tabular}{lrr}
-\toprule
-Metric & Difference & 95\% CI\\
-\midrule
-MOTA & +7.2195 & [5.4362, 9.2934]\\
-HOTA & +5.4051 & [4.1273, 6.9022]\\
-IDF1 & +8.8220 & [6.9005, 11.0537]\\
-IDS & -- & not significant\\
-\bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 \input{draft_sections/05_modern_acmot_v3.tex}
@@ -148,7 +93,7 @@ IDS & -- & not significant\\
 \centering\small
 \begin{tabular}{lrrr}
 \toprule
-State & Resolution & NMS IoU & Detector confidence floor\\
+State & Resolution & NMS IoU & Conf. floor\\
 \midrule
 LOW & 1536 & 0.70 & 0.10\\
 MEDIUM & 1280 & 0.45 & 0.40\\
@@ -186,6 +131,7 @@ OATrack & v3 & 48.095 & 34.483 & 59.364 & 604 & 21400 & 25057 & 68.609 & 65.116\
 \caption{Modern paired bootstrap changes versus the predeclared baseline. The intervals use 5000 paired sequence resamples with seed 42.}
 \label{tab:modern-bootstrap}
 \centering\scriptsize
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{llrr}
 \toprule
 Host & Metric & Difference & 95\% CI\\
@@ -201,89 +147,16 @@ OATrack & IDS & -169 & [-292, -42]\\
 \bottomrule
 \end{tabular}
 \end{table}
-\begin{table}[t]
-\caption{Modern v3 state occupancy on the second VisDrone validation read. Occupancy verifies policy use but does not establish timing causality.}
-\label{tab:occupancy}
-\centering\small
-\begin{tabular}{lrrr}
-\toprule
-Host & LOW & MEDIUM & HIGH\\
-\midrule
-ByteTrack & 7.38\% & 30.15\% & 62.47\%\\
-OATrack & 7.38\% & 33.31\% & 59.31\%\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \input{draft_sections/08_runtime.tex}
-\begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_runtime.tex}}
-  \caption{Measured Tesla T4 mean latency for the v3 hosts and the declared high-resolution baseline. The baseline and v3 harnesses do not include image-read work identically, so the bars are not a perfectly component-matched speedup.}
-  \label{fig:runtime}
-\end{figure}
-\begin{table}[t]
-\caption{Measured Tesla T4 end-to-end runtime over 200 frames.}
-\label{tab:runtime}
-\centering\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{llrrrrrr}
-\toprule
-System & Host & FPS & Mean ms & P95 ms & Detector ms & Tracker ms & Controller ms\\
-\midrule
-Baseline & ByteTrack & 7.15 & 139.9 & 171.7 & 129.3 & 10.6 & --\\
-Baseline & OATrack & 7.76 & 128.9 & 162.4 & 126.6 & 2.2 & --\\
-V3 & ByteTrack & 13.45 & 74.3 & 100.7 & 54.6 & 8.0 & 4.3\\
-V3 & OATrack & 15.27 & 65.5 & 85.9 & 52.6 & 1.8 & 4.2\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \input{draft_sections/09_transfer.tex}
-\begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{\safeinput{figures/fig_uavdt.tex}}
-  \caption{Frozen no-retuning UAVDT transfer. ByteTrack shows a strong MOTA/FP direction, whereas OATrack has mixed transfer with essentially unchanged HOTA.}
-  \label{fig:uavdt}
-\end{figure}
-\begin{table*}[t]
-\caption{Modern UAVDT transfer with the same frozen policy and no retuning. The evaluation is a single run per host under the project class-agnostic adapter; no bootstrap interval is claimed.}
-\label{tab:modern-uavdt}
-\centering\scriptsize
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{llrrrrrrrr}
-\toprule
-Host & Policy & HOTA & MOTA & IDF1 & IDS & FP & FN & Precision & Recall\\
-\midrule
-ByteTrack & baseline & 45.923 & -1.573 & 58.400 & 601 & 279616 & 66050 & 49.571 & 80.625\\
-ByteTrack & v3 & 47.004 & 16.028 & 61.767 & 486 & 212077 & 73702 & 55.751 & 78.381\\
-OATrack & baseline & 47.728 & 19.607 & 62.101 & 517 & 197937 & 75612 & 57.270 & 77.820\\
-OATrack & v3 & 47.640 & 22.873 & 62.931 & 486 & 183669 & 78774 & 58.800 & 76.893\\
-\bottomrule
-\end{tabular}%
-}
-\end{table*}
 
 \input{draft_sections/10_attribution_discussion.tex}
-\begin{table}[t]
-\caption{Attribution controls. The static control is from the first validation read; the shuffled timing comparison is calibration evidence.}
-\label{tab:attribution}
-\centering\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{p{.24\linewidth}p{.15\linewidth}p{.15\linewidth}p{.24\linewidth}}
-\toprule
-Control & ByteTrack & OATrack & Interpretation\\
-\midrule
-Matched static 1088/0.45/0.40 HOTA & 44.530 & 48.269 & Close to v3 values 44.523 and 48.095; switching gain is not isolated.\\
-Shuffled timing CV mean $\Delta$HOTA & 2.617 & 2.617 & At least as high as causal 2.447 on calibration; exact timing benefit is unproven.\\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \input{draft_sections/11_limitations.tex}
 \input{draft_sections/12_conclusion.tex}
 
 \backmatter
+\small
 \bmhead{Declarations}
 \noindent\textbf{Funding.} No funding statement has been supplied in the current project record; the authors should complete this declaration before submission.
 
@@ -299,5 +172,6 @@ Shuffled timing CV mean $\Delta$HOTA & 2.617 & 2.617 & At least as high as causa
 
 \noindent\textbf{Acknowledgements.} The authors should complete this statement before submission.
 
+\small
 \bibliography{references}
 \end{document}

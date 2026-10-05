@@ -1,21 +1,55 @@
 \section{Related work}
-\subsection{Tracking by detection}
-SORT established a compact online pipeline based on motion prediction and assignment, while DeepSORT added an appearance metric to reduce identity fragmentation \cite{bewley2016sort,wojke2017deepsort}. ByteTrack changed the detector--tracker interface by associating high-confidence detections first and then using lower-confidence boxes to recover objects that would otherwise be lost \cite{zhang2022bytetrack}. OC-SORT and BoT-SORT further refine motion and appearance association \cite{cao2023ocsort,aharon2022botsort}. These methods primarily improve the interpretation of the boxes they receive. AC--MOT addresses the complementary upstream question: which detector observations, at which resolution and suppression policy, should be presented to the tracker in the first place. The distinction matters because a tracker cannot associate an object that the detector has filtered out, and it cannot reliably resolve duplicated or merged observations caused by an unsuitable NMS operating point.
+\subsection{Tracking by detection and aerial MOT}
+SORT established a compact online pipeline based on motion prediction and
+assignment, while DeepSORT added appearance information to reduce identity
+fragmentation \cite{bewley2016sort,wojke2017deepsort}. ByteTrack changed the
+detector--tracker interface by associating high-confidence detections first and
+then using lower-confidence boxes to recover objects that would otherwise be
+lost \cite{zhang2022bytetrack}. Other modern trackers further refine motion and
+appearance association. These trackers
+primarily improve the interpretation of the boxes they receive; AC--MOT asks
+the complementary upstream question of which observations, at which resolution
+and suppression policy, should reach the tracker.
 
-OATrack is used in this work as a second tracker host, not as a claim of direct superiority over its published system \cite{qi2026oatrack}. The repository's OATrack implementation and tracker-side \texttt{min\_conf=0.40} are frozen for the modern comparison, while the detector checkpoint differs from the detector used in the published OATrack study. This controlled use tests whether a detector-side policy has a similar direction on a tracker with different association behaviour; it does not constitute an apples-to-apples reproduction of published OATrack numbers.
+VisDrone and UAVDT capture the small targets, changing target count, camera
+motion, viewpoint variation, and clutter that make aerial MOT difficult
+\cite{zhu2022visdrone,du2018uavdt}. In this paper they have separated roles:
+historical VisDrone and UAVDT evidence describes earlier profiles, while a
+modern frozen protocol tests v3. OATrack is a second tracker host rather than a
+claim of superiority over its published system \cite{qi2026oatrack}; its frozen
+repository implementation and tracker-side \texttt{min\_conf=0.40} are kept
+distinct from the detector-side v3 confidence floor.
 
-\subsection{Aerial multi-object tracking}
-VisDrone and UAVDT capture the properties that make aerial MOT difficult: small targets, large variation in target count, camera motion, altitude and viewpoint changes, and cluttered road scenes. VisDrone contains both detection and tracking tasks, whereas UAVDT provides a separate aerial distribution in which transfer is informative but protocol-sensitive. The benchmarks motivate methods that consider small-object evidence and platform motion, but benchmark scores alone do not specify how detector resolution or score filtering should be controlled during a sequence. AC--MOT uses the datasets as two separated scientific roles: historical test-dev and transfer evidence for the earlier profiles, and a modern frozen protocol for the v3 controller.
+\subsection{Detector operating points and adaptive inference}
+Confidence floors, NMS overlap thresholds, and input resolution are often
+treated as implementation settings. In aerial scenes they are coupled
+scientific variables: resolution changes small-object evidence and cost,
+confidence changes recall and clutter, and NMS changes whether nearby targets
+remain separate. AC--MOT does not replace detector architecture research; it
+makes these deployment choices explicit and lets them respond to scene evidence
+without changing detector weights.
 
-\subsection{Detector operating points and small objects}
-Confidence thresholds, NMS overlap thresholds, and input resolution are often treated as implementation settings rather than scientific variables. For aerial targets, that separation is questionable. A higher resolution can improve evidence for small objects while increasing latency; a lower confidence floor can preserve recall but increase association clutter; and NMS changes whether nearby targets are represented separately. Feature pyramids and small-object detector designs address representational capacity, but they do not remove the deployment choice among operating points. AC--MOT does not replace detector architecture research. It makes the operating-point choice explicit and allows it to respond to scene evidence without changing detector weights.
+Dynamic inference systems such as Chameleon show that conditional computation
+can adapt inference to content and resource constraints
+\cite{jiang2018chameleon}. AC--MOT is intentionally lighter: its
+state uses scalar image statistics and prior tracker boxes, its action set is
+finite, and its state machine is auditable line by line. It therefore tests an
+operating-point intervention at the detector--tracker boundary rather than a
+learned scheduler.
 
-\subsection{Adaptive and runtime-aware inference}
-Dynamic neural networks adapt depth, width, or resolution, and systems such as Chameleon adapt video analytics configurations to content and resource constraints \cite{han2022dynamic,jiang2018chameleon}. These studies establish that conditional computation is useful, but many learn or profile policies at a level broader than the detector--tracker boundary. AC--MOT is intentionally lightweight: its state is produced from scalar image statistics and prior tracker boxes, its action set is finite, and the final v3 state machine can be audited line by line. This simplicity permits paired quality evaluation and component timing, but it also means that the present work does not claim a learned optimal scheduler.
+\subsection{Evaluation and gap}
+MOTA emphasizes detection and identity errors, IDF1 emphasizes identity
+precision and recall, and HOTA balances detection and association
+\cite{luiten2021hota}. Their different
+responses are useful here because selectivity may reduce FP and IDS while
+increasing FN. Sequence-level paired bootstrap resampling preserves
+within-sequence dependence while quantifying system differences
+\cite{efron1993bootstrap}.
 
-\subsection{Evaluation, calibration, and the remaining gap}
-MOTA emphasizes detection and identity errors, IDF1 emphasizes identity precision and recall, and HOTA balances detection and association \cite{bernardin2008clear,ristani2016idf1,luiten2021hota}. Their different sensitivities are useful for an operating-point study because increased selectivity may reduce FP and IDS while increasing FN. Sequence-level paired bootstrap resampling is appropriate for a small number of video sequences because it preserves within-sequence dependence while quantifying uncertainty in system differences \cite{efron1993bootstrap}.
-
-The gap addressed here is consequently specific. There is limited rigorous analysis of a training-free online controller that jointly changes detector resolution, confidence floor, and NMS in aerial MOT while separating historical development from a frozen modern protocol, testing two tracker hosts, measuring true runtime, transferring without retuning, and auditing whether exact scene timing explains the gain. AC--MOT contributes an empirical and methodological answer to that gap, not a claim to invent adaptive inference or a new tracker.
-
-There is also a methodological gap between detector calibration and tracking evaluation. A confidence sweep can be reported as a detection result, but its tracking consequence depends on the tracker's birth, association, and termination logic. Conversely, a tracker comparison can hide the fact that the detector operating point changed the available candidate set. By holding detector provenance and tracker configurations fixed within each comparison, AC--MOT treats operating-point control as an intervention whose downstream consequences can be measured. The two-host design is not intended to prove independence from all trackers; it tests whether the direction is confined to one association implementation.
+The gap is consequently specific: rigorous evaluation of a training-free
+online controller that changes detector resolution, confidence, and NMS in
+aerial MOT while separating historical development from a frozen modern
+protocol, testing two tracker hosts, measuring runtime, transferring without
+retuning, and checking whether exact scene timing explains the gain. AC--MOT
+addresses this gap empirically and does not claim to invent adaptive inference
+or a new tracker.
