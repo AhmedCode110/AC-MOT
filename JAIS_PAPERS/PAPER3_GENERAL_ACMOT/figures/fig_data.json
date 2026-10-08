@@ -1,0 +1,81 @@
+{
+ "fig3": {
+  "yolov8": {
+   "candidates": 304318,
+   "frames": 2846,
+   "per_frame": 106.92832044975404,
+   "share_ge_025": 0.11840246058399437,
+   "median_score": 0.034168390557169914,
+   "t1_median_score": 0.09232199254415156,
+   "t2_median_score": 0.3207475182622865,
+   "windows": 2839
+  },
+  "rtdetr": {
+   "candidates": 510966,
+   "frames": 2846,
+   "per_frame": 179.53829936753337,
+   "share_ge_025": 0.207430631392304,
+   "median_score": 0.1100543737411499,
+   "t1_median_score": 0.20734441175238116,
+   "t2_median_score": 0.49327848539805,
+   "windows": 2839
+  },
+  "fasterrcnn": {
+   "candidates": 301828,
+   "frames": 2846,
+   "per_frame": 106.05340829234012,
+   "share_ge_025": 0.306237327219476,
+   "median_score": 0.0678715854883194,
+   "t1_median_score": 0.2362195752696725,
+   "t2_median_score": 0.7587880464160175,
+   "windows": 2839
+  },
+  "retinanet": {
+   "candidates": 920562,
+   "frames": 2846,
+   "per_frame": 323.4581869290232,
+   "share_ge_025": 0.12907115436005398,
+   "median_score": 0.10224420949816704,
+   "t1_median_score": 0.09559597032960557,
+   "t2_median_score": 0.2663477795600924,
+   "windows": 2839
+  }
+ },
+ "fig4": {
+  "detector": "rtdetr",
+  "sequence": "uav0000086_00000_v",
+  "decision_frame_index": 232,
+  "pooled": 858,
+  "t1": -1.247625015962186,
+  "t2": -0.20007705799717196,
+  "eta": 0.7964912254690886,
+  "n_reject": 493,
+  "n_ext": 206,
+  "n_primary": 159,
+  "t1_score": 0.2231115306734845,
+  "t2_score": 0.45014692962941405
+ },
+ "assets": {
+  "val_native": {
+   "file": "acmot_detcache_val_native.tar",
+   "sha256": "69a76315459c14fb358b564816e02371dc7ee21649cfe6791464936a2b69516e",
+   "release": "v7-dev-assets-1"
+  },
+  "retinanet": {
+   "file": "sci_retinanet_val7.tar",
+   "sha256": "4fbbc65efa9b6eae087e44490620da92a9c98f86eee39e0aacc4182f79953c06",
+   "release": "sci-v7f-unseen-1"
+  }
+ },
+ "fig8": {
+  "seq": "0014",
+  "frames": 106,
+  "noisy": 45,
+  "rho_bar_min": 0.47058823529411764,
+  "rho_bar_max_after_first_50": 0.5080645161290323,
+  "rho_bar_last": 0.5,
+  "regime_switches": 10,
+  "n_with_bands": 105
+ },
+ "pin": "c609172e287ebd971e6db686f4cc20c5c1fe9a61"
+}
