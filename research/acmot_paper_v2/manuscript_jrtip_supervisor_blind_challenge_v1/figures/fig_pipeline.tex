@@ -1,0 +1,28 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  node distance=4mm,
+  stage/.style={draw, rounded corners=2pt, align=center, text width=20mm,
+                minimum height=11mm, inner sep=2pt},
+  ctrl/.style={stage, fill=orange!10},
+  host/.style={stage, fill=blue!7},
+  note/.style={align=center, text width=22.5mm, font=\footnotesize, inner sep=1pt},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  fb/.style={-{Stealth[length=2mm]}, thick, dashed, green!40!black}]
+\node[stage] (frame) {Frame $I_t$};
+\node[ctrl, right=of frame] (scene) {Scene analysis};
+\node[ctrl, right=of scene] (ctrl) {AC-MOT\\controller};
+\node[host, right=of ctrl] (det) {Detector\\(frozen)};
+\node[host, right=of det] (trk) {Tracker\\(frozen)};
+\node[stage, right=of trk] (out) {Tracks of\\frame $t$};
+\draw[arr] (frame) -- (scene);
+\draw[arr] (scene) -- (ctrl);
+\draw[arr] (ctrl) -- node[above, font=\footnotesize] {$\theta_t$} (det);
+\draw[arr] (det) -- (trk);
+\draw[arr] (trk) -- (out);
+\node[note, below=2mm of scene] {edges, brightness, blur of $I_t$; crowd and tiny ratio from tracks of $t-1$};
+\node[note, below=2mm of ctrl] {SCI, scene label, recovery, hysteresis, dwell, state};
+\node[note, below=2mm of det] {resolution $r_t$, NMS IoU $\eta_t$, score threshold $c_t$};
+\node[note, below=2mm of trk] {ByteTrack or OATrack, unchanged};
+\draw[fb] (trk.north) -- ++(0,5mm) -| node[pos=0.25, above, font=\footnotesize]
+  {tracked boxes, used from frame $t+1$} (scene.north);
+\end{tikzpicture}

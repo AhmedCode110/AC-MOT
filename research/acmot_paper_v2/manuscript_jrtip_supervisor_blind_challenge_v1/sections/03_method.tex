@@ -1,0 +1,203 @@
+\section{AC-MOT Method}\label{sec:method}
+
+\subsection{Overview and operating point}
+Figure~\ref{fig:pipeline} shows the controlled pipeline. Each frame passes
+through scene analysis, the AC-MOT controller, the detector, and the tracker.
+The controller chooses the detector operating point
+\begin{equation}
+\theta_t = (c_t, \eta_t, r_t),
+\label{eq:theta}
+\end{equation}
+where $c_t$ is the detector confidence threshold, $\eta_t$ is the NMS IoU
+threshold, and $r_t$ is the input resolution (the long side of the resized
+image, in pixels). The detector resizes the frame to $r_t$, suppresses boxes
+that overlap a higher-scoring box by more than $\eta_t$, and removes boxes
+with a score below $c_t$. The remaining boxes go to the tracker. The detector
+weights and the tracker are frozen; AC-MOT only changes $\theta_t$.
+
+The controller uses only information that is available at run time. Its
+decision for frame $t$ is
+\begin{equation}
+\theta_t = \pi\left(I_t, \mathcal{B}_{1:t-1}\right),
+\label{eq:policy}
+\end{equation}
+where $I_t$ is the current image and $\mathcal{B}_{1:t-1}$ are the boxes that
+the tracker reported for earlier frames. The current image is available when
+the decision is made, so its statistics may be used. Tracker output of frame
+$t$ is stored only after detection and association, and it is used from frame
+$t+1$ on. No ground truth and no future frame enter the decision. The scene
+layer reads box coordinates and image statistics only; detector scores do not
+enter it.
+
+\begin{figure*}[t]
+\centering
+\input{figures/fig_pipeline}
+\caption{AC-MOT in a tracking-by-detection pipeline. Scene analysis and the
+controller choose the operating point $\theta_t=(c_t,\eta_t,r_t)$ before the
+detector runs. The frozen detector and tracker are not modified. Tracked boxes
+of frame $t$ feed the scene analysis of later frames (dashed arrow).}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Scene analysis}
+Scene analysis runs on frame 1 and then every ten frames ($t=1$ or
+$t \bmod 10 = 1$); analysis step $j$ denotes the $j$-th such frame. Two kinds
+of cues are computed.
+
+\emph{Image cues of the current frame.} The frame is reduced to quarter scale
+and converted to gray. The edge cue $e_t$ is the fraction of Canny edge pixels
+(thresholds 50 and 120), the brightness cue $\beta_t$ is the mean gray level,
+and the blur cue $\nu_t$ is the variance of the Laplacian.
+
+\emph{Box cues of earlier frames.} Let $N_j$ be the number of boxes that the
+tracker reported for frame $t-1$. The crowd cue and the tiny-object ratio are
+\begin{align}
+C_j&=\min\!\left(\frac{N_j}{30},1\right),\label{eq:crowd}\\
+T_j&=\frac{1}{N_j}\sum_{i=1}^{N_j}\mathbf{1}\!\left[a_i<32^2\right],\label{eq:tiny}
+\end{align}
+where $a_i$ is the area of box $i$ in image pixels and $T_j=0$ when $N_j=0$.
+
+\subsection{Crowd-selected SCI and scene label}
+The SCI of the frozen controller is the mean of the most recent crowd values,
+\begin{equation}
+S_j=\frac{1}{|H_j|}\sum_{k\in H_j} C_k,
+\label{eq:sci}
+\end{equation}
+where $H_j$ holds the last seven analysis steps (fewer at the start of a
+sequence). The weighted SCI uses the crowd cue alone because the cue audit of
+Sect.~\ref{sec:modern} selected the subset \{crowd\}. The other cues are still
+computed and still act on the state, as guard and auxiliary cues. They define
+a scene label $\ell_j$:
+\emph{night} if $\beta_t<80$; otherwise \emph{blur} if $\nu_t<180$; otherwise
+\emph{tiny} if $T_j>0.50$; otherwise \emph{crowded} if $C_j>0.65$ or
+$e_t>0.13$; otherwise \emph{clear}. The tiny ratio also guards the HIGH state
+directly, as shown next.
+
+\subsection{Three-state controller}
+The controller has three states, LOW, MEDIUM, and HIGH. The names describe
+scene difficulty. They are not a ranking of input resolution: in the frozen
+action map the HIGH state uses the smallest input (Table~\ref{tab:actions}).
+At each analysis step the state is updated in the order of
+Fig.~\ref{fig:state} and Algorithm~\ref{alg:controller}.
+
+\emph{Target.} The target is HIGH if $S_j>\tau_h$ or $T_j>0.50$, MEDIUM if
+$S_j>\tau_m$ or $\ell_j\in\{\text{crowded},\text{tiny}\}$, and LOW otherwise,
+with the frozen thresholds $\tau_m$ and $\tau_h$ of Table~\ref{tab:constants}.
+
+\emph{Recovery probe.} The controller keeps a decaying peak $P_j$ of the box
+count. When $P_{j-1}\geq5$ and $N_j<0.40\,P_{j-1}$, a drop age $d_j$ is
+increased; otherwise $d_j=0$. The peak is then updated as
+$P_j=\max(N_j,\lfloor 0.8\,P_{j-1}\rfloor)$. While $1\leq d_j\leq3$, the
+target is set to HIGH. This gives a short, bounded response when the number
+of tracked objects collapses.
+
+\emph{Hysteresis.} Only downward moves are held. In the HIGH state, a lower
+target is ignored while $S_j>0.50$ or $T_j>0.40$. In the MEDIUM state, a lower
+target is ignored while $S_j>0.25$.
+
+\emph{Dwell.} The state cannot change within 30 frames of the last change.
+The controller starts in LOW, and the state is held between analysis frames.
+
+\begin{figure}[t]
+\centering
+\input{figures/fig_state_logic}
+\caption{Update order of the frozen three-state controller at an analysis
+frame.}
+\label{fig:state}
+\end{figure}
+
+\begin{algorithm}[t]
+\caption{Frozen AC-MOT controller for one sequence}\label{alg:controller}
+\begin{algorithmic}[1]
+\State $q\gets$ LOW; $H\gets\emptyset$; $P,d\gets0$; $t_c\gets1$
+\For{each frame $t=1,2,\dots$}
+  \If{$t=1$ \textbf{or} $t \bmod 10=1$}
+    \State $e_t,\beta_t,\nu_t\gets$ statistics of $I_t$
+    \State $N,C,T\gets$ box cues of frame $t-1$
+    \State add $C$ to $H$ (keep 7); $S\gets\mathrm{mean}(H)$
+    \State $\ell\gets$ scene label; $g\gets$ target from $S,T,\ell$
+    \If{$P\geq5$ \textbf{and} $N<0.4P$} $d\gets d+1$
+    \Else{} $d\gets0$
+    \EndIf
+    \State $P\gets\max(N,\lfloor0.8P\rfloor)$
+    \If{$1\leq d\leq3$} $g\gets$ HIGH
+    \EndIf
+    \State apply the downward holds of Table~\ref{tab:constants}
+    \If{$t-t_c\geq30$ \textbf{and} $g\neq q$}
+      \State $q\gets g$; $t_c\gets t$
+    \EndIf
+  \EndIf
+  \State $(r_t,\eta_t,c_t)\gets$ action of state $q$
+  \State detect with $(r_t,\eta_t)$; drop scores $<c_t$
+  \State update the tracker; store its boxes
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Frozen constants and action map}
+Table~\ref{tab:constants} lists the frozen constants and
+Table~\ref{tab:actions} the frozen action map. LOW uses the largest input
+(1536 pixels) with loose NMS and a low score threshold. MEDIUM uses 1280
+pixels with tight NMS and a score threshold of 0.40. HIGH uses 1088 pixels
+with NMS 0.60 and a score threshold of 0.40. The actions were selected on
+calibration data together with $\tau_m$ and $\tau_h$
+(Sect.~\ref{sec:modern}). The score threshold $c_t$ is applied on the detector
+side before the tracker. It is separate from any confidence gate inside the
+tracker, such as the fixed tracker-side gate of OATrack.
+
+\subsection{How the constants were set}\label{sec:constants}
+The constants were set with parameter sweeps and experiments, not by hand.
+The analysis stride and the SCI window come from a temporal sweep on the
+VisDrone validation sequences. It tested 25 combinations, with windows of 1,
+3, 5, 7, and 9 analyses and strides of 1, 5, 10, 15, and 20 frames. Among the
+settings that met the speed and identity constraints (at least 25 FPS and at
+most 271 IDS), a window of 7 and a stride of 10 gave the highest MOTA.
+Operating-point sweeps on the same data covered input resolutions from 512 to
+960 pixels, confidence thresholds from 0.05 to 0.50, and NMS thresholds from
+0.30 to 0.80, and defined the supported values of the first optimized
+profiles (Sect.~\ref{sec:development}). The cue subset, the thresholds $\tau_m$
+and $\tau_h$, and the action map were selected by cross-validated search on
+separate calibration sequences (Sect.~\ref{sec:modern}). The remaining
+constants of Table~\ref{tab:constants} were kept fixed in all development
+stages.
+
+\begin{table}[t]
+\caption{Frozen constants of the AC-MOT scene layer.}
+\label{tab:constants}
+\centering\footnotesize
+\begin{tabular}{@{}p{43mm}l@{}}
+\toprule
+Constant & Value\\
+\midrule
+Analysis stride (frames) & 10\\
+SCI window (analysis steps) & 7\\
+Crowd normalizer (boxes) & 30\\
+Tiny-object area (pixels) & $32\times32$\\
+MEDIUM threshold $\tau_m$ & 0.29747709701135766\\
+HIGH threshold $\tau_h$ & 0.5114928923560124\\
+Tiny guard for HIGH & 0.50\\
+Label thresholds: brightness, blur & 80, 180\\
+Label thresholds: crowd, edges & 0.65, 0.13\\
+Recovery: min.\ peak, drop ratio, peak decay, steps & 5, 0.40, 0.80, 3\\
+Holds: HIGH ($S$, $T$), MEDIUM ($S$) & (0.50, 0.40), 0.25\\
+Dwell (frames) & 30\\
+Initial state & LOW\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Frozen action map. State names describe scene difficulty, not a
+resolution rank.}
+\label{tab:actions}
+\centering\footnotesize
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+State & Resolution $r$ & NMS IoU $\eta$ & Score threshold $c$\\
+\midrule
+LOW & 1536 & 0.70 & 0.10\\
+MEDIUM & 1280 & 0.45 & 0.40\\
+HIGH & 1088 & 0.60 & 0.40\\
+\bottomrule
+\end{tabular}
+\end{table}

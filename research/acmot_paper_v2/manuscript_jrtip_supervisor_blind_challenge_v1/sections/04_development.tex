@@ -1,0 +1,287 @@
+\section{How the Final Controller Was Developed}\label{sec:development}
+
+The controller was developed in four steps: a quality-oriented profile, an
+identity-aware profile, transfer and cross-pipeline studies, and a modern
+stage that produced the frozen controller. Each step is compared with the
+baseline it was built on. The historical steps used other detectors and
+evaluation protocols than the modern stage, so their numbers are reported in
+their own tables and are not pooled with the modern results.
+
+\subsection{Quality-oriented profile}\label{sec:quality}
+
+\emph{Baseline.} The reference pipeline is the pretrained YOLOv8n detector
+\cite{jocher2023yolov8} followed by ByteTrack \cite{zhang2022bytetrack}, both at
+their default settings: confidence threshold 0.25, NMS IoU threshold 0.45,
+input size 640 pixels, and the default ByteTrack parameters (high threshold
+0.25, low threshold 0.10, new-track threshold 0.25, buffer 30 frames, match
+threshold 0.80). It runs with one fixed operating point for the whole video.
+
+\emph{Method.} The first optimization-derived profile kept the same detector,
+used a tuned ByteTrack profile, and searched only on the VisDrone2019-MOT
+validation split. Five cues were used: crowd count, the fraction of earlier
+boxes below $32\times32$ pixels, edge density, low brightness, and low
+Laplacian variance. Each cue was normalized with validation statistics, and
+the index was their weighted sum
+\begin{equation}
+S_j=\sum_{k\in\{c,t,e,n,b\}}w_k\,x_{k,j},
+\label{eq:hist-sci}
+\end{equation}
+with $w_k\geq0$ and $\sum_k w_k=1$, averaged over seven analyses taken every
+ten frames. Confidence and NMS were interpolated linearly between the values
+at $S=0$ and $S=1$, and two sorted thresholds selected one of three
+resolutions (512, 928, 960 pixels).
+
+An Optuna TPE study \cite{akiba2019optuna} jointly searched the five weights,
+the confidence and NMS end points, and the two thresholds. The resolution
+levels, the supported confidence values $\{0.25,\dots,0.45\}$, the supported
+NMS values from 0.30 to 0.70, and the temporal settings were fixed beforehand
+by validation sweeps (Sect.~\ref{sec:constants}). The selection rule kept
+trials with at least 25 FPS and at most 271 IDS (a reference value from
+earlier validation runs) and then took the highest MOTA, with lower IDS, HOTA,
+IDF1, and FPS as tie-breaks. The frozen profile (archived as Trial~24) has
+$w_c=0.1294928$, $w_t=0.2217477$, $w_e=0.4337134$, $w_n=0.0535577$,
+$w_b=0.1614885$, confidence end points $(0.30,0.40)$, NMS end points
+$(0.35,0.35)$, and thresholds $(0.1353494, 0.2872868)$. On validation it
+reached MOTA 23.038, HOTA 36.110, IDF1 40.758, and IDS 270 at 37.169 FPS.
+
+\emph{Comparison.} Table~\ref{tab:quality} compares the profile with the
+baseline on the historical VisDrone test-dev split, with paired bootstrap
+intervals (5000 resamples, seed 42). HOTA rises by 5.4051 points, MOTA by
+7.2195 points, and IDF1 by 8.8220 points, and throughput rises from 36.528 to
+38.985 FPS.
+
+\begin{table}[t]
+\caption{Quality-oriented profile versus its baseline (YOLOv8n with ByteTrack
+at default settings) on VisDrone test-dev, historical protocol. Gain: paired
+bootstrap difference with 95\% interval; for IDS it is the reduction.}
+\label{tab:quality}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Metric & Baseline & Quality & Gain [95\% CI]\\
+\midrule
+HOTA & 28.430 & 33.835 & $+5.4051$ $[4.1273, 6.9022]$\\
+MOTA & 19.729 & 26.948 & $+7.2195$ $[5.4362, 9.2934]$\\
+IDF1 & 32.724 & 41.546 & $+8.8220$ $[6.9005, 11.0537]$\\
+IDS & 1235 & 1184 & $51$ $[-114, 219]$\\
+FPS & 36.528 & 38.985 & --\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Identity-aware Pareto profile}\label{sec:identity}
+
+\emph{Baseline.} The baseline is the same YOLOv8n and ByteTrack pipeline at
+default settings (Sect.~\ref{sec:quality}).
+
+\emph{Method.} Quality is not the only deployment goal; identity stability and
+compute can move in a different direction from MOTA. The second study kept
+the same cues, operating levels, temporal settings, and validation data, but
+changed the question. It maximized MOTA and minimized IDS subject only to
+$\mathrm{FPS}\geq25$, without the IDS gate. A seeded TPE sampler ran 49
+completed trials. A trial dominated another when it had no lower MOTA and no
+higher IDS, with at least one strict improvement, and the feasible Pareto
+front was built from these relations \cite{deb2002nsga2}. The balanced
+candidate maximized an equal-weight score of normalized MOTA and normalized IDS
+reduction, with HOTA, IDF1, FPS, and trial index as tie-breaks.
+
+The selected profile (archived as Trial~22) has weights $w_c=0.1646453$,
+$w_t=0.1746265$, $w_e=0.5076113$, $w_n=0.1206956$, $w_b=0.0324213$,
+confidence end points $(0.40,0.40)$, NMS end points $(0.60,0.35)$, and
+thresholds $(0.2927136, 0.6661672)$. On validation it reached MOTA 19.330,
+HOTA 31.651, IDF1 34.226, and IDS 168 at 51.406 FPS.
+
+\emph{Comparison.} Table~\ref{tab:identity} compares the profile with the
+baseline on test-dev. It removes 316 identity switches and raises throughput
+from 36.528 to 46.024 FPS, while HOTA, MOTA, and IDF1 also rise. Against the
+quality-oriented profile it has 265 fewer IDS $[82, 502]$ and $-2.617$ HOTA
+$[-4.004, -1.694]$. The two profiles therefore answer different questions: one
+favors overall quality and the other favors identity stability and speed.
+
+\begin{table}[t]
+\caption{Identity-aware profile versus its baseline (YOLOv8n with ByteTrack at
+default settings) on VisDrone test-dev, historical protocol. Gain: paired
+bootstrap difference with 95\% interval; for IDS it is the reduction.}
+\label{tab:identity}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Metric & Baseline & Identity & Gain [95\% CI]\\
+\midrule
+HOTA & 28.430 & 31.218 & $+2.788$ $[0.747, 4.660]$\\
+MOTA & 19.729 & 23.792 & $+4.063$ $[0.952, 6.886]$\\
+IDF1 & 32.724 & 37.870 & $+5.146$ $[2.028, 8.080]$\\
+IDS & 1235 & 919 & $316$ $[175, 470]$\\
+FPS & 36.528 & 46.024 & --\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Transfer and cross-pipeline studies}\label{sec:transfer}
+
+\emph{UAVDT.} The baseline is again YOLOv8n with ByteTrack at default settings
+(Sect.~\ref{sec:quality}). Both frozen profiles were applied to UAVDT
+\cite{du2018uavdt} without retuning (Table~\ref{tab:hist-uavdt}). The
+quality-oriented profile raised HOTA by 4.305 points $[2.740, 5.709]$ and the
+identity-aware profile by 2.845 points $[1.238, 4.348]$; their IDS reductions
+are 237 $[104, 377]$ and 250 $[110, 404]$.
+
+\begin{table}[t]
+\caption{Historical UAVDT transfer without retuning. Baseline: YOLOv8n with
+ByteTrack at default settings.}
+\label{tab:hist-uavdt}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Metric & Baseline & Quality & Identity\\
+\midrule
+HOTA & 24.085 & 28.390 & 26.930\\
+MOTA & 13.841 & 17.399 & 16.118\\
+IDF1 & 27.887 & 34.453 & 32.014\\
+IDS & 558 & 321 & 308\\
+FPS & 65.015 & 58.353 & 61.462\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{U2MOT on VisDrone.} The baseline is the published U2MOT tracker
+\cite{liu2023u2mot} with its released YOLOX-X detector \cite{ge2021yolox}, run
+at its own static setting. Seven VisDrone validation sequences served for
+development and 17 test-dev sequences for evaluation. The cue weights and
+transforms of the quality-oriented profile were kept, the tracker was not
+modified, and the action boundaries were set to the 33rd and 67th percentiles
+of the index on the U2MOT validation run, without using ground truth.
+Table~\ref{tab:u2mot} gives the comparison: the controlled pipeline has 87
+fewer IDS and 1230 fewer FP.
+
+\begin{table}[t]
+\caption{Cross-pipeline study on VisDrone test-dev. Baseline: U2MOT with its
+YOLOX-X detector at its static setting.}
+\label{tab:u2mot}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & U2MOT baseline & With controller\\
+\midrule
+MOTA & 53.873 & 53.767\\
+IDF1 & 69.775 & 69.849\\
+IDS & 1239 & 1152\\
+FP & 41385 & 40155\\
+FN & 63241 & 64801\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{SparseTrack on MOT17.} The baseline is the published SparseTrack tracker
+\cite{liu2025sparsetrack} with a fixed NMS IoU threshold of 0.75, on the seven
+MOT17 \texttt{val\_half} sequences (2652 frames) \cite{milan2020motchallenge}.
+A minimal edge-driven rule switched only the NMS threshold, between 0.70 and
+0.80; its threshold came from a leave-one-sequence-out study on the same
+sequences. Table~\ref{tab:sparsetrack} gives the comparison: the adaptive rule
+reduces IDS from 136 to 123, with MOTA $+0.0371$ points $[-0.041, +0.182]$.
+
+\begin{table}[t]
+\caption{Cross-pipeline study on MOT17 \texttt{val\_half}. Baseline:
+SparseTrack with a fixed NMS IoU threshold of 0.75.}
+\label{tab:sparsetrack}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & SparseTrack baseline & With adaptive NMS\\
+\midrule
+MOTA & 76.8881 & 76.9252\\
+IDF1 & 81.4943 & 81.5299\\
+IDS & 136 & 123\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Together these studies show that the preferred profile depends on the
+objective (quality or identity) and on the tracker host. This motivated a
+modern stage with a stronger detector, explicit calibration data, and two
+tracker hosts.
+
+\subsection{Modern development of the frozen controller}\label{sec:modern}
+
+\emph{Baseline.} The modern baseline is the YOLO11m detector
+\cite{jocher2024yolo11}, in the public VisDrone checkpoint described in
+Sect.~\ref{sec:setup}, run at a fixed operating point of 1536 pixels and NMS
+IoU 0.70 with no extra score threshold. It feeds ByteTrack
+\cite{zhang2022bytetrack} during development and both ByteTrack and OATrack
+\cite{qi2026oatrack} in the final evaluation. A large fixed input is a common
+choice for small aerial objects when no adaptation is used.
+
+\emph{Data and protocol.} Eight sequences of the VisDrone2019-MOT training split
+(3282 frames) were declared as calibration data. They are disjoint from the
+seven evaluation sequences. All development used four folds, each holding out
+two calibration sequences, and reported the cross-validated (CV) mean change
+in HOTA against the baseline. Detector outputs were cached for every
+resolution and NMS value; a score threshold applied to the cache was checked
+to reproduce direct inference exactly. Table~\ref{tab:devrecord} summarizes
+the development steps.
+
+\emph{Cue audit.} Stages 1 and 2 searched the state-to-resolution and
+state-to-NMS maps on exhaustive grids. Stage 3A searched all 31 non-empty
+subsets of the five cues and selected \{crowd\}, which defines the
+crowd-selected SCI of Eq.~\eqref{eq:sci}. The other cues were kept as guard and
+auxiliary cues of the state logic (Sect.~\ref{sec:method}).
+
+\emph{Score threshold.} At 1088 pixels and NMS 0.45, a fixed score threshold
+of 0.40 raised pooled calibration HOTA by $+0.881$ over 0.01 and improved
+seven of the eight sequences. The score threshold was therefore added as the
+third action dimension.
+
+\emph{Final joint search.} The final search used 60 TPE trials (seed 43). It
+searched $\tau_m\in[0.10,0.50]$, $\tau_h\in[\tau_m+0.05,\min(\tau_m+0.40,0.90)]$,
+and for each state a resolution in $\{1088,1280,1536\}$, an NMS value in
+$\{0.45,0.60,0.70\}$, and a score threshold in $\{0.10,0.25,0.40\}$. The
+objective was the CV mean change in HOTA against the baseline, with ByteTrack
+as host. Eligible candidates had to realize at least two distinct actions,
+each on at least 10\% of calibration frames, and switch within sequences. The
+frozen policy is the eligible candidate whose three states use three
+different actions (Table~\ref{tab:actions}). On calibration data it used LOW,
+MEDIUM, and HIGH on 7.6\%, 10.1\%, and 82.3\% of frames, with 0.607 state
+changes per 100 frames on average.
+
+\emph{Comparison.} Table~\ref{tab:folds} compares the frozen policy with the
+baseline on each calibration fold. All four folds are positive, with a CV
+mean of $+2.447$ HOTA. After these steps the thresholds, cue subset, and
+action map were frozen. The final comparison on the evaluation sequences is
+given in Sect.~\ref{sec:results}.
+
+\begin{table}[t]
+\caption{Main modern development steps on the eight calibration sequences
+(ByteTrack host). The score-threshold gain is pooled HOTA; the joint-search
+result is the mean over four folds.}
+\label{tab:devrecord}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Step & Search & Result\\
+\midrule
+Cue subset & 31 subsets & \{crowd\}\\
+Score threshold & 4 values & 0.40; $+0.881$ HOTA\\
+Joint search & 60 TPE trials & CV mean $+2.447$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Frozen policy versus the modern baseline (YOLO11m at 1536 pixels and
+NMS 0.70, ByteTrack) on the four calibration folds: change in HOTA.}
+\label{tab:folds}
+\centering\footnotesize
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+ & Fold 1 & Fold 2 & Fold 3 & Fold 4 & Mean\\
+\midrule
+$\Delta$HOTA & $+0.592$ & $+4.164$ & $+2.029$ & $+3.004$ & $+2.447$\\
+\bottomrule
+\end{tabular}
+\end{table}

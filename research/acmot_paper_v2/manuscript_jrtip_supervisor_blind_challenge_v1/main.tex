@@ -1,0 +1,74 @@
+\documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\floatname{algorithm}{Algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\hypersetup{hypertexnames=false}
+\newcommand{\checkpointsha}{\texttt{c6f98247\allowbreak{}e7c731a5\allowbreak{}67aaf37c\allowbreak{}a7b808be\allowbreak{}ff588b68\allowbreak{}7623e028\allowbreak{}b25a2e1d\allowbreak{}846e96e7}}
+
+\raggedbottom
+\setcounter{dbltopnumber}{2}
+
+\begin{document}
+
+\title[AC-MOT]{AC-MOT: Optimization-Guided Adaptive Detector Operating-Point Control for Aerial Multi-Object Tracking}
+
+\author*[1]{\fnm{Ahmed Gouda} \sur{Ismail}}\email{a7medgouda1@gmail.com}
+\author[1]{\fnm{Mohamed S.} \sur{Mohamed}}\email{mohamedms@mtc.edu.eg}
+\author[2]{\fnm{Tarek Ahmed} \sur{Mahmoud}}\email{tarek.mohamed@eui.edu.eg}
+
+\affil*[1]{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+\affil[2]{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+
+\abstract{Scenes recorded by unmanned aerial vehicles change over time in object density, object size, illumination, and blur. Most tracking-by-detection pipelines still run the detector at one fixed operating point. AC-MOT is a training-free control layer that treats the detector operating point as part of the multi-object tracking (MOT) system. It uses only the current frame and past tracker output. At run time it reads inexpensive scene cues and selects the detector confidence threshold, the non-maximum-suppression (NMS) IoU threshold, and the input resolution. The detector and the tracker are not retrained or modified. The controller was developed through optimization: a quality-oriented Optuna profile, an identity-aware MOTA/IDS Pareto study, transfer and cross-pipeline studies, and a modern controller developed with sequence-level cross-validation on separate calibration sequences and then frozen. On a frozen evaluation of seven VisDrone2019-MOT sequences with a YOLO11m detector, AC-MOT raises HOTA by 2.937 points with ByteTrack (95\% CI [2.356, 3.375]) and by 1.325 points with the recent OATrack tracker (95\% CI [0.200, 2.264]); MOTA rises by 17.995 and 6.318 points. On a Tesla T4 GPU, the controller adds only 4.26 ms per frame with ByteTrack and 4.20 ms with OATrack, so it adds very little latency and is suitable for real-time use. Applied to UAVDT without retuning, AC-MOT raises MOTA by 17.601 points with ByteTrack and by 3.267 points with OATrack.}
+
+\keywords{multi-object tracking, UAV video, adaptive inference, detector operating point, real-time image processing}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_development}
+\input{sections/05_setup}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+
+\backmatter
+
+\section*{Declarations}
+
+\noindent\textbf{Funding.} This research received no external funding.
+
+\noindent\textbf{Conflict of interest.} The authors declare no competing interests.
+
+\noindent\textbf{Ethics approval and consent to participate.} This computational study uses public benchmark data and does not involve human participants or animals.
+
+\noindent\textbf{Consent for publication.} Not applicable.
+
+\noindent\textbf{Data and code availability.} The frozen controller specification, result records, evidence map, staged sections, scripts, and build package are included in the project repository. Dataset redistribution remains subject to the original benchmark licenses and access terms.
+
+\noindent\textbf{Author contributions.} Ahmed Gouda Ismail: Conceptualization, Methodology, Software, Investigation, Data curation, Formal analysis, Visualization, Writing~--~original draft, Writing~--~review \& editing. Mohamed S. Mohamed: Supervision, Methodology, Writing~--~review \& editing. Tarek Ahmed Mahmoud: Supervision, Validation, Writing~--~review \& editing.
+
+\noindent\textbf{Acknowledgements.} Not applicable.
+
+\noindent\textbf{Submission exclusivity.} The manuscript is not under consideration elsewhere and has not been published previously.
+
+\noindent\textbf{AI use in manuscript preparation.} Generative AI tools were used to assist with drafting and language editing. The authors reviewed and verified all content, numerical values, and figures and take full responsibility for the manuscript.
+
+\bibliography{references}
+
+\end{document}

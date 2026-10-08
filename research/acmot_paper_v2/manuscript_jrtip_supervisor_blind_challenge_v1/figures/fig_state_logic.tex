@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  node distance=3mm,
+  blk/.style={draw, rounded corners=2pt, align=left, text width=70mm,
+               inner sep=3pt, fill=orange!8},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[blk] (cues) {\textbf{1 Cues} (frames $1, 11, 21, \dots$): crowd $C_j$ and
+  tiny ratio $T_j$ from the tracked boxes of frame $t-1$; edges, brightness,
+  and blur of $I_t$.};
+\node[blk, below=of cues] (sci) {\textbf{2 SCI and label}: $S_j$ = mean of the
+  last seven $C$ values; label night, blur, tiny, crowded, or clear.};
+\node[blk, below=of sci] (target) {\textbf{3 Target}: HIGH if $S_j>\tau_h$ or
+  $T_j>0.50$; MEDIUM if $S_j>\tau_m$ or label crowded or tiny; else LOW.};
+\node[blk, below=of target] (probe) {\textbf{4 Recovery}: if the box count
+  collapses below 0.40 of its decaying peak, target HIGH for up to three
+  analyses.};
+\node[blk, below=of probe] (hold) {\textbf{5 Hysteresis}: a downward move is
+  held while the scene stays difficult.};
+\node[blk, below=of hold] (dwell) {\textbf{6 Dwell}: no state change within 30
+  frames of the last change.};
+\node[blk, below=of dwell, fill=blue!7] (act) {\textbf{7 Action}: the state
+  selects $(r_t, \eta_t, c_t)$ from the frozen map (Table~\ref{tab:actions}) and
+  is held until the next analysis.};
+\foreach \a/\b in {cues/sci, sci/target, target/probe, probe/hold, hold/dwell, dwell/act}
+  \draw[arr] (\a) -- (\b);
+\end{tikzpicture}
