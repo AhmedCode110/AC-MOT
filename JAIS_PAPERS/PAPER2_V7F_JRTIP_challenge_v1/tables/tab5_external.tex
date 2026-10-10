@@ -1,0 +1,26 @@
+\begin{table}[t]
+\caption{Baseline comparison on the predeclared external systems (MOT17
+val-half, authors' released detections), each evaluated once with the frozen
+\scl{}. Paper: number reported by the authors (for PD-SORT, their released
+output). Host: published tracker alone (our reproduction). Reproduction class
+against the authors' number (EXACT: $|\Delta\mathrm{HOTA}|\le0.2$; CLOSE:
+$\le1.0$ with a documented, untuned cause). $\Delta$: host with \scl{} minus
+host, with 95\% paired-bootstrap interval; bold intervals exclude zero.}
+\label{tab:external}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Metric & Paper & Host & $\Delta$ [95\% CI]\\
+\midrule
+\multicolumn{4}{@{}l}{\textit{PD-SORT} \cite{wang2025pdsort}\textit{, EXACT}}\\
+\quad HOTA & 68.01 & 68.01 & {\boldmath $+0.61$ [$+0.27$, $+1.65$]}\\
+\quad MOTA & 75.19 & 75.19 & {\boldmath $+1.13$ [$+0.27$, $+3.03$]}\\
+\quad IDF1 & 81.03 & 81.03 & {\boldmath $+0.82$ [$+0.43$, $+1.94$]}\\
+\multicolumn{4}{@{}l}{\textit{Hybrid-SORT} \cite{yang2024hybridsort}\textit{, CLOSE}}\\
+\quad HOTA & 67.1 & 66.70 & 0 (identical)\\
+\quad MOTA & 75.8 & 75.52 & 0 (identical)\\
+\quad IDF1 & 78.0 & 77.56 & 0 (identical)\\
+\bottomrule
+\end{tabular}
+\end{table}

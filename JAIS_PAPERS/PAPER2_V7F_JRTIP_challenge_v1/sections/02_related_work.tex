@@ -1,0 +1,76 @@
+\section{Related Work}\label{sec:related}
+
+\subsection{Tracking by detection}
+SORT predicts each box with a Kalman filter and matches the predictions to new
+detections by overlap with the Hungarian method \cite{bewley2016sort}.
+StrongSORT and BoT-SORT add appearance features
+\cite{du2023strongsort,aharon2022botsort}. ByteTrack
+introduced a second association stage that uses low-confidence detections to
+continue existing tracks \cite{zhang2022bytetrack}. This two-stage design was
+kept by BoT-SORT \cite{aharon2022botsort}, SparseTrack \cite{liu2025sparsetrack},
+BoostTrack \cite{stanojevic2024boosttrack}, and Hybrid-SORT
+\cite{yang2024hybridsort}. OC-SORT \cite{cao2023ocsort}, Deep OC-SORT
+\cite{maggiolino2023deepocsort}, and PD-SORT \cite{wang2025pdsort} use a single
+confidence threshold. Recent designs learn association from box coordinates
+(C-TWiX \cite{miah2025twix}), run parallel association paths (TOPICTrack
+\cite{cao2025topictrack}), or associate two detection views (TrackTrack
+\cite{shim2025tracktrack}). End-to-end trackers predict identities directly
+\cite{zeng2022motr,gao2025motip}. All of these trackers read detector scores
+through fixed thresholds that were tuned for one detector, usually YOLOX
+\cite{ge2021yolox}. Seven of them are used in this paper as hosts and are kept
+unchanged.
+
+\subsection{Detector confidence and calibration}
+Detectors of different families, such as YOLOX \cite{ge2021yolox}, YOLOv8
+\cite{jocher2023yolov8}, YOLOv9 \cite{wang2024yolov9}, DETR
+\cite{carion2020detr}, and RT-DETR
+\cite{zhao2024rtdetr}, produce different score distributions. Their confidence
+is not calibrated across models and conditions, and calibration methods for
+object detection fit a mapping on labelled data \cite{kuppers2020detcalib}.
+Otsu's method selects a threshold from a histogram without labels by
+maximizing the separation between two classes \cite{otsu1979}. \scl{}
+applies it to the detector logits of recent frames.
+
+\subsection{Adaptive thresholds inside trackers}
+Several trackers adapt their own confidence thresholds. Adaptive ByteTrack
+derives the confidence threshold of ByteTrack from the detections of each
+frame \cite{ma2023adaptivebytetrack}. AdapTrack adapts the thresholds of its
+matching step \cite{shim2024adaptrack}. ACT sets the high and low thresholds
+of each frame from the first quartile of the confidence scores and the number
+of candidates \cite{act2026adaptive}. These methods are built into one tracker
+and use statistics of the current frame. \scl{} differs in
+four ways. Its statistics come from past frames. It decides for the whole
+stream whether to intervene at all, and otherwise keeps the tracker's own
+operating point. It acts through a declared host contract on several
+published trackers without modifying them. It is evaluated as one frozen
+policy under confidence shift and on external systems.
+
+\subsection{Adaptive inference}
+Dynamic neural networks adapt their computation to each input
+\cite{han2022dynamic}, and Chameleon re-profiles the configuration of video
+analytics pipelines over time \cite{jiang2018chameleon}. These methods learn or
+profile a policy for each model. A controller that sets the detector operating
+point from image cues is also tied to the detector it was calibrated with,
+because a change of the detector's score scale leaves the image unchanged.
+\scl{} reads the score stream instead and acts on the
+tracker's input and thresholds. Table~\ref{tab:related} summarizes the
+differences.
+
+\begin{table}[t]
+\caption{Adaptive methods closest to \scl{} (BT: ByteTrack).}
+\label{tab:related}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{17mm}>{\raggedright\arraybackslash}p{18mm}>{\raggedright\arraybackslash}p{15mm}>{\raggedright\arraybackslash}p{18mm}@{}}
+\toprule
+Method & Adapted & Statistics & Where\\
+\midrule
+Adapt.\ BT \cite{ma2023adaptivebytetrack} & confidence threshold & current frame & inside BT\\
+AdapTrack \cite{shim2024adaptrack} & matching thresholds & current frame & inside the tracker\\
+ACT \cite{act2026adaptive} & high and low thresholds & current frame & inside the tracker\\
+K{\"u}ppers \cite{kuppers2020detcalib} & detector scores & labelled data & detector output\\
+Chameleon \cite{jiang2018chameleon} & pipeline configuration & profiling & analytics pipeline\\
+\scl{} (this paper) & candidates, scores, thresholds & past frames, no labels & between detector and tracker\\
+\bottomrule
+\end{tabular}
+\end{table}

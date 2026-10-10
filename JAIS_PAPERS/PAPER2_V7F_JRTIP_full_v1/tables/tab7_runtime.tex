@@ -1,0 +1,20 @@
+\begin{table}[t]
+\caption{Baseline comparison of the per-frame time on a 4-vCPU Intel Xeon
+(2.10 GHz, no GPU) with a live YOLOv8n detector (736 pixels) and ByteTrack on
+three KITTI sequences (2,279 timed frames per arm). Host alone: the same
+pipeline without \scl{}. Mean / 95th percentile in milliseconds.}
+\label{tab:runtime}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Stage & Host alone & Host + \scl{}\\
+\midrule
+Frame decode & 13.88 / 16.21 & 13.88 / 16.51\\
+Detector (YOLOv8n, 736 px) & 41.91 / 58.41 & 42.17 / 59.43\\
+\scl{} & -- & 2.95 / 4.39\\
+Tracker (ByteTrack) & 2.04 / 3.57 & 1.43 / 2.64\\
+End to end & 57.85 / 76.35 & 60.44 / 80.78\\
+\bottomrule
+\end{tabular}
+\end{table}

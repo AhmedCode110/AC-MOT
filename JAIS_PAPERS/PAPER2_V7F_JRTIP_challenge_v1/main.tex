@@ -1,0 +1,79 @@
+\documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\floatname{algorithm}{Algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\hypersetup{hypertexnames=false}
+\newcommand{\ci}[3]{\begin{tabular}[c]{@{}c@{}}$#1$\\{}[$#2$, $#3$]\end{tabular}}
+\newcommand{\cib}[3]{{\boldmath\ci{#1}{#2}{#3}}}
+\newcommand{\cit}[3]{\begin{tabular}[t]{@{}c@{}}$#1$\\{}[$#2$, $#3$]\end{tabular}}
+\newcommand{\cibt}[3]{{\boldmath\cit{#1}{#2}{#3}}}
+\newcommand{\scl}{SCL}
+\newcommand{\aob}{AOB}
+\newcommand{\twol}[2]{\begin{tabular}[c]{@{}l@{}}#1\\#2\end{tabular}}
+
+\raggedbottom
+\setcounter{dbltopnumber}{2}
+
+\begin{document}
+
+\title[Self-Calibrating Control Layer for Multi-Object Trackers]{Training-Free Self-Calibrating Control Layer for Heterogeneous Multi-Object Trackers}
+
+\author*[1]{\fnm{Ahmed Gouda} \sur{Ismail}}\email{a7medgouda1@gmail.com}
+\author[1]{\fnm{Mohamed S.} \sur{Mohamed}}\email{mohamedms@mtc.edu.eg}
+\author[2]{\fnm{Tarek Ahmed} \sur{Mahmoud}}\email{tarek.mohamed@eui.edu.eg}
+
+\affil*[1]{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+\affil[2]{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+
+\abstract{Multi-object tracking pipelines are often built from a detector and a tracker developed separately. When the detector is replaced, retrained, or quantized for embedded hardware, its confidence scale changes, while the tracker keeps thresholds tuned for another detector. This paper presents \scl{}, a training-free self-calibrating control layer between a frozen detector and a frozen tracker. It calibrates itself online with nested Otsu thresholds on the detector logits of recent frames and decides whether the score stream is clean or noisy. On clean streams it keeps the tracker's operating point. On noisy streams it selects the candidates that reach the tracker, remaps their scores, and sets the tracker's thresholds. It also gives a continuation stage to trackers that lack one. It needs no labels and uses no future frames. One frozen configuration was evaluated on seven published trackers, four detection sources, and two datasets with paired bootstrap intervals. It raised the higher order tracking accuracy (HOTA) of OC-SORT and of the external PD-SORT by 0.61 points, with intervals above zero. When the detector scores were halved, it restored two trackers from 0 to about 66 HOTA. With a noisy RT-DETR-L detector, it raised the multi-object tracking accuracy (MOTA) of ByteTrack and BoT-SORT by 6.0 and 7.9 points. On four trackers with a low-score stage and well-matched detections, HOTA changed by at most 0.06 points. \scl{} takes 2.95 ms per frame on a four-core CPU without a GPU, so it adds very little latency and is suitable for real-time use.}
+
+\keywords{Multi-object tracking, Tracking by detection, Detector confidence calibration, Online adaptation, Otsu thresholding, Real-time image processing}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_development}
+\input{sections/05_setup}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+
+\backmatter
+
+\section*{Declarations}
+
+\noindent\textbf{Funding.} This research received no external funding.
+
+\noindent\textbf{Conflict of interest.} The authors declare no competing interests.
+
+\noindent\textbf{Ethics approval and consent to participate.} This computational study uses public benchmark data and does not involve human participants or animals.
+
+\noindent\textbf{Consent for publication.} Not applicable.
+
+\noindent\textbf{Data availability.} All datasets used (MOT17 and KITTI tracking) are publicly available from their providers. Tracker outputs, bootstrap records, and the frozen configuration are available from the corresponding author on reasonable request.
+
+\noindent\textbf{Code availability.} The implementation of \scl{} and the evaluation scripts are available from the corresponding author on reasonable request.
+
+\noindent\textbf{Author contributions.} Ahmed Gouda Ismail: Conceptualization, Methodology, Software, Investigation, Formal analysis, Visualization, Writing~--~original draft. Mohamed S. Mohamed and Tarek Ahmed Mahmoud: Supervision, Methodology, Writing~--~review \& editing. All authors read and approved the final manuscript.
+
+\noindent\textbf{Acknowledgements.} The authors thank the authors of the evaluated trackers for releasing their code, weights, and detections, and the maintainers of MOT17, KITTI, and TrackEval.
+
+\noindent\textbf{AI use in manuscript preparation.} Generative AI tools were used to assist with drafting and language editing. The authors reviewed and verified all content, numerical values, and figures and take full responsibility for the manuscript.
+
+\bibliography{references}
+
+\end{document}
