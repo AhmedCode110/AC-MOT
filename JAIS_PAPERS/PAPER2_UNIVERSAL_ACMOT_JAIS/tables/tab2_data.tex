@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Evaluation cells and their role. Development cells were visible while the layer was designed; predeclared and post-freeze cells were run once with the frozen policy.}
+\label{tab:data}
+\small
+\begin{tabular}{p{3.0cm}p{3.6cm}p{4.6cm}p{3.2cm}}
+\hline
+Data & Detector & Trackers & Role \\
+\hline
+MOT17 val-half (7 sequences) & published YOLOX-X detections & ByteTrack (2 settings), OC-SORT, BoostTrack, SparseTrack & development \\
+KITTI tracking training (21 sequences) & YOLOv8n, RT-DETR-L & ByteTrack, BoT-SORT, OC-SORT & development (detector transfer) \\
+MOT17 val-half, score transforms & published YOLOX-X, transformed scores & ByteTrack (2 settings), OC-SORT, BoostTrack & development (robustness) \\
+MOT17 val-half & released PD-SORT / Hybrid-SORT detections & PD-SORT, Hybrid-SORT & predeclared external \\
+MOT17 val-half, KITTI MOTS val (9 sequences), DanceTrack val (25 sequences) & authors' released detections & C-TWiX, TrackTrack (DanceTrack), TOPICTrack (MOT17) & post-freeze external \\
+\hline
+\end{tabular}
+\end{table}

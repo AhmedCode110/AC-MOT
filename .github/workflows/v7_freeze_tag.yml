@@ -1,0 +1,42 @@
+name: Publish V7 freeze tag
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/v7_freeze_tag.yml"]
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create or verify the annotated tag
+        env:
+          TAG: universal-acmot-v7-freeze
+          SHA: 488df9a95472b839cb75b72fb243c7ab3f826df7
+        run: |
+          set -euo pipefail
+          git cat-file -e "$SHA^{commit}"
+          # the frozen files at the freeze commit must match the policy lock
+          git show "$SHA:research/V7_POLICY_LOCK.json" > /tmp/lock.json
+          python3 - "$SHA" <<'PY'
+          import hashlib, json, subprocess, sys
+          sha = sys.argv[1]; lock = json.load(open("/tmp/lock.json"))
+          bad = [f for f, h in lock["file_sha256"].items()
+                 if hashlib.sha256(subprocess.check_output(["git", "show", f"{sha}:{f}"])).hexdigest() != h]
+          print(f"lock at {sha[:7]}: {len(lock['file_sha256']) - len(bad)}/{len(lock['file_sha256'])} files match", bad or "")
+          sys.exit(1 if bad else 0)
+          PY
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+            git fetch -q origin "refs/tags/$TAG:refs/tags/$TAG"
+            test "$(git rev-parse "$TAG^{commit}")" = "$SHA" && echo "tag exists at $SHA; unchanged" && exit 0
+            echo "tag exists at a different commit; refusing to move it"; exit 1
+          fi
+          git config user.name "AhmedCode110"
+          git config user.email "a7medgouda1@gmail.com"
+          git tag -a "$TAG" "$SHA" -m "Universal AC-MOT V7 frozen policy (V7f)"
+          git push origin "refs/tags/$TAG"
+          git ls-remote --tags origin "refs/tags/$TAG*"

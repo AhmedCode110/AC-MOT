@@ -1,0 +1,34 @@
+name: Overleaf project zips for the two JAIS papers
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/overleaf_zips.yml"]
+permissions:
+  contents: write
+jobs:
+  zip:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build zips (sources only; Overleaf compiles)
+        run: |
+          mkdir -p out
+          for P in PAPER1_SCENE_ADAPTIVE_JAIS PAPER2_SIVP_SPRINGER; do
+            (cd JAIS_PAPERS/$P && zip -qr ../../out/$P.zip manuscript.tex references.bib *.cls *.bst figures tables \
+               -x "figures/scene_frames/*" -x "*.aux" -x "*.log")
+          done
+          ls -la out; unzip -l out/PAPER1_SCENE_ADAPTIVE_JAIS.zip | tail -3
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=jais-overleaf-1
+          for id in $(gh api repos/${{ github.repository }}/releases --jq '.[] | select(.draft) | .id'); do gh api -X DELETE repos/${{ github.repository }}/releases/$id; done
+          if gh release view $TAG >/dev/null 2>&1; then
+            gh release upload $TAG out/*.zip --clobber
+          else
+            gh release create $TAG out/*.zip --target "$GITHUB_SHA" --title "JAIS manuscripts (Overleaf upload)" \
+              --notes "Source zips of the two manuscripts for Overleaf (New Project > Upload Project)." --prerelease
+          fi
+          gh release view $TAG --json isDraft,assets --jq '{isDraft, assets: [.assets[].name]}'

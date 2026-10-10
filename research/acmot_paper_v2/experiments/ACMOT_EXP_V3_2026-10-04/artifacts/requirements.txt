@@ -1,0 +1,12 @@
+# Controlled v12 environment from its existing notebook.
+# Install a matched torch/torchvision pair for your platform first (see README).
+ultralytics==8.3.200
+numpy==2.2.6
+scipy==1.15.3
+lap==0.5.12
+opencv-python==4.11.0.86
+# Upstream TrackEval imports these dependencies.
+pandas==2.2.3
+matplotlib==3.10.3
+pycocotools==2.0.10
+tabulate==0.9.0

@@ -1,0 +1,110 @@
+\section{Results}\label{sec:results}
+
+Figure~\ref{fig:forest} summarizes the HOTA difference between each host with
+\scl{} and the host alone for every evaluated cell. The following
+subsections give the baseline comparison for each part of the evaluation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig3_forest_col.pdf}
+\caption{Difference in HOTA (host with \scl{} minus host alone) with
+95\% paired-bootstrap interval for every evaluated cell. Blue: interval above
+zero; gray: interval contains zero, or identical output.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Tracker transfer}\label{sec:tracker}
+Table~\ref{tab:mot17} compares the development trackers with their hosts on
+MOT17. The two-stage trackers with well-matched detections stayed at the
+accuracy of their hosts. BoostTrack, online and with interpolation, and
+ByteTrack at floor 0.1 produced identical output. ByteTrack at floor 0.01
+changed by $-0.014$ HOTA and SparseTrack by $+0.055$. This is the
+self-limiting behavior of the clean regime (Sect.~\ref{sec:regimes}), which
+the prior design did not have (Table~\ref{tab:prior}).
+
+The single-stage OC-SORT improved at both emission floors. Its HOTA rose by
+0.61 points ($[+0.36,+1.24]$) at floor 0.01 and by 0.46 points
+($[+0.27,+1.09]$) at floor 0.1, and its MOTA by 1.27 and 1.26 points. HOTA
+was higher on 7 of 7 sequences in both settings (Fig.~\ref{fig:perseq}). The
+gain comes from the continuation rescue. OC-SORT discards every detection
+below its single threshold, and the layer passes it the foreground candidates
+that continue a track that would otherwise stay unmatched.
+
+\input{tables/tab3_mot17}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig4_per_sequence.pdf}
+\caption{Per-sequence HOTA differences (host with \scl{} minus host
+alone) on MOT17 val-half for the development and predeclared trackers.}
+\label{fig:perseq}
+\end{figure}
+
+\subsection{Detector change}\label{sec:detector}
+Table~\ref{tab:kitti} reports the KITTI results with the two other detectors. With
+the noisy RT-DETR-L stream, the two-stage trackers gained in MOTA and IDF1.
+ByteTrack gained 5.98 MOTA points ($[+1.16,+9.94]$), 3.87 IDF1 points, and
+0.91 HOTA points ($[+0.22,+1.55]$). BoT-SORT gained 7.86 MOTA points
+($[+2.21,+13.44]$) and 3.10 IDF1 points. With YOLOv8n, the single-stage
+OC-SORT gained 7.91 HOTA points ($[+5.47,+9.98]$), 9.40 MOTA points, and 9.60
+IDF1 points.
+
+\input{tables/tab4_kitti}
+
+\subsection{Detector confidence shift}\label{sec:shift}
+Table~\ref{tab:shift} and Fig.~\ref{fig:shift} give the trackers under the
+four score transforms. Halving the scores drove ByteTrack (official setting)
+and OC-SORT to 0 HOTA, because no detection reached their thresholds. With the
+layer they reached 66.17 and 66.72. Cubing reduced them to 60.92 and 58.34,
+and the layer restored them to 65.81 and 66.60. BoostTrack rose from 61.33 to
+64.84 under cubing. With temperature $T=2$, the layer raised ByteTrack and
+OC-SORT by 1.11 and 1.24 points. The library setting of ByteTrack, whose low
+thresholds already admit the shifted scores, stayed within 0.14 points in all
+four transforms. Over the 14 conditions, the layer raised HOTA significantly
+in 7 and lowered it significantly in none.
+
+\input{tables/tab_shift}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig5_calibration_shift.pdf}
+\caption{Detector confidence shift on MOT17 val-half: HOTA of each published
+tracker with its published thresholds, alone and with \scl{}, after
+four monotone transforms of the detector scores (pow3: $s^3$; scale05:
+$0.5\,s$; temp2 and temp05: $T=2$ and $T=0.5$).}
+\label{fig:shift}
+\end{figure*}
+
+\subsection{External systems}\label{sec:external}
+Table~\ref{tab:external} gives the two predeclared external systems. PD-SORT
+\cite{wang2025pdsort} was reproduced identically to the authors' released
+output. With \scl{}, its HOTA rose by 0.61 points ($[+0.27,+1.65]$), its
+MOTA by 1.13 points ($[+0.27,+3.03]$), and its IDF1 by 0.82 points
+($[+0.43,+1.94]$), with higher HOTA on 7 of 7 sequences
+(Fig.~\ref{fig:perseq}). False negatives fell by 1,291, and false positives
+rose by 681. PD-SORT is a single-stage tracker, and its gain follows the same
+mechanism as for OC-SORT; unlike OC-SORT, it was not seen during design.
+Hybrid-SORT \cite{yang2024hybridsort}, a two-stage tracker, produced identical
+output, as predicted before the run.
+
+\input{tables/tab5_external}
+
+\subsection{Latency}\label{sec:latency}
+Table~\ref{tab:runtime} and Fig.~\ref{fig:runtime} compare the per-frame time
+of the host pipeline with and without \scl{}. \scl{} took 2.95 ms per
+frame on average and 4.39 ms at the 95th percentile, including the
+phase-correlation motion cue. The end-to-end time rose from 57.85 to 60.44 ms
+per frame, by 4.5\%. The tracker became faster, from 2.04 to 1.43 ms per
+frame, because it received fewer candidates. The detector takes most of each
+frame, about 42 ms, so the layer adds only a small part of the total latency.
+
+\input{tables/tab7_runtime}
+
+\begin{figure}[t]
+\centering
+\input{figures/fig_runtime}
+\caption{Mean per-frame time by stage for the host pipeline alone and with
+\scl{} (4-vCPU Intel Xeon, no GPU). The labels give the measured
+end-to-end time.}
+\label{fig:runtime}
+\end{figure}

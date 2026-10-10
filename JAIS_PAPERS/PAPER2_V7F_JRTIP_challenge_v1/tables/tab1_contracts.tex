@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\caption{Host contracts: the operating point that each published tracker
+declares, as used by the layer. $\tau$ is the tracker's own published
+threshold, which differs between trackers.}
+\label{tab:contracts}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{30mm}lcccc>{\raggedright\arraybackslash}p{32mm}@{}}
+\toprule
+Tracker (setting) & Type & assoc $a$ & birth $b$ & low $\ell$ & match $m_0$ & Decision mapped to\\
+\midrule
+ByteTrack (official MOT17) & two-stage & 0.6 & 0.7 & 0.1 & 0.8 & thresholds, candidates, scores\\
+ByteTrack (library default) & two-stage & 0.25 & 0.25 & 0.1 & 0.8 & same\\
+SparseTrack & two-stage & $\tau$ & $\tau+0.1$ & 0.1 & published & same\\
+BoostTrack & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate & same\\
+Hybrid-SORT & two-stage & $\tau$ & $\tau$ & 0.1 & $1-$IoU gate & same\\
+OC-SORT & single-stage & 0.6 & 0.6 & 0.6 & 0.7 & same\\
+PD-SORT & single-stage & $\tau$ & $\tau$ & $\tau$ & $1-$IoU gate & same\\
+\bottomrule
+\end{tabular}
+\end{table*}

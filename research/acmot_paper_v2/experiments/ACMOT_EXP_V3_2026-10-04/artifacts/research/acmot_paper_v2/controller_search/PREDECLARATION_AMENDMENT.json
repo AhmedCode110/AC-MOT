@@ -1,0 +1,14 @@
+{
+  "amendment_before_any_stage3b_or_stage4_trial": true,
+  "timestamp_utc": "2026-10-04T13:25:00Z",
+  "reason": "PHASE2_DIAGNOSIS.md found that Stage 1/2's selected action mapping is a DEGENERATE CONSTANT (same (resolution,NMS) for LOW/MEDIUM/HIGH). The originally predeclared Stage 3B (PREDECLARATION_STAGE3PLUS.json) fixes the action mapping at that constant while searching only t_med/t_high -- but if the action never varies by level, no threshold retuning can possibly change outcomes (the level assignment becomes behaviorally irrelevant). Running Stage 3B as originally specified would be a tautological null, not a real test. This is a logical-flaw correction found before running, not a result-driven change to chase a positive outcome.",
+  "change": "Merge Stage 3B and Stage 4 into a single joint Optuna TPE search over {t_med, t_high, res_low, res_medium, res_high, nms_low, nms_medium, nms_high}, cue subset fixed at Stage 3A's winner (['crowd'] -- justified since Stage 3A showed near-zero sensitivity to cue subset, so fixing it to reduce dimensionality is reasonable, not arbitrary). Resolution choices drawn from the NARROW set {1088,1280,1536} (not the broadened set) to keep the trial budget's per-trial cost comparable to Stage 1/2 (reusing already-generated calibration cache, no new GPU work needed for this joint search).",
+  "search_space": {
+    "t_med": [0.10, 0.50], "t_high_offset_from_t_med": [0.05, 0.40],
+    "res_low": [1088, 1280, 1536], "res_medium": [1088, 1280, 1536], "res_high": [1088, 1280, 1536],
+    "nms_low": [0.45, 0.60, 0.70], "nms_medium": [0.45, 0.60, 0.70], "nms_high": [0.45, 0.60, 0.70]
+  },
+  "method": "Optuna TPESampler, seed=42, n_trials=60 (predeclared budget).",
+  "objective": "unchanged: CV-mean delta-HOTA vs matched-static (r1088_n45, narrow-space reference), ByteTrack host, 4 predeclared folds.",
+  "robustness_gate": "unchanged from PREDECLARATION_STAGE3PLUS.json (CV-mean>0 AND >=3/4 folds positive AND non-degenerate, i.e. action mapping must actually use >=2 distinct (resolution,nms) values across the 3 levels for the candidate to be eligible)."
+}

@@ -1,0 +1,50 @@
+name: SCI + V7f candidate on VisDrone val-7 (development split)
+on:
+  workflow_dispatch:
+    inputs:
+      candidate: {description: "candidate commit sha", required: true}
+      label: {description: "result directory under research/final/sci_v7f", required: true}
+      systems: {description: "systems", required: true}
+      boots: {description: "';'-separated 'A B' pairs", required: false, default: ""}
+      oracle: {description: "layers for the oracle diagnostic", required: false, default: ""}
+  push:
+    branches: [sci-v7f-general-layer-dev]
+    paths: [".github/workflows/sci_v7_val.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: sci-v7-${{ github.event.inputs.label || 'C1' }}
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: VisDrone val annotations cache
+        uses: actions/cache@v4
+        with:
+          path: ~/acmot_work/VisDrone2019-MOT-val
+          key: visdrone-val-ann-e53571990dfc
+      - name: Run candidate (val7 only)
+        env:
+          # a push of this file runs the pre-registered candidate C1
+          CANDIDATE: ${{ github.event.inputs.candidate || '5a8502f2cf7f76f168ab238a389115adfa228aa8' }}
+          LABEL: ${{ github.event.inputs.label || 'C1_5a8502f' }}
+          SYSTEMS: ${{ github.event.inputs.systems || 'NATIVE+MEDIUM NATIVE+SCI V7f+MEDIUM V7f+SCI NATIVE+LOW NATIVE+HIGH V7f+LOW V7f+HIGH NATIVE+PERM1 NATIVE+PERM2 NATIVE+PERM3 V7f+PERM1 V7f+PERM2 V7f+PERM3' }}
+          BOOTS: ${{ github.event.inputs.boots || 'NATIVE+MEDIUM V7f+MEDIUM;NATIVE+MEDIUM NATIVE+SCI;V7f+MEDIUM V7f+SCI;NATIVE+SCI V7f+SCI;V7f+PERM1 V7f+SCI;V7f+PERM2 V7f+SCI;V7f+PERM3 V7f+SCI;NATIVE+PERM1 NATIVE+SCI;V7f+MEDIUM V7f+HIGH;V7f+MEDIUM V7f+LOW' }}
+          ORACLE: ${{ github.event.inputs.oracle || '' }}
+        run: bash tools/sci_v7/ci/run_candidate.sh
+      - name: Commit results
+        if: always()
+        env:
+          CANDIDATE: ${{ github.event.inputs.candidate || '5a8502f2cf7f76f168ab238a389115adfa228aa8' }}
+          LABEL: ${{ github.event.inputs.label || 'C1_5a8502f' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "research/final/sci_v7f/${LABEL}" || true
+          git diff --cached --quiet && exit 0
+          git commit -m "SCI + V7f val-7 results: ${LABEL} (candidate ${CANDIDATE}, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 7; done

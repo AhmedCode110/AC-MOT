@@ -1,0 +1,39 @@
+name: Fetch AIAA journal length guidelines
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/fetch_jais_rules.yml"]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch
+        run: |
+          sudo apt-get -qq install -y poppler-utils >/dev/null
+          mkdir -p JAIS_PAPERS/refs/aiaa_rules
+          cd JAIS_PAPERS/refs/aiaa_rules
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36"
+          curl -fsSL -A "$UA" -o limits_2024.pdf "https://aiaa.org/wp-content/uploads/2024/12/journalpagelimitsandwordcountguidelines_Sept_2024.pdf" || true
+          curl -fsSL -A "$UA" -o limits_2018.pdf "https://arc.aiaa.org/pb-assets/PDFs/JournalPageLimitsandWordCountGuidelines_August%202018.pdf" || true
+          curl -fsSL -A "$UA" -o author_page.html "https://aiaa.org/publications/journals/journal-author/" || true
+          curl -fsSL -A "$UA" -o policies.html "https://aiaa.org/publications/publish-with-aiaa/publication-policies/" || true
+          curl -fsSL -A "$UA" -o open_access.html "https://www.aiaa.org/publications/Open-Access/" || true
+          curl -fsSL -A "$UA" -o fees.html "https://aiaa.org/publications/open-access/open-access-and-publication-fees/" || true
+          curl -fsSL -A "$UA" -o sivp_publish.html "https://link.springer.com/journal/11760/how-to-publish-with-us" || true
+          curl -fsSL -A "$UA" -o sivp_guidelines.html "https://link.springer.com/journal/11760/submission-guidelines" || true
+          curl -fsSL -A "$UA" -o acceptance.html "https://aiaa.org/publications/journals/Journal-Author/journal-acceptance-procedure/" || true
+          for f in *.pdf; do [ -s "$f" ] && pdftotext -layout "$f" "${f%.pdf}.txt"; done
+          for f in *.html; do [ -s "$f" ] && python3 -c "import re,sys,html;t=open(sys.argv[1],errors='ignore').read();t=re.sub(r'(?s)<(script|style).*?</\1>','',t);t=re.sub(r'<[^>]+>',' ',t);print(re.sub(r'\s+',' ',html.unescape(t)))" "$f" > "${f%.html}.txt"; done
+          rm -f *.html; ls -la
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f JAIS_PAPERS/refs/aiaa_rules
+          git diff --cached --quiet && exit 0
+          git commit -m "AIAA journal length and charge guidelines (fetched by run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

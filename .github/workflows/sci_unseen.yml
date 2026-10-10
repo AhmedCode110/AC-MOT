@@ -1,0 +1,181 @@
+name: G1 transfer - unseen detector (RetinaNet), BoT-SORT host, runtime (val-7, CPU runners)
+on:
+  workflow_dispatch:
+  push:
+    branches: [sci-v7f-general-layer-dev]
+    paths: [".github/workflows/sci_unseen.yml"]
+permissions:
+  contents: write
+env:
+  ZIP_SHA: e53571990dfc79229e0a8ae10264bc4fa604a027c44b06e3a097417e4fa55705
+  RN_URL: https://download.pytorch.org/models/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth
+  RN_SHA: 5905b1c544219215e544dbe319720397bc4e68de61a733a59350d7976645b769
+  YOLO_SHA: f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36
+  RTDETR_SHA: 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f
+  G1: 751c602212aed8c0c2c302594dcd42436e2296f0
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        seq: [uav0000086_00000_v, uav0000117_02622_v, uav0000137_00458_v, uav0000182_00000_v,
+              uav0000268_05773_v, uav0000305_00000_v, uav0000339_00001_v]
+        res: ["640", "736", "832"]
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/cache/restore@v4
+        with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
+      - name: Frames + environment
+        run: |
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip "*${{ matrix.seq }}*" -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' "$GITHUB_WORKSPACE/research/final/env/repo_venv.txt" > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          curl -fsSL -o ~/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth "$RN_URL"
+          echo "$RN_SHA  $HOME/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth" | sha256sum -c -
+          git diff --quiet "$G1" -- adapters/detectors/retinanet.py tools/sci_v7/build_sweep_cache.py || { echo "adapter or cache tool differs from the lock"; exit 1; }
+      - name: Build
+        run: |
+          PYTHONPATH=$PWD ~/venv/bin/python tools/sci_v7/build_sweep_cache.py --weights ~/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth \
+            --det retinanet --dataset "$DATA" --out ~/sweep --res ${{ matrix.res }} --seqs ${{ matrix.seq }} 2>&1 | grep -v -i warn
+      - uses: actions/upload-artifact@v4
+        with: {name: "rn-${{ matrix.seq }}-${{ matrix.res }}", path: ~/sweep, retention-days: 30}
+
+  evaluate:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/download-artifact@v4
+        with: {path: ~/art}
+      - uses: actions/cache/restore@v4
+        with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
+      - name: Caches, frames, environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          mkdir -p ~/sweep && for a in ~/art/*; do cp -r "$a"/* ~/sweep/; done
+          test "$(find ~/sweep/retinanet -name '*.npz' | wc -l)" = 21
+          (cd ~ && tar -cf sci_retinanet_val7.tar sweep/retinanet && sha256sum sci_retinanet_val7.tar) | tee ~/rn.sha256
+          gh release view sci-v7f-unseen-1 >/dev/null 2>&1 || gh release create sci-v7f-unseen-1 --prerelease \
+            --title "G1 unseen detector: RetinaNet val-7 cache" --notes "Lock: research/TRANSFER_LOCK_RETINANET_G1.json" --target "${GITHUB_SHA}"
+          gh release upload sci-v7f-unseen-1 ~/sci_retinanet_val7.tar --clobber
+          curl -fsSL -o ~/sw.tar https://github.com/AhmedCode110/AC-MOT/releases/download/sci-v7f-sweep-1/sci_sweep_val7.tar
+          echo "dfa2276559471e7e65e3097294059757ee1990a6b239beef254f2470091c905b  $HOME/sw.tar" | sha256sum -c -
+          tar -xf ~/sw.tar -C ~ && rm ~/sw.tar
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' research/final/env/repo_venv.txt > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          ~/venv/bin/pip install -q motmetrics==1.4.0 pytest
+          git clone -q https://github.com/JonathonLuiten/TrackEval.git ~/TrackEval && git -C ~/TrackEval checkout -q 12c8791
+          REL="https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1"
+          curl -fsSL -o ~/SHA256SUMS "$REL/SHA256SUMS"; f=acmot_detcache_val_native.tar
+          curl -fsSL -o ~/$f "$REL/$f" && (cd ~ && grep " $f" SHA256SUMS | sha256sum -c -)
+          tar -xf ~/$f -C "$GITHUB_WORKSPACE" --exclude='._*' 2>/dev/null; rm ~/$f
+      - name: Locks and tests at the G1 commit
+        run: |
+          set -e
+          O=research/final/sci_v7f/G1_transfer; mkdir -p $O
+          git diff --quiet "$G1" -- $(python3 -c "import json;print(' '.join(json.load(open('research/GENERAL_ACMOT_G1_LOCK.json'))['file_sha256']))") \
+            && echo "G1 files identical to $G1" | tee $O/lock_check.txt
+          PYTHONPATH=$PWD:$HOME/TrackEval ~/venv/bin/python -m pytest -q tests/test_sci_v7.py 2>&1 | tail -2 | tee $O/tests.txt
+      - name: Evaluate (val7 only)
+        run: |
+          set -e
+          export PYTHONPATH=$PWD:$HOME/TrackEval ACMOT_VISDRONE_VAL="$DATA" V7_SPLIT=val7 V7_WORKERS=4 SCI_CACHE=sweep SCI_SWEEP_ROOT=$HOME/sweep
+          O=research/final/sci_v7f/G1_transfer; PY=~/venv/bin/python; D=tools/sci_v7/dev.py
+          RN="NATIVE+MEDIUM V7f+MEDIUM NATIVE+R640 V7f+R640 NATIVE+R832 V7f+R832"
+          BS="NATIVE+MEDIUM@botsort V7f+MEDIUM@botsort"
+          V7_DETS=retinanet $PY $D run $RN 2>&1 | tail -3
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D run $BS 2>&1 | tail -3
+          V7_DETS=retinanet $PY $D report $RN 2>&1 | grep -v BURST | tee $O/retinanet_bytetrack_internal.txt
+          V7_DETS=retinanet $PY $D official $RN 2>&1 | grep -v BURST | tee $O/retinanet_bytetrack_official.txt
+          V7_DETS=retinanet $PY $D seq NATIVE+MEDIUM V7f+MEDIUM 2>&1 | grep -v BURST > $O/retinanet_bytetrack_per_sequence.txt
+          V7_DETS=retinanet $PY $D ops $RN 2>&1 | grep -v BURST > $O/retinanet_operating.txt
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D report $BS 2>&1 | grep -v BURST | tee $O/botsort_internal.txt
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D official $BS 2>&1 | grep -v BURST | tee $O/botsort_official.txt
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D seq $BS 2>&1 | grep -v BURST > $O/botsort_per_sequence.txt
+          for pr in "NATIVE+MEDIUM V7f+MEDIUM" "NATIVE+R640 V7f+R640" "NATIVE+R832 V7f+R832"; do
+            V7_DETS=retinanet $PY $D boot $pr --json $O/bootstrap_retinanet.json 2>&1 | grep -v BURST >> $O/bootstrap_retinanet.txt
+            V7_DETS=retinanet $PY $D boot $pr --protocol official --json $O/bootstrap_retinanet_official.json 2>&1 | grep -v BURST >> $O/bootstrap_retinanet_official.txt
+          done
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D boot $BS --json $O/bootstrap_botsort.json 2>&1 | grep -v BURST | tee $O/bootstrap_botsort.txt
+          V7_DETS=retinanet,yolov8,rtdetr $PY $D boot $BS --protocol official --json $O/bootstrap_botsort_official.json 2>&1 | grep -v BURST > $O/bootstrap_botsort_official.txt
+          cp ~/rn.sha256 $O/sci_retinanet_val7.tar.sha256
+          { echo "runner_commit $(git rev-parse HEAD)"; echo "g1_commit $G1"; echo "cpu $(lscpu | sed -n 's/^Model name: *//p') x $(nproc)"; echo "gpu none (GitHub-hosted runner)"; echo "split val7 (development, row P6); no protected split opened"; } > $O/environment.txt
+          echo OK > $O/STATUS.txt
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/sci_v7f/G1_transfer || true
+          git diff --cached --quiet && exit 0
+          git commit -m "G1 transfer: RetinaNet (unseen detector) and BoT-SORT host on val-7 (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 7; done
+
+  runtime:
+    # runtime results of this workflow come from run 37009596192; a push re-runs only build + evaluate
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {det: yolov8, weights: yolov8n.pt}
+          - {det: rtdetr, weights: rtdetr-l.pt}
+          - {det: retinanet, weights: retinanet_resnet50_fpn_v2_coco-5905b1c5.pth}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with: {path: ~/val.zip, key: visdrone-val-zip-e53571990dfc, fail-on-cache-miss: true}
+      - name: Environment
+        run: |
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip "*uav0000086_00000_v*" "*uav0000339_00001_v*" -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
+          python3 -m venv ~/venv && ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' research/final/env/repo_venv.txt > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          curl -fsSL -o ~/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+          curl -fsSL -o ~/rtdetr-l.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/rtdetr-l.pt
+          curl -fsSL -o ~/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth "$RN_URL"
+          echo "$YOLO_SHA  $HOME/yolov8n.pt" | sha256sum -c -
+          echo "$RTDETR_SHA  $HOME/rtdetr-l.pt" | sha256sum -c -
+          echo "$RN_SHA  $HOME/retinanet_resnet50_fpn_v2_coco-5905b1c5.pth" | sha256sum -c -
+      - name: Benchmark (one host per detector, CPU)
+        run: |
+          set -e
+          O=research/final/sci_v7f/G1_runtime; mkdir -p $O
+          PYTHONPATH=$PWD ~/venv/bin/python tools/sci_v7/benchmark.py --weights ~/${{ matrix.weights }} --det ${{ matrix.det }} \
+            --dataset "$DATA" --seqs uav0000086_00000_v uav0000339_00001_v --max-frames 160 \
+            --arms native:736 fixed:736 sci:resolution --out $O/bench_${{ matrix.det }}.json 2>&1 | grep -v -i warn
+          PYTHONPATH=$PWD ~/venv/bin/python tools/sci_v7/benchmark.py --weights ~/${{ matrix.weights }} --det ${{ matrix.det }} \
+            --dataset "$DATA" --seqs uav0000086_00000_v --max-frames 60 \
+            --arms fixed:512 fixed:576 fixed:640 fixed:704 fixed:736 fixed:768 fixed:832 fixed:896 fixed:960 \
+            --out $O/latency_curve_${{ matrix.det }}.json 2>&1 | grep -v -i warn
+          lscpu | sed -n 's/^Model name: *//p' > $O/host_${{ matrix.det }}.txt
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/sci_v7f/G1_runtime || true
+          git diff --cached --quiet && exit 0
+          git commit -m "G1 runtime on a CPU runner: ${{ matrix.det }} (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4 5 6; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((5 + RANDOM % 20)); done

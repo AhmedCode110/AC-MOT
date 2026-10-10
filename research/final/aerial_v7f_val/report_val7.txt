@@ -1,0 +1,4 @@
+system                             cat |     yolov8: MOTA  HOTA  IDF1   IDS     FP     FN    P    R clean |     rtdetr: MOTA  HOTA  IDF1   IDS     FP     FN    P    R clean
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+NATIVE                               5 |             17.0  31.7  33.7   359   9740  45768 68.9 32.0  1.00 |             -6.2  36.8  40.7   839  42646  28065 47.9 58.3  1.00
+V7f                                  0 |             18.1  33.9  37.6   244   9552  45351 69.7 32.7  0.47 |             21.0  41.1  46.8   168  14074  38946 66.9 42.2  0.19

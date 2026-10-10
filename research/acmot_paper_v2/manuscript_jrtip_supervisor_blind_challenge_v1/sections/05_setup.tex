@@ -1,0 +1,50 @@
+\section{Experimental Setup}\label{sec:setup}
+
+\subsection{Detector and tracker hosts}
+All modern experiments use one frozen public YOLO11m detector
+\cite{jocher2024yolo11}, the
+Hugging Face checkpoint \texttt{dronefreak/\allowbreak visdrone-\allowbreak yolo11m}. It was
+trained on VisDrone2019-DET at 640 pixels (SHA256 \checkpointsha). It runs in half precision. Detections of the
+classes pedestrian, car, van, truck, and bus are passed on.
+
+Two tracker hosts are used and kept unchanged. ByteTrack uses the Ultralytics
+implementation with high threshold 0.25, low threshold 0.10, new-track
+threshold 0.25, buffer 30 frames, and match threshold 0.80. OATrack is a
+re-implementation of the published method \cite{qi2026oatrack} in its main
+configuration, with a tracker-side confidence gate of 0.40. This gate belongs
+to the tracker and is never changed by AC-MOT.
+
+\subsection{Systems}
+The baseline runs the detector at the fixed operating point of 1536 pixels and
+NMS IoU 0.70, with no score threshold above the cache floor of 0.01. AC-MOT
+runs the frozen controller of Sect.~\ref{sec:method} on the same detector. For
+each host, the baseline and AC-MOT differ only in the detector operating
+point.
+
+\subsection{Data}
+The VisDrone evaluation uses seven sequences of the VisDrone2019-MOT
+validation split. They contain 71,830 ground-truth boxes. The cue subset,
+thresholds, and action map of the frozen controller were selected on the
+separate calibration sequences only (Sect.~\ref{sec:modern}). The UAVDT transfer uses 20 test
+sequences with 16,592 frames. The frozen controller, thresholds, and action
+map are applied without any change. Detector outputs for UAVDT were produced
+at the three frozen operating points, giving 49,776 detector forward passes.
+
+\subsection{Metrics and evaluation}
+VisDrone results are scored with a Python port of the VisDrone2019-MOT
+Task~4b evaluation. Ignored regions are removed, the five classes above are
+evaluated separately, CLEAR-MOT and identity measures use IoU 0.5, and counts
+are summed over classes and sequences. HOTA is added with the same class-aware
+scheme using TrackEval. UAVDT is scored with one vehicle class. We report
+HOTA \cite{luiten2021hota}, MOTA, IDF1, IDS, FP, FN, precision, and recall.
+
+Uncertainty on VisDrone is estimated with a paired bootstrap at the sequence
+level \cite{efron1993bootstrap}. Each of 5000 resamples (seed 42) draws seven
+sequences with replacement. The same draw is used for both systems, the pooled
+metrics are recomputed, and their difference is recorded. The 95\% interval
+is the 2.5--97.5 percentile range. UAVDT is a single frozen run per host.
+
+Latency is measured on one Tesla T4 GPU over the first 200 frames of sequence
+\texttt{uav0000086\_00000\_v}, excluding five warm-up frames. For every
+frame, the time spent in the controller (image statistics, scene analysis, and
+state update) is recorded separately from the detector and tracker time.

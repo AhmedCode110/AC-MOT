@@ -1,0 +1,12 @@
+{"source": "Drive UAVDT_EXTERNAL_GENERALIZATION/results/FROZEN_3SYSTEM_TEST_2026-09-12/UAVDT_TEST_DATA_PROVENANCE.json (id 1S1aT7WKE1wcszsFZlyDpXH21VKNa-Lix)",
+ "adapter_sha256": "8957b4da276121408b5769c23eb3de84dd30667c88d539e437ba6b6afc28648a",
+ "systems_lock_sha256": "dee530513325b0acd3df2b56ffb00e7ddb9457fe2abf91783b2f2c98a437f114",
+ "v1_freeze_sha256": "8eeb7b916e7085b290313349cb0ebb95fa97f7f3956caefedd902fcf2890379c",
+ "v1_calibration_sha256": "fd42b22987365236944e90d3ebd646a28a56e5b60986cf1ad9f05881e7958c78",
+ "v2_freeze_sha256": "ba922adac720ac822e80145aa697e24f86bd8bd9a71cb49b2736ba83195fcd72",
+ "repository_commit": "5becc52a569f271ee8b73ce47c67d495de0d64a5",
+ "trackeval_commit": "12c8791b303e0a0b50f753af204249e622d0281a", "gpu": "Tesla T4",
+ "test_sequences": ["M0203","M0205","M0208","M0209","M0403","M0601","M0602","M0606","M0701","M0801","M0802","M1001","M1004","M1007","M1009","M1101","M1301","M1302","M1303","M1401"],
+ "total_frames": 16592,
+ "ignore_sequences": ["M0203","M0205","M0208","M0403","M0601","M0602","M0606","M0701","M0802","M1001","M1004","M1007","M1009","M1101","M1301","M1302","M1303","M1401"],
+ "classes": [2, 5, 7]}

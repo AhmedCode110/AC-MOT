@@ -1,0 +1,91 @@
+{
+  "decision": "frozen_common_detector_checkpoint",
+  "selected": "dronefreak/visdrone-yolo11m (best.pt)",
+  "local_filename": "yolo11m_visdrone_frozen.pt",
+  "sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+  "source": {
+    "platform": "Hugging Face",
+    "repo_id": "dronefreak/visdrone-yolo11m",
+    "url": "https://huggingface.co/dronefreak/visdrone-yolo11m",
+    "original_filename": "best.pt",
+    "repo_sha": "ed725b79676afa40054a91422258e7cb2b9528b8",
+    "author": "dronefreak",
+    "last_modified": "2026-07-05T21:01:32.000Z",
+    "license": "AGPL-3.0 (https://ultralytics.com/license) -- declared both in the HF repo card and inside the checkpoint's own metadata; flagged for disclosure in any paper/documentation, not a blocker for internal frozen-inference use",
+    "classification": "third-party reproduction (not official OATrack release, not an Ultralytics-official release)",
+    "related_repo": "https://github.com/dronefreak/VisDrone-dataset-python-toolkit (documented training toolkit, 33 models benchmarked systematically)"
+  },
+  "checkpoint_metadata_verified_by_torch_load": {
+    "architecture": "ultralytics.nn.tasks.DetectionModel (YOLO11m)",
+    "ultralytics_version_in_checkpoint": "8.4.56",
+    "pinned_project_ultralytics_version": "8.3.200",
+    "loads_cleanly_with_pinned_version": true,
+    "load_check_date_utc": "2026-10-04",
+    "nc": 11,
+    "names": {
+      "0": "pedestrian", "1": "people", "2": "bicycle", "3": "car", "4": "van",
+      "5": "truck", "6": "tricycle", "7": "awning-tricycle", "8": "bus", "9": "motor", "10": "others"
+    },
+    "train_args": {
+      "data": "/tmp/visdrone_yolo_9rolehtr/dataset.yaml (ephemeral path; standard Ultralytics VisDrone2019-DET conversion, not VisDrone-MOT)",
+      "model": "yolo11m.pt",
+      "imgsz": 640,
+      "epochs": 300,
+      "batch": 16,
+      "optimizer": "auto -> SGD",
+      "mosaic": 1.0,
+      "close_mosaic": 10,
+      "val_split_used_for_checkpoint_selection": "val (VisDrone2019-DET val, 548 images); this is a best.pt (fitness-selected on DET val), not a last-epoch checkpoint"
+    },
+    "epoch_field_in_checkpoint": -1,
+    "note_on_epoch_field": "-1 is the normal value after ultralytics strip_optimizer() on a finalized export; does not indicate 0 training epochs (train_args.epochs=300 confirmed, and fitted weights behave accordingly in sanity inference)."
+  },
+  "dataset_provenance": {
+    "dataset": "VisDrone2019-DET (still-image object detection benchmark: 6471 train / 548 val / 1610 test-dev)",
+    "NOT": "VisDrone2019-MOT (56 video sequences / ~24,201 train frames) -- this is the set our own in-house training and AC-MOT protocol use",
+    "det_vs_mot_overlap_check": "VisDrone-DET and VisDrone-MOT are documented as distinct, non-overlapping video/image collections in the VisDrone benchmark design (separate challenge tracks, separate capture sets); no direct frame-level overlap verification was performed beyond this, since the two tracks are independently curated by the VisDrone organizers.",
+    "relation_to_our_held_out_visdrone_mot_val": "No evidence of leakage into our final held-out VisDrone2019-MOT-val; this checkpoint was never exposed to, or selected against, our evaluation data."
+  },
+  "sanity_check": {
+    "performed_on": "Mac CPU, ultralytics==8.3.200 (pinned), single calibration-sequence frame (uav0000013_00000_v, frame 50) -- NOT final held-out VisDrone-MOT-val, NOT used for threshold tuning or model selection",
+    "imgsz_used": 1536,
+    "conf_threshold": 0.25,
+    "result": "91 detections, plausible class distribution (pedestrian/people/motor/bicycle/awning-tricycle), confidence range 0.254-0.839; no catastrophic failure, no NaN/garbage output",
+    "cuda_sanity_check": "pending -- to be run briefly on the Lightning T4 (load + inference at 1088/1280/1536, class-output check) before cache generation, per the no-tuning quick-audit requirement"
+  },
+  "class_mapping_for_acmot_eval5_protocol": {
+    "rule": "output-only post-detection filter/remap, no retraining",
+    "checkpoint_class_index_to_eval5": {
+      "0": "pedestrian -> eval5 class 0 (pedestrian)",
+      "3": "car -> eval5 class 1 (car)",
+      "4": "van -> eval5 class 2 (van)",
+      "5": "truck -> eval5 class 3 (truck)",
+      "8": "bus -> eval5 class 4 (bus)"
+    },
+    "dropped_classes": "checkpoint indices 1 (people), 2 (bicycle), 6 (tricycle), 7 (awning-tricycle), 9 (motor), 10 (others) are dropped post-detection for the eval5 protocol -- identical in kind to how the in-house training's own eval5 mapping already drops non-eval5 raw VisDrone classes; no evaluation semantics changed."
+  },
+  "runner_up_candidate": {
+    "repo_id": "erbayat/yolov11m-visdrone",
+    "url": "https://huggingface.co/erbayat/yolov11m-visdrone",
+    "sha256": "bce8035b91611daeb7b0c4a516a77c39bfc3c995fb01d64bd6b69f3431cc0bc2",
+    "why_not_selected": "Nearly empty model card (no reported metrics, invalid config.json); weaker documented provenance than dronefreak despite a cleaner 10-class output (no 'others' class) and a closer-matching Ultralytics version (8.3.29) and a more permissive license (OpenRAIL). Kept in external_weights_audit/ for reference; not deleted.",
+    "verified_independently": {
+      "architecture": "YOLO11m (ultralytics.nn.tasks.DetectionModel)",
+      "ultralytics_version_in_checkpoint": "8.3.29",
+      "nc": 10,
+      "train_args_imgsz": 640,
+      "train_args_epochs": 400,
+      "train_args_batch": 16,
+      "dataset": "VisDrone2019-DET (standard Ultralytics VisDrone.yaml)",
+      "loads_cleanly_with_pinned_ultralytics_8_3_200": true
+    }
+  },
+  "what_this_checkpoint_is_not": [
+    "NOT the exact official OATrack YOLO11m-smallobj detector (that checkpoint is not publicly released; the OATrack paper's data-availability statement states materials are available from the corresponding author upon reasonable request only)",
+    "NOT trained by us",
+    "NOT a reproduction of OATrack's detector training protocol (different dataset: DET not MOT; different imgsz: 640 not 1536; epochs/augmentation/class-set choices undocumented by OATrack and not matched here)"
+  ],
+  "frozen_since_git_commit": "fec8ac7861826aa44b8ce66da09225f08870275f",
+  "decision_date_utc": "2026-10-04",
+  "status": "FROZEN -- do not fine-tune; use identically across all four main systems (YOLO11m+ByteTrack, YOLO11m+frozen OATrack, AC-MOT+YOLO11m+ByteTrack, AC-MOT+YOLO11m+frozen OATrack)"
+}

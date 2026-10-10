@@ -1,0 +1,29 @@
+\begin{tikzpicture}
+\begin{axis}[
+  ybar,
+  /pgf/bar width=11pt,
+  width=0.95\columnwidth,
+  height=4.8cm,
+  ymin=55, ymax=75,
+  xmin=0.5, xmax=3.5,
+  xtick={1,2,3},
+  xticklabels={SparseTrack, {BoostTrack\\(online)}, {BoostTrack\\(+ GBI)}},
+  xticklabel style={align=center},
+  ylabel={HOTA (\%)},
+  axis x line*=bottom,
+  axis y line*=left,
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  legend style={at={(0.5,1.03)}, anchor=south, legend columns=3,
+    font=\scriptsize, draw=none, /tikz/every even column/.append style={column sep=4pt}},
+  legend cell align=left,
+]
+\addplot[fill=black!35, draw=black!55] coordinates {(1,68.88) (2,68.49) (3,71.72)};
+\addplot[fill=red!60, draw=red!75] coordinates {(1,64.72) (2,62.61) (3,66.35)};
+\addplot[fill=blue!60, draw=blue!75] coordinates {(1,68.93) (2,68.49) (3,71.72)};
+\legend{Host alone, Host + \aob{}, Host + \scl{}}
+\node[rotate=90, anchor=east, font=\scriptsize, text=white] at (axis cs:1,64.3) {$-4.15$};
+\node[rotate=90, anchor=east, font=\scriptsize, text=white] at (axis cs:2,62.2) {$-5.89$};
+\node[rotate=90, anchor=east, font=\scriptsize, text=white] at (axis cs:3,65.9) {$-5.37$};
+\end{axis}
+\end{tikzpicture}

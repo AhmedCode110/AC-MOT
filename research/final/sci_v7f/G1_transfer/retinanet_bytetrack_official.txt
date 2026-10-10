@@ -1,0 +1,8 @@
+OFFICIAL-COMPATIBLE VisDrone-MOT (class-aware, ignored regions dropped)
+system           cat | retinanet: MOTA  HOTA  IDF1   IDS     FP     FN    P    R
+NATIVE+MEDIUM      5 |         -18.1  23.6  22.5  1292  32697  50823 39.1 29.2
+V7f+MEDIUM         4 |         -10.3  28.5  28.6   468  28625  50166 43.1 30.2
+NATIVE+R640        5 |         -13.7  22.4  20.8  1161  27207  53328 40.5 25.8
+V7f+R640           4 |          -6.0  24.3  23.1   491  22113  53535 45.3 25.5
+NATIVE+R832        4 |         -16.2  25.0  24.7  1420  33664  48390 41.0 32.6
+V7f+R832           4 |          -6.5  28.9  29.8   528  27556  48440 45.9 32.6

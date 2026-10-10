@@ -1,0 +1,16 @@
+{
+  "recorded_before_default_target_trials": true,
+  "correction": "The historical FrozenSCIController is detector-side, not tracker-threshold-adaptive.",
+  "source": "scripts/run_final_test_3workers_locked.py::FrozenSCIController",
+  "mechanism": {
+    "confidence": "conf_easy + sci * (conf_hard - conf_easy)",
+    "nms_iou": "nms_easy + sci * (nms_hard - nms_easy)",
+    "resolution": "three-way selection using threshold_mid and threshold_high"
+  },
+  "historical_static_baseline": {
+    "confidence": 0.25,
+    "nms_iou": 0.45,
+    "resolution": 640
+  },
+  "scope": "This corrects terminology prospectively. Existing predeclarations and result artifacts remain immutable."
+}

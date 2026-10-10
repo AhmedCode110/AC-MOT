@@ -1,0 +1,22 @@
+\begin{sidewaystable}
+\centering
+\caption{Paired sequence-level bootstrap (5,000 resamples, seed 42): observed difference and 95\% percentile interval. HOTA, MOTA and IDF1 in percentage points; IDS reduction in switches (positive = fewer switches for the first system).}
+\label{tab:ch4-boot}
+\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textheight}
+\begin{tabular}{llllll}
+\hline
+Data & Comparison & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 & IDS reduction \\
+\hline
+VisDrone & Q vs static default & $+5.41$ [$+4.13$, $+6.90$] & $+7.22$ [$+5.44$, $+9.29$] & $+8.82$ [$+6.90$, $+11.05$] & $+51$ [$-114$, $+219$] \\
+VisDrone & Q vs hand-designed & $+1.14$ [$+0.14$, $+2.27$] & $+3.71$ [$+2.39$, $+5.19$] & $+2.03$ [$+0.59$, $+3.77$] & $-123$ [$-244$, $-14$] \\
+VisDrone & Q vs matched static anchor & $-0.09$ [$-0.25$, $+0.06$] & $-0.05$ [$-0.25$, $+0.16$] & $-0.23$ [$-0.50$, $+0.02$] & $+13$ [$-23$, $+46$] \\
+VisDrone & B vs static default & $+2.79$ [$+0.75$, $+4.66$] & $+4.06$ [$+0.95$, $+6.89$] & $+5.15$ [$+2.03$, $+8.08$] & $+316$ [$+175$, $+470$] \\
+VisDrone & B vs Q & $-2.62$ [$-4.00$, $-1.69$] & $-3.16$ [$-6.14$, $-1.35$] & $-3.68$ [$-5.88$, $-2.24$] & $+265$ [$+82$, $+502$] \\
+UAVDT & Q vs static default & $+4.30$ [$+2.74$, $+5.71$] & $+3.56$ [$+1.45$, $+5.81$] & $+6.57$ [$+3.81$, $+8.82$] & $+237$ [$+104$, $+377$] \\
+UAVDT & B vs static default & $+2.85$ [$+1.24$, $+4.35$] & $+2.28$ [$+0.72$, $+4.16$] & $+4.13$ [$+1.63$, $+6.49$] & $+250$ [$+110$, $+404$] \\
+UAVDT & B vs Q & $-1.46$ [$-2.19$, $-0.91$] & $-1.28$ [$-2.44$, $-0.20$] & $-2.44$ [$-3.74$, $-1.37$] & $+13$ [$-20$, $+50$] \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\end{sidewaystable}

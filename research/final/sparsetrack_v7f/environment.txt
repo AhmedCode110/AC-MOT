@@ -1,0 +1,7 @@
+repo_commit 79749c5a72d000c26e67464b6c95a43b1b4de625
+sparsetrack_commit 499844f32c5bb2332f9811f26cd70cf4e517d4e7
+opencv_gmc 4.6.0
+python Python 3.12.3
+cpu AMD EPYC 7763 64-Core Processor x 4
+acmot_v7.py sha256 98d90fac222e35373a362ce4f279030ac87a82f909a261ff376324be74604bcb
+config sha256 c2b3a0f76594b3ff70b04868e5adc025e2c1c79e54e7958e51c1c76eeef6e5dd

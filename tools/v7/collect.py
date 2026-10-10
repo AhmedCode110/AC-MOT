@@ -60,12 +60,33 @@ def mot17(host):
     return out
 
 
+def kitti(det):
+    sys.path.insert(0, str(ROOT / "tools/v7/kitti"))
+    import kitti_eval as ke
+    out = {}
+    base = ROOT / "outputs/v7/kitti"
+    for p in sorted(base.iterdir()) if base.exists() else []:
+        if not all((p / det / f"{s}.trk.pkl").exists() for s in ke.seqs()):
+            continue
+        try:
+            with redirect_stdout(io.StringIO()):
+                m = ke.combine(ke.evaluate(det, p.name))
+        except Exception as e:
+            out[p.name] = {"error": str(e)[:200]}
+            continue
+        out[p.name] = {k: (round(v, 3) if isinstance(v, float) else v) for k, v in m.items()}
+    return out
+
+
 if __name__ == "__main__":
     res = {"visdrone_val7_yolo_rtdetr": visdrone("val7", ["yolov8", "rtdetr"]),
            "visdrone_val7_fasterrcnn": visdrone("val7", ["fasterrcnn"]),
            "visdrone_dev40": visdrone("dev40", ["yolov8", "rtdetr"]),
            "mot17_sparsetrack": mot17("sparsetrack"),
-           "mot17_boosttrack": mot17("boosttrack")}
+           "mot17_boosttrack": mot17("boosttrack"),
+           "mot17_bytetrack_ocsort_c1": mot17("bytetrack_mot17"),
+           "kitti_train_yolov8": kitti("yolov8"),
+           "kitti_train_rtdetr": kitti("rtdetr")}
     dest = ROOT / "research/final/V7_DEV_RESULTS.json"
     old = json.load(open(dest)) if dest.exists() else {}
     for k, v in res.items():                 # merge: never erase earlier entries

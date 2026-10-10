@@ -1,0 +1,41 @@
+\begin{table}[t]
+\caption{Baseline comparison under a detector change on KITTI tracking
+training (official HOTA, car and pedestrian averaged). Host: published
+tracker alone with the same detections. $\Delta$: host with \scl{}
+minus host, with 95\% paired-bootstrap interval; bold intervals exclude zero.
+BoT-SORT excludes one sequence on which the unmodified tracker fails
+numerically.}
+\label{tab:kitti}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Metric & Host & $\Delta$ [95\% CI]\\
+\midrule
+\multicolumn{3}{@{}l}{\textit{ByteTrack} \cite{zhang2022bytetrack}\textit{, RT-DETR-L}}\\
+\quad HOTA & 50.73 & {\boldmath $+0.91$ [$+0.22$, $+1.55$]}\\
+\quad MOTA & 47.27 & {\boldmath $+5.98$ [$+1.16$, $+9.94$]}\\
+\quad IDF1 & 64.98 & {\boldmath $+3.87$ [$+1.67$, $+5.06$]}\\
+\multicolumn{3}{@{}l}{\textit{BoT-SORT} \cite{aharon2022botsort}\textit{, RT-DETR-L}}\\
+\quad HOTA & 53.91 & $+0.61$ [$-0.39$, $+1.61$]\\
+\quad MOTA & 48.25 & {\boldmath $+7.86$ [$+2.21$, $+13.44$]}\\
+\quad IDF1 & 67.74 & {\boldmath $+3.10$ [$+1.00$, $+4.57$]}\\
+\multicolumn{3}{@{}l}{\textit{OC-SORT} \cite{cao2023ocsort}\textit{, RT-DETR-L}}\\
+\quad HOTA & 52.64 & $+0.19$ [$-0.57$, $+1.19$]\\
+\quad MOTA & 57.59 & $-0.57$ [$-4.36$, $+1.40$]\\
+\quad IDF1 & 69.87 & $+0.04$ [$-1.31$, $+1.78$]\\
+\multicolumn{3}{@{}l}{\textit{ByteTrack} \cite{zhang2022bytetrack}\textit{, YOLOv8n}}\\
+\quad HOTA & 45.31 & $+0.06$ [$-1.19$, $+1.24$]\\
+\quad MOTA & 46.54 & $-1.87$ [$-6.25$, $+0.03$]\\
+\quad IDF1 & 60.92 & $+1.49$ [$-0.36$, $+3.27$]\\
+\multicolumn{3}{@{}l}{\textit{BoT-SORT} \cite{aharon2022botsort}\textit{, YOLOv8n}}\\
+\quad HOTA & 49.21 & $-1.02$ [$-2.43$, $+0.25$]\\
+\quad MOTA & 49.89 & {\boldmath $-2.43$ [$-7.43$, $-0.14$]}\\
+\quad IDF1 & 64.41 & $+0.35$ [$-2.10$, $+2.27$]\\
+\multicolumn{3}{@{}l}{\textit{OC-SORT} \cite{cao2023ocsort}\textit{, YOLOv8n}}\\
+\quad HOTA & 36.27 & {\boldmath $+7.91$ [$+5.47$, $+9.98$]}\\
+\quad MOTA & 33.99 & {\boldmath $+9.40$ [$+1.10$, $+12.30$]}\\
+\quad IDF1 & 50.46 & {\boldmath $+9.60$ [$+5.61$, $+12.16$]}\\
+\bottomrule
+\end{tabular}
+\end{table}

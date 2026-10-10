@@ -1,0 +1,26 @@
+{
+  "predeclared_before_any_broadened_trial": true,
+  "timestamp_utc": "2026-10-04T11:40:00Z",
+  "purpose": "The original {1088,1280,1536}x{0.45,0.60,0.70} action space was itself a predeclared, non-cherry-picked choice (identical to the Colab notebook's CACHE_RES/NMS_IOU, predeclared before the detector swap), but the user wants the final controller NOT to be bottlenecked purely by that initial choice. This file predeclares a MODEST, bounded broadening, decided BEFORE seeing any broadened result.",
+  "resolution_extension": {
+    "new_points": [896, 1728],
+    "rule": "extend the existing arithmetic-ish progression on both ends by a comparable step (1088-1536 spans two ~448px steps; 896 and 1728 continue that spacing below/above), not chosen by trying several and keeping ones that look good.",
+    "broadened_resolution_set": [896, 1088, 1280, 1536, 1728],
+    "nms_set_unchanged": [0.45, 0.60, 0.70],
+    "n_static_points": 15,
+    "cache_scope": "CALIBRATION SPLIT ONLY for the 2 new resolutions, at this stage -- generating VisDrone-val cache for 896/1728 is deferred until/unless a broadened-resolution policy actually survives every gate and is selected for freeze (keeps GPU use tied to genuine need, per the resource-management instruction)."
+  },
+  "tractability_bound_declared_now": {
+    "statement": "Given measured per-trial cost (~130s/candidate x 8 calibration sequences for a full causal-simulation trial, ~20s/sequence for a static-point score), the following is the COMPLETE additional work this broadening will trigger, decided now, before any result is seen:",
+    "steps": [
+      "1. Generate calibration-split cache at resolutions {896,1728} x NMS {0.45,0.60,0.70} (new GPU work, ~35 min on T4).",
+      "2. Re-run the oracle/headroom gate on the full 15-point broadened static-point set, 8 calibration sequences, ByteTrack host (~800s CPU).",
+      "3. DECISION POINT (evidence-based, not outcome-chasing): if the broadened oracle headroom (best-per-sequence hindsight vs the new best matched-static, mean per-sequence HOTA) is still <= the original narrow-space headroom (0.178) and still concentrated in <=1-2 sequences, this constitutes sufficient evidence that broadening the action space does not change the qualitative finding; the staged controller search (Stage 1/2/3A/3B/Stage4) is NOT re-run on the broadened space, and the narrow-space staged results already in progress stand as the complete controller-development evidence. If the broadened oracle headroom is MEANINGFULLY larger and more broadly distributed, the staged pipeline (Stage 1/2/3A/3B/Stage4 pattern) IS re-run on the broadened action space before freeze.",
+      "4. This decision rule is fixed now; it will not be loosened or tightened after step 2's result is seen."
+    ]
+  },
+  "scoped_out_this_session": {
+    "old_AC-MOT_apples_to_apples_rerun": "The historical frozen AC-MOT (v1.0.0-acmot-frozen, FrozenSCIController, YOLOv8n+ByteTrack-specific, tracker-threshold-adaptive architecture) is a DIFFERENT detector AND a different controller architecture (tracker-threshold vs detector-operating-point). A 'clearly defined comparable setting' requires a separate protocol-design decision (e.g., which of its outputs map onto a detector-side action, or whether only its SCI/scene layer -- already reused here -- is comparable) that is not resolvable from the repository alone without introducing a new, undeclared mapping. This is recorded as a SCOPED-OUT, NOT a silently-skipped, item: GAP_AUDIT.md already documents this as item 2.1 'plug-in form... has not been used for AC-MOT'. Flagged for the owner's future decision, not fabricated here.",
+    "exhaustive_true_pareto_sweep": "A full compute-cost-vs-quality Pareto frontier across many more than 15 operating points (e.g., a continuous resolution sweep) is not attempted; the 15-point broadened grid is treated as a reasonable, bounded, predeclared approximation."
+  }
+}

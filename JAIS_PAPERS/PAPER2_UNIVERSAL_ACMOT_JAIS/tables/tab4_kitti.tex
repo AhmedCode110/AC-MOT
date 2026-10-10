@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Detector transfer on KITTI tracking training (official HOTA, car and pedestrian averaged). BoT-SORT excludes one sequence on which the unmodified tracker fails numerically.}
+\label{tab:kitti}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccc}
+\hline
+Tracker & Detector & Host HOTA / MOTA / IDF1 & $\Delta$HOTA & $\Delta$MOTA & $\Delta$IDF1 \\
+\hline
+ByteTrack & RT-DETR-L & 50.73 / 47.27 / 64.98 & {\boldmath $+0.91$ [$+0.22$, $+1.55$]} & {\boldmath $+5.98$ [$+1.16$, $+9.94$]} & {\boldmath $+3.87$ [$+1.67$, $+5.06$]} \\
+BoT-SORT & RT-DETR-L & 53.91 / 48.25 / 67.74 & $+0.61$ [$-0.39$, $+1.61$] & {\boldmath $+7.86$ [$+2.21$, $+13.44$]} & {\boldmath $+3.10$ [$+1.00$, $+4.57$]} \\
+OC-SORT & RT-DETR-L & 52.64 / 57.59 / 69.87 & $+0.19$ [$-0.57$, $+1.19$] & $-0.57$ [$-4.36$, $+1.40$] & $+0.04$ [$-1.31$, $+1.78$] \\
+ByteTrack & YOLOv8n & 45.31 / 46.54 / 60.92 & $+0.06$ [$-1.19$, $+1.24$] & $-1.87$ [$-6.25$, $+0.03$] & $+1.49$ [$-0.36$, $+3.27$] \\
+BoT-SORT & YOLOv8n & 49.21 / 49.89 / 64.41 & $-1.02$ [$-2.43$, $+0.25$] & {\boldmath $-2.43$ [$-7.43$, $-0.14$]} & $+0.35$ [$-2.10$, $+2.27$] \\
+OC-SORT & YOLOv8n & 36.27 / 33.99 / 50.46 & {\boldmath $+7.91$ [$+5.47$, $+9.98$]} & {\boldmath $+9.40$ [$+1.10$, $+12.30$]} & {\boldmath $+9.60$ [$+5.61$, $+12.16$]} \\
+\hline
+\end{tabular}}
+\end{table}

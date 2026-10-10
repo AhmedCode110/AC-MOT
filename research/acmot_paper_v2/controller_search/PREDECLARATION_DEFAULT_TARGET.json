@@ -1,0 +1,84 @@
+{
+  "predeclared_before_any_default_target_trial": true,
+  "timestamp_utc": "2026-10-04T15:00:00Z",
+  "supersedes_for_this_new_search_only": [
+    "PREDECLARATION.json",
+    "PREDECLARATION_BROADENED.json",
+    "PREDECLARATION_AMENDMENT.json"
+  ],
+  "owner_decisions": {
+    "A": "The only comparison and selection reference is HOST DEFAULT versus AC-MOT. Matched static is not a gate, reference, control, objective, or table row. Host default is r1536_n70 with the host's unmodified default confidence handling, exactly as systems 1/2 in scripts/run_baseline_systems.py. Trackers are frozen and identical between systems.",
+    "B": "The historical frozen AC-MOT is a detector-side controller. In scripts/run_final_test_3workers_locked.py::FrozenSCIController it interpolates detector confidence and NMS from SCI and selects one of three detector resolutions by threshold_mid/threshold_high. Its StaticBaselineController uses confidence 0.25, NMS 0.45, and size 640. The historical description tracker-threshold-adaptive in PREDECLARATION_BROADENED.json is incorrect for that controller.",
+    "C": "The new controller acts only on the original three detector-side knobs: resolution, NMS IoU, and confidence floor. Cue weights and cue computation remain frozen."
+  },
+  "historical_terminology_correction": {
+    "new_record_file": "CONTROLLER_TERMINOLOGY_CORRECTION_DEFAULT_TARGET.json",
+    "source": "scripts/run_final_test_3workers_locked.py::FrozenSCIController",
+    "rule": "No existing PREDECLARATION* or *_RESULT artifact is edited or deleted."
+  },
+  "data_and_evaluation_lock": {
+    "calibration": "research/acmot_paper_v2/DETECTOR_SPLIT.json -> calibration only; 8 sequences in listed order",
+    "folds": [
+      ["uav0000316_01288_v", "uav0000289_06922_v"],
+      ["uav0000013_00000_v", "uav0000076_00720_v"],
+      ["uav0000307_00000_v", "uav0000020_00406_v"],
+      ["uav0000315_00000_v", "uav0000243_00001_v"]
+    ],
+    "held_out_val": "VisDrone2019-MOT-val is not read, scored, or used for any choice in this search.",
+    "host_for_selection": "ByteTrack with its frozen defaults",
+    "official_evaluator": "tools/v6/eval_official.py",
+    "objective": "CV-mean over the four fixed folds of pooled HOTA(AC-MOT) minus pooled HOTA(host default)."
+  },
+  "fixed_scene_layer_and_threshold_search": {
+    "source": "acmot_sci.SceneLayer and frozen run_universal_acmot.analyze_visual",
+    "causal_inputs": "frame-t image statistics and tracker-reported boxes from frames before t only; never GT",
+    "cue_weights_and_computation": "frozen and unchanged",
+    "reason_thresholds_are_searched": "Commit 293b3c4 diagnosed degenerate historical thresholds: HIGH never occurs on calibration and 7/8 sequences are MEDIUM-dominant.",
+    "threshold_space": {
+      "t_med": [0.1, 0.5],
+      "t_high_offset_from_t_med": [0.05, 0.4],
+      "constraint": "t_high = t_med + offset and t_high <= 0.9"
+    }
+  },
+  "action_spaces": {
+    "resolution": [896, 1088, 1280, 1536, 1728],
+    "nms_iou": [0.45, 0.6, 0.7],
+    "confidence_floor_bytetrack": [0.1, 0.25, 0.4],
+    "confidence_floor_oatrack": [0.4, 0.5],
+    "oatrack_note": "OATrack internal min_conf is frozen at 0.40, so lower detector floors have no effect there.",
+    "cache_rule": "Only existing conf=0.01 caches are filtered by confidence; no detector forward pass is permitted. Existing calibration caches for every listed resolution/NMS point, including 896 and 1728, are reused without regeneration."
+  },
+  "confidence_validity_gate": {
+    "artifact": "research/acmot_paper_v2/CONFIDENCE_EXACTNESS_CHECK_FIXED.json",
+    "required": "all_exact=true, total_cases=18, exact_matches=18",
+    "failure_action": "Track B is invalid and cannot be selected. Freeze Track A instead and report each failing case and its class ids.",
+    "current_evidence_commit": "d203660"
+  },
+  "tracks_and_staged_plan": {
+    "track_a_resolution_nms": {
+      "confidence": "host-default, unmodified",
+      "stage_1": "Optuna GridSampler seed 42 over LOW/MEDIUM/HIGH resolution mapping: 5^3=125 trials; NMS fixed at 0.70.",
+      "stage_2": "Optuna GridSampler seed 42 over LOW/MEDIUM/HIGH NMS mapping: 3^3=27 trials; Stage-1 resolution winner fixed.",
+      "joint_threshold_action": "60 predeclared Optuna TPE trials, seed 42, jointly searching t_med/t_high and the three-level resolution/NMS mapping seeded from stages 1/2."
+    },
+    "track_b_resolution_nms_confidence": {
+      "stage_1": "Same 125-trial resolution grid, with NMS 0.70 and confidence 0.25 fixed.",
+      "stage_2": "Same 27-trial NMS grid, with the Stage-1 winner fixed and confidence 0.25 fixed.",
+      "stage_3a": "Optuna GridSampler seed 42 over LOW/MEDIUM/HIGH confidence mapping: 3^3=27 trials, with the preceding winners fixed.",
+      "joint_threshold_action": "60 predeclared Optuna TPE trials, seed 42, jointly searching t_med/t_high and all three-level resolution/NMS/confidence actions."
+    },
+    "tractability_bound": "426 total candidate evaluations, each on the eight calibration sequences only. The factorization and fixed 60-trial joint budgets are set before results; no trial budget, dataset, evaluator, cue computation, or search space will change after results are seen."
+  },
+  "selection_and_freeze_rules": {
+    "primary": "Within each track, select the joint-stage candidate with maximum CV-mean delta HOTA versus host default.",
+    "tie_break": [
+      "higher number of positive folds",
+      "fewer distinct three-knob actions across levels",
+      "lower mean selected resolution",
+      "lexicographically ordered parameter tuple"
+    ],
+    "track_choice": "If the confidence validity gate passes, freeze Track B. If it fails, freeze Track A; Track A otherwise remains a diagnostic comparator only.",
+    "freeze": "Write FROZEN_POLICY_DEFAULT_TARGET.json with the selected policy, source result, calibration-only metrics, gate evidence, and the exact git commit hash. No held-out result may modify it.",
+    "will_not_be_changed_after_seeing_results": true
+  }
+}

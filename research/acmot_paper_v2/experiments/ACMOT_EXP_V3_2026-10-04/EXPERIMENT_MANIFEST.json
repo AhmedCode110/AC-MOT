@@ -1,0 +1,212 @@
+{
+ "experiment_id": "ACMOT_EXP_V3_2026-10-04",
+ "title": "AC-MOT v3 adaptive detector-side controller, YOLO11m + ByteTrack/OATrack, VisDrone-MOT + UAVDT transfer",
+ "timestamps": {
+  "lineage_start": "2026-10-03T20:24:12Z",
+  "final_experiment_initiated": "2026-10-04T03:17:24+03:00",
+  "v3_freeze": "2026-10-04T16:48:02+03:00",
+  "second_val_read": "2026-10-04T16:59:13+03:00",
+  "uavdt_cache_completed": "2026-10-04T21:21:10+03:00",
+  "uavdt_evaluated": "2026-10-04T23:41:34+03:00",
+  "archive_created_utc": "2026-10-04T21:18:35+00:00",
+  "uavdt_completed": "2026-10-04T23:41:34+03:00",
+  "experiment_completed": "2026-10-04T23:53:18+03:00"
+ },
+ "repository": {
+  "path_mac": "/Users/ahmedgouda/CLAUDECODEX/claude_STADE/Master/AC-MOT",
+  "head": "87fd91a59784ca08c5fd52a88795ddee3994e564",
+  "branch": "sci-v7f-general-layer-dev"
+ },
+ "final_controller": {
+  "t_med": 0.29747709701135766,
+  "t_high": 0.5114928923560124,
+  "action_mapping": {
+   "LOW": {
+    "resolution": 1536,
+    "nms_iou": 0.7,
+    "confidence_floor": 0.1
+   },
+   "MEDIUM": {
+    "resolution": 1280,
+    "nms_iou": 0.45,
+    "confidence_floor": 0.4
+   },
+   "HIGH": {
+    "resolution": 1088,
+    "nms_iou": 0.6,
+    "confidence_floor": 0.4
+   }
+  },
+  "source": "research/acmot_paper_v2/controller_search/FREEZE_MANIFEST_V3_ADAPTIVE.json"
+ },
+ "baseline": "r1536_n70",
+ "detector_sha256": "c6f98247e7c731a567aaf37ca7b808beff588b687623e028b25a2e1d846e96e7",
+ "detector_sha256_verified_local": true,
+ "splits": {
+  "calibration": "research/acmot_paper_v2/DETECTOR_SPLIT.json \u2192 calibration (8 seq, 3282 frames)",
+  "final": "VisDrone2019-MOT-val 7 seq ['uav0000086_00000_v', 'uav0000117_02622_v', 'uav0000137_00458_v', 'uav0000182_00000_v', 'uav0000268_05773_v', 'uav0000305_00000_v', 'uav0000339_00001_v']",
+  "uavdt": "test-20, 16592 frames (protocol frozen 2026-09-12)"
+ },
+ "seeds": {
+  "optuna_sampler_seed": 43,
+  "shuffled_control_seed": 44,
+  "bootstrap_seed": 42,
+  "bootstrap_resamples": 5000
+ },
+ "kaggle_kernel": {
+  "kernel_id": "ahmedgouda1111111/uavdt-v3-cache-gen",
+  "recorded_utc": "2026-10-04T21:18:35+00:00",
+  "status_at_record": "COMPLETE (full 20-sequence/16592-frame run pulled and verified locally)",
+  "kernel_version": "v8 per commit 5a3d066 message ('kernel v8, full 16592-frame run')",
+  "script": "notebooks/kaggle/run_uavdt_cache_kaggle.py",
+  "script_sha256": "9ac86355db278314d020a49c0402a69c5f96155793c0213d618b62fbbb5a36e0",
+  "script_commit": "5a3d066dec9db3e8b18ba2106dd1206eb00db399",
+  "dataset_sources": [
+   "shakaibkaggle/uavdt-dataset (mounted /kaggle/input/datasets/shakaibkaggle/uavdt-dataset)",
+   "owner private dataset 'acmot-frozen-yolo11m-visdrone' (mounted /kaggle/input/acmot-frozen-yolo11m-visdrone)"
+  ],
+  "gpu": "Kaggle-provided GPU (exact model not re-verified against the kernel log from this archive host; cache output volume/forward-pass count below confirm the run completed as specified)",
+  "action_pairs_cached": [
+   [
+    1536,
+    0.7
+   ],
+   [
+    1280,
+    0.45
+   ],
+   [
+    1088,
+    0.6
+   ]
+  ],
+  "note_baseline": "baseline r1536_n70 equals the LOW (1536,0.70) cache with no conf filter, so no extra baseline cache is needed",
+  "sequences": "UAVDT test-20: M0203 M0205 M0208 M0209 M0403 M0601 M0602 M0606 M0701 M0801 M0802 M1001 M1004 M1007 M1009 M1101 M1301 M1302 M1303 M1401",
+  "expected_frames": 16592,
+  "protocol": [
+   "research/uavdt_protocol/UAVDT_EXTERNAL_PROTOCOL_FREEZE.json",
+   "research/uavdt_protocol/UAVDT_ADAPTER_V1_FREEZE.json",
+   "tools/build_uavdt_view.py"
+  ],
+  "cache_stats": {
+   "forward_passes": 49776,
+   "wall_seconds": 5651.554999828339,
+   "action_res_nms": [
+    [
+     1536,
+     0.7
+    ],
+    [
+     1280,
+     0.45
+    ],
+    [
+     1088,
+     0.6
+    ]
+   ],
+   "seq_frame_counts": {
+    "M0203": 1007,
+    "M0205": 646,
+    "M0208": 265,
+    "M0209": 1576,
+    "M0403": 514,
+    "M0601": 372,
+    "M0602": 480,
+    "M0606": 1374,
+    "M0701": 1308,
+    "M0801": 298,
+    "M0802": 1101,
+    "M1001": 1859,
+    "M1004": 269,
+    "M1007": 659,
+    "M1009": 604,
+    "M1101": 864,
+    "M1301": 1182,
+    "M1302": 719,
+    "M1303": 445,
+    "M1401": 1050
+   }
+  },
+  "cache_stats_source": "research/acmot_paper_v2/cache/uavdt/UAVDT_CACHE_STATS.json (external, git-ignored; hashed in ARTIFACT_INDEX.csv)",
+  "outputs": "PULLED (60 npz files: 20 sequences x 3 action pairs; copied locally to research/acmot_paper_v2/cache/uavdt/)",
+  "evaluation": "RUN -- research/acmot_paper_v2/run_uavdt_transfer.py -> research/acmot_paper_v2/UAVDT_TRANSFER_RESULT.json (commit 010f253)"
+ },
+ "selection_audit": {
+  "selected_trial": 7,
+  "selected_cv_mean": 2.4469571172780746,
+  "predeclared_rule": "argmax CV-mean objective among eligible (genuinely-adaptive, gate-passing) trials; ties broken by simplicity (fewest distinct action tuples, then lowest mean compute).",
+  "predeclared_eligibility": ">=2 distinct action tuples, each realized on >=10% of pooled calibration frames, AND within-sequence switching (not just sequence-to-sequence difference).",
+  "implemented_eligibility": "run_v3_joint_search.py: n_actions_ge10pct counts LEVELS (not distinct action tuples) >=10% AND mean switches > 0",
+  "eligible_by_implemented_flag": [
+   [
+    10,
+    2.533849811983581
+   ],
+   [
+    7,
+    2.4469571172780746
+   ],
+   [
+    8,
+    0.20379458964180763
+   ]
+  ],
+  "argmax_by_implemented_flag": [
+   10,
+   2.533849811983581
+  ],
+  "eligible_by_predeclared_tuple_rule": [
+   [
+    54,
+    2.9514886268347293
+   ],
+   [
+    7,
+    2.4469571172780746
+   ],
+   [
+    8,
+    0.20379458964180763
+   ]
+  ],
+  "argmax_by_predeclared_tuple_rule": [
+   54,
+   2.9514886268347293
+  ],
+  "finding": "DEVIATION RECORDED, NOT CORRECTED: trial 7 is not the argmax of the predeclared selection rule under either eligibility reading. Implemented flag -> trial 10 (MEDIUM and HIGH share one action tuple, so it fails the predeclared tuple rule). Predeclared tuple rule -> trial 54 (varies NMS only). Commit f2d94b5 justifies trial 7 as 'genuinely 3-way distinct across all dimensions', a criterion not in PREDECLARATION_V3_FINAL.json. The frozen controller is archived exactly as frozen; this deviation must be disclosed with any paper claim."
+ },
+ "artifact_counts": {
+  "copied": 100,
+  "external_hash_only": 349,
+  "copied_bytes": 2413584,
+  "external_bytes": 310048858
+ },
+ "stages": {
+  "baseline_r1536_n70": 2,
+  "first_val_read_static_control": 3,
+  "second_val_read_v3": 87,
+  "setup": 40,
+  "phaseB_v3_adaptive_dev": 15,
+  "runtime_T4": 4,
+  "uavdt_transfer": 128,
+  "phaseA_dev_vs_matched_static": 21,
+  "step4_prior_dev_coco_detectors": 5,
+  "calibration_cache": 144
+ },
+ "final_result_tables": {
+  "paper_ready": "research/acmot_paper_v2/experiments/ACMOT_EXP_V3_2026-10-04/PAPER_READY_RESULTS.md",
+  "visdrone_v3": "research/acmot_paper_v2/SECOND_VAL_READ_V3_RESULT.json",
+  "bootstrap_v3": "research/acmot_paper_v2/BOOTSTRAP_V3_RESULT.json",
+  "baseline": "research/acmot_paper_v2/BASELINE_SYSTEMS_RESULT.json",
+  "runtime_v3": "research/acmot_paper_v2/V3_RUNTIME_BENCHMARK_RESULT.json",
+  "static_control": "research/acmot_paper_v2/FINAL_ACMOT_SYSTEMS_RESULT.json",
+  "uavdt": "research/acmot_paper_v2/UAVDT_TRANSFER_RESULT.json"
+ },
+ "known_issues": [
+  "RESOLVED (at commit 87fd91a, this archive built after it): FINAL_REPORT.md \u00a78/\u00a711 previously carried stale text claiming v3 FPS was unmeasured and UAVDT was blocked; both were corrected in place (\u00a78 now reports V3_RUNTIME_BENCHMARK_RESULT.json's real numbers, \u00a78b reports the completed UAVDT transfer, \u00a711 closed out).",
+  "Selection-rule deviation (selection_audit): trial 7 is not the argmax of the predeclared selection rule under either eligibility reading. Disclosed in FREEZE_MANIFEST.json and PAPER_READY_RESULTS.md; the frozen controller was NOT changed in response (immutability rule).",
+  "VisDrone-val read twice (static control, then v3 adaptive); both reads labeled and preserved.",
+  "UAVDT transfer is a single frozen-policy run per host (not a search); no CV/bootstrap applies there by design."
+ ]
+}

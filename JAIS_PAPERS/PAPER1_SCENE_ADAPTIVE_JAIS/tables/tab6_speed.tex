@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Accuracy--throughput trade-off of the detector input resolution on VisDrone2019-MOT validation (confidence 0.25, NMS IoU 0.70, tuned tracker; T4 processing throughput and 95th-percentile per-frame latency).}
+\label{tab:speed}
+\small
+\begin{tabular}{rrrrrrr}
+\hline
+Resolution & HOTA & MOTA & IDF1 & IDS & FPS & P95 latency (ms) \\
+\hline
+512 & 26.05 & 13.93 & 26.00 & 216 & 62.7 & 26.1 \\
+576 & 27.77 & 15.67 & 29.19 & 240 & 57.6 & 29.0 \\
+640 & 30.43 & 16.96 & 32.23 & 326 & 53.5 & 32.1 \\
+704 & 31.56 & 17.35 & 34.26 & 322 & 49.8 & 33.6 \\
+768 & 32.09 & 18.15 & 34.45 & 359 & 47.3 & 36.9 \\
+832 & 33.53 & 18.92 & 37.02 & 413 & 45.3 & 37.5 \\
+896 & 35.07 & 20.17 & 39.08 & 399 & 45.0 & 38.2 \\
+928 & 35.10 & 20.67 & 39.70 & 416 & 42.9 & 38.6 \\
+960 & 36.03 & 20.87 & 40.25 & 420 & 42.0 & 40.9 \\
+\hline
+\end{tabular}
+\end{table}

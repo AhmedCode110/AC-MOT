@@ -1,0 +1,29 @@
+\begin{table}[t]
+\caption{Baseline comparison of the development stage on MOT17 val-half
+(published YOLOX-X detections). Host: published tracker alone (our
+reproduction). $\Delta$: tracker with the prior design \aob{} or with \scl{}
+minus host, with 95\% paired-bootstrap interval (10,000 resamples,
+seed 42). Bold intervals exclude zero.}
+\label{tab:prior}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}lrcc@{}}
+\toprule
+Metric & Host & $\Delta$ \aob{} & $\Delta$ \scl{}\\
+\midrule
+\multicolumn{4}{@{}l}{\textit{SparseTrack} \cite{liu2025sparsetrack}}\\
+\quad HOTA & 68.88 & \cibt{-4.15}{-5.54}{-1.66} & \cit{+0.06}{-0.01}{+0.25}\\
+\quad MOTA & 77.85 & \cibt{-6.14}{-8.10}{-2.74} & \cit{+0.08}{-0.03}{+0.30}\\
+\quad IDF1 & 81.97 & \cibt{-4.49}{-6.19}{-1.96} & \cit{+0.16}{-0.02}{+0.70}\\
+\multicolumn{4}{@{}l}{\textit{BoostTrack, online} \cite{stanojevic2024boosttrack}}\\
+\quad HOTA & 68.49 & \cibt{-5.89}{-7.76}{-2.87} & 0 (identical)\\
+\quad MOTA & 75.50 & \cibt{-8.87}{-12.37}{-7.14} & 0 (identical)\\
+\quad IDF1 & 81.41 & \cibt{-6.22}{-9.33}{-2.85} & 0 (identical)\\
+\multicolumn{4}{@{}l}{\textit{BoostTrack, with interpolation} \cite{stanojevic2024boosttrack}}\\
+\quad HOTA & 71.72 & \cibt{-5.37}{-7.30}{-2.75} & 0 (identical)\\
+\quad MOTA & 81.03 & \cibt{-8.73}{-12.59}{-6.50} & 0 (identical)\\
+\quad IDF1 & 84.16 & \cibt{-5.65}{-8.96}{-2.77} & 0 (identical)\\
+\bottomrule
+\end{tabular}
+\end{table}

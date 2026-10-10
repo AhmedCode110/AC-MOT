@@ -1,0 +1,54 @@
+\chapter{Introduction}\label{ch:intro}
+
+\section{Motivation}
+Cameras are now routine sensors in surveillance, driving assistance, robotics, and unmanned aerial vehicles (UAVs), and most of these applications need more than detection: they need persistent identities for the objects in view, so that a vehicle can be followed across an intersection or a person counted only once. Multi-object tracking (MOT) provides those identities. The dominant way to do it in real time is tracking by detection: a detector proposes scored boxes in each frame, and an online tracker associates them over time with motion and, optionally, appearance cues \cite{bewley2016sort,wojke2017deepsort,zhang2022bytetrack}. The pipeline is modular, which is its strength: detectors and trackers are developed separately, benchmarked separately, and combined by the engineer who deploys them.
+
+The modularity has a cost that is easy to overlook. Every tracking pipeline is governed by a handful of operating-point parameters. The detector exposes a confidence threshold that decides which boxes reach the tracker, an overlap threshold for non-maximum suppression (NMS), and an input resolution that dominates its computational cost. The tracker exposes score thresholds for association and for starting new tracks and, in many modern trackers, a second, lower threshold for recovering occluded objects \cite{zhang2022bytetrack}. These parameters are normally set once, often to library defaults or to the values that the tracker's authors tuned for one detector on one benchmark, and they are left unchanged.
+
+Two situations make fixed operating points fragile. The first is a changing scene. Aerial video is the extreme case: within one flight the camera passes from sparse rural roads to dense intersections, from daylight to dusk, and from sharp to motion-blurred frames, and the objects are small and numerous \cite{zhu2022visdrone,du2018uavdt,wu2022uavsurvey}. A threshold that suppresses clutter in a crowded scene may discard the few visible vehicles on an empty road, and the resolution needed to see small objects is wasted on frames that contain none. The second situation is a changing detector. In an engineered system the detector is replaced by a faster or more accurate model, retrained for a new sensor, or quantized for an embedded processor, while the tracker keeps the thresholds its authors tuned for another detector. The confidence scale of the new detector is generally different \cite{kuppers2020detcalib}, and nothing in the pipeline notices. In the experiments of this thesis, halving the scores of a published detector drives two well-known trackers from about 67 to 0 higher order tracking accuracy (HOTA), because no detection reaches their thresholds.
+
+Retuning the operating point for every scene type and every detector requires labelled data from the deployment domain, which is exactly what an operational system lacks. This thesis therefore asks whether the operating point can be controlled online, without training and without labels, and it asks equally carefully when such control does not help.
+
+\section{Problem Statement}
+The thesis addresses two related research questions.
+
+\begin{description}[leftmargin=0cm,style=nextline]
+\item[RQ1: Scene-adaptive control of the detector.] Can a lightweight, causal, training-free controller that reads the scene and adjusts the detector's confidence threshold, suppression threshold, and input resolution improve multi-object tracking in UAV video under a throughput constraint, and, if it does, does the improvement come from adaptation or from the operating point that the controller converges to?
+\item[RQ2: Score-driven control of the tracker.] Can a training-free layer placed between a frozen detector and a frozen tracker keep published trackers operating when the detector's confidence scale changes or becomes noisy, while leaving well-matched pipelines unchanged, and how does such a layer behave on trackers that were not visible during its design?
+\end{description}
+
+The two questions are connected. The first controller reads image cues and acts on the detector; Chapter~\ref{ch:scene} shows that its benefit comes from calibrating the operating point rather than from switching it, and that it is structurally unable to see a shift of the detector's confidence scale. The second controller was designed to address those limitations: it reads the detector's score stream and acts on the tracker's input and thresholds.
+
+\section{Objectives}
+The objectives of the thesis are:
+\begin{enumerate}
+\item to survey real-time object detection and multi-object tracking, their paradigms, metrics, and datasets, and to identify the role of operating-point parameters in deployed pipelines;
+\item to design a scene-adaptive controller of the detector operating point for UAV tracking, select it on validation data only, and evaluate it once on locked held-out data and on a second dataset without retuning;
+\item to determine, by an attribution analysis, whether the measured gain of the scene-adaptive controller comes from adaptation or from calibration;
+\item to design a self-calibrating, detector- and tracker-agnostic control layer that reads the detector's score stream and adapts the tracker through a declared host contract;
+\item to evaluate one frozen configuration of that layer on a heterogeneous set of published trackers, detectors, and datasets, with development, predeclared, and post-freeze external evidence kept separate; and
+\item to report the failure cases and limitations of both controllers as carefully as their gains.
+\end{enumerate}
+
+\section{Contributions}
+The main contributions of the thesis are the following.
+\begin{enumerate}
+\item A structured review of real-time object detection and tracking, from hand-crafted features through convolutional detectors to transformer-based trackers, with the evaluation metrics and benchmarks used in the field (Chapter~\ref{ch:background}; published in \cite{ismail2026realtime}).
+\item A controlled study that separates the value of calibrating the detector operating point from the value of switching it with the scene in UAV multi-object tracking: the validation-optimized scene-adaptive controller performs like its own matched static operating point on held-out data, and ablations bound when scene-driven switching adds accuracy (Chapter~\ref{ch:scene}).
+\item As the instrument of that study, a training-free scene-adaptive controller whose five cues are ranked against a label-free calibration set, with a validation-only selection chain, a locked held-out evaluation on VisDrone2019 test-dev, and a zero-tuning test on UAVDT (Chapter~\ref{ch:scene}).
+\item A training-free, causal control layer that self-calibrates from the detector's score stream with nested Otsu thresholds, estimates a clean or noisy regime for the stream, intervenes only when the evidence supports it, and supplies a continuation stage to trackers that lack one (Chapter~\ref{ch:layer}).
+\item A host contract that makes the layer applicable to single-stage, two-stage, coordinate-only, and two-view trackers, and an evaluation protocol that separates development trackers from predeclared and post-freeze external systems with registered reproduction criteria (Chapters~\ref{ch:method} and~\ref{ch:layer}).
+\item An evaluation of the frozen layer on nine published trackers, four sources of detections, and three datasets, which identifies where the layer helps, where it is transparent, and where it fails (Chapter~\ref{ch:layer}).
+\end{enumerate}
+
+\section{Research Principles}
+Four principles are applied throughout the thesis, because each of them rules out a common way in which tracking results are overstated.
+\begin{itemize}
+\item \emph{Training-free and causal.} Neither controller has learned weights, and neither uses future frames or ground truth at run time. The scene-adaptive controller uses a small number of scalar parameters selected on validation data; the control layer uses one fixed configuration for every tracker, detector, and dataset.
+\item \emph{Freeze before testing.} Every configuration was frozen before the data used to report it was opened. The held-out and external evaluations were run once, and no parameter was changed after their results were seen.
+\item \emph{Paired statistics.} Every comparison is paired on the same sequences and detections, and its uncertainty is quantified by a bootstrap over sequences. A difference is called significant only when its 95\% interval excludes zero.
+\item \emph{Negative results are results.} The thesis reports the evaluations in which the controllers did not help or degraded accuracy, and it does not claim that either controller improves every tracker. The control layer was designed to be detector- and tracker-agnostic and is evaluated on a heterogeneous set of published systems; it needs no training or dataset-specific labelled calibration.
+\end{itemize}
+
+\section{Thesis Organization}
+The remainder of the thesis is organized as follows. Chapter~\ref{ch:background} reviews object detection and multi-object tracking, their challenges, paradigms, metrics, and datasets, and the work on detector calibration and adaptive tracking that is closest to this thesis. Chapter~\ref{ch:method} describes the evaluation methodology shared by both studies: datasets, metrics, the paired bootstrap, the freeze protocol, and the timing protocol. Chapter~\ref{ch:scene} presents the scene-adaptive controller of the detector operating point for UAV tracking and its held-out and attribution results. Chapter~\ref{ch:layer} presents the self-calibrating control layer and its evaluation on published trackers. Chapter~\ref{ch:conclusions} compares the two approaches, answers the research questions, and outlines future work. Appendix~\ref{app:repro} lists the software versions, frozen artifacts, and settings needed to reproduce the results.

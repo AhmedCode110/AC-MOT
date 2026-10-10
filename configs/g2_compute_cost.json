@@ -1,0 +1,52 @@
+{
+ "about": "Detector-relative compute axis for G2. Cost of one detector call at a native setting = measured mean detector latency (ms) on one CPU host (research/final/sci_v7f/G1_runtime/latency_curve_<det>.json: AMD EPYC 7763, 2 threads, 50 frames of uav0000086_00000_v, CUDA-free) divided by the latency at the reference setting 736 px. A reused frame (no detector call) costs 0. The controller sees only normalized costs, never native settings.",
+ "reference_setting": 736,
+ "latency_ms": {
+  "yolov8": {
+   "512": 51.67,
+   "576": 66.13,
+   "640": 77.8,
+   "704": 83.76,
+   "736": 90.56,
+   "768": 98.25,
+   "832": 109.81,
+   "896": 117.33,
+   "960": 125.31
+  },
+  "rtdetr": {
+   "512": 649.1,
+   "576": 742.12,
+   "640": 906.77,
+   "704": 1074.11,
+   "736": 1147.8,
+   "768": 1258.51,
+   "832": 1476.76,
+   "896": 1652.64,
+   "960": 1882.41
+  }
+ },
+ "normalized_cost": {
+  "yolov8": {
+   "512": 0.5706,
+   "576": 0.7302,
+   "640": 0.8591,
+   "704": 0.9249,
+   "736": 1.0,
+   "768": 1.0849,
+   "832": 1.2126,
+   "896": 1.2956,
+   "960": 1.3837
+  },
+  "rtdetr": {
+   "512": 0.5655,
+   "576": 0.6466,
+   "640": 0.79,
+   "704": 0.9358,
+   "736": 1.0,
+   "768": 1.0965,
+   "832": 1.2866,
+   "896": 1.4398,
+   "960": 1.64
+  }
+ }
+}

@@ -1,0 +1,7 @@
+== full: cue per target per outer fold
+   sensitivity   img_blur det_count det_gap det_count det_count det_gap det_count  | final: det_gap
+   assoc_offset  - - - img_motion - - -  | final: -
+yolov8: V4_736          MOTA  17.49 HOTA  33.25 IDF1  36.57 IDS  159 R  29.1 ncat 0
+yolov8: V5[full          ] MOTA  17.14 HOTA  31.75 IDF1  33.55 IDS  154 R  26.1 ncat 0 | Δq -2.26 CI [-4.77,-0.38] P(Δ≤0) 1.00 | seq Δq≥0 1/7
+rtdetr: V4_736          MOTA  21.53 HOTA  38.99 IDF1  42.41 IDS   81 R  32.2 ncat 0
+rtdetr: V5[full          ] MOTA  24.36 HOTA  38.43 IDF1  41.76 IDS   64 R  30.2 ncat 0 | Δq -0.60 CI [-2.15,+1.10] P(Δ≤0) 0.70 | seq Δq≥0 4/7

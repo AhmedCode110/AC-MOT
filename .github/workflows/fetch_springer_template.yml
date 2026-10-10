@@ -1,0 +1,40 @@
+name: Fetch Springer Nature LaTeX template
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/fetch_springer_template.yml"]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch
+        run: |
+          set -x
+          mkdir -p /tmp/sn && cd /tmp/sn
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36"
+          for u in \
+            "https://resource-cms.springernature.com/springer-cms/rest/v1/content/18782940/data/v12" \
+            "https://resource-cms.springernature.com/springer-cms/rest/v1/content/18782940/data/v11" \
+            "https://resource-cms.springernature.com/springer-cms/rest/v1/content/18782940/data/v10" \
+            "https://mirrors.ctan.org/macros/latex/contrib/springer-nature/sn-jnl.zip"; do
+            curl -fsSL -A "$UA" -o t.zip "$u" && unzip -tq t.zip && { echo "OK $u" > source.txt; break; } || rm -f t.zip
+          done
+          [ -f t.zip ] || { echo "no template fetched"; exit 1; }
+          unzip -q t.zip -d x
+          find x -type f | head -100
+          D=$GITHUB_WORKSPACE/JAIS_PAPERS/templates/springer_nature
+          mkdir -p $D
+          find x \( -name "sn-jnl.cls" -o -name "*.bst" -o -name "sn-article.tex" -o -name "*.pdf" -name "*user*" \) -exec cp {} $D/ \;
+          cp source.txt $D/; ls -la $D
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f JAIS_PAPERS/templates
+          git diff --cached --quiet && exit 0
+          git commit -m "Springer Nature LaTeX template (fetched by run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

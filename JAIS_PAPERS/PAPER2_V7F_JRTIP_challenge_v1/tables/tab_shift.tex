@@ -1,0 +1,35 @@
+\begin{table}[t]
+\caption{Baseline comparison under detector confidence shift on MOT17 val-half
+(HOTA). The detector scores are transformed before the tracker, whose
+published thresholds stay fixed; $T$ is a logit temperature, $\sigma(z/T)$.
+Host: published tracker alone. $\Delta$: with \scl{} minus host,
+with 95\% paired-bootstrap interval (10,000 resamples, seed 42). Bold
+intervals exclude zero. Emission floor 0.01 (BoostTrack 0.1).}
+\label{tab:shift}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Transform & Host & + \scl{} & $\Delta$HOTA\\
+\midrule
+\multicolumn{4}{@{}l}{\textit{ByteTrack, official setting} \cite{zhang2022bytetrack}}\\
+\quad $s^3$ & 60.92 & 65.81 & {\boldmath $+4.89$ [$+2.60$, $+13.69$]}\\
+\quad $0.5\,s$ & 0.00 & 66.17 & {\boldmath $+66.17$ [$+49.32$, $+75.40$]}\\
+\quad $T=2$ & 65.84 & 66.95 & {\boldmath $+1.11$ [$+0.35$, $+3.87$]}\\
+\quad $T=0.5$ & 67.30 & 67.29 & $-0.009$ [$-0.051$, $+0.005$]\\
+\multicolumn{4}{@{}l}{\textit{ByteTrack, library setting} \cite{zhang2022bytetrack}}\\
+\quad $s^3$ & 66.31 & 66.31 & $-0.006$ [$-0.384$, $+0.383$]\\
+\quad $0.5\,s$ & 66.61 & 66.48 & $-0.14$ [$-0.66$, $+0.14$]\\
+\quad $T=2$ & 63.97 & 63.97 & 0 (identical)\\
+\quad $T=0.5$ & 66.53 & 66.52 & $-0.006$ [$-0.029$, $+0.001$]\\
+\multicolumn{4}{@{}l}{\textit{OC-SORT} \cite{cao2023ocsort}}\\
+\quad $s^3$ & 58.34 & 66.60 & {\boldmath $+8.26$ [$+5.86$, $+16.81$]}\\
+\quad $0.5\,s$ & 0.00 & 66.72 & {\boldmath $+66.72$ [$+50.32$, $+75.56$]}\\
+\quad $T=2$ & 65.99 & 67.22 & {\boldmath $+1.24$ [$+0.52$, $+3.42$]}\\
+\quad $T=0.5$ & 66.61 & 67.06 & $+0.45$ [$-0.01$, $+0.97$]\\
+\multicolumn{4}{@{}l}{\textit{BoostTrack, online} \cite{stanojevic2024boosttrack}}\\
+\quad $s^3$ & 61.33 & 64.84 & {\boldmath $+3.51$ [$+0.85$, $+13.28$]}\\
+\quad $T=2$ & 67.59 & 67.59 & 0 (identical)\\
+\bottomrule
+\end{tabular}
+\end{table}

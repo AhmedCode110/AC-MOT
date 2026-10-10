@@ -1,0 +1,140 @@
+\section{Results}\label{sec:results}
+
+\subsection{Frozen VisDrone evaluation}
+Table~\ref{tab:visdrone} lists the aggregate results on the seven VisDrone
+sequences, and Fig.~\ref{fig:visdrone} shows HOTA, MOTA, and IDF1.
+
+\begin{table}[t]
+\caption{Frozen VisDrone evaluation on seven VisDrone2019-MOT sequences
+(71,830 ground-truth boxes). Baseline: fixed operating point (1536, 0.70).}
+\label{tab:visdrone}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{ByteTrack} & \multicolumn{2}{c}{OATrack}\\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Metric & Baseline & AC-MOT & Baseline & AC-MOT\\
+\midrule
+HOTA & 41.586 & 44.523 & 46.770 & 48.095\\
+MOTA & 9.876 & 27.871 & 28.165 & 34.483\\
+IDF1 & 48.569 & 53.929 & 57.107 & 59.364\\
+IDS & 1341 & 1016 & 773 & 604\\
+FP & 39274 & 24892 & 25394 & 21400\\
+FN & 24121 & 25902 & 25432 & 25057\\
+Precision & 54.849 & 64.852 & 64.628 & 68.609\\
+Recall & 66.419 & 63.940 & 64.594 & 65.116\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{ByteTrack host.} AC-MOT changes HOTA from 41.586 to 44.523, MOTA from
+9.876 to 27.871, and IDF1 from 48.569 to 53.929. IDS fall from 1341 to 1016
+and FP from 39274 to 24892, while FN rise from 24121 to 25902. Precision rises
+from 54.849 to 64.852 and recall falls from 66.419 to 63.940. The detector
+output becomes more selective: clutter and identity-confusing boxes are
+removed at a small cost in recall.
+
+\emph{OATrack host.} AC-MOT changes HOTA from 46.770 to 48.095, MOTA from
+28.165 to 34.483, and IDF1 from 57.107 to 59.364. IDS fall from 773 to 604, FP
+from 25394 to 21400, and FN from 25432 to 25057. Precision rises from 64.628 to
+68.609 and recall from 64.594 to 65.116. OATrack starts from a stronger
+baseline.
+
+\begin{figure}[t]
+\centering
+\input{figures/fig_visdrone}
+\caption{HOTA, MOTA, and IDF1 on the seven VisDrone sequences for both
+tracker hosts (values in Table~\ref{tab:visdrone}).}
+\label{fig:visdrone}
+\end{figure}
+
+\subsection{Paired bootstrap}
+\begin{table}[t]
+\caption{Paired sequence-level bootstrap on VisDrone: AC-MOT minus baseline,
+5000 resamples, seed 42. HOTA, MOTA, IDF1, precision, and recall in points;
+IDS, FP, and FN in counts.}
+\label{tab:bootstrap}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Host & Metric & Difference & 95\% interval\\
+\midrule
+ByteTrack & HOTA & $+2.937$ & $[+2.356, +3.375]$\\
+ & MOTA & $+17.995$ & $[+13.541, +23.282]$\\
+ & IDF1 & $+5.360$ & $[+4.490, +6.178]$\\
+ & IDS & $-325$ & $[-498, -164]$\\
+ & FP & $-14382$ & $[-19176, -9620]$\\
+ & FN & $+1781$ & $[+288, +3594.075]$\\
+ & Precision & $+10.003$ & $[+8.712, +11.895]$\\
+ & Recall & $-2.479$ & $[-4.507, -0.469]$\\
+\midrule
+OATrack & HOTA & $+1.325$ & $[+0.200, +2.264]$\\
+ & MOTA & $+6.318$ & $[+4.741, +7.879]$\\
+ & IDF1 & $+2.258$ & $[+0.548, +3.474]$\\
+ & IDS & $-169$ & $[-292, -42]$\\
+ & FP & $-3994$ & $[-6190, -2494.900]$\\
+ & FN & $-375$ & $[-1462.575, +670]$\\
+ & Precision & $+3.981$ & $[+2.957, +5.511]$\\
+ & Recall & $+0.522$ & $[-0.869, +2.111]$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:bootstrap} gives the paired differences (AC-MOT minus baseline)
+and their 95\% intervals. With ByteTrack, the intervals of HOTA, MOTA, IDF1,
+precision, IDS, and FP lie entirely on the side of improvement, and FN and
+recall move in the opposite direction. With OATrack, HOTA, MOTA, IDF1, and
+precision rise and IDS and FP fall, all with intervals on one side of zero.
+
+\subsection{Controller behaviour}
+
+The controller uses all three states with both hosts. With ByteTrack, LOW,
+MEDIUM, and HIGH cover 7.4\%, 30.1\%, and 62.5\% of the frames; with OATrack
+they cover 7.4\%, 33.3\%, and 59.3\%. The two hosts diverge through their
+different tracked boxes. State changes are rare, between 0.10 and 0.54 per 100
+frames depending on the sequence, so the detector input stays stable over
+long stretches of video.
+
+\subsection{Frozen UAVDT transfer}
+\begin{table}[t]
+\caption{Frozen UAVDT transfer without retuning (20 sequences, 16,592 frames,
+one vehicle class). Baseline: fixed operating point (1536, 0.70).}
+\label{tab:uavdt}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{ByteTrack} & \multicolumn{2}{c}{OATrack}\\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Metric & Baseline & AC-MOT & Baseline & AC-MOT\\
+\midrule
+HOTA & 45.923 & 47.004 & 47.728 & 47.640\\
+MOTA & $-1.573$ & 16.028 & 19.607 & 22.873\\
+IDF1 & 58.400 & 61.767 & 62.101 & 62.931\\
+IDS & 601 & 486 & 517 & 486\\
+FP & 279616 & 212077 & 197937 & 183669\\
+FN & 66050 & 73702 & 75612 & 78774\\
+Precision & 49.571 & 55.751 & 57.270 & 58.800\\
+Recall & 80.625 & 78.381 & 77.820 & 76.893\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:uavdt} and Fig.~\ref{fig:uavdt} report the transfer to UAVDT
+without retuning. With ByteTrack, HOTA changes from 45.923 to 47.004 ($+1.081$),
+MOTA from $-1.573$ to 16.028 ($+17.601$), and IDF1 from 58.400 to 61.767
+($+3.367$). IDS fall by 115 and FP by 67539, while FN rise by 7652. With
+OATrack, MOTA changes from 19.607 to 22.873 ($+3.267$), IDF1 from 62.101 to
+62.931 ($+0.831$), IDS fall by 31, and FP fall by 14268. With both hosts the
+transfer gives fewer FP and IDS and higher precision, with slightly lower
+recall, the same pattern as with ByteTrack on VisDrone.
+
+\begin{figure}[t]
+\centering
+\input{figures/fig_uavdt}
+\caption{HOTA, MOTA, and IDF1 of the frozen UAVDT transfer for both tracker
+hosts (values in Table~\ref{tab:uavdt}).}
+\label{fig:uavdt}
+\end{figure}

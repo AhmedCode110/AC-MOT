@@ -1,0 +1,25 @@
+name: C-TWiX + frozen V7f (MOT17 / KITTIMOT / DanceTrack val)
+on:
+  workflow_dispatch:
+  push:
+    branches: [universal-adapters-v1-y0zkeh]
+    paths: [".github/workflows/recent_ctwix.yml", "tools/v7/recent/ctwix_run.sh"]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run
+        run: bash tools/v7/recent/ctwix_run.sh
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/final/recent/ctwix || true
+          git diff --cached --quiet && exit 0
+          git commit -m "C-TWiX + frozen V7f: results (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do git pull --rebase origin universal-adapters-v1-y0zkeh && git push origin HEAD:universal-adapters-v1-y0zkeh && break; sleep 5; done

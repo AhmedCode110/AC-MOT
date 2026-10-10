@@ -1,0 +1,78 @@
+\section{Related Work}\label{sec:related}
+
+\subsection{Tracking by detection and aerial MOT}
+SORT built a compact online pipeline from motion prediction and assignment,
+and DeepSORT added appearance features to reduce identity fragmentation
+\cite{bewley2016sort,wojke2017deepsort}. ByteTrack first associates
+high-confidence detections and then uses low-confidence boxes to recover
+objects that would otherwise be lost \cite{zhang2022bytetrack}. Tracktor
+reuses the detector's box regression for tracking \cite{bergmann2019tracktor},
+and TrackFormer performs detection and association with transformer queries
+\cite{meinhardt2022trackformer}. Standard evaluation follows the MOTChallenge
+benchmarks \cite{milan2020motchallenge}.
+
+Aerial video adds small targets, changing object counts, camera motion, and
+clutter \cite{zhu2022visdrone,du2018uavdt}. UAVMOT addresses the motion of the
+UAV camera inside the tracker \cite{liu2022uavmot}, and LSO-YOLO designs a
+lightweight real-time detector for small UAV objects \cite{dai2026lsoyolo}.
+OATrack \cite{qi2026oatrack} is a recent UAV small-object tracker published in
+2026. It weights association by detection quality and uses a YOLO detection
+cache. We use OATrack as a second host and keep it unchanged. With the same
+detector, AC-MOT improves its results in our pipeline: HOTA rises by 1.325,
+MOTA by 6.318, and IDF1 by 2.258 points, and IDS fall by 169
+(Sect.~\ref{sec:results}). These works improve the tracker or the detector
+itself. AC-MOT asks a different question: which detector setting should be
+used for the current scene.
+
+\subsection{Adaptive thresholds inside trackers}
+Some trackers adapt their own thresholds. Adaptive ByteTrack changes the
+confidence threshold used inside ByteTrack \cite{ma2023adaptivebytetrack}, and
+AdapTrack adapts the matching thresholds of the association step
+\cite{shim2024adaptrack}. Both change one tracker from the inside. AC-MOT
+works outside the tracker: it adapts the detector setting and leaves the
+tracker unchanged, so the same controller runs with ByteTrack and with OATrack
+without any change to either. It also adapts three settings together
+(confidence, NMS, and resolution) instead of one threshold.
+
+\subsection{Adaptive inference for detection}
+Dynamic neural networks change their structure or parameters for each input
+\cite{han2022dynamic}, and resolution-adaptive networks spend less computation
+on easy inputs \cite{yang2020ranet}. AdaScale selects the input scale of each
+video frame with a scale regressor trained on detector features
+\cite{chin2019adascale}. ApproxDet switches detection configurations at run
+time with accuracy and latency models trained offline \cite{xu2020approxdet}.
+Chameleon re-profiles the configuration of video analytics pipelines over time
+\cite{jiang2018chameleon}. These methods target detection accuracy or
+analytics cost, and most of them need an extra learned model. AC-MOT needs no
+learned model and no retraining, and it is evaluated with MOT metrics on two
+trackers. Table~\ref{tab:related} summarizes the differences.
+
+\begin{table}[t]
+\caption{Adaptive methods closest to AC-MOT (BT: ByteTrack).}
+\label{tab:related}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{20mm}>{\raggedright\arraybackslash}p{17mm}>{\raggedright\arraybackslash}p{13mm}@{}}
+\toprule
+Method & Adapted & Where & Task\\
+\midrule
+AdaScale \cite{chin2019adascale} & input scale & detector & video detection\\
+ApproxDet \cite{xu2020approxdet} & detection configuration & detector & video detection\\
+Chameleon \cite{jiang2018chameleon} & pipeline configuration & analytics pipeline & video analytics\\
+Adapt.\ BT \cite{ma2023adaptivebytetrack} & confidence threshold & inside BT & MOT\\
+AdapTrack \cite{shim2024adaptrack} & matching thresholds & inside the tracker & MOT\\
+AC-MOT & confidence, NMS, resolution & detector; tracker unchanged & aerial MOT\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Optimization and evaluation}
+Optuna provides define-by-run search with the Tree-structured Parzen Estimator
+(TPE) sampler \cite{akiba2019optuna}, which was used throughout the
+development of AC-MOT. The identity-aware study reports a feasible Pareto
+front based on the usual notion of non-dominance \cite{deb2002nsga2}. MOTA
+weighs detection and identity errors, IDF1 measures identity precision and
+recall, and HOTA balances detection and association \cite{luiten2021hota}.
+Paired bootstrap resampling at the sequence level keeps the dependence within
+each sequence and gives intervals for system differences
+\cite{efron1993bootstrap}.

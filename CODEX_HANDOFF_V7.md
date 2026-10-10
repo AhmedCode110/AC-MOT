@@ -4,12 +4,48 @@ Last updated: 2026-09-28. Update this file, `research/final/V7_EXPERIMENT_LEDGER
 and `research/final/V7_DEV_RESULTS.json` after EVERY experiment batch, then
 commit and push (no force).
 
+## CLOUD STATUS (read first; updated 2026-09-28, environment C1)
+- **V7 IS FROZEN**: system V7f, freeze commit **488df9a** on
+  `universal-adapters-v1-y0zkeh` (draft PR #1). Config
+  `configs/universal_acmot_policy_v7.json`, lock `research/V7_POLICY_LOCK.json`.
+  The annotated tag `universal-acmot-v7-freeze` → 488df9a is on GitHub (published
+  by workflow `.github/workflows/v7_freeze_tag.yml`, run 36477643708, after checking
+  the policy lock at that commit: 10/10 files match). Immutable.
+- Evidence: development matrix + CIs `research/final/V7_STATISTICS.md`;
+  experiments E12–E20 + STRESS-L in the ledger; availability matrix
+  `V7_FALLBACK_VALIDATION.md`; runs `V7_CLOUD_RUNS.md`.
+- **Post-freeze external results** (`V7_EXTERNAL_TRANSFER.md`, predeclared in
+  `V7_EXTERNAL_SELECTION.md` in the freeze commit):
+  - PD-SORT (IEEE TCE 2025): faithful pixel-free reproduction (metric-identical to
+    the authors' released MOT17-val run) 68.011/75.185/81.032 → + frozen V7f
+    68.624/76.313/81.850; ΔHOTA +0.61 [+0.27, +1.65], ΔMOTA +1.13 [+0.27, +3.03],
+    ΔIDF1 +0.82 [+0.43, +1.94] (10k paired bootstrap, seed 42); HOTA up on 7/7 sequences.
+  - Hybrid-SORT (AAAI 2024): reproduction of the accessible setup 66.70/75.52/77.56
+    (README 67.1/75.8/78.0) → + V7f identical (Δ = 0; two-stage host, clean stream).
+- BLOCKED here (recorded once): motchallenge.net, Google Drive, arXiv, Hugging
+  Face, Zenodo, several author hosts. Reachable: GitHub, PyPI, official KITTI S3.
+- Offline completion done: runtime benchmark (`V7_REALTIME.md`), external results JSON,
+  V7_{METHOD,ABLATION,FAILURE_EVOLUTION,PAPER_CLAIMS,REPRODUCIBILITY,FINAL_SUMMARY}.md,
+  lock-integrity tests (61 tests pass).
+- Main thesis table (paper vs reproduction vs + V7f for SparseTrack, BoostTrack,
+  ByteTrack, OC-SORT, PD-SORT, Hybrid-SORT; per-sequence; calibration shift; KITTI):
+  `research/final/V7_MAIN_RESULTS.md` / `.json`.
+- SparseTrack + V7f DONE on GitHub Actions (`.github/workflows/sparsetrack_v7f.yml`,
+  run 36475110213; MOT17 frames 2669/2669 sha256-verified; lock 10/10):
+  68.876/77.849/81.974 → 68.931/77.927/82.130, ΔHOTA +0.055 [−0.011, +0.254].
+  Record `research/final/sparsetrack_v7f/`. The same runner pattern (motchallenge.net
+  reachable from Actions) can serve other frame-dependent runs.
+- Next (if more compute/network): further 2025/26 published systems when their
+  artefacts become reachable (TOPICTrack stays reserved; it needs frames + ReID);
+  VisDrone/UAVDT labelled checks and conf16 once Google Drive is reachable;
+  the final timing benchmark on one fixed device.
+
 ## 0. Branch, commit, working tree
 - Repository: https://github.com/AhmedCode110/AC-MOT (public).
 - Branch: **`universal-adapters-v1`**. The authoritative commit is the branch
   HEAD; `git log -1` shows the latest state commit. First V7 commit: `d56bba0`.
 - Tags: `universal-acmot-v6-freeze` → `2cff95f` (V6-TF, immutable).
-  `universal-acmot-v7-freeze` does NOT exist yet (V7 is not frozen).
+  `universal-acmot-v7-freeze` → `488df9a` (V7f, frozen).
 - Expected working tree after `git clone` + `scripts/setup_research_assets.sh`:
   - clean git tree;
   - untracked, git-ignored `outputs/det_cache_*_native/` and `outputs/v7/`;
@@ -152,9 +188,11 @@ MOT17 metrics are HOTA/MOTA/IDF1; VisDrone metrics are MOTA/HOTA/IDF1.
 4. **E13 — regime computed on all emitted candidates.** Add
    `V7Spec.pool="raw"`, test it, and keep `"post"` as the default for
    V6EMU identity.
-5. **E12 — ID switches.**
-   - Split the extra IDS by clean vs noisy frames and by sequence.
-   - Test cold-frame handling.
+5. **E12 — ID switches.** Label-free part done (ledger E12-LF). Labelled:
+   - `python tools/v7/diag_churn.py <split> <det> V6EMU V7c V7d ...`
+     (per-frame IDS attribution: cold/first-30, clean/noisy, near regime
+     changes);
+   - E12a `V7c@cold=none`, `V7d@cold=none` (all VisDrone cells + MOT17 hosts).
 6. **Stage D:**
    ```
    V7_SPLIT=testdev python tools/v7/dev.py run NATIVE V6EMU <best>            # (+ V7_DETS=fasterrcnn)

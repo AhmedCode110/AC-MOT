@@ -1,0 +1,3 @@
+# UAVDT transfer (complete)
+
+Kernel `ahmedgouda1111111/uavdt-v3-cache-gen` is part of this experiment and was NOT relaunched or modified after completion. Cache pulled (60 npz files, 20 sequences x 3 action pairs, 49776 forward passes, 16592 total frames across sequences, matching the frozen 16592-frame protocol exactly). The frozen v3 policy and the r1536_n70 baseline were evaluated once each (no retuning) for both ByteTrack and OATrack via `research/acmot_paper_v2/run_uavdt_transfer.py`; results in `research/acmot_paper_v2/UAVDT_TRANSFER_RESULT.json` (commit 010f253) and summarized in PAPER_READY_RESULTS.md Table 6 and FINAL_REPORT.md Section 8b (commit 87fd91a).

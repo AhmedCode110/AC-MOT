@@ -1,0 +1,100 @@
+# GIT STATE (read-only query, GIT_OPTIONAL_LOCKS=0)
+recorded_utc: 2026-10-04T21:18:35+00:00
+branch: sci-v7f-general-layer-dev
+HEAD: 87fd91a59784ca08c5fd52a88795ddee3994e564
+remote: https://github.com/AhmedCode110/AC-MOT.git
+
+## status --short
+M research/acmot_paper_v2/FINAL_REPORT.md
+?? research/acmot_paper_v2/experiments/
+
+## key commits
+c0fc71e  2026-10-03T20:24:12Z AC-MOT paper v2: gap audit of the original scene-adaptive line and the 7 experiments it needs  [lineage start: gap audit]
+fec8ac7  2026-10-04T03:17:24+03:00 Lightning Studio version of the YOLO11m VisDrone training pipeline  [detector pipeline / freeze lineage]
+93647b0  2026-10-04T14:50:56+03:00 Predeclare host-default controller search  [predeclare host-default target]
+dc47f47  2026-10-04T15:10:39+03:00 FREEZE (final): AC-MOT is a documented no-op; frozen static policy updated to include confidence=0.40  [static freeze]
+bfa5caf  2026-10-04T15:18:14+03:00 Final held-out results: systems 3&4 (AC-MOT frozen no-op + YOLO11m + ByteTrack/OATrack)  [FIRST VAL READ (static)]
+ad18b59  2026-10-04T15:35:16+03:00 Predeclare v3: joint 3-dimension (resolution,NMS,detector-confidence) adaptive search vs r1536_n70  [predeclare v3]
+f2d94b5  2026-10-04T16:36:26+03:00 v3 joint search complete: selected genuinely-adaptive candidate (trial 7)  [v3 search complete]
+2ed0697  2026-10-04T16:47:21+03:00 Shuffled control: causal timing does not beat random timing of the same action mix  [shuffled control]
+309dca5  2026-10-04T16:48:02+03:00 FREEZE: v3 genuinely-adaptive AC-MOT controller (primary method)  [FREEZE v3]
+0af0066  2026-10-04T16:59:13+03:00 SECOND VAL READ: frozen v3 adaptive controller results on VisDrone-val  [SECOND VAL READ v3]
+cbc313c  2026-10-04T17:03:19+03:00 Primary bootstrap: v3 adaptive controller vs r1536_n70 (5000 resamples, SECOND VAL READ)  [v3 bootstrap]
+2e2fdd1  2026-10-04T17:04:23+03:00 Rewrite final report: v3 genuinely-adaptive controller as primary result  [final report]
+c7a2d41  2026-10-04T17:31:36+03:00 Exact v3 runtime benchmark: ByteTrack 13.5 FPS, OATrack 15.3 FPS, controller overhead ~4.2ms  [v3 runtime]
+7ecc63a  2026-10-04T17:28:36+03:00 Add UAVDT transfer cache generation script (3 action pairs only, owner-authorized)  [UAVDT cache script]
+5a3d066  2026-10-04T21:21:10+03:00 Add finalized Kaggle UAVDT cache-generation kernel script (provenance)  [Kaggle UAVDT kernel script]
+040dbf1  2026-10-04T23:24:50+03:00 Add UAVDT_TRANSFER evaluation script (frozen v3 vs r1536_n70, no retuning)  [UAVDT transfer eval script]
+010f253  2026-10-04T23:41:34+03:00 UAVDT_TRANSFER results: frozen v3 adaptive vs r1536_n70, both trackers, no retuning  [UAVDT transfer results]
+87fd91a  2026-10-04T23:53:18+03:00 Final report: add UAVDT_TRANSFER section, fix stale runtime section, close remaining-work list  [final report: UAVDT section + runtime fix]
+
+## log since 2026-10-03
+87fd91a59784ca08c5fd52a88795ddee3994e564 2026-10-04T23:53:18+03:00 Final report: add UAVDT_TRANSFER section, fix stale runtime section, close remaining-work list
+010f2530a9bf8c84945298324eda83d5bd9c5f1c 2026-10-04T23:41:34+03:00 UAVDT_TRANSFER results: frozen v3 adaptive vs r1536_n70, both trackers, no retuning
+040dbf1302fec84b702d7713659d523496f0764f 2026-10-04T23:24:50+03:00 Add UAVDT_TRANSFER evaluation script (frozen v3 vs r1536_n70, no retuning)
+5a3d066dec9db3e8b18ba2106dd1206eb00db399 2026-10-04T21:21:10+03:00 Add finalized Kaggle UAVDT cache-generation kernel script (provenance)
+c7a2d4132aa504d31b390407e552608b031beb21 2026-10-04T17:31:36+03:00 Exact v3 runtime benchmark: ByteTrack 13.5 FPS, OATrack 15.3 FPS, controller overhead ~4.2ms
+b0eea29a1f9c20df341ef07ae71f3ffcaf34bdc8 2026-10-04T17:30:26+03:00 Fix v3 runtime benchmark: inline analyze_visual instead of importing its heavy host module
+b16c1e9d5a849ccc17d46cabad312222a6dd5891 2026-10-04T17:29:21+03:00 Add exact v3 runtime benchmark script (real detector+controller+tracker, not cache playback)
+7ecc63a75377a8c7b7c9f17fd1369ba77e8871e1 2026-10-04T17:28:36+03:00 Add UAVDT transfer cache generation script (3 action pairs only, owner-authorized)
+2e2fdd1da853443abd9604e4e8a4e5b340bf2c24 2026-10-04T17:04:23+03:00 Rewrite final report: v3 genuinely-adaptive controller as primary result
+cbc313c364c581337d5fda95bf0d679230222348 2026-10-04T17:03:19+03:00 Primary bootstrap: v3 adaptive controller vs r1536_n70 (5000 resamples, SECOND VAL READ)
+0af0066f52795968cd061572bd18a1fda285aa9a 2026-10-04T16:59:13+03:00 SECOND VAL READ: frozen v3 adaptive controller results on VisDrone-val
+ad854ee4878b2df6590e0f8646cf976caad057b4 2026-10-04T16:48:23+03:00 Add SECOND VAL READ script for the frozen v3 adaptive controller
+309dca51b39fb358ccf603ee19ad7b1a4a3fd0ec 2026-10-04T16:48:02+03:00 FREEZE: v3 genuinely-adaptive AC-MOT controller (primary method)
+2ed0697325db3ce3f1680889baaef3c77d8f573e 2026-10-04T16:47:21+03:00 Shuffled control: causal timing does not beat random timing of the same action mix
+f2d94b5a2a40a0b9d2931512fdd48d783f18b398 2026-10-04T16:36:26+03:00 v3 joint search complete: selected genuinely-adaptive candidate (trial 7)
+9f6380f1ad21ea5d7e4d0a4a62d6c03937d16747 2026-10-04T15:38:04+03:00 Add v3 joint adaptive search script (resolution+NMS+confidence vs r1536_n70)
+ad18b59ac52a43b4168275f9676afbaac7511e9c 2026-10-04T15:35:16+03:00 Predeclare v3: joint 3-dimension (resolution,NMS,detector-confidence) adaptive search vs r1536_n70
+985a89dc604e821d08c575021f178b20fa301d7f 2026-10-04T15:33:36+03:00 Runtime benchmark results; draft v2 adaptive-controller predeclaration (paused pending writer-conflict check)
+51b114864dd8399dbb56b5aed1c7beeeb0ca2518 2026-10-04T15:24:43+03:00 Add real end-to-end T4 runtime benchmark script (detector forward + tracker, not cache playback)
+efb479cad46518b5a9814c698fb39e110dbc095b 2026-10-04T15:24:16+03:00 Final consolidated report: four-system table, bootstrap CIs, failure analysis, limitations
+6b0c2d59b73ac9e74b8c9ee0b27ef95ee98685ea 2026-10-04T15:23:16+03:00 Paired bootstrap (5000 resamples): system3-vs-1 and system4-vs-2 deltas, VisDrone-val
+bfa5cafca6d25e06fd4cb1635babf1db47b5e610 2026-10-04T15:18:14+03:00 Final held-out results: systems 3&4 (AC-MOT frozen no-op + YOLO11m + ByteTrack/OATrack)
+7cb49e7c567c0db2567b1275e57b248980b38abb 2026-10-04T15:11:19+03:00 Add final held-out systems 3&4 test (AC-MOT frozen no-op + YOLO11m + ByteTrack/OATrack)
+dc47f47a19304fe5ada7af82154883b0a1d0fcca 2026-10-04T15:10:39+03:00 FREEZE (final): AC-MOT is a documented no-op; frozen static policy updated to include confidence=0.40
+193957207ee4c0d9591ba82bc65a6d7614775799 2026-10-04T15:09:56+03:00 Confidence-floor finding: flat static conf=0.40 robustly beats conf=0.01 (broadly distributed)
+bd140a87aa91d2b9dc1fbc1dd66d7471e117e8e0 2026-10-04T14:51:25+03:00 Correct confidence-exactness finding: original check had a class-filter bug
+93647b0610379499aeff1aa33c7f802e86cce7ad 2026-10-04T14:50:56+03:00 Predeclare host-default controller search
+d2036607b45e202c3198c909361ef9f05ff11fa1 2026-10-04T14:49:31+03:00 Fix confidence exactness verifier class filtering
+c272089f123ca00e668a4e7932cec2f8b1b50484 2026-10-04T14:41:41+03:00 Add Stage 3B+4 joint result and cache-extension script (from previous Claude session)
+b453ea272647f9eea67dff4bb5129d577a809e52 2026-10-04T13:41:00+03:00 Add joint Stage 3B+4 search script (thresholds + action mapping together)
+117092f6327540d242f2afb6a78690ff9f9701a2 2026-10-04T13:38:39+03:00 Amend Stage 3B/4: merge into one joint threshold+action search (logical-flaw fix)
+293b3c48eb1ac1c3bce7858656f982ebd8660041 2026-10-04T13:38:05+03:00 Phase 2 diagnosis: SceneLayer levels are degenerate on this dataset (root cause found)
+44eedb36139ec89b2884441a577a08cc58ace918 2026-10-04T13:05:31+03:00 Fix lazy cache loading for broadened resolutions; add Phase-2 segment-level headroom diagnostic
+07f1b4d3007870f61ae7c94088ccde7043cc2ab9 2026-10-04T12:35:48+03:00 Stage 3A search: all 31 cue subsets converge to the same tiny, fold-concentrated delta
+e0d6a3a106ec64dcdcc9eb0ffaa4c4a41807cd26 2026-10-04T12:03:32+03:00 Stage 2 search: best trial fails the robustness gate (fold-concentrated)
+1ceb01fa47531f14a0a5291df5c787ee3386e900 2026-10-04T11:40:09+03:00 Predeclare a bounded broadened operating-point sweep before any result is seen
+ccc83fe9961f71ee936361cda3256d4de0d12b60 2026-10-04T11:24:05+03:00 Predeclare Stage 3+ (cue subset, SCI thresholds, joint refinement) before any trial
+6c5831fd16ff4f01f31daf48824b18815cb49f4d 2026-10-04T11:22:27+03:00 Stage 1 search: null result -- no level->resolution mapping beats matched-static
+dc4952805ee56a4cc295457204f331f64f58aed1 2026-10-04T10:48:29+03:00 Oracle/headroom gate: PROCEED, but headroom is tiny and single-sequence-driven
+fa650cf273b8cd4ae2adb4d39e4aefb4d14181df 2026-10-04T10:32:20+03:00 Predeclare AC-MOT controller search space, objective, and selection rule BEFORE any trial
+9514d0f9212f1aecc2fcd0f6959c7f0c5910333c 2026-10-04T10:22:10+03:00 Confidence-floor exactness check: NOT exact -- excluded from the AC-MOT search space
+956d28b75b96956dada6465c656d746d216ff9a9 2026-10-04T06:18:54+03:00 Cache generation stats: 135/135 files, 18,384 forward passes, verified
+d3a3cd31cc45b3877b399b5bdfdc02e2454c05ac 2026-10-04T05:39:02+03:00 Detector cache generation + baseline systems 1&2 on VisDrone-val (frozen public detector)
+e5b6706ac0b7a4031c9e27679c3da4263f4496a8 2026-10-04T04:12:17+03:00 Lightning script: pass git provenance via env var instead of running git remotely
+fec8ac7861826aa44b8ce66da09225f08870275f 2026-10-04T03:17:24+03:00 Lightning Studio version of the YOLO11m VisDrone training pipeline
+25d82dca25ce968e8b044609f1eaa969833b6065 2026-10-03T21:22:35Z Kaggle integration: generator for private smoke/train kernels (GPU assertion, session guard, cross-session resume with full checkpoint, state dataset); scientific cells copied verbatim and asserted
+d78d862ab88cc9eaf7fe625c7f7c4b199dc7018c 2026-10-03T21:10:48Z OATrack comparison: detector trained on all 56 train sequences and every frame (paper-aligned), configurable class set, exact multi-NMS caches (one forward pass, predictor postprocess per IoU), design record
+ff398c96d931f9681f76521930ab3f8a1d54a77a 2026-10-03T21:04:07Z Step 4 (development, in-sample): OATrack's fixed min_conf is not the best operating point; calibrated operating point on top of OATrack is the candidate claim
+4d6a0f907ced452279f87fd7dd644df8a8725da7 2026-10-03T21:03:48Z Training notebook: re-running all cells after a finished training no longer fails (tested end to end on a synthetic dataset)
+1c2daa3e962c67baface9aa7240090abb3d4e078 2026-10-03T21:03:03Z OATrack comparison: detector split (32 train / 8 calibration, protected 16 excluded), YOLO11m VisDrone training and caching notebook, operating-point sweep tool
+e10436bb3547048005e7f7d7e7a7db5ddeb72e4c 2026-10-03T20:55:45Z OATrack (Sensors 2026) re-implemented from the paper, unit tests, mechanism check against Ultralytics ByteTrack on val-7 caches
+c0fc71e3a6bd412ffca10f4493387f8333f328c5 2026-10-03T20:24:12Z AC-MOT paper v2: gap audit of the original scene-adaptive line and the 7 experiments it needs
+f31d9c8ef92545b9fc38c3738a36cabff775c568 2026-10-03T11:16:51Z G2 S3 gate: crop refinement off the static frontier, oracle below the gate at every budget - S3 rejected; G2 outcome E (static compute + V7f)
+4de8cafc7074618d51a47a41e973acef3bbd33ac 2026-10-03T10:35:44Z Thesis in the MTC Word template: front matter, chapters, tables, equations, IEEE references, Arabic summary and title page; build scripts
+
+## tags
+g2-s3-1
+general-acmot-g1-freeze
+jais-overleaf-1
+recent-assets-1
+sci-v7f-sweep-1
+sci-v7f-unseen-1
+universal-acmot-v1-freeze
+universal-acmot-v3-freeze
+universal-acmot-v4-freeze
+universal-acmot-v6-freeze
+universal-acmot-v7-freeze
+v1.0.0-acmot-frozen
+v7-dev-assets-1

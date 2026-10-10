@@ -1,0 +1,68 @@
+\section{Introduction}\label{sec:intro}
+
+Multi-object tracking (MOT) finds every object of interest in a video and
+keeps the same identity for each object over time. It is a core part of
+surveillance, driving, and airborne systems
+\cite{zhu2022visdrone,wu2022uavsurvey,lu2024uavdetection}, and many of these systems
+must produce results with low delay. Most practical trackers follow the
+tracking-by-detection design. A detector scores candidate boxes in each frame,
+and the tracker links the boxes whose scores pass its thresholds into
+trajectories \cite{bewley2016sort,zhang2022bytetrack,cao2023ocsort}.
+
+In deployed systems the detector and the tracker are rarely developed
+together. A detector is replaced by a faster model, retrained for a new
+sensor, or quantized for embedded hardware. The tracker, however, keeps the
+thresholds that its authors tuned for another detector. Detector confidence is
+not calibrated across models and conditions \cite{kuppers2020detcalib}, so the
+new detector usually has a different score scale, and nothing in the pipeline
+notices the change.
+
+The effect can be large. In the experiments of this paper, halving the scores
+of a published detector drives two well-known trackers to 0 higher order
+tracking accuracy (HOTA) \cite{luiten2021hota}, because no detection reaches
+their fixed thresholds (Sect.~\ref{sec:shift}). Retuning
+every tracker for every detector needs labelled data from the deployment
+domain, which an operational system usually does not have.
+
+Existing methods only partly address this problem. Adaptive-threshold
+trackers adjust their own thresholds from the detections of each frame, but
+each method is built into one specific tracker
+\cite{ma2023adaptivebytetrack,shim2024adaptrack,act2026adaptive}. Confidence
+calibration methods correct the detector scores, but they need labelled data
+\cite{kuppers2020detcalib}. Adaptive inference methods learn or profile a
+policy for one model \cite{han2022dynamic,jiang2018chameleon}. What is missing
+is a training-free component that works outside the tracker, calibrates itself
+from the detector's own score stream, and leaves the tracker unchanged when
+the tracker already fits that stream.
+
+This paper presents such a component: \scl{}, a self-calibrating control layer
+between a frozen detector and a frozen tracker. It reads the stream of detector scores
+and the operating point that the tracker declares, and it decides online
+whether the tracker needs help. \scl{} is described in
+Sect.~\ref{sec:method}, and Sect.~\ref{sec:development} explains how it was
+developed from an earlier design that always intervened.
+
+The main contributions are:
+\begin{enumerate}
+\item \scl{}, a training-free control layer that calibrates itself from the detector
+      score stream and changes the tracker's input only when the stream is
+      noisy (Sect.~\ref{sec:method}).
+\item A host contract of four numbers that lets one frozen configuration work
+      with single-stage and two-stage trackers
+      without modifying them (Sect.~\ref{sec:contract}).
+\item A development path from always-on banding (\aob{}), a prior design that
+      always intervened, in which
+      each step is compared with that baseline (Sect.~\ref{sec:development}).
+\item An evaluation of one frozen configuration on seven published trackers,
+      four detection sources, and two datasets, with development and
+      predeclared external roles, paired bootstrap intervals, and a
+      latency measurement on a CPU (Sects.~\ref{sec:setup}
+      and~\ref{sec:results}).
+\end{enumerate}
+
+The rest of the paper is organized as follows. Section~\ref{sec:related}
+reviews related work. Section~\ref{sec:method} describes \scl{}, and
+Section~\ref{sec:development} explains how it was developed.
+Section~\ref{sec:setup} gives the experimental setup,
+Section~\ref{sec:results} the results, and Section~\ref{sec:discussion} a
+discussion. Section~\ref{sec:conclusion} concludes the paper.

@@ -1,0 +1,107 @@
+name: General-SCI resolution sweep cache (val-7, CPU runner)
+on:
+  workflow_dispatch:
+  push:
+    branches: [sci-v7f-general-layer-dev]
+    paths: [".github/workflows/sci_sweep_cache.yml"]
+permissions:
+  contents: write
+env:
+  ZIP_SHA: e53571990dfc79229e0a8ae10264bc4fa604a027c44b06e3a097417e4fa55705
+  YOLO_SHA: f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36
+  RTDETR_SHA: 6de60b10d4bc566f00cda0f5b4d64afe4b66d48dc9695d2171effb7859d8e73f
+jobs:
+  zip:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: c
+        uses: actions/cache@v4
+        with:
+          path: ~/val.zip
+          key: visdrone-val-zip-e53571990dfc
+      - if: steps.c.outputs.cache-hit != 'true'
+        run: |
+          pip install -q gdown==5.2.0
+          for t in 1 2 3 4; do gdown -q 1rqnKe9IgU_crMaxRoel9_nuUsMEBBVQu -O ~/val.zip && break; sleep 300; done
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+  build:
+    needs: zip
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {det: yolov8, weights: yolov8n.pt, res: "512 576 640 704 736 768 832 896 960"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "512"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "576"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "640"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "704"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "736"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "768"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "832"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "896"}
+          - {det: rtdetr, weights: rtdetr-l.pt, res: "960"}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/val.zip
+          key: visdrone-val-zip-e53571990dfc
+          fail-on-cache-miss: true
+      - name: Frames + environment
+        run: |
+          echo "$ZIP_SHA  $HOME/val.zip" | sha256sum -c -
+          mkdir -p ~/w && unzip -q ~/val.zip -d ~/w && rm ~/val.zip
+          D=$(dirname "$(find ~/w -type d -name sequences | head -1)"); echo "DATA=$D" >> $GITHUB_ENV
+          python3 -m venv ~/venv
+          ~/venv/bin/pip install -q --upgrade pip
+          ~/venv/bin/pip install -q torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cpu
+          grep -v -E '^(torch|torchvision)==' "$GITHUB_WORKSPACE/research/final/env/repo_venv.txt" > ~/req.txt
+          ~/venv/bin/pip install -q -r ~/req.txt || true
+          curl -fsSL -o ~/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+          curl -fsSL -o ~/rtdetr-l.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/rtdetr-l.pt
+          echo "$YOLO_SHA  $HOME/yolov8n.pt" | sha256sum -c -
+          echo "$RTDETR_SHA  $HOME/rtdetr-l.pt" | sha256sum -c -
+          lscpu | sed -n 's/^Model name: *//p'; nproc
+      - name: Build
+        run: |
+          PYTHONPATH=$PWD ~/venv/bin/python tools/sci_v7/build_sweep_cache.py --weights ~/${{ matrix.weights }} \
+            --det ${{ matrix.det }} --dataset "$DATA" --out ~/sweep --res ${{ matrix.res }} 2>&1 | grep -v -i warn
+          { lscpu | sed -n 's/^Model name: *//p'; nproc; } > ~/sweep/${{ matrix.det }}/host_${{ strategy.job-index }}.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sweep-${{ matrix.det }}-${{ strategy.job-index }}
+          path: ~/sweep
+          retention-days: 30
+  merge:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: ~/art
+      - name: Merge, summarise, release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ~/sweep && for a in ~/art/*; do cp -r "$a"/* ~/sweep/; done
+          find ~/sweep -name '*.npz' | wc -l
+          curl -fsSL -o ~/SHA256SUMS https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/SHA256SUMS
+          f=acmot_detcache_val_native.tar
+          curl -fsSL -o ~/$f https://github.com/AhmedCode110/AC-MOT/releases/download/v7-dev-assets-1/$f
+          (cd ~ && grep " $f" SHA256SUMS | sha256sum -c -)
+          mkdir -p ~/nat && tar -xf ~/$f -C ~/nat --exclude='._*' 2>/dev/null
+          pip install -q numpy
+          O=research/final/sci_v7f/sweep; mkdir -p $O
+          python3 tools/sci_v7/sweep_summary.py ~/sweep ~/nat/outputs/det_cache_val_native $O/sweep_summary.json | tee $O/sweep_summary.txt
+          cat ~/sweep/*/host_*.txt | sort | uniq -c > $O/hosts.txt
+          (cd ~ && tar -cf sci_sweep_val7.tar sweep && sha256sum sci_sweep_val7.tar) | tee $O/sci_sweep_val7.tar.sha256
+          gh release view sci-v7f-sweep-1 >/dev/null 2>&1 || gh release create sci-v7f-sweep-1 --prerelease \
+            --title "General-SCI val-7 resolution sweep cache" --notes "Development split val-7 only. Recipe: tools/sci_v7/build_sweep_cache.py" --target "${GITHUB_SHA}"
+          gh release upload sci-v7f-sweep-1 ~/sci_sweep_val7.tar --clobber
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f $O && git commit -m "General-SCI val-7 resolution sweep: latency and fidelity summary (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 7; done

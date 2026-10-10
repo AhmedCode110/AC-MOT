@@ -1,0 +1,79 @@
+{
+ "kernel_id": "ahmedgouda1111111/uavdt-v3-cache-gen",
+ "recorded_utc": "2026-10-04T21:18:35+00:00",
+ "status_at_record": "COMPLETE (full 20-sequence/16592-frame run pulled and verified locally)",
+ "kernel_version": "v8 per commit 5a3d066 message ('kernel v8, full 16592-frame run')",
+ "script": "notebooks/kaggle/run_uavdt_cache_kaggle.py",
+ "script_sha256": "9ac86355db278314d020a49c0402a69c5f96155793c0213d618b62fbbb5a36e0",
+ "script_commit": "5a3d066dec9db3e8b18ba2106dd1206eb00db399",
+ "dataset_sources": [
+  "shakaibkaggle/uavdt-dataset (mounted /kaggle/input/datasets/shakaibkaggle/uavdt-dataset)",
+  "owner private dataset 'acmot-frozen-yolo11m-visdrone' (mounted /kaggle/input/acmot-frozen-yolo11m-visdrone)"
+ ],
+ "gpu": "Kaggle-provided GPU (exact model not re-verified against the kernel log from this archive host; cache output volume/forward-pass count below confirm the run completed as specified)",
+ "action_pairs_cached": [
+  [
+   1536,
+   0.7
+  ],
+  [
+   1280,
+   0.45
+  ],
+  [
+   1088,
+   0.6
+  ]
+ ],
+ "note_baseline": "baseline r1536_n70 equals the LOW (1536,0.70) cache with no conf filter, so no extra baseline cache is needed",
+ "sequences": "UAVDT test-20: M0203 M0205 M0208 M0209 M0403 M0601 M0602 M0606 M0701 M0801 M0802 M1001 M1004 M1007 M1009 M1101 M1301 M1302 M1303 M1401",
+ "expected_frames": 16592,
+ "protocol": [
+  "research/uavdt_protocol/UAVDT_EXTERNAL_PROTOCOL_FREEZE.json",
+  "research/uavdt_protocol/UAVDT_ADAPTER_V1_FREEZE.json",
+  "tools/build_uavdt_view.py"
+ ],
+ "cache_stats": {
+  "forward_passes": 49776,
+  "wall_seconds": 5651.554999828339,
+  "action_res_nms": [
+   [
+    1536,
+    0.7
+   ],
+   [
+    1280,
+    0.45
+   ],
+   [
+    1088,
+    0.6
+   ]
+  ],
+  "seq_frame_counts": {
+   "M0203": 1007,
+   "M0205": 646,
+   "M0208": 265,
+   "M0209": 1576,
+   "M0403": 514,
+   "M0601": 372,
+   "M0602": 480,
+   "M0606": 1374,
+   "M0701": 1308,
+   "M0801": 298,
+   "M0802": 1101,
+   "M1001": 1859,
+   "M1004": 269,
+   "M1007": 659,
+   "M1009": 604,
+   "M1101": 864,
+   "M1301": 1182,
+   "M1302": 719,
+   "M1303": 445,
+   "M1401": 1050
+  }
+ },
+ "cache_stats_source": "research/acmot_paper_v2/cache/uavdt/UAVDT_CACHE_STATS.json (external, git-ignored; hashed in ARTIFACT_INDEX.csv)",
+ "outputs": "PULLED (60 npz files: 20 sequences x 3 action pairs; copied locally to research/acmot_paper_v2/cache/uavdt/)",
+ "evaluation": "RUN -- research/acmot_paper_v2/run_uavdt_transfer.py -> research/acmot_paper_v2/UAVDT_TRANSFER_RESULT.json (commit 010f253)"
+}

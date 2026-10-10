@@ -1,0 +1,11 @@
+1r-f9FDbmRXDHl3vbp1Giis0WlOqV3QC2 dance_test_0.80.pickle
+1CapopRkSLNrQgRoKdR7ppF60RlmB1nyB dance_test_0.95.pickle
+1FapbUe8ifc5vRWwQmVas_OsZzchdcvmV dance_val_0.80.pickle
+1GghI5lB4y94G4G7bQLmBmPDK5iJUHzN_ dance_val_0.95.pickle
+1GaQsNG4TwGES2isPm4yVl0WowVBOEyZr mot17_test_0.80.pickle
+1upO-evhhfREKljuwUcnHEQhSnIu2UC1f mot17_test_0.95.pickle
+1HNglpiQuW1d0iRZdEYZoI86o2OxF8Oum mot17_val_0.95.pickle
+1u6RO827_YB4tChlPxPsLTKkRwRBJKyzD mot20_test_0.80.pickle
+1EP4sCy6UKyRVpIY0DOTiQWzHlWYFWJaS mot20_test_0.95.pickle
+1PuR6tcwef0tRKUnXJtfa74LnK124yftA mot20_val_0.80.pickle
+1O93Za4OcmZUYh9xgkD48W0EjVLsaksad mot20_val_0.95.pickle

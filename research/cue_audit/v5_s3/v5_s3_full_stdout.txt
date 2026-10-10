@@ -1,0 +1,4 @@
+== full: cue per target per outer fold
+   sensitivity   - det_count det_gap det_count det_gap det_gap det_gap  | final: det_gap
+   gate_tau      trk_survival img_blur img_brightness - trk_survival - -  | final: trk_survival
+   assoc_offset  - det_gap det_gap det_count det_gap det_count det_gap  | final: det_gap

@@ -1,0 +1,234 @@
+[
+ {
+  "id": "a_v3",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res640",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 640
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res736",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 736
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res832",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 832
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_sens0.3",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.3
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res640_sens0.3",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 640,
+   "fixed_sensitivity": 0.3
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res736_sens0.3",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 736,
+   "fixed_sensitivity": 0.3
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res832_sens0.3",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 832,
+   "fixed_sensitivity": 0.3
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_sens0.4",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.4
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res640_sens0.4",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 640,
+   "fixed_sensitivity": 0.4
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res736_sens0.4",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 736,
+   "fixed_sensitivity": 0.4
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res832_sens0.4",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 832,
+   "fixed_sensitivity": 0.4
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_sens0.5",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_sensitivity": 0.5
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res640_sens0.5",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 640,
+   "fixed_sensitivity": 0.5
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res736_sens0.5",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 736,
+   "fixed_sensitivity": 0.5
+  },
+  "density_kwargs": {},
+  "selectable": false
+ },
+ {
+  "id": "a_res832_sens0.5",
+  "base": "V1",
+  "overrides": {
+   "feedback": "accepted",
+   "normalizer": "ecdf",
+   "gate_stat": "zlogit",
+   "gate_tau": 0.75,
+   "policy_raw_floor": 0.0,
+   "fixed_resolution": 832,
+   "fixed_sensitivity": 0.5
+  },
+  "density_kwargs": {},
+  "selectable": false
+ }
+]

@@ -30,6 +30,25 @@ SYSTEMS = {
     "V7d": dict(dup="track", domain="full", regime="rho", rho_frames=100, clean="upper",
                 noisy_primary="t2", noisy_ext="otsu", scores="auto", cold="host",
                 dup_regime="noisy", dup_clean="xclass", motion_regime="noisy"),
+    # V7e (cloud C1): V7d + regime from the median rho of ALL past non-cold
+    # frames (rho_frames=0; removes the floor-driven mid-stream flips, ledger
+    # E15) + foreground track-consistent rescue (rescue_band=fg: a foreground
+    # candidate that continues an uncovered track of t-1 but that the host
+    # cannot see at its passed operating point is handed to the host's lowest
+    # stage; a no-op for two-stage hosts, the missing low stage for
+    # single-stage hosts, ledger E16).
+    "V7e": dict(dup="track", domain="full", regime="rho", rho_frames=0, clean="upper",
+                noisy_primary="t2", noisy_ext="otsu", scores="auto", cold="host",
+                dup_regime="noisy", dup_clean="xclass", motion_regime="noisy",
+                rescue="track", rescue_band="fg"),
+    # V7f: V7e + interpretability check of the nested split (bg_check: a pooled
+    # stream without a background mode gives no evidence against the host;
+    # for a host WITHOUT a low stage, every emitted candidate of such a
+    # stream may continue an uncovered track). Ledger E17-E18.
+    "V7f": dict(dup="track", domain="full", regime="rho", rho_frames=0, clean="upper",
+                noisy_primary="t2", noisy_ext="otsu", scores="auto", cold="host",
+                dup_regime="noisy", dup_clean="xclass", motion_regime="noisy",
+                rescue="track", rescue_band="fg", bg_check=True),
 }
 
 

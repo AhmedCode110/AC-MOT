@@ -1,0 +1,60 @@
+\section{Development from a Prior Design}\label{sec:development}
+
+\subsection{Baseline: always-on banding}\label{sec:prior}
+\scl{} was developed from an earlier design of the same research program,
+called always-on banding (\aob{}). \aob{} computed the same nested Otsu bands
+but treated every stream as noisy. In every frame it applied the bands,
+removed every weaker candidate that overlapped a stronger one with IoU above
+one half, and remapped all scores by rank onto fixed ranges. It admitted no
+candidate at the first frame. \aob{} was designed for noisy detector streams,
+and it is the baseline of this section.
+
+Table~\ref{tab:prior} compares \aob{} and \scl{} with the same strong published
+trackers on MOT17 \cite{milan2016mot16}. \aob{} lowered the HOTA of
+SparseTrack by 4.15 points and that of BoostTrack by 5.89 points online and
+5.37 points with interpolation, all with intervals below zero. Two causes were
+found. First, overlap-based duplicate removal deleted occluded people in
+crowds. Second, the self-calibrated thresholds were stricter than the
+trackers' own: for SparseTrack and online BoostTrack, false positives fell by
+1,630 and 1,351, but false negatives rose by 4,955 and 6,167. On the same
+trackers, \scl{} changed HOTA by $+0.06$ for SparseTrack and left both
+BoostTrack variants identical to the host. Figure~\ref{fig:prior} shows the
+same comparison.
+
+\input{tables/tab_prior}
+
+\begin{figure}[t]
+\centering
+\input{figures/fig_prior}
+\caption{HOTA on MOT17 val-half of three strong published trackers alone, with
+\aob{}, and with \scl{}. The labels give the change caused by \aob{}.}
+\label{fig:prior}
+\end{figure}
+
+\subsection{Design steps}\label{sec:steps}
+Each step from \aob{} to \scl{} was introduced to remove one diagnosed cause
+and was compared with the step before it on development data
+(Table~\ref{tab:ablation}). Emulating \aob{} inside the new framework reduced
+ByteTrack at floor 0.1 from 67.70 to 56.41 HOTA and OC-SORT from 66.44 to
+45.72. The regime gate, which adds the regime estimate, the self-limiting
+clean regime, and the crowd-safe duplicate rule, restored SparseTrack from
+64.72 to 68.93 and BoostTrack from 62.61 to 68.37. Estimating the regime from
+the whole stream removed regime changes in the middle of a stream and raised
+ByteTrack from 67.561 to 67.702 and OC-SORT from 65.697 to 66.071. The
+continuation rescue added 0.2 to 0.4 points for OC-SORT. The background check
+completed \scl{}: it returned ByteTrack and BoostTrack to output identical to
+the host and raised OC-SORT to 67.04 and 66.91 at the two floors. Four
+variants were rejected on evidence, because they lowered HOTA, added false
+positives, or let false tracks through on a noisy stream.
+
+\input{tables/tab6_ablation}
+
+\subsection{Freeze and tests}\label{sec:freeze}
+The final configuration was frozen before any external evaluation. It was
+recorded in a version-control tag and protected by a lock file that holds
+cryptographic hashes of the layer, its configuration, and the evaluation
+runners. Every later run verified the lock before running. Sixty-one automated
+tests check that the layer uses no future data, that its state resets between
+sequences, that clean streams pass through unchanged, that the output does not
+depend on detector, tracker, or sequence names, that affine score transforms
+leave the bands unchanged where designed, and that the lock is intact.

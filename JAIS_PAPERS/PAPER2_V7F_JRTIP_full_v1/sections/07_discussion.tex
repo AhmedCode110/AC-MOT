@@ -1,0 +1,42 @@
+\section{Discussion}\label{sec:discussion}
+
+\emph{When the layer acts.} The direction of the effect follows two
+properties of the pipeline rather than the dataset: whether the tracker has a
+continuation stage, and whether the detector's score distribution matches the
+tracker's thresholds. The regime estimate makes this visible. On the C-TWiX
+streams after the freeze, 99.7\% of the MOT17 frames and 99.9\% of the
+DanceTrack frames were classified clean, and the largest noisy share was 2.8\%
+of the frames, on KITTI. When the stream fits the tracker, the layer stays out
+of the way.
+
+\emph{Self-limiting by design.} In the clean regime the layer keeps the
+tracker's thresholds and scores, so a tracker with a low-score stage and
+well-matched detections receives its native input. This is the main
+difference from the prior design \aob{}, which lowered the HOTA of the same strong
+trackers by 4.15 to 5.89 points (Table~\ref{tab:prior}). The layer therefore does not
+need to know in advance whether a tracker needs help; it reads the answer from
+the score stream.
+
+\emph{A continuation stage for single-stage trackers.} Single-stage trackers
+drop every detection below one threshold, so a track can be lost when its
+object scores low for a few frames. The continuation rescue considers only
+candidates that overlap a track of the previous frame that no usable candidate
+covers, so it targets exactly these gaps. OC-SORT and the external PD-SORT
+gained HOTA on 7 of 7 MOT17 sequences through this stage.
+
+\emph{Detector replacement.} When a detector is replaced or its confidence
+scale shifts, the fixed thresholds of a tracker stop matching the scores. The
+layer re-anchors them from the score stream without labels. Under halved
+scores it restored two trackers from 0 to about 66 HOTA, and with a different
+detector it raised the MOTA of two two-stage trackers by 6.0 and 7.9 points.
+This is the situation the layer was built for: a detector that is swapped,
+retrained, or quantized while the tracker stays fixed.
+
+\emph{Real-time deployment.} The layer needs no training, no GPU, and no
+access to the detector's internals, and it needs only four contract values
+from the tracker's configuration. At run time it reads the candidate list, one
+small grayscale image for the motion cue, and the tracks of the previous
+frame. On a four-core CPU it takes 2.95 ms per frame, adds 4.5\% to the end-to-end time, and makes the tracker
+itself faster. \scl{} therefore adds very little latency and is
+suitable for real-time use. New trackers are added through their published
+contract values and an adapter, without changes to the policy.

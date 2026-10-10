@@ -1,0 +1,6 @@
+candidate_commit 5a8502f2cf7f76f168ab238a389115adfa228aa8
+runner_commit 180cd1103021c95dedc2af061f95f32330eaae7d
+code_sha256 5db5deb5250de8b46483151cda925694120678fa7d90934a8bd52fda47908181
+cpu AMD EPYC 7763 64-Core Processor x 4
+gpu none (GitHub-hosted runner)
+split val7 (development, row P6); no protected split opened

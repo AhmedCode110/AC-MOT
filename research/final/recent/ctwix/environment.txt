@@ -1,0 +1,6 @@
+repo_commit 1d9a10a0bd11db469e2fc10fa880a93336da664e
+twix_commit 3cff9cce39fe77eca78c2a2662aa655cd3215e7c
+trackeval_commit 12c8791b303e0a0b50f753af204249e622d0281a
+python Python 3.12.3
+cpu AMD EPYC 9V45 96-Core Processor x 4
+dancetrack_val_annotations /home/runner/acmot_work/labels/dance/val

@@ -1,0 +1,6 @@
+NATIVE+MEDIUM    retinanet mean res  736.0  rel compute 1.000  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.998/0.000  intervention 0.000
+V7f+MEDIUM       retinanet mean res  736.0  rel compute 1.000  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.608/0.389  intervention 1.000
+NATIVE+R640      retinanet mean res  640.0  rel compute 0.756  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.998/0.000  intervention 0.000
+V7f+R640         retinanet mean res  640.0  rel compute 0.756  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.916/0.082  intervention 1.000
+NATIVE+R832      retinanet mean res  832.0  rel compute 1.278  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.998/0.000  intervention 0.000
+V7f+R832         retinanet mean res  832.0  rel compute 1.278  L/M/H 0.000/1.000/0.000  switches    0  cold/clean/noisy 0.002/0.544/0.454  intervention 1.000

@@ -1,0 +1,18 @@
+rtdetr 512 658.2 ms (p95 718.2) 188.1 cand/frame 
+rtdetr 576 775.7 ms (p95 821.6) 184.9 cand/frame 
+rtdetr 640 923.5 ms (p95 985.4) 182.9 cand/frame {'boxes_ge_0_25': 101016, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 9.987147521284216e-07}
+rtdetr 704 907.2 ms (p95 954.4) 176.8 cand/frame 
+rtdetr 736 1194.2 ms (p95 1268.8) 179.5 cand/frame {'boxes_ge_0_25': 105989, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 1.1519729362470385e-06}
+rtdetr 768 1278.4 ms (p95 1352.0) 177.4 cand/frame 
+rtdetr 832 1451.8 ms (p95 1508.6) 176.8 cand/frame {'boxes_ge_0_25': 110569, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 1.6155742239321337e-06}
+rtdetr 896 1777.2 ms (p95 1813.8) 179.8 cand/frame 
+rtdetr 960 1876.6 ms (p95 1904.9) 180.6 cand/frame 
+yolov8 512 35.8 ms (p95 41.2) 79.9 cand/frame 
+yolov8 576 45.6 ms (p95 52.8) 91.3 cand/frame 
+yolov8 640 54.6 ms (p95 62.8) 98.0 cand/frame {'boxes_ge_0_25': 30973, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 4.830964030668409e-07}
+yolov8 704 61.6 ms (p95 70.0) 103.2 cand/frame 
+yolov8 736 62.8 ms (p95 70.5) 106.9 cand/frame {'boxes_ge_0_25': 36032, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 4.827328844599008e-07}
+yolov8 768 69.3 ms (p95 76.9) 109.2 cand/frame 
+yolov8 832 79.3 ms (p95 87.1) 116.0 cand/frame {'boxes_ge_0_25': 41515, 'matched_iou_0_9': 1.0, 'mean_abs_score_diff': 4.836927613578633e-07}
+yolov8 896 90.4 ms (p95 99.4) 120.7 cand/frame 
+yolov8 960 100.9 ms (p95 109.7) 128.5 cand/frame 
