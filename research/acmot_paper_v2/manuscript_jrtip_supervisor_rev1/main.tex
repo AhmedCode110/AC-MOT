@@ -1,0 +1,74 @@
+\documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\floatname{algorithm}{Algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\hypersetup{hypertexnames=false}
+\newcommand{\checkpointsha}{\texttt{c6f98247\allowbreak{}e7c731a5\allowbreak{}67aaf37c\allowbreak{}a7b808be\allowbreak{}ff588b68\allowbreak{}7623e028\allowbreak{}b25a2e1d\allowbreak{}846e96e7}}
+
+\raggedbottom
+\setcounter{dbltopnumber}{2}
+
+\begin{document}
+
+\title[AC-MOT]{AC-MOT: Optimization-Guided Adaptive Detector Operating-Point Control for Aerial Multi-Object Tracking}
+
+\author*[1]{\fnm{Ahmed Gouda} \sur{Ismail}}\email{a7medgouda1@gmail.com}
+\author[1]{\fnm{Mohamed S.} \sur{Mohamed}}\email{mohamedms@mtc.edu.eg}
+\author[2]{\fnm{Tarek Ahmed} \sur{Mahmoud}}\email{tarek.mohamed@eui.edu.eg}
+
+\affil*[1]{\orgdiv{Computer Engineering and Artificial Intelligence Department}, \orgname{Military Technical College}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+\affil[2]{\orgdiv{Computer Engineering Department}, \orgname{Egypt University of Informatics}, \orgaddress{\city{Cairo}, \country{Egypt}}}
+
+\abstract{Multi-object tracking (MOT) in unmanned aerial vehicle (UAV) videos is challenging due to variations in object density, size, illumination, and blur. However, most tracking-by-detection systems use fixed detector settings that may not suit changing scene conditions. This paper proposes Adaptive Control for Multi-Object Tracking (AC-MOT), a training-free framework that dynamically adjusts the detector operating point, defined by the confidence threshold, non-maximum suppression (NMS) intersection-over-union (IoU) threshold, and input resolution. Using only the current frame and past tracking information, AC-MOT treats the detector operating point as an online control variable without modifying or retraining the detector or tracker. Initial optimization experiments reveal trade-offs among tracking accuracy, identity preservation, and computational efficiency, motivating a three-state controller. On VisDrone, AC-MOT improves Higher Order Tracking Accuracy (HOTA) from 41.586 to 44.523, Multiple Object Tracking Accuracy (MOTA) from 9.876 to 27.871, and Identity F1 Score (IDF1) from 48.569 to 53.929 with ByteTrack, while reducing identity switches (IDS) from 1,341 to 1,016. With OATrack, MOTA increases from 28.165 to 34.483, and IDS decreases from 773 to 604. Paired bootstrap analysis with 5,000 resamples supports improvements in HOTA, MOTA, IDF1, and IDS for both trackers. Cross-dataset evaluation on UAVDT, using the same fixed policy without retuning, improves MOTA by 17.601 and 3.267 points with ByteTrack and OATrack, respectively. These results demonstrate that online detector operating-point adaptation can improve aerial MOT performance with limited computational overhead and no additional training.}
+
+\keywords{multi-object tracking, UAV video, adaptive inference, detector operating point, real-time image processing}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_development}
+\input{sections/05_setup}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+
+\backmatter
+
+\section*{Declarations}
+
+\noindent\textbf{Funding.} This research received no external funding.
+
+\noindent\textbf{Conflict of interest.} The authors declare no competing interests.
+
+\noindent\textbf{Ethics approval and consent to participate.} This computational study uses public benchmark data and does not involve human participants or animals.
+
+\noindent\textbf{Consent for publication.} Not applicable.
+
+\noindent\textbf{Data and code availability.} The frozen controller specification, result records, evidence map, staged sections, scripts, and build package are included in the project repository. Dataset redistribution remains subject to the original benchmark licenses and access terms.
+
+\noindent\textbf{Author contributions.} Ahmed Gouda Ismail: Conceptualization, Methodology, Software, Investigation, Data curation, Formal analysis, Visualization, Writing~--~original draft, Writing~--~review \& editing. Mohamed S. Mohamed: Supervision, Methodology, Writing~--~review \& editing. Tarek Ahmed Mahmoud: Supervision, Validation, Writing~--~review \& editing.
+
+\noindent\textbf{Acknowledgements.} Not applicable.
+
+\noindent\textbf{Submission exclusivity.} The manuscript is not under consideration elsewhere and has not been published previously.
+
+\noindent\textbf{AI use in manuscript preparation.} Generative AI tools were used to assist with drafting and language editing. The authors reviewed and verified all content, numerical values, and figures and take full responsibility for the manuscript.
+
+\bibliography{references}
+
+\end{document}

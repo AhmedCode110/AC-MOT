@@ -1,0 +1,66 @@
+\section{Introduction}\label{sec:intro}
+
+Unmanned aerial vehicles (UAVs) are widely used for traffic monitoring,
+surveillance, and search, and many of these tasks need multi-object tracking
+(MOT): every object must be detected in every frame and keep the same
+identity over time \cite{wu2022uavsurvey,zhu2022visdrone}. Aerial video makes
+this hard. Objects are small, their number changes quickly, the camera moves,
+and illumination and blur change within one video
+\cite{zhu2022visdrone,du2018uavdt,cheng2023smallobject}. Many of these
+applications also need results with low delay, so the processing cost matters
+as much as the accuracy.
+
+The performance of aerial multi-object tracking depends on several factors, including the quality of object detection, the ability to associate objects across consecutive frames, and the computational resources available for processing. These factors are closely related, since errors in object detection can directly affect the tracking process. Missed detections may interrupt object trajectories, while false detections can lead to incorrect associations and identity switches. At the same time, improving detection accuracy often requires additional computation, which may increase processing time and limit real-time performance. Achieving a suitable balance between detection quality, tracking accuracy, identity consistency, and computational efficiency is therefore an important challenge in aerial MOT systems.
+
+Most MOT systems follow the tracking-by-detection design. A detector finds the
+objects in each frame, and a tracker links the detections over time
+\cite{bewley2016sort,zhang2022bytetrack}. Much research improves the tracker,
+for example its motion model or its association rules, and much research
+improves the detector itself. Far less attention is given to how the detector
+is run. In practice the detector uses one confidence threshold, one
+non-maximum-suppression (NMS) threshold, and one input resolution for the
+whole video. These three values form the detector operating point, and they
+decide which boxes reach the tracker.
+
+A fixed operating point does not fit a scene that keeps changing. A setting
+that works in a sparse, clear scene can keep too much clutter in a dense
+scene. A setting that works in a dense scene can lose small or weak objects in
+another part of the same video. A large input helps small objects, but it
+costs the same time on easy and hard frames. The choice therefore moves false
+positives, missed objects, identity switches, and runtime together.
+
+Existing adaptive methods only partly address this problem. Adaptive inference
+methods change the detector's input scale or configuration, but they usually
+need an extra learned model and are designed for detection, not tracking
+\cite{chin2019adascale,xu2020approxdet}. Adaptive tracking methods change
+thresholds inside one specific tracker \cite{ma2023adaptivebytetrack,shim2024adaptrack}.
+What is missing is a simple, training-free way to adapt the detector
+operating point online for MOT, without changing the detector or the tracker.
+
+This paper presents AC-MOT, a training-free control layer that adapts the
+detector operating point online for aerial MOT. It sits between the detector
+and the tracker, reads inexpensive scene cues, and works with existing
+detectors and trackers without retraining or modifying them. The method is
+described in Sect.~\ref{sec:method}, and Sect.~\ref{sec:development} explains
+how it was developed with optimization and tested step by step.
+
+The main contributions are:
+\begin{enumerate}
+\item A training-free control layer that treats the detector operating point
+      as part of the MOT system and adapts it online (Sect.~\ref{sec:method}).
+\item An optimization-guided development path, in which each step is compared
+      with the baseline it was built on (Sect.~\ref{sec:development}).
+\item An evaluation on VisDrone2019-MOT with two trackers, ByteTrack and the
+      recent OATrack, using eight MOT metrics and paired bootstrap intervals,
+      together with a transfer to UAVDT without retuning
+      (Sects.~\ref{sec:setup} and~\ref{sec:results}).
+\item A latency measurement showing that the control layer adds only a few
+      milliseconds per frame on a Tesla T4 GPU (Sect.~\ref{sec:discussion}).
+\end{enumerate}
+
+The rest of the paper is organized as follows. Section~\ref{sec:related}
+reviews related work. Section~\ref{sec:method} describes AC-MOT, and
+Section~\ref{sec:development} explains how it was developed.
+Section~\ref{sec:setup} gives the experimental setup,
+Section~\ref{sec:results} the results, and Section~\ref{sec:discussion} a
+discussion. Section~\ref{sec:conclusion} concludes the paper.

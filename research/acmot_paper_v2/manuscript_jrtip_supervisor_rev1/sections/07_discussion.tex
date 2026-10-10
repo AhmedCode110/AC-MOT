@@ -1,0 +1,35 @@
+\section{Discussion}\label{sec:discussion}
+
+\emph{The operating point is part of the MOT system.} The same frozen detector
+and the same trackers give very different MOT results at different operating
+points. Moving away from the fixed 1536/0.70 point raises MOTA by 17.995 points
+with ByteTrack and by 6.318 points with OATrack on VisDrone. The detector
+operating point is therefore a first-order variable of aerial MOT and deserves
+the same attention as the association method.
+
+\emph{Selective observation streams.} The main effect of AC-MOT is a more
+selective detection stream. FP and IDS drop sharply, precision rises, and FN
+rise a little with ByteTrack. MOTA reacts most strongly because it counts FP
+directly; HOTA and IDF1 rise by smaller amounts. The same pattern appears on
+UAVDT, where FP fall by 67539 with ByteTrack and by 14268 with OATrack.
+
+\emph{Tracker dependence.} ByteTrack gains more than OATrack. ByteTrack starts
+from a weaker baseline and uses low-score boxes in its second association
+step, so a likely reason is that removing clutter helps it directly. OATrack
+already weights detections by quality inside its association, and it gains
+mainly in MOTA, IDF1, IDS, and FP. Results are therefore reported per host.
+
+\emph{Development path.} The historical profiles showed that the preferred
+operating point depends on the goal: quality or identity stability and speed.
+The modern stage kept a finite, readable controller with one crowd index, a few
+guard cues, three states, and three actions.
+
+\emph{Deployment.} AC-MOT needs no training and no access to detector or
+tracker internals. It changes three arguments of the detector call. Its
+analysis runs on a quarter-scale image every ten frames and uses boxes that
+the tracker already produced. On a Tesla T4 the controller takes 4.26 ms per
+frame with ByteTrack and 4.20 ms with OATrack, which is small next to detector
+inference. The control layer therefore adds very little latency and is
+suitable for real-time use. The same interface can host other action maps, for
+example maps chosen for a latency budget, without changes to the detector or
+the tracker.

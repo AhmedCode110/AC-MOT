@@ -1,0 +1,365 @@
+\section{Proposed AC-MOT Framework}\label{sec:method}
+This section presents the proposed AC-MOT framework for adaptive multi-object tracking in aerial videos. The framework dynamically adjusts the detector operating point according to changing scene conditions without modifying or retraining the detector or tracker. It combines lightweight scene analysis, scene complexity estimation, and a three-state control mechanism to select suitable detector configurations during online tracking. The following subsections describe the operating point, the scene cues, the scene complexity index, the three-state controller, the action map, and how each value of the controller was chosen. Table~\ref{tab:symbols} lists the symbols used in this section.
+
+\subsection{Overview and operating point}
+Figure~\ref{fig:pipeline} shows where AC-MOT sits in the pipeline. For each
+frame, scene analysis and the AC-MOT controller run first and choose the
+detector settings. The detector and the tracker then run as usual with these
+settings. The detector settings at frame $t$ are called the operating point
+\begin{equation}
+\theta_t = (c_t, \eta_t, r_t),
+\label{eq:theta}
+\end{equation}
+which has three parts:
+\begin{itemize}
+\item $r_t$ is the input resolution, the long side of the resized image in
+      pixels. A larger input shows small objects better but takes more time.
+\item $\eta_t$ is the NMS IoU threshold. When two boxes overlap with an
+      intersection over union (IoU) above $\eta_t$, the box with the lower
+      score is removed. A lower $\eta_t$ removes more overlapping boxes.
+\item $c_t$ is the score threshold. Boxes with a detector score below $c_t$
+      are removed before they reach the tracker. A higher $c_t$ passes fewer
+      but more reliable boxes.
+\end{itemize}
+The detector weights and the tracker are frozen; AC-MOT changes only
+$\theta_t$.
+
+The controller uses only information that is available at run time:
+\begin{equation}
+\theta_t = \pi\left(I_t, \mathcal{B}_{1:t-1}\right),
+\label{eq:policy}
+\end{equation}
+where $\pi$ is the control rule described in this section, $I_t$ is the image
+of the current frame, and $\mathcal{B}_{1:t-1}$ are the boxes that the tracker
+reported for the earlier frames $1$ to $t-1$. In words, the decision for frame
+$t$ uses the current image and the past tracker output. The tracker output of
+frame $t$ is used only from frame $t+1$ on. No ground truth, no future frame,
+and no detector score enters the decision.
+
+\begin{figure*}[t]
+\centering
+\input{figures/fig_pipeline}
+\caption{AC-MOT in a tracking-by-detection pipeline. Scene analysis and the
+controller choose the operating point $\theta_t=(c_t,\eta_t,r_t)$ before the
+detector runs. The frozen detector and tracker are not modified. Tracked boxes
+of frame $t$ feed the scene analysis of later frames (dashed arrow).}
+\label{fig:pipeline}
+\end{figure*}
+
+\begin{table}[t]
+\caption{Symbols computed at run time. Fixed values are listed in
+Table~\ref{tab:constants}.}
+\label{tab:symbols}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{55mm}@{}}
+\toprule
+Symbol & Meaning\\
+\midrule
+$t$ & frame index\\
+$j$ & analysis step (frames $1, 11, 21, \dots$)\\
+$I_t$ & image of frame $t$\\
+$r_t$, $\eta_t$, $c_t$ & input resolution, NMS IoU threshold, score threshold
+  used at frame $t$, Eq.~\eqref{eq:theta}\\
+$\mathcal{B}_{1:t-1}$ & boxes reported by the tracker for frames $1$ to $t-1$\\
+$e_t$, $\beta_t$, $\nu_t$ & edge density, brightness, and sharpness of $I_t$\\
+$N_j$ & number of tracked boxes in frame $t-1$\\
+$a_i$ & area of tracked box $i$ in pixels\\
+$C_j$ & crowd cue, Eq.~\eqref{eq:crowd}\\
+$T_j$ & tiny-object ratio, Eq.~\eqref{eq:tiny}\\
+$S_j$ & scene complexity index (SCI), Eq.~\eqref{eq:sci}\\
+$H_j$ & the last seven analysis steps\\
+$\ell_j$ & scene label, Eq.~\eqref{eq:label}\\
+$g_j$ & target state, Eqs.~\eqref{eq:target}--\eqref{eq:hold}\\
+$q_j$ & controller state: LOW, MEDIUM, or HIGH, Eq.~\eqref{eq:dwell}\\
+$P_j$, $d_j$ & peak object count and drop counter,
+  Eqs.~\eqref{eq:drop}--\eqref{eq:peak}\\
+$t_c$ & frame of the last state change\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scene cues}
+Scene analysis does not run on every frame. It runs on frame 1 and then once
+every 10 frames ($t=1$ or $t \bmod 10 = 1$, that is, frames 1, 11, 21,
+\dots). Each of these frames is an analysis step $j$. Between two analysis
+steps the controller keeps its last decision. The stride of 10 frames was
+selected by a temporal sweep on validation data (Sect.~\ref{sec:constants}).
+Two kinds of cues are computed at each step.
+
+\emph{Image cues of the current frame.} The frame is reduced to a quarter of
+its width and height and converted to gray levels, so that the cues are cheap
+to compute. Three cues are then measured:
+\begin{itemize}
+\item the edge density $e_t$, the fraction of pixels marked as edges by the
+      Canny detector (lower and upper thresholds 50 and 120); many edges
+      indicate a cluttered scene;
+\item the brightness $\beta_t$, the mean gray level from 0 (black) to 255
+      (white); a low value indicates a dark or night scene;
+\item the sharpness $\nu_t$, the variance of the Laplacian of the gray image;
+      a low value indicates a blurred frame.
+\end{itemize}
+
+\emph{Box cues of the previous frame.} Let $N_j$ be the number of boxes that
+the tracker reported for frame $t-1$, and let $a_i$ be the area of box $i$ in
+pixels of the original image. The crowd cue and the tiny-object ratio are
+\begin{align}
+C_j&=\min\!\left(\frac{N_j}{30},1\right),\label{eq:crowd}\\
+T_j&=\frac{1}{N_j}\sum_{i=1}^{N_j}\mathbf{1}\!\left[a_i<32^2\right].\label{eq:tiny}
+\end{align}
+$C_j$ is the number of tracked objects divided by 30 and capped at 1, so every
+frame with 30 or more objects has $C_j=1$. $T_j$ is the fraction of tracked
+boxes smaller than $32\times32$ pixels, which is the size limit of small
+objects in the COCO benchmark \cite{lin2014coco}. The indicator
+$\mathbf{1}[\cdot]$ is 1 when its condition holds and 0 otherwise, and $T_j=0$
+when $N_j=0$.
+
+\subsection{Scene complexity index and scene label}
+The scene complexity index (SCI) measures how crowded the recent frames are.
+It is the mean crowd cue of the last seven analysis steps:
+\begin{equation}
+S_j=\frac{1}{|H_j|}\sum_{k\in H_j} C_k,
+\label{eq:sci}
+\end{equation}
+where $H_j$ holds the steps $j-6,\dots,j$ (fewer at the start of a video) and
+$|H_j|$ is their number. With a stride of 10 frames, the seven steps cover
+about the last 60 frames, so a single unusual frame changes $S_j$ only a little. The
+window of seven steps was selected by the same temporal sweep as the stride
+(Sect.~\ref{sec:constants}). Because $C_j\le1$, $S_j$ lies between 0 and 1.
+While fewer than 30 objects are tracked, $S_j$ is simply the recent average
+number of tracked objects divided by 30.
+
+The SCI uses the crowd cue alone. During development, all 31 combinations of
+the five cues (crowd, tiny ratio, edges, brightness, and blur) were tested as
+SCI inputs on the calibration sequences, and the crowd cue alone was selected
+(Sect.~\ref{sec:modern}). The other four cues are still used as checks on the
+state through the scene label
+\begin{equation}
+\ell_j=\begin{cases}
+\text{night}   & \text{if } \beta_t<80,\\
+\text{blur}    & \text{else if } \nu_t<180,\\
+\text{tiny}    & \text{else if } T_j>0.50,\\
+\text{crowded} & \text{else if } C_j>0.65 \text{ or } e_t>0.13,\\
+\text{clear}   & \text{otherwise.}
+\end{cases}
+\label{eq:label}
+\end{equation}
+The conditions are checked from top to bottom, and the first one that holds
+gives the label. For example, $T_j>0.50$ means that more than half of the
+tracked boxes are tiny, and $C_j>0.65$ means that at least 20 objects are
+tracked.
+
+\subsection{Three-state controller}
+The controller is always in one of three states: LOW, MEDIUM, or HIGH. The
+names describe how difficult the scene is. They do not rank the input size:
+in the final action map the HIGH state uses the smallest input
+(Table~\ref{tab:actions}). The state changes only at analysis steps, in four
+steps (Algorithm~\ref{alg:controller}).
+
+\emph{Step 1: target state.} The SCI and the scene label give a target state
+\begin{equation}
+g_j=\begin{cases}
+\text{HIGH}   & \text{if } S_j>\tau_h \text{ or } T_j>0.50,\\
+\text{MEDIUM} & \text{else if } S_j>\tau_m \text{ or}\\
+              & \quad \ell_j\in\{\text{crowded},\text{tiny}\},\\
+\text{LOW}    & \text{otherwise,}
+\end{cases}
+\label{eq:target}
+\end{equation}
+where $\tau_m=0.297$ and $\tau_h=0.511$ are the two SCI thresholds (exact
+values in Table~\ref{tab:constants}). They were selected by the joint search
+on the calibration sequences (Sect.~\ref{sec:constants}). Since $S_j$ is the
+recent average number of tracked objects divided by 30, the SCI conditions
+give MEDIUM above about 9 objects ($30\tau_m=8.9$) and HIGH above about 15
+objects ($30\tau_h=15.3$).
+
+\emph{Step 2: recovery probe.} When the number of tracked objects suddenly
+collapses, the controller tries the HIGH action for a short time. It keeps a
+slowly decaying peak $P_j$ of the object count and a drop counter $d_j$:
+\begin{align}
+d_j&=\begin{cases}
+d_{j-1}+1 & \text{if } P_{j-1}\ge5 \text{ and}\\
+          & \quad N_j<0.40\,P_{j-1},\\
+0         & \text{otherwise,}
+\end{cases}\label{eq:drop}\\
+P_j&=\max\left(N_j,\lfloor 0.8\,P_{j-1}\rfloor\right),\label{eq:peak}
+\end{align}
+with $P_0=d_0=0$. A collapse is detected when at least 5 objects were seen
+before and fewer than 40\% of them remain. The peak loses 20\% at each step,
+so an old peak is forgotten after a few steps. While $1\le d_j\le3$, the
+target $g_j$ is set to HIGH, so the probe lasts at most three analysis steps
+(30 frames).
+
+\emph{Step 3: hysteresis.} A move to a lower state is held while the scene is
+still close to difficult:
+\begin{equation}
+g_j\leftarrow\begin{cases}
+\text{HIGH}   & \text{if } q_{j-1}=\text{HIGH} \text{ and}\\
+              & \quad (S_j>0.50 \text{ or } T_j>0.40),\\
+\text{MEDIUM} & \text{if } q_{j-1}=\text{MEDIUM},\\
+              & \quad g_j=\text{LOW} \text{ and } S_j>0.25,\\
+g_j           & \text{otherwise.}
+\end{cases}
+\label{eq:hold}
+\end{equation}
+The hold values lie just below the values that lead into each state
+($0.50<\tau_h$, 0.40 below the tiny guard of 0.50, and $0.25<\tau_m$),
+so the state does not jump back and forth when the scene stays near a
+threshold. Upward moves are not held.
+
+\emph{Step 4: dwell.} After a change, the state is kept for at least 30 frames,
+that is, three analysis steps:
+\begin{equation}
+q_j=\begin{cases}
+g_j     & \text{if } t-t_c\ge30,\\
+q_{j-1} & \text{otherwise,}
+\end{cases}
+\label{eq:dwell}
+\end{equation}
+where $t_c$ is the frame of the last state change. The controller starts in
+LOW with $t_c=1$, so the first change is possible at frame 31. Whenever
+$q_j\ne q_{j-1}$, $t_c$ is set to $t$.
+
+The state $q_j$ then selects the operating point from the action map, and the
+detector uses it until the next analysis step.
+
+\begin{algorithm}[t]
+\caption{AC-MOT controller for one video}\label{alg:controller}
+\begin{algorithmic}[1]
+\State $q\gets$ LOW; $H\gets\emptyset$; $P\gets0$; $d\gets0$; $t_c\gets1$
+\For{each frame $t=1,2,\dots$}
+  \If{$t=1$ \textbf{or} $t \bmod 10=1$}
+    \State $e_t,\beta_t,\nu_t\gets$ image cues of $I_t$
+    \State $N,C,T\gets$ box cues of frame $t-1$
+    \State add $C$ to $H$ (keep 7); $S\gets\mathrm{mean}(H)$
+    \State $\ell\gets$ label (Eq.~\ref{eq:label}); $g\gets$ target (Eq.~\ref{eq:target})
+    \State update $d$ and $P$ (Eqs.~\ref{eq:drop}--\ref{eq:peak})
+    \If{$1\leq d\leq3$} $g\gets$ HIGH
+    \EndIf
+    \State apply the holds (Eq.~\ref{eq:hold})
+    \If{$t-t_c\geq30$ \textbf{and} $g\neq q$}
+      \State $q\gets g$; $t_c\gets t$
+    \EndIf
+  \EndIf
+  \State $(r_t,\eta_t,c_t)\gets$ action of state $q$ (Table~\ref{tab:actions})
+  \State detect with $(r_t,\eta_t)$; drop scores $<c_t$
+  \State update the tracker; store its boxes
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Action map}
+Table~\ref{tab:actions} gives the operating point of each state. LOW uses the
+largest input (1536 pixels), loose NMS (0.70), and a low score threshold
+(0.10), so the detector passes more weak boxes when the scene is sparse.
+MEDIUM uses 1280 pixels, tight NMS (0.45), and a score threshold of 0.40.
+HIGH uses 1088 pixels, NMS 0.60, and a score threshold of 0.40. In the two
+difficult states, the detector therefore passes only boxes with a score of at
+least 0.40. The map was selected together with $\tau_m$ and $\tau_h$ by the
+joint search on the calibration sequences (Sect.~\ref{sec:constants}). The
+score threshold $c_t$ is applied on the detector side before the tracker. It is
+separate from any confidence gate inside the tracker, such as the fixed
+tracker-side gate of OATrack.
+
+\begin{table}[t]
+\caption{Action map. State names describe scene difficulty, not a resolution
+rank. Selected by the joint search on the calibration sequences.}
+\label{tab:actions}
+\centering\footnotesize
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+State & Resolution $r$ & NMS IoU $\eta$ & Score threshold $c$\\
+\midrule
+LOW & 1536 & 0.70 & 0.10\\
+MEDIUM & 1280 & 0.45 & 0.40\\
+HIGH & 1088 & 0.60 & 0.40\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{How each value was chosen}\label{sec:constants}
+All values of Tables~\ref{tab:actions} and~\ref{tab:constants} were fixed
+before the final evaluation and were not changed after it. The last column of
+Table~\ref{tab:constants} gives the source of each value. There are four
+sources.
+
+\emph{Joint search on the calibration sequences.} The SCI thresholds $\tau_m$
+and $\tau_h$ and the action map were selected together by an Optuna TPE search
+with 60 trials \cite{akiba2019optuna}. The calibration sequences are eight
+sequences of the VisDrone2019-MOT training split. They serve as the validation
+(tuning) data of the final stage and are disjoint from the evaluation
+sequences. Each trial was scored by four-fold cross-validation, with two
+sequences held out in each fold, as the mean change in HOTA against the
+baseline. The search ranges were $\tau_m\in[0.10,0.50]$ and
+$\tau_h\in[\tau_m+0.05,\min(\tau_m+0.40,0.90)]$, with, for each state, an
+input of 1088, 1280, or 1536 pixels, an NMS value of 0.45, 0.60, or 0.70,
+and a score threshold of 0.10, 0.25, or 0.40. The input sizes and NMS values
+are the operating points for which detector outputs were cached; 1536 pixels
+with NMS 0.70 is the baseline point, and 0.70 is the default NMS value of the
+Ultralytics detector. The three score thresholds are the low and high
+thresholds of ByteTrack (0.10 and 0.25) and the confidence gate of OATrack
+(0.40). In a separate sweep of the score threshold over 0.01, 0.10, 0.25, and
+0.40 on the same sequences, at 1088 pixels and NMS 0.45, 0.40 gave the highest
+pooled HOTA (+0.881 over 0.01) and improved seven of the eight sequences. The frozen policy reached a mean HOTA
+gain of 2.447 points over the four folds, with all folds positive
+(Sect.~\ref{sec:modern}).
+
+\emph{Cue audit on the calibration sequences.} The choice of the crowd cue as
+the only SCI input came from testing all 31 non-empty subsets of the five
+cues with the same cross-validation (Sect.~\ref{sec:modern}).
+
+\emph{Temporal sweep on the validation split.} The analysis stride and the
+SCI window were selected in the first development stage, with the YOLOv8n
+pipeline, on the VisDrone2019-MOT validation sequences. The sweep tested 25
+combinations: windows of 1, 3, 5, 7, and 9 analysis steps and strides of 1, 5,
+10, 15, and 20 frames. Five of the 25 settings met both constraints of that
+stage, at least 25 FPS and at most 271 IDS (the IDS of the original controller
+on the same data). Among them, a window of 7 and a stride of 10 gave the
+highest MOTA, 18.165 against 18.044 for the next setting. Operating-point
+sweeps on the same data covered input resolutions from 512 to 960 pixels,
+confidence thresholds from 0.05 to 0.50, and NMS thresholds from 0.30 to 0.80,
+and defined the supported values of the first optimized profiles
+(Sect.~\ref{sec:development}).
+
+\emph{Fixed design values.} The tiny-object area follows the COCO definition
+of small objects \cite{lin2014coco}. The remaining values (the crowd
+normalizer, the Canny thresholds, the label thresholds, the recovery, hold,
+and dwell values, and the initial state) come from the original AC-MOT
+controller and were kept unchanged in every search of the final stage. The
+searched values above
+were tuned with these values in place, so the selected thresholds and actions
+are matched to them. For example, the crowd normalizer of 30 only sets the
+scale of $S_j$: $\tau_m$ and $\tau_h$ were searched on this scale and
+correspond to about 9 and 15 tracked objects.
+
+\begin{table*}[t]
+\caption{Values of the AC-MOT controller and how each value was chosen.
+Calibration sequences: eight VisDrone2019-MOT training sequences used as
+tuning data, disjoint from the evaluation sequences. CV: four-fold
+cross-validation.}
+\label{tab:constants}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{50mm}l>{\raggedright\arraybackslash}p{62mm}@{}}
+\toprule
+Symbol & Meaning & Value & How the value was chosen\\
+\midrule
+$\tau_m$ & SCI threshold for MEDIUM, Eq.~\eqref{eq:target} & 0.29747709701135766 & joint TPE search on the calibration sequences, 60 trials, CV\\
+$\tau_h$ & SCI threshold for HIGH, Eq.~\eqref{eq:target} & 0.5114928923560124 & same joint search\\
+$(r,\eta,c)$ & operating point of each state & Table~\ref{tab:actions} & same joint search over $\{1088,1280,1536\}\times\{0.45,0.60,0.70\}\times\{0.10,0.25,0.40\}$\\
+-- & SCI input cue & crowd only & cue audit of all 31 cue subsets on the calibration sequences, CV\\
+-- & analysis stride & 10 frames & temporal sweep of 25 settings on the validation split; highest MOTA with $\geq$25 FPS and $\leq$271 IDS\\
+$|H_j|$ & SCI window & 7 steps & same temporal sweep\\
+-- & tiny-object area & $32\times32$ pixels & COCO small-object limit \cite{lin2014coco}\\
+-- & crowd normalizer, Eq.~\eqref{eq:crowd} & 30 boxes & original controller; sets the scale on which $\tau_m$, $\tau_h$ were searched\\
+-- & Canny thresholds (lower, upper) & 50, 120 & original controller; fixed in all final-stage searches\\
+-- & night and blur labels, Eq.~\eqref{eq:label} & $\beta_t<80$, $\nu_t<180$ & original controller; fixed in all final-stage searches\\
+-- & crowded label, Eq.~\eqref{eq:label} & $C_j>0.65$ or $e_t>0.13$ & original controller; fixed in all final-stage searches\\
+-- & tiny label and HIGH guard, Eqs.~\eqref{eq:label}, \eqref{eq:target} & $T_j>0.50$ & original controller; fixed in all final-stage searches\\
+-- & recovery: minimum peak, drop ratio, peak decay, steps & 5, 0.40, 0.80, 3 & original controller; fixed in all final-stage searches\\
+-- & holds in HIGH ($S_j$, $T_j$) and MEDIUM ($S_j$), Eq.~\eqref{eq:hold} & (0.50, 0.40), 0.25 & original controller; fixed in all final-stage searches\\
+-- & dwell, Eq.~\eqref{eq:dwell} & 30 frames & original controller; fixed in all final-stage searches\\
+-- & initial state & LOW & original controller; fixed in all final-stage searches\\
+\bottomrule
+\end{tabular}
+\end{table*}

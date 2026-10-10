@@ -1,0 +1,21 @@
+\section{Conclusion}\label{sec:conclusion}
+
+AC-MOT is a training-free control layer that uses only the current frame and
+past tracker output and adapts the detector
+confidence threshold, NMS IoU threshold, and input resolution online while the
+detector and the tracker stay unchanged. Its frozen form uses a crowd-selected
+scene complexity index, guard cues for tiny objects, illumination, blur, and
+edges, a recovery probe, hysteresis, and dwell, and a three-state action map.
+
+The controller was developed through optimization. Quality-oriented and
+identity-aware profiles, together with transfer and cross-pipeline studies,
+showed that the preferred operating point depends on the objective and on the
+tracker host. The modern stage froze the controller after sequence-level
+cross-validation on separate calibration sequences.
+
+On seven VisDrone2019-MOT sequences, AC-MOT raised HOTA by 2.937 points with
+ByteTrack and by 1.325 points with OATrack, and MOTA by 17.995 and 6.318
+points, with paired bootstrap intervals for every metric. Applied to UAVDT
+without retuning, it raised MOTA by 17.601 and 3.267 points. These results
+support treating the detector operating point as part of the MOT system and
+controlling it online.
